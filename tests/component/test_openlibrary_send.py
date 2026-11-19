@@ -197,7 +197,7 @@ async def test_send_adds_and_links_the_book(
         "id_value": ISBN,
     }
     assert add[3]["Cookie"] == COOKIE
-    assert add[3]["User-Agent"].startswith("HomeKeeperLibrary/")
+    assert add[3]["User-Agent"].startswith("HomeKeeperGames/")
     assert not _calls(aioclient_mock, "post", "/books/OL5M/add-cover")
 
 

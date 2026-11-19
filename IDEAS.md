@@ -21,7 +21,7 @@ Nothing here is committed scope. When an item ships, remove it. The design docs 
 ## Product ideas
 
 - **QR shelf labels.** Print a QR label for each shelf, built on the QR label work of
-  Home Keeper. A scan of the label opens `/home-keeper/library/scan;shelf=<id>`.
+  Home Keeper. A scan of the label opens `/home-keeper/games/scan;shelf=<id>`.
 - **Series gaps.** List the numbers that are missing from each series that the library
   holds, and put them on the wishlist in 1 step.
 - **Reading log for children.** Minutes or pages for each day, a streak, and a goal for a

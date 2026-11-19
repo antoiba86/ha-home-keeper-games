@@ -5,4 +5,4 @@ views:
   - title: Library
     path: library
     cards:
-      - type: custom:home-keeper-library-card
+      - type: custom:home-keeper-games-card

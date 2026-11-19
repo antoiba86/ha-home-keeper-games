@@ -304,7 +304,7 @@ jobs:
             const missing = JSON.parse(process.env.MISSING || '[]');
 
             // Re-running the workflow must not post a second time.
-            const marker = `<!-- home-keeper-library-release v${version} -->`;
+            const marker = `<!-- home-keeper-games-release v${version} -->`;
             const releaseUrl =
               `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/releases/tag/v${version}`;
 

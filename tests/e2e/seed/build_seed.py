@@ -85,6 +85,7 @@ def _load_pure() -> tuple[types.ModuleType, types.ModuleType]:
 
 def seed_id(kind: str, key: str) -> str:
     """A stable uuid4 hex for a seed record."""
+    # The salt keeps the old name, so the ids of the committed seed files stay the same.
     digest = hashlib.sha256(f"home-keeper-library-seed:{kind}:{key}".encode()).digest()
     return uuid.UUID(bytes=digest[:16], version=4).hex
 

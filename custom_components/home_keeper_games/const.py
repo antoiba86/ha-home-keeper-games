@@ -16,7 +16,7 @@ DOMAIN = "home_keeper_games"
 NAME = "Home Keeper Games"
 ICON = "mdi:bookshelf"
 DOCS_URL = "https://github.com/antoiba86/ha-home-keeper-games"
-USER_AGENT = "HomeKeeperLibrary/{version} (+" + DOCS_URL + ")"
+USER_AGENT = "HomeKeeperGames/{version} (+" + DOCS_URL + ")"
 
 # The Home Keeper integration that this integration requires.
 HOME_KEEPER_DOMAIN = "home_keeper"
@@ -46,11 +46,11 @@ PANEL_VERSION = "0.4.0"
 
 # The built bundles are in frontend/dist/ and Home Assistant serves them here.
 STATIC_URL = "/home_keeper_games_static"
-TAB_JS_FILENAME = "library-tab.js"
-CARD_JS_FILENAME = "library-card.js"
-TAB_ID = "library"
-TAB_ELEMENT = "home-keeper-library-tab"
-TAB_ORDER = 50
+TAB_JS_FILENAME = "games-tab.js"
+CARD_JS_FILENAME = "games-card.js"
+TAB_ID = "games"
+TAB_ELEMENT = "home-keeper-games-tab"
+TAB_ORDER = 60
 TAB_HOST_API = 1
 
 # The cover HTTP views.

@@ -44,7 +44,7 @@ agrees with the next release. Only `(Fixes #N)` counts.
 
 - **Maintainer:** `author_association` is `OWNER`, `MEMBER` or `COLLABORATOR`.
 - **Bot:** a login that ends in `[bot]`, or `github-actions`. Two bot comments carry a
-  state: `<!-- home-keeper-library-release vX.Y.Z... -->` (that release has the fix) and, on a PR,
+  state: `<!-- home-keeper-games-release vX.Y.Z... -->` (that release has the fix) and, on a PR,
   `<!-- preview-release -->` (a preview build is available; use the newest one).
 - **User:** any other author.
 

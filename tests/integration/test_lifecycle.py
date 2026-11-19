@@ -70,8 +70,8 @@ def test_get_state_and_the_tab(ws):
     rows = tabs["result"]
     rows = rows["tabs"] if isinstance(rows, dict) else rows
     tab = next(t for t in rows if t["companion"] == DOMAIN)
-    assert tab["id"] == "library" and tab["element"] == "home-keeper-library-tab"
-    assert tab["module_url"].startswith("/home_keeper_games_static/library-tab.js")
+    assert tab["id"] == "games" and tab["element"] == "home-keeper-games-tab"
+    assert tab["module_url"].startswith("/home_keeper_games_static/games-tab.js")
     assert tab["title"] == "Library"
 
 
@@ -117,7 +117,7 @@ def test_loan_adds_a_home_keeper_task(api):
         )
 
 
-@pytest.mark.parametrize("bundle", ["library-tab.js", "library-card.js"])
+@pytest.mark.parametrize("bundle", ["games-tab.js", "games-card.js"])
 def test_bundles_served(api, bundle):
     if not (DIST / bundle).exists():
         pytest.skip(f"frontend/dist/{bundle} is not built")

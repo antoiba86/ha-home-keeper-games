@@ -35,7 +35,7 @@ test.describe('Card for a user who is not an admin', { tag: '@responsive' }, () 
   });
 
   test('the Home Keeper panel is not open to the user', async ({ page }) => {
-    await page.goto('/home-keeper/library', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('home-keeper-library-tab')).toHaveCount(0);
+    await page.goto('/home-keeper/games', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('home-keeper-games-tab')).toHaveCount(0);
   });
 });

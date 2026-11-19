@@ -25,7 +25,7 @@ implements:
   - custom_components/home_keeper_games/frontend/src/styles.ts
   - custom_components/home_keeper_games/frontend/src/global.d.ts
 related: [home-keeper-dependency, scan-and-isbn, csv-import-export, people-privilege]
-source_hash: b9acf48b8590
+source_hash: 48ff0a564a7e
 ---
 
 # Tab and card
@@ -59,7 +59,7 @@ with no runtime framework. The rules for a change are in
 The tab URL with its hash goes to Home Keeper ([home-keeper-dependency](home-keeper-dependency.md)).
 Rollup builds `tab-index.ts` and `card-index.ts` with the locale tables and `PANEL_VERSION`
 inlined, and the zxing decoder as a separate chunk. `card.async_register_card` delivers
-`library-card.js?v=<hash>` by 1 path, so the card is in the card picker:
+`games-card.js?v=<hash>` by 1 path, so the card is in the card picker:
 
 - **Lovelace resource.** With the resources in storage, which is the default, the card
   is a resource of type `module`. `card_resource.plan_card_resource` matches the rows by
@@ -85,7 +85,7 @@ closes a websocket that gets a message of 4 MB or more.
 ### The tab
 
 The Home Keeper panel sets `hass`, `narrow`, `route` and `host` on
-`home-keeper-library-tab`. `route.path` is the path after `/home-keeper/library`.
+`home-keeper-games-tab`. `route.path` is the path after `/home-keeper/games`.
 `utils.parseRoute` turns it into a view, an id and the filters, and `utils.buildPath` is
 the inverse. The host gives the tab only the path and drops a `?query`. So the filters
 are `;key=value` parameters on the last segment, as in `/books;q=le%20guin;status=read`.
@@ -112,7 +112,7 @@ the stored values. A [sheet](scan-and-isbn.md#title-sheet) has no close button.
 
 ### The card
 
-`home-keeper-library-card` shows the person of the user, or the `person` of the config for an admin.
+`home-keeper-games-card` shows the person of the user, or the `person` of the config for an admin.
 Its sections are search with the location of each result, Reading with the page and a Read button,
 Want to read with a random pick, the yearly goal and the household activity of the people who share
 their reading. Each section has a toggle in the visual editor. The card calls `set_reading` with no
@@ -142,9 +142,9 @@ their reading. Each section has a toggle in the visual editor. The card calls `s
 
 ## One-way doors
 
-- The element names `home-keeper-library-tab` and `home-keeper-library-card`, and the
-  bundle names `library-tab.js` and `library-card.js`.
+- The element names `home-keeper-games-tab` and `home-keeper-games-card`, and the
+  bundle names `games-tab.js` and `games-card.js`.
 - The tab paths and the `;key=value` filter keys, because a user can bookmark them.
-- The Lovelace resource of type `module` at `/home_keeper_games_static/library-card.js`.
+- The Lovelace resource of type `module` at `/home_keeper_games_static/games-card.js`.
 - The card config keys `person`, `title`, `search`, `reading`, `want`, `goal` and
   `household`.

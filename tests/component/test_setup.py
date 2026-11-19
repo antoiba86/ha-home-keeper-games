@@ -26,10 +26,10 @@ async def test_tab_is_registered_with_home_keeper(hass, setup_entry) -> None:
     tabs = hass.data[TABS].tabs()
     assert len(tabs) == 1
     tab = tabs[0]
-    assert tab.companion == DOMAIN and tab.id == "library"
-    assert tab.element == "home-keeper-library-tab"
-    assert tab.icon == "mdi:bookshelf" and tab.order == 50 and tab.host_api == 1
-    assert tab.module_url.startswith("/home_keeper_games_static/library-tab.js?v=")
+    assert tab.companion == DOMAIN and tab.id == "games"
+    assert tab.element == "home-keeper-games-tab"
+    assert tab.icon == "mdi:bookshelf" and tab.order == 60 and tab.host_api == 1
+    assert tab.module_url.startswith("/home_keeper_games_static/games-tab.js?v=")
     assert set(tab.titles) == set(LANGUAGES)
     assert tab.titles["en"] == "Library" and tab.titles["de"] == "Bibliothek"
     assert setup_entry.runtime_data.tab_registered is True
@@ -185,7 +185,7 @@ def _card_resources(hass) -> list[dict]:
     return [
         item
         for item in hass.data[LOVELACE_DATA].resources.async_items()
-        if "library-card.js" in str(item.get("url"))
+        if "games-card.js" in str(item.get("url"))
     ]
 
 
@@ -212,7 +212,7 @@ async def test_resources_read_the_mode_of_an_older_home_assistant(hass) -> None:
 def _extra_card_urls(hass) -> list[str]:
     from homeassistant.components.frontend import DATA_EXTRA_MODULE_URL
 
-    return [u for u in hass.data[DATA_EXTRA_MODULE_URL].urls if "library-card.js" in u]
+    return [u for u in hass.data[DATA_EXTRA_MODULE_URL].urls if "games-card.js" in u]
 
 
 async def test_card_is_a_lovelace_resource_and_not_a_module(hass, setup_entry) -> None:
@@ -221,7 +221,7 @@ async def test_card_is_a_lovelace_resource_and_not_a_module(hass, setup_entry) -
     rows = _card_resources(hass)
     assert len(rows) == 1
     assert rows[0]["type"] == "module"
-    assert rows[0]["url"].startswith("/home_keeper_games_static/library-card.js?v=")
+    assert rows[0]["url"].startswith("/home_keeper_games_static/games-card.js?v=")
     assert _extra_card_urls(hass) == []
     # A reload keeps the 1 row and adds no module URL.
     assert await hass.config_entries.async_reload(setup_entry.entry_id)
@@ -256,7 +256,7 @@ async def test_card_is_a_module_when_resources_are_yaml(
     await hass.async_block_till_done()
     urls = _extra_card_urls(hass)
     assert len(urls) == 1
-    assert urls[0].startswith("/home_keeper_games_static/library-card.js?v=")
+    assert urls[0].startswith("/home_keeper_games_static/games-card.js?v=")
     assert _card_resources(hass) == []
     assert await hass.config_entries.async_remove(entry.entry_id)
     await hass.async_block_till_done()

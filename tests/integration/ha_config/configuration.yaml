@@ -23,19 +23,19 @@ recorder:
 lovelace:
   mode: storage
   dashboards:
-    home-keeper-library-e2e:
+    home-keeper-games-e2e:
       mode: yaml
       title: Library
       icon: mdi:bookshelf
       show_in_sidebar: true
-      filename: home-keeper-library-e2e.yaml
+      filename: home-keeper-games-e2e.yaml
 
 # Helper + automation used by test_events to observe the item lifecycle events
 # (the public cross-integration hook). The automation records the last event's
 # payload so a REST test can assert the event fired with the right data.
 input_text:
   hkl_last_event:
-    name: HomeKeeperLibrary last event
+    name: HomeKeeperGames last event
     max: 255
 
 automation:

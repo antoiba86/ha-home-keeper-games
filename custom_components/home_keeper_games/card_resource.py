@@ -30,7 +30,7 @@ def resource_path(url: str) -> str:
     row. An absolute URL that a user typed for this bundle
     (``http://homeassistant.local:8123/...``) also matches. The plan then writes
     the relative URL into that row, which works from each host. A copy at another
-    path, such as ``/local/library-card.js``, is a different resource and stays.
+    path, such as ``/local/games-card.js``, is a different resource and stays.
     """
     return urlsplit(url).path
 

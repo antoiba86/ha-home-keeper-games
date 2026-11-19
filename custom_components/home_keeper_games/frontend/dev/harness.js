@@ -1,6 +1,6 @@
 // The harness script: a fake `hass`, a fake host and the fixture state.
-import '../dist/library-tab.js';
-import '../dist/library-card.js';
+import '../dist/games-tab.js';
+import '../dist/games-card.js';
 
 const params = new URLSearchParams(location.search);
 if (params.get('theme') === 'dark') document.documentElement.classList.add('dark');
@@ -91,13 +91,13 @@ function toast(text) {
 const app = document.getElementById('app');
 if (params.get('card') === '1') {
   app.innerHTML = '<div class="cardwrap"></div>';
-  const card = document.createElement('home-keeper-library-card');
-  card.setConfig({ type: 'custom:home-keeper-library-card', person: params.get('person') || undefined });
+  const card = document.createElement('home-keeper-games-card');
+  card.setConfig({ type: 'custom:home-keeper-games-card', person: params.get('person') || undefined });
   app.firstChild.appendChild(card);
   card.hass = hass;
 } else {
   app.innerHTML = '<header>Home Keeper</header><div class="tabs"><span>Tasks</span><span>Appliances</span><span class="on">Library</span><span>Settings</span></div><main></main>';
-  const tab = document.createElement('home-keeper-library-tab');
+  const tab = document.createElement('home-keeper-games-tab');
   let path = params.get('path') || '/books';
   const host = {
     apiVersion: 1,

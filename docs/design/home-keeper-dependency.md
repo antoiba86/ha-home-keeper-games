@@ -63,10 +63,10 @@ away when the check passes.
 `_register_tab` imports `custom_components.home_keeper.panel_tabs` in an executor job and
 calls its `async_register_panel_tab` with a `PanelTab`:
 
-- `companion` `home_keeper_games`, `id` `library`, `icon` `mdi:bookshelf`, `order` 50;
+- `companion` `home_keeper_games`, `id` `games`, `icon` `mdi:bookshelf`, `order` 60;
 - `titles`: the `tab.title` of each language in `backend_strings`;
-- `module_url`: `/home_keeper_games_static/library-tab.js?v=<content hash>`;
-- `element` `home-keeper-library-tab` and `host_api` 1.
+- `module_url`: `/home_keeper_games_static/games-tab.js?v=<content hash>`;
+- `element` `home-keeper-games-tab` and `host_api` 1.
 
 The returned callable removes the tab. If Home Keeper refuses the tab, the library logs
 the reason and runs without it. The coordinator flag `tab_registered` goes to the
@@ -92,7 +92,7 @@ the docs URL and the capability `import_export`
 
 ## One-way doors
 
-- The tab id `library`, the element name `home-keeper-library-tab`, the host API version
-  1 and the tab path `/home-keeper/library`.
+- The tab id `games`, the element name `home-keeper-games-tab`, the host API version
+  1 and the tab path `/home-keeper/games`.
 - The repair issue ids, which match the abort reasons.
 - `const.HOME_KEEPER_MIN_VERSION`, which users read in the repair issue.

@@ -63,7 +63,7 @@ def test_the_check_sees_each_kind_of_import() -> None:
     source = (
         "import homeassistant.core\n"
         "from homeassistant.util import dt\n"
-        "from .store import HomeKeeperLibraryStore\n"
+        "from .store import HomeKeeperGamesStore\n"
         "from . import coordinator, const\n"
         "from .const import DOMAIN\n"
         "import json\n"

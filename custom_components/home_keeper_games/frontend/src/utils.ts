@@ -294,7 +294,7 @@ function cleanQuery(view: View, query: Record<string, string>): Record<string, s
 }
 
 /**
- * Parse the tab path (after `/home-keeper/library`) into a route.
+ * Parse the tab path (after `/home-keeper/games`) into a route.
  *
  * The filters of a view are `;key=value` parameters on the last segment, as in
  * `/books;q=le%20guin;status=read`. The host API of Home Keeper keeps the path

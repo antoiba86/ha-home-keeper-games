@@ -47,7 +47,7 @@ const banner = (what) =>
 // the scanner opens on a browser with no native BarcodeDetector.
 export default [
   {
-    input: { 'library-tab': 'src/tab-index.ts' },
+    input: { 'games-tab': 'src/tab-index.ts' },
     output: {
       dir: 'dist',
       format: 'es',
@@ -59,7 +59,7 @@ export default [
     onwarn,
   },
   {
-    input: { 'library-card': 'src/card-index.ts' },
+    input: { 'games-card': 'src/card-index.ts' },
     output: {
       dir: 'dist',
       format: 'es',

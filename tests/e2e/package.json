@@ -1,5 +1,5 @@
 {
-  "name": "home-keeper-library-e2e",
+  "name": "home-keeper-games-e2e",
   "private": true,
   "version": "1.0.0",
   "description": "Playwright browser e2e tests for the Home Keeper Library panel + card",

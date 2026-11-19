@@ -36,7 +36,7 @@ in the rules files below. Read the file for your topic before you change code or
 - Home Keeper is an `after_dependencies` entry. The admin UI is the Library tab of the
   Home Keeper panel. Without Home Keeper, a repair issue shows and the tab is gone.
 - Frontend: TypeScript and Rollup in `custom_components/home_keeper_games/frontend/`.
-  CI builds `frontend/dist/` (`library-tab.js`, `library-card.js`), which is gitignored.
+  CI builds `frontend/dist/` (`games-tab.js`, `games-card.js`), which is gitignored.
 - Administration is in the tab. Usage is through the card, the per-person `sensor` and
   `todo` entities and the open services. Do not mix the 2.
 - Docs site: `website/` (Docusaurus). It renders `docs/guide/` and copies some `docs/*.md`.

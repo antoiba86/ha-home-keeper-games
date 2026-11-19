@@ -1,4 +1,4 @@
-// The `home-keeper-library-card` dashboard card and its visual editor.
+// The `home-keeper-games-card` dashboard card and its visual editor.
 //
 // Any user can add the card. It shows the reading of the caller's own person.
 // An admin can set `person` in the config to show another person. The data
@@ -41,8 +41,8 @@ export interface CardConfig {
 export const SECTIONS = ['search', 'reading', 'want', 'goal', 'household'] as const;
 type Section = (typeof SECTIONS)[number];
 
-export const CARD_TAG = 'home-keeper-library-card';
-export const EDITOR_TAG = 'home-keeper-library-card-editor';
+export const CARD_TAG = 'home-keeper-games-card';
+export const EDITOR_TAG = 'home-keeper-games-card-editor';
 
 const CARD_CSS = `
 :host { display: block; ${TOKENS} }
@@ -96,7 +96,7 @@ export function sectionsOn(config: CardConfig): Record<Section, boolean> {
   return out;
 }
 
-export class HomeKeeperLibraryCard extends HTMLElement {
+export class HomeKeeperGamesCard extends HTMLElement {
   private _hass?: HomeAssistant;
   private _api?: LibraryApi;
   private _config: CardConfig = { type: `custom:${CARD_TAG}` };
@@ -367,7 +367,7 @@ export class HomeKeeperLibraryCard extends HTMLElement {
 }
 
 /** The visual editor of the card. Plain DOM: a title, a person and the section toggles. */
-export class HomeKeeperLibraryCardEditor extends HTMLElement {
+export class HomeKeeperGamesCardEditor extends HTMLElement {
   private _config: CardConfig = { type: `custom:${CARD_TAG}` };
   private _hass?: HomeAssistant;
 

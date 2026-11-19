@@ -16,7 +16,7 @@ async function lendableBook(): Promise<Record<string, any>> {
 }
 
 test.describe('Library tab', { tag: '@responsive' }, () => {
-  test('Home Keeper shows the Library tab at /home-keeper/library', async ({ page }) => {
+  test('Home Keeper shows the Library tab at /home-keeper/games', async ({ page }) => {
     const errors = trackErrors(page);
     const tab = await openTab(page);
     const panel = page.locator('home-keeper-panel');

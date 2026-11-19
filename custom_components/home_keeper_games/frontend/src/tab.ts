@@ -1,5 +1,5 @@
-// The `home-keeper-library-tab` element. The Home Keeper panel loads it at
-// `/home-keeper/library/...` and gives it `hass`, `narrow`, `route` and `host`
+// The `home-keeper-games-tab` element. The Home Keeper panel loads it at
+// `/home-keeper/games/...` and gives it `hass`, `narrow`, `route` and `host`
 // (host API v1, build spec section 10).
 //
 // The URL is the source of truth. The `route` setter is the only place that
@@ -109,7 +109,7 @@ export function replyId(res: unknown, noun: string): string | null {
   return inner && typeof inner.id === 'string' ? inner.id : null;
 }
 
-export class HomeKeeperLibraryTab extends HTMLElement {
+export class HomeKeeperGamesTab extends HTMLElement {
   private _hass?: HomeAssistant;
   private _api?: LibraryApi;
   private _host: TabHost | null = null;

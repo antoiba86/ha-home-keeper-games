@@ -8,7 +8,7 @@ let host;
 
 async function mount(path = '/books', opts = {}) {
   const fake = fakeHass(opts);
-  el = document.createElement('home-keeper-library-tab');
+  el = document.createElement('home-keeper-games-tab');
   host = {
     apiVersion: 1,
     navigate: vi.fn((p) => {
@@ -58,7 +58,7 @@ describe('data', () => {
     const unsub = vi.fn();
     let resolve;
     fake.hass.connection.subscribeMessage = vi.fn(() => new Promise((r) => (resolve = r)));
-    el = document.createElement('home-keeper-library-tab');
+    el = document.createElement('home-keeper-games-tab');
     el.route = { path: '/books' };
     document.body.appendChild(el);
     el.hass = fake.hass;
@@ -72,7 +72,7 @@ describe('data', () => {
   it('shows the error of a failed fetch', async () => {
     const fake = fakeHass();
     fake.send.mockRejectedValueOnce({ message: 'boom' });
-    el = document.createElement('home-keeper-library-tab');
+    el = document.createElement('home-keeper-games-tab');
     el.route = { path: '/books' };
     document.body.appendChild(el);
     el.hass = fake.hass;

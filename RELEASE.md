@@ -29,7 +29,7 @@ There is no manual `git tag` step.
       section without a bump merges clean and ships nothing. `lint.yml`'s
       `changelog-release-gap` job (`ci/check-changelog-release-gap.py`) catches this at
       PR time.
-   4. Builds `frontend/dist/` (`library-tab.js`, its decoder chunk and `library-card.js`)
+   4. Builds `frontend/dist/` (`games-tab.js`, its decoder chunk and `games-card.js`)
       from TypeScript with Rollup.
    5. Builds `home_keeper_games.zip` (the HACS asset).
    6. Pushes tag `vX.Y.Z` and creates the GitHub Release. The body is the changelog
@@ -101,7 +101,7 @@ How the job behaves:
   against the previous tag of any kind.
 - **The job ignores a bare `(#N)`**, because squash-merge adds the PR number to commit
   subjects in that form. It also ignores `(Related to #N)`.
-- **You can run it again safely.** Each comment has a `<!-- home-keeper-library-release vX.Y.Z -->`
+- **You can run it again safely.** Each comment has a `<!-- home-keeper-games-release vX.Y.Z -->`
   marker, and the job skips an issue that has one.
 - **It cannot fail a release.** The release is tagged and published before the job runs.
   A bad issue number becomes a warning and a row in the job summary.

@@ -1,9 +1,9 @@
-// The entry point of `library-card.js`, the Lovelace resource of the card.
-import { CARD_TAG, EDITOR_TAG, HomeKeeperLibraryCard, HomeKeeperLibraryCardEditor } from './card';
+// The entry point of `games-card.js`, the Lovelace resource of the card.
+import { CARD_TAG, EDITOR_TAG, HomeKeeperGamesCard, HomeKeeperGamesCardEditor } from './card';
 import { t } from './i18n';
 
-if (!customElements.get(CARD_TAG)) customElements.define(CARD_TAG, HomeKeeperLibraryCard);
-if (!customElements.get(EDITOR_TAG)) customElements.define(EDITOR_TAG, HomeKeeperLibraryCardEditor);
+if (!customElements.get(CARD_TAG)) customElements.define(CARD_TAG, HomeKeeperGamesCard);
+if (!customElements.get(EDITOR_TAG)) customElements.define(EDITOR_TAG, HomeKeeperGamesCardEditor);
 
 interface CustomCard {
   type: string;
@@ -26,4 +26,4 @@ if (!w.customCards.some((c) => c.type === CARD_TAG)) {
   });
 }
 
-export { HomeKeeperLibraryCard, HomeKeeperLibraryCardEditor };
+export { HomeKeeperGamesCard, HomeKeeperGamesCardEditor };

@@ -7,7 +7,7 @@ import type { LibraryApi } from './api';
 import { COVER_SIGN_SECONDS, coverColors, CoverUrls, escapeHTML, initials, type TabRoute } from './utils';
 
 /** The panel URL of the tab. A tab path is added after it. */
-export const TAB_BASE = '/home-keeper/library';
+export const TAB_BASE = '/home-keeper/games';
 
 const svg = (d: string, size = 18) =>
   `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;

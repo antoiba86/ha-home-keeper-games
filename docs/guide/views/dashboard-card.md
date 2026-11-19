@@ -1,7 +1,7 @@
 # Dashboard card
 
 Home Keeper Library supports a dashboard card, **Home Keeper Library**
-(`custom:home-keeper-library-card`), that shows the reading of 1 person. Every user can
+(`custom:home-keeper-games-card`), that shows the reading of 1 person. Every user can
 add it to a dashboard, such as the dashboard of a phone or a wall tablet. The card
 resource is registered automatically.
 
@@ -38,7 +38,7 @@ controls: use the Library tab for those.
 ## YAML
 
 ```yaml
-type: custom:home-keeper-library-card
+type: custom:home-keeper-games-card
 person: alice   # optional, the id of a Home Assistant person
 title: Our books  # optional
 search: true

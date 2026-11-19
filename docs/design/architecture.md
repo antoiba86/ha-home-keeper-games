@@ -9,7 +9,7 @@ implements:
   - custom_components/home_keeper_games/backend_i18n.py
   - custom_components/home_keeper_games/manifest.json
 related: [store-models, people-privilege, events-api, home-keeper-dependency, frontend-tab-card]
-source_hash: 6414492ff256
+source_hash: 68e132e7861c
 ---
 
 # Architecture
@@ -143,7 +143,7 @@ notes and `acquired_from`, and it has no Open Library key.
 ## One-way doors
 
 - The domain `home_keeper_games`, the static path `/home_keeper_games_static` and the
-  tab path `/home-keeper/library`.
+  tab path `/home-keeper/games`.
 - The service names and fields, and the event names and payloads
   ([INTEGRATING.md](../INTEGRATING.md)).
 - The storage key `home_keeper_games`, `const.STORAGE_VERSION` and the option key

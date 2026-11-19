@@ -7,8 +7,8 @@ let el;
 
 async function mount(config = {}, opts = {}) {
   const fake = fakeHass(opts);
-  el = document.createElement('home-keeper-library-card');
-  el.setConfig({ type: 'custom:home-keeper-library-card', ...config });
+  el = document.createElement('home-keeper-games-card');
+  el.setConfig({ type: 'custom:home-keeper-games-card', ...config });
   document.body.appendChild(el);
   el.hass = fake.hass;
   await flush();
@@ -30,8 +30,8 @@ afterEach(() => {
 
 describe('card', () => {
   it('registers in the card picker', () => {
-    expect(window.customCards.some((c) => c.type === 'home-keeper-library-card')).toBe(true);
-    expect(customElements.get('home-keeper-library-card').getStubConfig()).toEqual({ type: 'custom:home-keeper-library-card' });
+    expect(window.customCards.some((c) => c.type === 'home-keeper-games-card')).toBe(true);
+    expect(customElements.get('home-keeper-games-card').getStubConfig()).toEqual({ type: 'custom:home-keeper-games-card' });
   });
 
   it('shows the reading, want to read, goal and household of the caller', async () => {
@@ -136,21 +136,21 @@ describe('card', () => {
 
 describe('card editor', () => {
   it('sends config-changed for a section and a person', () => {
-    const ed = document.createElement('home-keeper-library-card-editor');
+    const ed = document.createElement('home-keeper-games-card-editor');
     ed.hass = fakeHass().hass;
-    ed.setConfig({ type: 'custom:home-keeper-library-card' });
+    ed.setConfig({ type: 'custom:home-keeper-games-card' });
     document.body.appendChild(ed);
     const events = [];
     ed.addEventListener('config-changed', (e) => events.push(e.detail.config));
     const box = ed.querySelector('[data-key="goal"]');
     box.checked = false;
     box.dispatchEvent(new Event('change'));
-    expect(events.at(-1)).toEqual({ type: 'custom:home-keeper-library-card', goal: false });
+    expect(events.at(-1)).toEqual({ type: 'custom:home-keeper-games-card', goal: false });
     const sel = ed.querySelector('[data-key="person"]');
     expect([...sel.options].map((o) => o.textContent)).toEqual(['Current user', 'Alex', 'Jo', 'Sam']);
     sel.value = ALEX;
     sel.dispatchEvent(new Event('change'));
-    expect(events.at(-1)).toEqual({ type: 'custom:home-keeper-library-card', goal: false, person: ALEX });
+    expect(events.at(-1)).toEqual({ type: 'custom:home-keeper-games-card', goal: false, person: ALEX });
     ed.remove();
   });
 });

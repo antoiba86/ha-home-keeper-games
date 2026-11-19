@@ -10,7 +10,7 @@ How the tab and the card work is in [frontend-tab-card](../../docs/design/fronte
 ## Routing
 
 - **The URL is the source of truth.** Every page of the tab maps to a path under
-  `/home-keeper/library`: `/books`, `/books/<id>`, `/shelves`, `/loans`, `/wishlist`,
+  `/home-keeper/games`: `/books`, `/books/<id>`, `/shelves`, `/loans`, `/wishlist`,
   `/scan`, `/import` and `/settings`. The `route` setter is the only place that changes
   the view state.
 - **Navigate only with `host.navigate(path, {replace})`.** The Home Keeper panel owns
@@ -40,7 +40,7 @@ How the tab and the card work is in [frontend-tab-card](../../docs/design/fronte
 ## Bundles and the card
 
 - 2 ES module bundles ship from `frontend/dist/` at `/home_keeper_games_static`: the tab
-  (`library-tab.js`, loaded by the Home Keeper panel) and the card (`library-card.js`).
+  (`games-tab.js`, loaded by the Home Keeper panel) and the card (`games-card.js`).
   Each URL carries a content hash in `?v=`.
 - **Deliver the card by 1 path only**: a Lovelace resource, or `frontend.add_extra_js_url`
   when the resources are in YAML or the resource write fails (`card.py`). Both paths
