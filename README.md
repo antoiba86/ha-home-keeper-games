@@ -1,4 +1,4 @@
-# Home Keeper Library
+# Home Keeper Games
 
 [![Integration Usage][usage-shield]][usage]
 [![GitHub Downloads][downloads-shield]][releases]
@@ -12,39 +12,46 @@
 [![HA Version][ha-version-shield]][ha-version]
 [![Docs][docs-shield]][docs]
 
-**Home Keeper Library requires [Home Keeper](https://github.com/prestomation/ha-home-keeper).
+**Home Keeper Games requires [Home Keeper](https://github.com/prestomation/ha-home-keeper).
 Install and set up Home Keeper first.**
 
-Home Keeper Library is a Home Assistant integration for the books of a household. It
-records the rooms, bookcases and shelves of the home, the books and their copies, the
-reading status of each person, the loans and a wishlist. Admins manage it in a
-**Library** tab of the Home Keeper panel. Every user gets a dashboard card, sensors and a
-To read list.
+Home Keeper Games is a Home Assistant integration for the video games of a household. It
+records the physical and digital games of each console, where each physical copy is in
+the home, the play status of each person, the loans and a wishlist. Admins manage it in
+a **Games** tab of the Home Keeper panel. Every user gets a dashboard card, sensors and a
+wishlist to-do list.
 
-> 📖 **Full documentation** (a browsable User Guide and Developer Guide) lives at
-> **<https://antoiba86.github.io/ha-home-keeper-games/>**. The site is generated from
-> `docs/`, so the two never drift.
+This project is derived from
+[Home Keeper Library](https://github.com/prestomation/ha-home-keeper-library) by Preston
+Tamkin. See [Origin and credits](#origin-and-credits).
 
-![The book list of the Library tab in Home Keeper](docs/images/books-desktop.png)
+> [!WARNING]
+> **Work in progress.** There is no release yet. The code is still the Home Keeper
+> Library code, and the change to games is in progress. Do not install it yet.
 
 ## Features
 
-- Read the ISBN barcode of each book with the camera of a phone. Details and covers
-  come from [Open Library](https://openlibrary.org).
-- Find the shelf of each book in its room and bookcase.
-- Keep a reading status, a rating, notes and a yearly goal for each person.
-- Lend and borrow books, with a Home Keeper task on each due date.
-- Send the wishlist books to buy to a to-do list of the person.
-- Import a Goodreads or StoryGraph CSV file, and export to one.
+The first release will have these features:
+
+- Find the shelf or the TV cabinet of each physical game.
+- Keep the copies of each game: platform (PS5, PS4, Switch, Switch 2 and more),
+  physical or digital, edition, region and condition.
+- Get the details and the cover of a game from [IGDB](https://www.igdb.com).
+- Keep a play status, a rating and a review for each person.
+- Record the play time from the PlayStation Network and Nintendo integrations of Home
+  Assistant.
+- Lend and borrow games, with a Home Keeper task on each due date.
+- Send the wishlist games to buy to a to-do list of the person.
 
 ## Install
 
 1. Install and set up [Home Keeper](https://github.com/prestomation/ha-home-keeper#installation).
-2. In [HACS](https://hacs.xyz/), search for **Home Keeper Library**, or
+2. In [HACS](https://hacs.xyz/), add this repository as a custom repository of the
+   type **Integration**, or
    [open it in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=antoiba86&repository=ha-home-keeper-games&category=integration).
-3. Download **Home Keeper Library** and restart Home Assistant.
+3. Download **Home Keeper Games** and restart Home Assistant.
 4. Add the integration in **Settings → Devices & services → Add integration → Home
-   Keeper Library**.
+   Keeper Games**.
 
 ## Documentation
 
@@ -57,7 +64,7 @@ To read list.
 ## Development
 
 - Backend: `custom_components/home_keeper_library/`. The pure core imports no Home
-  Assistant code.
+  Assistant code. The folder gets the name `home_keeper_games` in the rename step.
 - Panel frontend: `custom_components/home_keeper_library/frontend/`, built with
   TypeScript and Rollup.
 - Tests: `pytest` in `tests/unit`, `tests/component` and `tests/integration`,
@@ -86,7 +93,7 @@ author, as the MIT license requires.
 [hacs]: https://github.com/hacs/integration
 [hacs-validation-shield]: https://github.com/antoiba86/ha-home-keeper-games/actions/workflows/hacs.yml/badge.svg
 [hacs-validation]: https://github.com/antoiba86/ha-home-keeper-games/actions/workflows/hacs.yml
-[usage-shield]: https://img.shields.io/badge/dynamic/json?color=41BDF5&logo=home-assistant&label=integration%20usage&suffix=%20installs&cacheSeconds=15600&url=https%3A%2F%2Fanalytics.home-assistant.io%2Fcustom_integrations.json&query=%24.home_keeper_library.total&style=for-the-badge
+[usage-shield]: https://img.shields.io/badge/dynamic/json?color=41BDF5&logo=home-assistant&label=integration%20usage&suffix=%20installs&cacheSeconds=15600&url=https%3A%2F%2Fanalytics.home-assistant.io%2Fcustom_integrations.json&query=%24.home_keeper_games.total&style=for-the-badge
 [usage]: https://analytics.home-assistant.io/
 [downloads-shield]: https://img.shields.io/github/downloads/antoiba86/ha-home-keeper-games/total.svg?style=for-the-badge
 [release-date-shield]: https://img.shields.io/github/release-date/antoiba86/ha-home-keeper-games?style=for-the-badge
