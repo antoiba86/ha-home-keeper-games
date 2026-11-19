@@ -1,9 +1,9 @@
 ---
-title: Developing Home Keeper Library
-summary: How to run the tests of Home Keeper Library, and the automated checks that guard each pull request, for contributors.
+title: Developing Home Keeper Games
+summary: How to run the tests of Home Keeper Games, and the automated checks that guard each pull request, for contributors.
 ---
 
-# Develop Home Keeper Library
+# Develop Home Keeper Games
 
 The workflow, the branch rules and the release steps are in [AGENTS.md](../AGENTS.md) and
 [RELEASE.md](../RELEASE.md). The detail of each topic is in `.amazonq/rules/`.

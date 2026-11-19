@@ -25,8 +25,8 @@ This project is derived from
 Tamkin. See [Origin and credits](#origin-and-credits).
 
 > [!WARNING]
-> **Work in progress.** There is no release yet. The code is still the Home Keeper
-> Library code, and the change to games is in progress. Do not install it yet.
+> **Work in progress.** There is no release yet. The code still keeps books,
+> and the change to games is in progress. Do not install it yet.
 
 ## Features
 
@@ -63,7 +63,7 @@ The first release will have these features:
 ## Development
 
 - Backend: `custom_components/home_keeper_games/`. The pure core imports no Home
-  Assistant code. The folder gets the name `home_keeper_games` in the rename step.
+  Assistant code.
 - Panel frontend: `custom_components/home_keeper_games/frontend/`, built with
   TypeScript and Rollup.
 - Tests: `pytest` in `tests/unit`, `tests/component` and `tests/integration`,

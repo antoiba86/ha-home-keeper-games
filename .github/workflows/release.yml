@@ -311,11 +311,11 @@ jobs:
             const body = (summary) => {
               const quote = summary ? `\n> ${summary}\n` : '';
               return isBeta
-                ? `${marker}\n**Fixed in Home Keeper Library v${version}**, out now as a beta.\n${quote}\n` +
+                ? `${marker}\n**Fixed in Home Keeper Games v${version}**, out now as a beta.\n${quote}\n` +
                   `To try it before it ships to everyone, turn on **Show beta versions** for ` +
-                  `Home Keeper Library in HACS and update. This issue stays open until the fix reaches ` +
+                  `Home Keeper Games in HACS and update. This issue stays open until the fix reaches ` +
                   `a stable release.\n\n[Release notes](${releaseUrl})`
-                : `${marker}\n**Shipped in Home Keeper Library v${version}.** Update through HACS to get it.\n${quote}\n` +
+                : `${marker}\n**Shipped in Home Keeper Games v${version}.** Update through HACS to get it.\n${quote}\n` +
                   `Closing this out. If you still run into it after updating, reopen the issue ` +
                   `or leave a comment and it'll be picked back up.\n\n[Release notes](${releaseUrl})`;
             };

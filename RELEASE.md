@@ -149,7 +149,7 @@ does not bump the version or cut a real release. `preview-release.yml` does the 
 - **Build.** It runs `ci/build-panel.sh` and `ci/build-zip.sh`, as `release.yml` does.
   It then publishes a GitHub pre-release with tag `vX.Y.Z.dev<pr>` and `home_keeper_games.zip`
   attached, and posts a sticky PR comment with the install steps.
-- **Install.** In HACS, open *Home Keeper Library* → ⋮ → **Redownload**, turn on **Show beta
+- **Install.** In HACS, open *Home Keeper Games* → ⋮ → **Redownload**, turn on **Show beta
   versions**, and select `X.Y.Z.dev<pr>`. HACS can need a refresh to show it. As an
   alternative, unzip `home_keeper_games.zip` from the release into
   `config/custom_components/home_keeper_games/`.

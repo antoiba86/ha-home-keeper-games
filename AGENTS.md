@@ -3,9 +3,9 @@ title: Agent instructions
 summary: The hard gates for every change to the integration, and the rules file for each topic.
 ---
 
-# AGENTS.md — Home Keeper Library
+# AGENTS.md — Home Keeper Games
 
-Home Keeper Library is a Home Assistant integration (domain `home_keeper_games`) for the
+Home Keeper Games is a Home Assistant integration (domain `home_keeper_games`) for the
 books of a household: rooms, shelves, copies, reading status, loans and a wishlist. It is
 a companion of Home Keeper and requires it. This page lists the hard gates. The detail is
 in the rules files below. Read the file for your topic before you change code or push.

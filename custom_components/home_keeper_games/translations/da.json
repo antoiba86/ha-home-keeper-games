@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Home Keeper Library",
+        "title": "Home Keeper Games",
         "description": "Angiv valutaen for eksemplarernes priser og værdier.",
         "data": {
           "currency": "Valuta"
@@ -16,9 +16,9 @@
       "invalid_currency": "Indtast en valutakode på 3 bogstaver."
     },
     "abort": {
-      "already_configured": "Home Keeper Library er allerede sat op.",
-      "single_instance_allowed": "Home Keeper Library er allerede sat op.",
-      "home_keeper_missing": "Home Keeper Library kræver Home Keeper. Installér Home Keeper fra HACS, genstart Home Assistant og tilføj derefter Home Keeper Library igen. Installationstrin: {url}",
+      "already_configured": "Home Keeper Games er allerede sat op.",
+      "single_instance_allowed": "Home Keeper Games er allerede sat op.",
+      "home_keeper_missing": "Home Keeper Games kræver Home Keeper. Installér Home Keeper fra HACS, genstart Home Assistant og tilføj derefter Home Keeper Games igen. Installationstrin: {url}",
       "home_keeper_not_set_up": "Tilføj først Home Keeper-integrationen.",
       "home_keeper_too_old": "Opdatér Home Keeper til version {version} eller nyere."
     }
@@ -62,7 +62,7 @@
       "cannot_connect": "Open Library er ikke tilgængeligt. Prøv igen senere."
     },
     "abort": {
-      "not_loaded": "Home Keeper Library er ikke indlæst. Prøv igen, når den er startet."
+      "not_loaded": "Home Keeper Games er ikke indlæst. Prøv igen, når den er startet."
     }
   },
   "entity": {
@@ -1109,7 +1109,7 @@
   },
   "exceptions": {
     "not_loaded": {
-      "message": "Home Keeper Library er ikke indlæst."
+      "message": "Home Keeper Games er ikke indlæst."
     },
     "admin_required": {
       "message": "Kun en administrator kan gøre dette."

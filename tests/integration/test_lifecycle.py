@@ -72,7 +72,7 @@ def test_get_state_and_the_tab(ws):
     tab = next(t for t in rows if t["companion"] == DOMAIN)
     assert tab["id"] == "games" and tab["element"] == "home-keeper-games-tab"
     assert tab["module_url"].startswith("/home_keeper_games_static/games-tab.js")
-    assert tab["title"] == "Library"
+    assert tab["title"] == "Games"
 
 
 def test_no_repair_issue_with_home_keeper(ws):

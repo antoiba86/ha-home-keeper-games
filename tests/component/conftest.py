@@ -84,7 +84,7 @@ async def setup_entry(hass, persons, hk_entry):
 
     entry = MockConfigEntry(
         domain=DOMAIN,
-        title="Home Keeper Library",
+        title="Home Keeper Games",
         data={},
         options={"currency": "EUR"},
         unique_id=DOMAIN,

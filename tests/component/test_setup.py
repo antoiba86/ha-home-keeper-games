@@ -31,7 +31,7 @@ async def test_tab_is_registered_with_home_keeper(hass, setup_entry) -> None:
     assert tab.icon == "mdi:bookshelf" and tab.order == 60 and tab.host_api == 1
     assert tab.module_url.startswith("/home_keeper_games_static/games-tab.js?v=")
     assert set(tab.titles) == set(LANGUAGES)
-    assert tab.titles["en"] == "Library" and tab.titles["de"] == "Bibliothek"
+    assert tab.titles["en"] == "Games" and tab.titles["de"] == "Spiele"
     assert setup_entry.runtime_data.tab_registered is True
     assert _issues(hass) == set()
 

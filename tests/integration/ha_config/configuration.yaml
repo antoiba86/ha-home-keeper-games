@@ -39,7 +39,7 @@ input_text:
     max: 255
 
 automation:
-  - alias: Capture Home Keeper Library room added
+  - alias: Capture Home Keeper Games room added
     trigger:
       - platform: event
         event_type: home_keeper_games_room_added

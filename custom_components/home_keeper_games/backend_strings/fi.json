@@ -1,5 +1,5 @@
 {
-  "tab.title": "Kirjasto",
+  "tab.title": "Pelit",
   "companion.description": "Kirjat, hyllyt, lainat ja lukutila.",
   "loan_task.name_out": "Hae {title} takaisin: {party}",
   "loan_task.name_in": "Palauta {title}: {party}",

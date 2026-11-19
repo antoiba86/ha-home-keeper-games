@@ -1,6 +1,6 @@
-"""Constants for Home Keeper Library.
+"""Constants for Home Keeper Games.
 
-Home Keeper Library is a companion of Home Keeper. It stores the books of a
+Home Keeper Games is a companion of Home Keeper. It stores the books of a
 household: the rooms, bookcases and shelves where the copies are, the reading
 status of each person, the loans and the wishlist. The admin UI is a tab in the
 Home Keeper panel. The usage surfaces are the card, the per-person entities and

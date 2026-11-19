@@ -1,4 +1,4 @@
-// Pure logic for the Home Keeper Library tab and card.
+// Pure logic for the Home Keeper Games tab and card.
 //
 // Nothing here touches the DOM, the clock or Home Assistant. A caller gives the
 // current time and the data. The mutation gate runs on this file, so each

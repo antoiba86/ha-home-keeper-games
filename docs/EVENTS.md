@@ -1,11 +1,11 @@
 ---
 title: Events reference
-summary: The bus events of Home Keeper Library for integrators. When each event fires, with its payload and an example automation.
+summary: The bus events of Home Keeper Games for integrators. When each event fires, with its payload and an example automation.
 ---
 
 # Events reference
 
-Home Keeper Library fires a Home Assistant bus event for each change to the
+Home Keeper Games fires a Home Assistant bus event for each change to the
 library. Automations and other integrations use these events. Each event
 observes a change that a service already makes, so an event needs no service of
 its own.

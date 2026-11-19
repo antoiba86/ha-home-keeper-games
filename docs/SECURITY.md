@@ -1,11 +1,11 @@
 ---
 title: Security model
-summary: The access of admins and of non-admin users to each surface of Home Keeper Library. The fields that each reply hides from a non-admin user.
+summary: The access of admins and of non-admin users to each surface of Home Keeper Games. The fields that each reply hides from a non-admin user.
 ---
 
 # Security model
 
-In Home Keeper Library, an admin manages the library. Each signed-in user keeps the
+In Home Keeper Games, an admin manages the library. Each signed-in user keeps the
 reading of their own person. Admins manage the locations, the books and their copies, the
 loans and the wishlist. A non-admin user sets the reading status, the rating and the
 notes of their own person, and reads what the projections allow.

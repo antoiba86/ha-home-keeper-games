@@ -50,7 +50,7 @@ Write it as the maintainer does: casual, 3 or 4 short sentences, no headings, no
 greeting such as "Hi name", no sign-off. Start from this template:
 
 > Thanks for the suggestion. This is available in preview build **{version}** if you'd like
-> to try it out. In HACS, open Home Keeper Library → ⋮ → **Redownload**, turn on
+> to try it out. In HACS, open Home Keeper Games → ⋮ → **Redownload**, turn on
 > **Show beta versions**, and pick `{version}`. The docs for it are here: {guide links}.
 > I'd like some feedback before I merge, so I may hold off until I hear from you.
 

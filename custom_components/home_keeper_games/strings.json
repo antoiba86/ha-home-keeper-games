@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Home Keeper Library",
+        "title": "Home Keeper Games",
         "description": "Set the currency of the prices and values of the copies.",
         "data": {
           "currency": "Currency"
@@ -16,9 +16,9 @@
       "invalid_currency": "Enter a currency code of 3 letters."
     },
     "abort": {
-      "already_configured": "Home Keeper Library is already set up.",
-      "single_instance_allowed": "Home Keeper Library is already set up.",
-      "home_keeper_missing": "Home Keeper Library requires Home Keeper. Install Home Keeper from HACS, restart Home Assistant, then add Home Keeper Library again. Installation steps: {url}",
+      "already_configured": "Home Keeper Games is already set up.",
+      "single_instance_allowed": "Home Keeper Games is already set up.",
+      "home_keeper_missing": "Home Keeper Games requires Home Keeper. Install Home Keeper from HACS, restart Home Assistant, then add Home Keeper Games again. Installation steps: {url}",
       "home_keeper_not_set_up": "Add the Home Keeper integration first.",
       "home_keeper_too_old": "Update Home Keeper to version {version} or later."
     }
@@ -62,7 +62,7 @@
       "cannot_connect": "Open Library is not available. Try again later."
     },
     "abort": {
-      "not_loaded": "Home Keeper Library is not loaded. Try again after it starts."
+      "not_loaded": "Home Keeper Games is not loaded. Try again after it starts."
     }
   },
   "entity": {
@@ -1109,7 +1109,7 @@
   },
   "exceptions": {
     "not_loaded": {
-      "message": "Home Keeper Library is not loaded."
+      "message": "Home Keeper Games is not loaded."
     },
     "admin_required": {
       "message": "Only an admin user can do this."

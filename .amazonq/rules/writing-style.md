@@ -1,6 +1,6 @@
 ---
 title: Writing style (ASD-STE100)
-summary: The Simplified Technical English rules and the glossary for all English text in Home Keeper Library.
+summary: The Simplified Technical English rules and the glossary for all English text in Home Keeper Games.
 ---
 
 # Writing style (ASD-STE100)

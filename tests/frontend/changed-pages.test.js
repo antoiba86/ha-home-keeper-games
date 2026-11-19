@@ -32,7 +32,7 @@ describe('pagesForChanges', () => {
       ],
     });
     expect(pages).toEqual([
-      {title: 'Integrating with Home Keeper Library', route: '/developer/integrating'},
+      {title: 'Integrating with Home Keeper Games', route: '/developer/integrating'},
       {title: 'Events reference', route: '/developer/events'},
       {title: 'Release Notes', route: '/docs/release-notes'},
       {title: 'Introduction', route: '/docs/intro'},

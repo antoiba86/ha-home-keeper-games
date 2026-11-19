@@ -1,4 +1,4 @@
-"""Home Keeper Library: the books of a household, as a companion of Home Keeper.
+"""Home Keeper Games: the books of a household, as a companion of Home Keeper.
 
 Setup order:
 
@@ -47,7 +47,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: LibraryConfigEntry) -> bool:
-    """Set up Home Keeper Library from its config entry."""
+    """Set up Home Keeper Games from its config entry."""
     await hass.async_add_executor_job(backend_i18n.preload)
     store = LibraryStore(hass)
     await store.load()

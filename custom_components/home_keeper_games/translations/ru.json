@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Home Keeper Library",
+        "title": "Home Keeper Games",
         "description": "Задать валюту цен и стоимости экземпляров.",
         "data": {
           "currency": "Валюта"
@@ -16,9 +16,9 @@
       "invalid_currency": "Введите код валюты из 3 букв."
     },
     "abort": {
-      "already_configured": "Home Keeper Library уже настроен.",
-      "single_instance_allowed": "Home Keeper Library уже настроен.",
-      "home_keeper_missing": "Для Home Keeper Library нужен Home Keeper. Установите Home Keeper из HACS, перезапустите Home Assistant и снова добавьте Home Keeper Library. Шаги установки: {url}",
+      "already_configured": "Home Keeper Games уже настроен.",
+      "single_instance_allowed": "Home Keeper Games уже настроен.",
+      "home_keeper_missing": "Для Home Keeper Games нужен Home Keeper. Установите Home Keeper из HACS, перезапустите Home Assistant и снова добавьте Home Keeper Games. Шаги установки: {url}",
       "home_keeper_not_set_up": "Сначала добавьте интеграцию Home Keeper.",
       "home_keeper_too_old": "Обновите Home Keeper до версии {version} или новее."
     }
@@ -62,7 +62,7 @@
       "cannot_connect": "Open Library недоступна. Повторите попытку позже."
     },
     "abort": {
-      "not_loaded": "Home Keeper Library не загружена. Повторите попытку после её запуска."
+      "not_loaded": "Home Keeper Games не загружена. Повторите попытку после её запуска."
     }
   },
   "entity": {
@@ -1109,7 +1109,7 @@
   },
   "exceptions": {
     "not_loaded": {
-      "message": "Home Keeper Library не загружен."
+      "message": "Home Keeper Games не загружен."
     },
     "admin_required": {
       "message": "Это может сделать только администратор."

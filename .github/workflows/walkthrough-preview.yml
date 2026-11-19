@@ -214,7 +214,7 @@ jobs:
                 marker,
                 '### 🎥 Panel walkthrough',
                 '',
-                `<img src="${gif}" alt="Home Keeper Library panel walkthrough" width="820">`,
+                `<img src="${gif}" alt="Home Keeper Games panel walkthrough" width="820">`,
                 '',
                 `▶️ [Higher-quality MP4](${mp4})`,
                 '',

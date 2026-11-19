@@ -118,7 +118,7 @@ jobs:
 
             Built from commit `${{ github.event.pull_request.head.sha }}`.
 
-            **Install via HACS:** open *Home Keeper Library* → ⋮ → **Redownload**, enable **Show beta versions**, and pick `${{ steps.ver.outputs.version }}`. Or download `home_keeper_games.zip` below and unzip into `config/custom_components/home_keeper_games/`.
+            **Install via HACS:** open *Home Keeper Games* → ⋮ → **Redownload**, enable **Show beta versions**, and pick `${{ steps.ver.outputs.version }}`. Or download `home_keeper_games.zip` below and unzip into `config/custom_components/home_keeper_games/`.
           prerelease: true
           files: home_keeper_games.zip
 
@@ -139,7 +139,7 @@ jobs:
               '',
               '`' + version + '` — an installable **pre-release** of this PR, not a real release.',
               '',
-              '**Install via HACS:** open *Home Keeper Library* → ⋮ → **Redownload**, enable **Show beta versions**, and pick `' + version + '`. (HACS may need a refresh to see it.)',
+              '**Install via HACS:** open *Home Keeper Games* → ⋮ → **Redownload**, enable **Show beta versions**, and pick `' + version + '`. (HACS may need a refresh to see it.)',
               '',
               'Or grab `home_keeper_games.zip` from the [release](' + url + ') and unzip into `config/custom_components/home_keeper_games/`.',
               '',

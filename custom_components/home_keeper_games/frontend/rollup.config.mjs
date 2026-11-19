@@ -28,7 +28,7 @@ const plugins = () => [
   nodeResolve({ browser: true }),
   typescript({ tsconfig: './tsconfig.json' }),
   virtual({ 'panel-version': `export const PANEL_VERSION = '${PANEL_VERSION}';` }),
-  terser({ format: { comments: /^\**\n \* Home Keeper Library/ } }),
+  terser({ format: { comments: /^\**\n \* Home Keeper Games/ } }),
 ];
 
 // zxing is compiled TypeScript with `this` at the top level of each module. In an ES
@@ -39,7 +39,7 @@ const onwarn = (warning, warn) => {
 };
 
 const banner = (what) =>
-  `/**\n * Home Keeper Library ${what}.\n * Version: ${PANEL_VERSION}\n * Built: ${BUILD_DATE}\n */`;
+  `/**\n * Home Keeper Games ${what}.\n * Version: ${PANEL_VERSION}\n * Built: ${BUILD_DATE}\n */`;
 
 // The output is `dist/` only. The integration serves `dist/` as a static path, so
 // the sources, the tests and node_modules are not public. Both bundles are ES

@@ -59,7 +59,7 @@ async def test_a_language_without_a_file_reads_no_file(hass, setup_entry) -> Non
     assert backend_i18n.resolve_exception("xx", "not_loaded") == (
         backend_i18n.resolve_exception("en", "not_loaded")
     )
-    assert backend_i18n.resolve_string("xx", "tab.title") == "Library"
+    assert backend_i18n.resolve_string("xx", "tab.title") == "Games"
 
 
 async def test_a_second_preload_reads_nothing(hass, setup_entry) -> None:

@@ -1,5 +1,5 @@
 {
-  "tab.title": "Knihovna",
+  "tab.title": "Hry",
   "companion.description": "Knihy, police, výpůjčky a stav čtení.",
   "loan_task.name_out": "Získat zpět {title} od {party}",
   "loan_task.name_in": "Vrátit {title} osobě {party}",

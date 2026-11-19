@@ -1,6 +1,6 @@
 ---
 title: Architecture
-summary: The split of Home Keeper Library into a pure core and Home Assistant glue. The setup steps. The index of the design docs.
+summary: The split of Home Keeper Games into a pure core and Home Assistant glue. The setup steps. The index of the design docs.
 implements:
   - custom_components/home_keeper_games/__init__.py
   - custom_components/home_keeper_games/const.py
@@ -9,12 +9,12 @@ implements:
   - custom_components/home_keeper_games/backend_i18n.py
   - custom_components/home_keeper_games/manifest.json
 related: [store-models, people-privilege, events-api, home-keeper-dependency, frontend-tab-card]
-source_hash: 68e132e7861c
+source_hash: fca3397f8e0b
 ---
 
 # Architecture
 
-Home Keeper Library is a Home Assistant integration for the books of a household. It
+Home Keeper Games is a Home Assistant integration for the books of a household. It
 records the rooms, bookcases and shelves of the home, the books and their copies, the
 reading status of each person, the loans and a wishlist. It is a companion of Home
 Keeper: admins manage the library in a tab of the Home Keeper panel. Every user reads and

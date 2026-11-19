@@ -2,7 +2,7 @@
   "name": "home-keeper-games-frontend",
   "version": "0.1.0",
   "private": true,
-  "description": "Home Keeper Library tab module and dashboard card, built with Rollup",
+  "description": "Home Keeper Games tab module and dashboard card, built with Rollup",
   "scripts": {
     "build": "rm -rf dist && rollup -c",
     "test": "vitest run",

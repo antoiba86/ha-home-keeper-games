@@ -23,7 +23,7 @@
         "version": 1,
         "minor_version": 1,
         "domain": "home_keeper_games",
-        "title": "Home Keeper Library",
+        "title": "Home Keeper Games",
         "data": {},
         "options": {"currency": "EUR"},
         "pref_disable_new_entities": false,

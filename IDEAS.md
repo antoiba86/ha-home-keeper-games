@@ -1,6 +1,6 @@
 ---
 title: Ideas and open work
-summary: The single backlog of Home Keeper Library work that is not built, for maintainers and agents.
+summary: The single backlog of Home Keeper Games work that is not built, for maintainers and agents.
 ---
 
 # Ideas and open work

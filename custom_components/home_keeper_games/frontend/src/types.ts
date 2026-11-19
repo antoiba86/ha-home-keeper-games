@@ -1,4 +1,4 @@
-// Shared types for the Home Keeper Library tab and card.
+// Shared types for the Home Keeper Games tab and card.
 //
 // The raw shapes match `home_keeper_games/get_state` (see the build spec,
 // sections 2 and 5). `utils.normalizeState` turns the raw reply into `Lib`,

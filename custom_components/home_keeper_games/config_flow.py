@@ -1,4 +1,4 @@
-"""The config flow and the options flow of Home Keeper Library.
+"""The config flow and the options flow of Home Keeper Games.
 
 The integration has 1 config entry. The flow first checks Home Keeper. If Home
 Keeper is not installed, not set up or too old, the flow stops with the reason

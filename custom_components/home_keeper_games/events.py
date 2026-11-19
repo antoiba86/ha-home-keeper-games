@@ -1,4 +1,4 @@
-"""Pure payload builders for the bus events of Home Keeper Library.
+"""Pure payload builders for the bus events of Home Keeper Games.
 
 Each state change fires a ``home_keeper_games_<noun>_<verb>`` event. The store
 fires it, and a builder here makes the payload, so a test and an integrator read

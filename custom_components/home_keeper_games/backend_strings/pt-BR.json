@@ -1,5 +1,5 @@
 {
-  "tab.title": "Biblioteca",
+  "tab.title": "Jogos",
   "companion.description": "Livros, estantes, empréstimos e status de leitura.",
   "loan_task.name_out": "Pegar {title} de volta de {party}",
   "loan_task.name_in": "Devolver {title} para {party}",

@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Home Keeper Library 藏书",
+        "title": "Home Keeper Games 藏书",
         "description": "设置藏本价格和价值所用的货币。",
         "data": {
           "currency": "货币"
@@ -16,9 +16,9 @@
       "invalid_currency": "请输入 3 个字母的货币代码。"
     },
     "abort": {
-      "already_configured": "Home Keeper Library 已设置。",
-      "single_instance_allowed": "Home Keeper Library 已设置。",
-      "home_keeper_missing": "Home Keeper Library 需要 Home Keeper。请从 HACS 安装 Home Keeper，重启 Home Assistant，然后再次添加 Home Keeper Library。安装步骤：{url}",
+      "already_configured": "Home Keeper Games 已设置。",
+      "single_instance_allowed": "Home Keeper Games 已设置。",
+      "home_keeper_missing": "Home Keeper Games 需要 Home Keeper。请从 HACS 安装 Home Keeper，重启 Home Assistant，然后再次添加 Home Keeper Games。安装步骤：{url}",
       "home_keeper_not_set_up": "请先添加 Home Keeper 集成。",
       "home_keeper_too_old": "请将 Home Keeper 更新到 {version} 或更高版本。"
     }
@@ -62,7 +62,7 @@
       "cannot_connect": "Open Library 不可用。请稍后重试。"
     },
     "abort": {
-      "not_loaded": "Home Keeper Library 尚未加载。请在其启动后重试。"
+      "not_loaded": "Home Keeper Games 尚未加载。请在其启动后重试。"
     }
   },
   "entity": {
@@ -1109,7 +1109,7 @@
   },
   "exceptions": {
     "not_loaded": {
-      "message": "Home Keeper Library 未加载。"
+      "message": "Home Keeper Games 未加载。"
     },
     "admin_required": {
       "message": "只有管理员用户才能执行此操作。"

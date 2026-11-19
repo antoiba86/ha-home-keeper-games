@@ -27,7 +27,7 @@ export const test = base.extend({
 
 export { expect };
 
-/** The panel URL of the Library tab in Home Keeper. */
+/** The panel URL of the Games tab in Home Keeper. */
 export const TAB_URL = '/home-keeper/games';
 
 /** The seeded dashboard with the card (tests/integration/ha_config). */

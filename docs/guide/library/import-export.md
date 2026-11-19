@@ -21,7 +21,7 @@ download the CSV file.
 ## Import a file
 
 1. Open the **Books** page of the Library tab, and select **Import**.
-2. In **Source**, select **Goodreads CSV**, **StoryGraph CSV** or **Home Keeper Library
+2. In **Source**, select **Goodreads CSV**, **StoryGraph CSV** or **Home Keeper Games
    CSV**.
 3. Select the **Person** whose reading status the file holds.
 4. Select a **Shelf for new books**, or no shelf.
@@ -69,8 +69,8 @@ Open the **Settings** page of the Library tab. In **Export**, select a person or
 books, no reading status**, select the format, and select **Export CSV**.
 
 - **Goodreads CSV** has the Goodreads columns. Goodreads and StoryGraph import it.
-- **Home Keeper Library CSV** has every book and copy field and the location of each
-  copy. Import it into another Home Keeper Library to move the library.
+- **Home Keeper Games CSV** has every book and copy field and the location of each
+  copy. Import it into another Home Keeper Games to move the library.
 
 The file name has the format and the date, such as `library-goodreads-2026-10-05.csv`.
 

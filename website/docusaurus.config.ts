@@ -19,7 +19,7 @@ const repoUrl = `https://github.com/${organizationName}/${projectName}`;
 const editUrl = `${repoUrl}/tree/main/website/`;
 
 const config: Config = {
-  title: 'Home Keeper Library',
+  title: 'Home Keeper Games',
   tagline: 'The books of a household, as a companion of Home Keeper',
   favicon: 'img/favicon.svg',
 
@@ -91,9 +91,9 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'Home Keeper Library',
+      title: 'Home Keeper Games',
       logo: {
-        alt: 'Home Keeper Library',
+        alt: 'Home Keeper Games',
         src: 'img/logo.svg',
       },
       items: [
@@ -154,7 +154,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Home Keeper Library, a community Home Assistant integration. Built with Docusaurus.`,
+      copyright: `Home Keeper Games, a community Home Assistant integration. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,

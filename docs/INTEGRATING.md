@@ -1,9 +1,9 @@
 ---
 title: Integrating with the library
-summary: How automations, scripts, voice assistants and other integrations use the services, events and entities of Home Keeper Library, for integrators.
+summary: How automations, scripts, voice assistants and other integrations use the services, events and entities of Home Keeper Games, for integrators.
 ---
 
-# Integrate with Home Keeper Library
+# Integrate with Home Keeper Games
 
 Automations, scripts, voice assistants and other integrations use 3 stable surfaces:
 
@@ -102,7 +102,7 @@ still works when the library is not installed.
 | `sensor` *person* reading now | The books with status Reading, with `books` |
 | `todo` *person* to read | The books with status Want to read |
 
-The entities are on 1 service device, Home Keeper Library. The unique id of a
+The entities are on 1 service device, Home Keeper Games. The unique id of a
 per-person entity holds the person id, so a new name of the person keeps the entity.
 
 ## Home Keeper

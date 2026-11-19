@@ -1,6 +1,6 @@
 """The index of every surface that an integrator can use.
 
-The public API of Home Keeper Library is in registries that do not know about
+The public API of Home Keeper Games is in registries that do not know about
 each other: the services in ``services.py``, the bus events in ``const.py`` with
 payloads from ``events.py``, the websocket commands in ``websocket_api.py``, the
 entity platforms in ``const.PLATFORMS``, and the HTTP views in ``covers.py`` and

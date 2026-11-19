@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Home Keeper Library",
+        "title": "Home Keeper Games",
         "description": "Nastavit měnu cen a hodnot výtisků.",
         "data": {
           "currency": "Měna"
@@ -16,9 +16,9 @@
       "invalid_currency": "Zadejte kód měny ze 3 písmen."
     },
     "abort": {
-      "already_configured": "Home Keeper Library je už nastaven.",
-      "single_instance_allowed": "Home Keeper Library je už nastaven.",
-      "home_keeper_missing": "Home Keeper Library vyžaduje Home Keeper. Nainstalujte Home Keeper z HACS, restartujte Home Assistant a potom znovu přidejte Home Keeper Library. Kroky instalace: {url}",
+      "already_configured": "Home Keeper Games je už nastaven.",
+      "single_instance_allowed": "Home Keeper Games je už nastaven.",
+      "home_keeper_missing": "Home Keeper Games vyžaduje Home Keeper. Nainstalujte Home Keeper z HACS, restartujte Home Assistant a potom znovu přidejte Home Keeper Games. Kroky instalace: {url}",
       "home_keeper_not_set_up": "Nejdříve přidejte integraci Home Keeper.",
       "home_keeper_too_old": "Aktualizujte Home Keeper na verzi {version} nebo novější."
     }
@@ -62,7 +62,7 @@
       "cannot_connect": "Open Library není dostupná. Zkuste to později."
     },
     "abort": {
-      "not_loaded": "Home Keeper Library není načtena. Zkuste to znovu po jejím spuštění."
+      "not_loaded": "Home Keeper Games není načtena. Zkuste to znovu po jejím spuštění."
     }
   },
   "entity": {
@@ -1109,7 +1109,7 @@
   },
   "exceptions": {
     "not_loaded": {
-      "message": "Home Keeper Library není načten."
+      "message": "Home Keeper Games není načten."
     },
     "admin_required": {
       "message": "Toto může udělat jen správce."

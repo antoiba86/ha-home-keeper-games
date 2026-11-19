@@ -1,9 +1,9 @@
 ---
 title: Claude Code memory
-summary: Loads AGENTS.md into every Claude Code session for Home Keeper Library.
+summary: Loads AGENTS.md into every Claude Code session for Home Keeper Games.
 ---
 
-# Home Keeper Library — Claude Code memory
+# Home Keeper Games — Claude Code memory
 
 @AGENTS.md
 
