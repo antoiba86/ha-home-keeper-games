@@ -1,6 +1,5 @@
 # Home Keeper Games
 
-[![Integration Usage][usage-shield]][usage]
 [![GitHub Downloads][downloads-shield]][releases]
 [![GitHub Release][release-shield]][releases]
 [![GitHub Release Date][release-date-shield]][releases]
@@ -93,8 +92,6 @@ author, as the MIT license requires.
 [hacs]: https://github.com/hacs/integration
 [hacs-validation-shield]: https://github.com/antoiba86/ha-home-keeper-games/actions/workflows/hacs.yml/badge.svg
 [hacs-validation]: https://github.com/antoiba86/ha-home-keeper-games/actions/workflows/hacs.yml
-[usage-shield]: https://img.shields.io/badge/dynamic/json?color=41BDF5&logo=home-assistant&label=integration%20usage&suffix=%20installs&cacheSeconds=15600&url=https%3A%2F%2Fanalytics.home-assistant.io%2Fcustom_integrations.json&query=%24.home_keeper_games.total&style=for-the-badge
-[usage]: https://analytics.home-assistant.io/
 [downloads-shield]: https://img.shields.io/github/downloads/antoiba86/ha-home-keeper-games/total.svg?style=for-the-badge
 [release-date-shield]: https://img.shields.io/github/release-date/antoiba86/ha-home-keeper-games?style=for-the-badge
 [commits-shield]: https://img.shields.io/github/last-commit/antoiba86/ha-home-keeper-games?style=for-the-badge
