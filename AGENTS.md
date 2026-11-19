@@ -53,6 +53,9 @@ in the rules files below. Read the file for your topic before you change code or
 ### Branches and merges
 
 - **Never push to `main`.** Use a feature branch and a PR.
+- **Local work is allowed when the maintainer asks for it.** Work on a local branch, run
+  every local tier, and squash merge into local `main`. Push only when the maintainer
+  says so ([pr-workflow.md](.amazonq/rules/pr-workflow.md#local-work)).
 - **Every check green, plus approval, before a merge.** A failure you did not cause is
   still yours to clear. Never merge on a red or running check.
 - **Read what a soft gate produced.** A `continue-on-error` step is always green.
