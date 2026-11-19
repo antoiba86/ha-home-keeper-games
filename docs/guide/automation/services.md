@@ -98,9 +98,9 @@ to the list. The per-person entities follow the privacy rules in
 
 ## Reference
 
-- [Integrating](https://prestomation.github.io/ha-home-keeper-library/developer/integrating)
+- [Integrating](https://antoiba86.github.io/ha-home-keeper-games/developer/integrating)
   has the services by group and the contract for other integrations.
-- [Events](https://prestomation.github.io/ha-home-keeper-library/developer/events) has
+- [Events](https://antoiba86.github.io/ha-home-keeper-games/developer/events) has
   each event, its payload and when it fires.
-- [API reference](https://prestomation.github.io/ha-home-keeper-library/developer/api)
+- [API reference](https://antoiba86.github.io/ha-home-keeper-games/developer/api)
   has every service field, event payload and entity attribute.

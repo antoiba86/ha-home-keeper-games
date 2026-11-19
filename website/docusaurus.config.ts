@@ -6,7 +6,7 @@ import {themes as prismThemes} from 'prism-react-renderer';
 // under /<repo>/pr-preview/pr-<n>/, so the deploy workflows set DOCS_BASE_URL to keep
 // asset paths correct for each deploy target.
 // The GitHub repository of the integration.
-const repoSlug = 'prestomation/ha-home-keeper-library';
+const repoSlug = 'antoiba86/ha-home-keeper-games';
 const [organizationName, projectName] = repoSlug.split('/');
 const baseUrl = process.env.DOCS_BASE_URL ?? `/${projectName}/`;
 

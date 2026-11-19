@@ -7,7 +7,7 @@ summary: How the Docusaurus docs site is generated, built, previewed, and deploy
 
 This is the user-facing documentation site for the integration. It uses
 [Docusaurus](https://docusaurus.io/), and GitHub Pages serves it at
-**https://prestomation.github.io/ha-home-keeper-library/**.
+**https://antoiba86.github.io/ha-home-keeper-games/**.
 
 It has 2 audiences, each with its own sidebar:
 
@@ -53,7 +53,7 @@ repository. Put documentation for a new feature in `docs/guide/`.
 ```bash
 cd website
 npm install
-npm start        # dev server with live reload at http://localhost:3000/ha-home-keeper-library/
+npm start        # dev server with live reload at http://localhost:3000/ha-home-keeper-games/
 npm run build    # production build into website/build
 npm run typecheck
 ```

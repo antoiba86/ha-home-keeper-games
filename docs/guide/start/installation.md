@@ -16,7 +16,7 @@ The Library tab needs Home Keeper version 0.30.0 or later.
 ## Install the library
 
 1. In HACS, search for **Home Keeper Library**, or
-   [open it in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=prestomation&repository=ha-home-keeper-library&category=integration).
+   [open it in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=antoiba86&repository=ha-home-keeper-games&category=integration).
 2. Download **Home Keeper Library** and restart Home Assistant.
 3. Go to **Settings → Devices & services → Add integration**, and select **Home Keeper
    Library**.

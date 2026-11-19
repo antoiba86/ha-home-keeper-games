@@ -9,11 +9,11 @@ is the single source of truth (see `RELEASE.md`).
 
 ### Added
 
-- **[Open Library title match](https://prestomation.github.io/ha-home-keeper-library/docs/guide/scan-books).**
+- **[Open Library title match](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/scan-books).**
   When a scanned ISBN has no match, the library looks for the title that you type on Open
   Library and asks if it is your book. If you confirm, the book gets the description,
   subjects and cover from Open Library, and keeps your ISBN.
-- **[SBN numbers](https://prestomation.github.io/ha-home-keeper-library/docs/guide/scan-books).**
+- **[SBN numbers](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/scan-books).**
   You can type the 9-digit SBN of an old UK book where the library asks for an ISBN. The
   library finds and stores the book with the matching ISBN.
 
@@ -26,15 +26,15 @@ is the single source of truth (see `RELEASE.md`).
 
 ### Added
 
-- **[Send books to Open Library](https://prestomation.github.io/ha-home-keeper-library/docs/guide/open-library).**
+- **[Send books to Open Library](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/open-library).**
   An admin can connect an Open Library account and send a book that Open Library does not
   have, and the library links the new record. The **Not on Open Library** filter lists
   these books.
-- **[Title for unmatched scans](https://prestomation.github.io/ha-home-keeper-library/docs/guide/scan-books).**
+- **[Title for unmatched scans](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/scan-books).**
   If Open Library has no match for a scanned book, the scan stops and asks for its title,
   so you can find the book again later. You can also add the other details and a photo of
   the cover, or remove the scan.
-- **[Library in Home Keeper export](https://prestomation.github.io/ha-home-keeper-library/docs/guide/import-export).**
+- **[Library in Home Keeper export](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/import-export).**
   The Home Keeper export file now holds your whole library: books, shelves, reading
   status, loans and wishlists. Its import brings them back or applies your edits, and a
   bundle export also holds the covers.
@@ -76,29 +76,29 @@ is the single source of truth (see `RELEASE.md`).
 
 ### Added
 
-- **[ISBN barcode scan](https://prestomation.github.io/ha-home-keeper-library/docs/guide/scan-books).** Scan the ISBN barcode of each book with a
+- **[ISBN barcode scan](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/scan-books).** Scan the ISBN barcode of each book with a
   phone. The book goes on the selected shelf with its details and cover from Open
   Library. Enter the ISBN by hand for a book with no barcode.
-- **[Rooms and shelves](https://prestomation.github.io/ha-home-keeper-library/docs/guide/rooms-and-shelves).** Record the rooms, bookcases and
+- **[Rooms and shelves](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/rooms-and-shelves).** Record the rooms, bookcases and
   shelves of the home. Each copy shows its shelf.
-- **[Book search and filters](https://prestomation.github.io/ha-home-keeper-library/docs/guide/books).** Find a book by its title, author, ISBN,
+- **[Book search and filters](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/books).** Find a book by its title, author, ISBN,
   series or notes. Filter the library by room, shelf, reader, subject and reading status.
-- **[Reading status and notes](https://prestomation.github.io/ha-home-keeper-library/docs/guide/book-detail).** Each person keeps a reading status, a
+- **[Reading status and notes](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/book-detail).** Each person keeps a reading status, a
   rating, the page, the dates and private notes for each book. Each copy keeps its
   format, condition, price and value.
-- **[Lent and borrowed books](https://prestomation.github.io/ha-home-keeper-library/docs/guide/loans).** Record the books that are lent out or
+- **[Lent and borrowed books](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/loans).** Record the books that are lent out or
   borrowed. Each due date gets a Home Keeper task, and the completed task returns the book.
-- **[Per-person wishlist](https://prestomation.github.io/ha-home-keeper-library/docs/guide/wishlist).** Each person has a wishlist. The books to buy go
+- **[Per-person wishlist](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/wishlist).** Each person has a wishlist. The books to buy go
   to a to-do list of that person.
-- **[Goodreads and StoryGraph import](https://prestomation.github.io/ha-home-keeper-library/docs/guide/import-export).** Bring a reading history in
+- **[Goodreads and StoryGraph import](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/import-export).** Bring a reading history in
   from a Goodreads or StoryGraph CSV file, with a preview first. Export the library to a
   CSV file that both read.
-- **[Dashboard card](https://prestomation.github.io/ha-home-keeper-library/docs/guide/dashboard-card).** Each user gets a dashboard card with their
+- **[Dashboard card](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/dashboard-card).** Each user gets a dashboard card with their
   reading and their yearly goal. The card also shows the books to read next and the
   household activity.
-- **[Per-person entities](https://prestomation.github.io/ha-home-keeper-library/docs/guide/services).** Each person gets a To read list and sensors for
+- **[Per-person entities](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/services).** Each person gets a To read list and sensors for
   the books read this year and the books in progress.
-- **[Services and events](https://prestomation.github.io/ha-home-keeper-library/docs/guide/services).** Each operation of the Library tab is a service
+- **[Services and events](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/services).** Each operation of the Library tab is a service
   for automations. Each change fires an event.
-- **[People and privacy](https://prestomation.github.io/ha-home-keeper-library/docs/guide/people-and-privacy).** Prices, borrower names and private
+- **[People and privacy](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/people-and-privacy).** Prices, borrower names and private
   notes stay with the admins. Each person can stop sharing their reading status.

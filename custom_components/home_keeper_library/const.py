@@ -15,7 +15,7 @@ from __future__ import annotations
 DOMAIN = "home_keeper_library"
 NAME = "Home Keeper Library"
 ICON = "mdi:bookshelf"
-DOCS_URL = "https://github.com/prestomation/ha-home-keeper-library"
+DOCS_URL = "https://github.com/antoiba86/ha-home-keeper-games"
 USER_AGENT = "HomeKeeperLibrary/{version} (+" + DOCS_URL + ")"
 
 # The Home Keeper integration that this integration requires.

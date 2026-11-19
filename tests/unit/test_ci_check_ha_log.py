@@ -31,7 +31,7 @@ CLEAN_LOG = f"""\
 
 BLOCKING_LOG = f"""\
 {TS} INFO (MainThread) [homeassistant.core] Starting Home Assistant
-{TS} WARNING (MainThread) [homeassistant.util.loop] Detected blocking call to read_text with args (PosixPath('/config/custom_components/home_keeper_library/manifest.json'),) inside the event loop by custom integration 'home_keeper_library' at custom_components/home_keeper_library/diagnostics.py, line 33: manifest_data = json.loads(manifest_path.read_text(encoding="utf-8")) (offender: /usr/local/lib/python3.13/pathlib/_local.py, line 546: return f.read()), please create a bug report at https://github.com/prestomation/ha-home-keeper-library/issues
+{TS} WARNING (MainThread) [homeassistant.util.loop] Detected blocking call to read_text with args (PosixPath('/config/custom_components/home_keeper_library/manifest.json'),) inside the event loop by custom integration 'home_keeper_library' at custom_components/home_keeper_library/diagnostics.py, line 33: manifest_data = json.loads(manifest_path.read_text(encoding="utf-8")) (offender: /usr/local/lib/python3.13/pathlib/_local.py, line 546: return f.read()), please create a bug report at https://github.com/antoiba86/ha-home-keeper-games/issues
 Traceback (most recent call last):
   File "/config/custom_components/home_keeper_library/diagnostics.py", line 33, in async_get_config_entry_diagnostics
 """
@@ -247,7 +247,7 @@ REAL_BLOCKING_LINE = (
     'manifest_data = json.loads(manifest_path.read_text(encoding="utf-8")) '
     "(offender: /usr/local/lib/python3.13/pathlib/_local.py, line 546: "
     "return f.read()), please create a bug report at "
-    "https://github.com/prestomation/ha-home-keeper-library/issues"
+    "https://github.com/antoiba86/ha-home-keeper-games/issues"
 )
 
 REAL_COMPOSE_LOG = "\n".join(

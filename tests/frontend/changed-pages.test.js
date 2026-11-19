@@ -71,7 +71,7 @@ describe('pagesForChanges', () => {
 });
 
 describe('renderComment', () => {
-  const base = 'https://prestomation.github.io/ha-home-keeper-library/pr-preview/pr-9/';
+  const base = 'https://antoiba86.github.io/ha-home-keeper-games/pr-preview/pr-9/';
 
   it('renders a marked, bulleted list with absolute preview URLs', () => {
     const body = renderComment(
@@ -80,14 +80,14 @@ describe('renderComment', () => {
     );
     expect(body).toContain(COMMENT_MARKER);
     expect(body).toContain(
-      '- [Services and events](https://prestomation.github.io/ha-home-keeper-library/pr-preview/pr-9/docs/guide/services)',
+      '- [Services and events](https://antoiba86.github.io/ha-home-keeper-games/pr-preview/pr-9/docs/guide/services)',
     );
   });
 
   it('collapses a trailing slash so routes are not doubled', () => {
     const body = renderComment([{title: 'Home', route: '/'}], base);
     expect(body).toContain(
-      '- [Home](https://prestomation.github.io/ha-home-keeper-library/pr-preview/pr-9/)',
+      '- [Home](https://antoiba86.github.io/ha-home-keeper-games/pr-preview/pr-9/)',
     );
     expect(body).not.toContain('pr-9//');
   });

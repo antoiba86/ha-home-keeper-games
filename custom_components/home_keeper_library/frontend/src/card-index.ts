@@ -22,7 +22,7 @@ if (!w.customCards.some((c) => c.type === CARD_TAG)) {
     name: t('card.name'),
     description: t('card.description'),
     preview: true,
-    documentationURL: 'https://github.com/prestomation/ha-home-keeper-library',
+    documentationURL: 'https://github.com/antoiba86/ha-home-keeper-games',
   });
 }
 

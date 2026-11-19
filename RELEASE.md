@@ -46,7 +46,7 @@ An `### Added` bullet writes its bold lead as a Markdown link to the page that d
 the feature:
 
 ```markdown
-- **[Dashboard card](https://prestomation.github.io/ha-home-keeper-library/docs/guide/dashboard-card).**
+- **[Dashboard card](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/dashboard-card).**
   Every user can show their reading on a dashboard.
 ```
 
@@ -54,12 +54,12 @@ the feature:
   the comment the issue reporter gets, so the link goes there too.
 - **Use the absolute site URL.** People read the bullet on GitHub and in the release
   body, where a relative path does not resolve.
-- **User Guide URL.** Use `https://prestomation.github.io/ha-home-keeper-library/docs/guide/<slug>`,
+- **User Guide URL.** Use `https://antoiba86.github.io/ha-home-keeper-games/docs/guide/<slug>`,
   where `<slug>` is the page's `USER_SECTIONS` entry in `website/scripts/doc-map.mjs`.
   For a deeper anchor, add the heading slug.
 - **Developer Guide URL.** Add the file's `DOC_ROUTES` value in
   `website/scripts/doc-map.mjs` (`docs/INTEGRATING.md` → `/developer/integrating`) to
-  `https://prestomation.github.io/ha-home-keeper-library`. The generated API reference is in
+  `https://antoiba86.github.io/ha-home-keeper-games`. The generated API reference is in
   `GENERATED_DEV_PAGES`, which gives its `route` directly.
 - **A link to a page that the release adds resolves only when a _stable_ ships.**
   `deploy-docs` in `release.yml` runs only when `prerelease == 'false'`, so a beta does

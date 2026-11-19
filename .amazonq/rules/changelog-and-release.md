@@ -36,7 +36,7 @@ feature PR must follow so that its work ships.
 - The lead must stand alone. `summarize()` in `ci/release-issues.py` quotes the whole
   bullet into the comment that an issue reporter gets, and the lead comes first.
 - **An `### Added` lead links its documentation**, with the bold outside the link:
-  `**[Dashboard card](https://prestomation.github.io/ha-home-keeper-library/docs/guide/dashboard-card).**`.
+  `**[Dashboard card](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/dashboard-card).**`.
   Use the absolute site URL. A guide page is `.../docs/guide/<slug>`, where the slug is the
   `USER_SECTIONS` entry in `website/scripts/doc-map.mjs`. Link the nearest page that says
   what the feature does, never the README.

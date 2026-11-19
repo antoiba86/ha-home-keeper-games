@@ -11,13 +11,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/prestomation/ha-home-keeper-library.git"
+    "url": "git+https://github.com/antoiba86/ha-home-keeper-games.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/prestomation/ha-home-keeper-library/issues"
+    "url": "https://github.com/antoiba86/ha-home-keeper-games/issues"
   },
-  "homepage": "https://github.com/prestomation/ha-home-keeper-library#readme",
+  "homepage": "https://github.com/antoiba86/ha-home-keeper-games#readme",
   "devDependencies": {
     "@stryker-mutator/core": "^10.0.0",
     "@stryker-mutator/vitest-runner": "^10.1.1",

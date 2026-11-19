@@ -8,7 +8,6 @@
 [![License][license-shield]](LICENSE)
 [![hacs][hacs-shield]][hacs]
 ![Project Maintenance][maintenance-shield]
-[![ko-fi][kofi-shield]][kofi]
 [![HACS Validation][hacs-validation-shield]][hacs-validation]
 [![HA Version][ha-version-shield]][ha-version]
 [![Docs][docs-shield]][docs]
@@ -23,7 +22,7 @@ reading status of each person, the loans and a wishlist. Admins manage it in a
 To read list.
 
 > 📖 **Full documentation** (a browsable User Guide and Developer Guide) lives at
-> **<https://prestomation.github.io/ha-home-keeper-library/>**. The site is generated from
+> **<https://antoiba86.github.io/ha-home-keeper-games/>**. The site is generated from
 > `docs/`, so the two never drift.
 
 ![The book list of the Library tab in Home Keeper](docs/images/books-desktop.png)
@@ -42,18 +41,18 @@ To read list.
 
 1. Install and set up [Home Keeper](https://github.com/prestomation/ha-home-keeper#installation).
 2. In [HACS](https://hacs.xyz/), search for **Home Keeper Library**, or
-   [open it in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=prestomation&repository=ha-home-keeper-library&category=integration).
+   [open it in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=antoiba86&repository=ha-home-keeper-games&category=integration).
 3. Download **Home Keeper Library** and restart Home Assistant.
 4. Add the integration in **Settings → Devices & services → Add integration → Home
    Keeper Library**.
 
 ## Documentation
 
-- [User Guide](https://prestomation.github.io/ha-home-keeper-library/docs/intro): every
+- [User Guide](https://antoiba86.github.io/ha-home-keeper-games/docs/intro): every
   feature, with screenshots. The pages are written in [`docs/guide/`](docs/guide).
-- [Developer Guide](https://prestomation.github.io/ha-home-keeper-library/developer/integrating):
+- [Developer Guide](https://antoiba86.github.io/ha-home-keeper-games/developer/integrating):
   the services, the events and the API reference.
-- [Release notes](https://prestomation.github.io/ha-home-keeper-library/docs/release-notes).
+- [Release notes](https://antoiba86.github.io/ha-home-keeper-games/docs/release-notes).
 
 ## Development
 
@@ -67,27 +66,34 @@ To read list.
 See [AGENTS.md](AGENTS.md) for workflow, [RELEASE.md](RELEASE.md) for releases and
 [Developing](docs/DEVELOPING.md) for the test commands and the CI guardrails.
 
+## Origin and credits
+
+This project is derived from
+[Home Keeper Library](https://github.com/prestomation/ha-home-keeper-library) by
+Preston Tamkin, version 0.4.0, under the MIT license. It is a separate project. The
+original author does not maintain, review or endorse it. Report problems with this
+project here, not to the original project.
+
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE). The license keeps the copyright notice of the original
+author, as the MIT license requires.
 
-[releases]: https://github.com/prestomation/ha-home-keeper-library/releases
-[release-shield]: https://img.shields.io/github/release/prestomation/ha-home-keeper-library.svg?style=for-the-badge
-[license-shield]: https://img.shields.io/github/license/prestomation/ha-home-keeper-library.svg?style=for-the-badge
-[hacs-shield]: https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge
+[releases]: https://github.com/antoiba86/ha-home-keeper-games/releases
+[release-shield]: https://img.shields.io/github/release/antoiba86/ha-home-keeper-games.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/antoiba86/ha-home-keeper-games.svg?style=for-the-badge
+[hacs-shield]: https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge
 [hacs]: https://github.com/hacs/integration
-[hacs-validation-shield]: https://github.com/prestomation/ha-home-keeper-library/actions/workflows/hacs.yml/badge.svg
-[hacs-validation]: https://github.com/prestomation/ha-home-keeper-library/actions/workflows/hacs.yml
+[hacs-validation-shield]: https://github.com/antoiba86/ha-home-keeper-games/actions/workflows/hacs.yml/badge.svg
+[hacs-validation]: https://github.com/antoiba86/ha-home-keeper-games/actions/workflows/hacs.yml
 [usage-shield]: https://img.shields.io/badge/dynamic/json?color=41BDF5&logo=home-assistant&label=integration%20usage&suffix=%20installs&cacheSeconds=15600&url=https%3A%2F%2Fanalytics.home-assistant.io%2Fcustom_integrations.json&query=%24.home_keeper_library.total&style=for-the-badge
 [usage]: https://analytics.home-assistant.io/
-[downloads-shield]: https://img.shields.io/github/downloads/prestomation/ha-home-keeper-library/total.svg?style=for-the-badge
-[release-date-shield]: https://img.shields.io/github/release-date/prestomation/ha-home-keeper-library?style=for-the-badge
-[commits-shield]: https://img.shields.io/github/last-commit/prestomation/ha-home-keeper-library?style=for-the-badge
-[commits]: https://github.com/prestomation/ha-home-keeper-library/commits/main
-[maintenance-shield]: https://img.shields.io/badge/maintainer-%40prestomation-blue.svg?style=for-the-badge
+[downloads-shield]: https://img.shields.io/github/downloads/antoiba86/ha-home-keeper-games/total.svg?style=for-the-badge
+[release-date-shield]: https://img.shields.io/github/release-date/antoiba86/ha-home-keeper-games?style=for-the-badge
+[commits-shield]: https://img.shields.io/github/last-commit/antoiba86/ha-home-keeper-games?style=for-the-badge
+[commits]: https://github.com/antoiba86/ha-home-keeper-games/commits/main
+[maintenance-shield]: https://img.shields.io/badge/maintainer-%40antoiba86-blue.svg?style=for-the-badge
 [ha-version-shield]: https://img.shields.io/badge/Home%20Assistant-2025.7%2B-blue.svg?style=for-the-badge
 [ha-version]: https://www.home-assistant.io/
 [docs-shield]: https://img.shields.io/badge/docs-website-03a9f4.svg?style=for-the-badge
-[docs]: https://prestomation.github.io/ha-home-keeper-library/
-[kofi-shield]: https://img.shields.io/badge/Ko--fi-donate-FF5E5B?style=for-the-badge&logo=kofi&logoColor=white
-[kofi]: https://ko-fi.com/prestomation
+[docs]: https://antoiba86.github.io/ha-home-keeper-games/

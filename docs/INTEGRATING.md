@@ -14,7 +14,7 @@ Automations, scripts, voice assistants and other integrations use 3 stable surfa
 Do not read the storage file or call the websocket commands. The tab and the card use
 those, and they can change.
 
-The [API reference](https://prestomation.github.io/ha-home-keeper-library/developer/api)
+The [API reference](https://antoiba86.github.io/ha-home-keeper-games/developer/api)
 lists every service field, event payload and entity attribute. The site generates it
 from the integration. Which service an admin or a user can call is in
 [SECURITY.md](SECURITY.md).
@@ -117,7 +117,7 @@ integration.
 The library registers the capability `import_export`, so the Home Keeper export holds
 the library section. Home Keeper calls `export_data` and `import_data` for it. The import
 matches each record and never deletes one
-([import and export](https://prestomation.github.io/ha-home-keeper-library/docs/guide/import-export#home-keeper-export-includes-your-library)).
+([import and export](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/import-export#home-keeper-export-includes-your-library)).
 
 ## Contract
 

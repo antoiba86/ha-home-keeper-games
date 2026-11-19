@@ -15,7 +15,7 @@ reminder, is for the maintainer. Do not do it. Write the report in ASD-STE100 En
 
 ## 1. Collect the data
 
-Use the GitHub MCP tools on the repository `prestomation/ha-home-keeper-library`.
+Use the GitHub MCP tools on the repository `antoiba86/ha-home-keeper-games`.
 Make independent calls together.
 
 1. `list_issues`, state `OPEN`, all pages. `list_pull_requests`, state `open`.

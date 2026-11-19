@@ -35,7 +35,7 @@ import {
 const here = dirname(fileURLToPath(import.meta.url));
 const website = resolve(here, '..');
 const repo = resolve(website, '..');
-const REPO_URL = 'https://github.com/prestomation/ha-home-keeper-library';
+const REPO_URL = 'https://github.com/antoiba86/ha-home-keeper-games';
 
 // ---------------------------------------------------------------------------
 // Link / image rewriting
@@ -47,7 +47,7 @@ const REPO_URL = 'https://github.com/prestomation/ha-home-keeper-library';
 // use the published URL, which reads correctly on GitHub; here they're pulled back
 // to a site-relative route so a PR preview links within itself rather than sending
 // the reader to production.
-const SITE_URL = 'https://prestomation.github.io/ha-home-keeper-library';
+const SITE_URL = 'https://antoiba86.github.io/ha-home-keeper-games';
 
 // Rewrite every Markdown link/image target. `sourceDir` is the canonical file's
 // directory relative to the repo root, so relative links resolve correctly.
