@@ -25,7 +25,7 @@ lovelace:
   dashboards:
     home-keeper-games-e2e:
       mode: yaml
-      title: Library
+      title: Games
       icon: mdi:bookshelf
       show_in_sidebar: true
       filename: home-keeper-games-e2e.yaml
