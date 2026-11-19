@@ -60,7 +60,7 @@ Run the cheapest tier first.
   config and options flow step and every service. A new service needs a call there, or an
   entry in `VALIDATION_ONLY`. The test sends no request to Open Library.
 - **The container runs in Python dev mode** (`docker-compose.yml`). The last step of each
-  `integration.yml` lane runs `python ci/check-ha-log.py --domain home_keeper_library` on the
+  `integration.yml` lane runs `python ci/check-ha-log.py --domain home_keeper_games` on the
   saved log. Read the grouped report. Fix a real finding. For a message that a test causes
   on purpose, add a narrow regex and a reason to `ci/ha-log-allowlist.txt`. Never run the
   gate on a log that you have not read once.
@@ -80,12 +80,12 @@ Run the cheapest tier first.
   component step installs the harness. The integration step does not, and its runner
   turns the socket plugins off.
 - **Unit and component.** `tests/unit/conftest.py` installs stub parent packages for
-  `custom_components.home_keeper_library`. In one pytest process, Home Assistant finds
+  `custom_components.home_keeper_games`. In one pytest process, Home Assistant finds
   the stub and every component test fails with "No setup or config entry setup function
   defined". A job that wants both tiers (coverage) runs 2 invocations with
   `--cov-append`.
 - `tests/unit/conftest.py` runs each pure module under its real dotted name
-  (`custom_components.home_keeper_library.<mod>`) and registers `ex.<mod>` as an alias.
+  (`custom_components.home_keeper_games.<mod>`) and registers `ex.<mod>` as an alias.
   Keep the real name: mutmut matches a mutant key to `__module__`. Keep the file in
   `tests/unit/`: as a root conftest its stubs would hide the real integration from the
   component tier.

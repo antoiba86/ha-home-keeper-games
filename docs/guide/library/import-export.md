@@ -115,6 +115,6 @@ item of each wishlist book again.
 
 Home Keeper calls 2 admin-only services. A script can call them too:
 
-- `home_keeper_library.export_data` returns the library section.
-- `home_keeper_library.import_data` reads a library section. With `dry_run: true` it only
+- `home_keeper_games.export_data` returns the library section.
+- `home_keeper_games.import_data` reads a library section. With `dry_run: true` it only
   reports the changes.

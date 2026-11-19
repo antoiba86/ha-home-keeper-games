@@ -6,7 +6,7 @@ import json
 import threading
 from pathlib import Path
 
-from custom_components.home_keeper_library import csv_io
+from custom_components.home_keeper_games import csv_io
 
 BOB = "p_bob"
 OL = "https://openlibrary.org"

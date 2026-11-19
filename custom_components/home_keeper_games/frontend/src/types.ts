@@ -1,6 +1,6 @@
 // Shared types for the Home Keeper Library tab and card.
 //
-// The raw shapes match `home_keeper_library/get_state` (see the build spec,
+// The raw shapes match `home_keeper_games/get_state` (see the build spec,
 // sections 2 and 5). `utils.normalizeState` turns the raw reply into `Lib`,
 // which has arrays in display order.
 
@@ -146,7 +146,7 @@ export interface Me {
   is_admin: boolean;
 }
 
-/** The `home_keeper_library/get_state` reply (`projections.project_state`). */
+/** The `home_keeper_games/get_state` reply (`projections.project_state`). */
 export interface RawState {
   revision: number;
   rooms: Room[];

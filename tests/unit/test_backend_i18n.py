@@ -13,7 +13,7 @@ import pytest
 _DIR = (
     Path(__file__).resolve().parents[2]
     / "custom_components"
-    / "home_keeper_library"
+    / "home_keeper_games"
     / "backend_strings"
 )
 _SOURCE = json.loads((_DIR / "en.json").read_text(encoding="utf-8"))

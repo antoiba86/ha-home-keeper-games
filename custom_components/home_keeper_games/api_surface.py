@@ -43,7 +43,7 @@ class Field:
 
 @dataclass(frozen=True, slots=True)
 class ServiceSpec:
-    """A ``home_keeper_library.*`` service.
+    """A ``home_keeper_games.*`` service.
 
     ``name`` is the key in ``services.yaml``, in ``strings.json`` ``services`` and
     in the handler table of ``services.py``.
@@ -497,12 +497,12 @@ SURFACE_KINDS: tuple[SurfaceKind, ...] = (
         "Actions (services)",
         "published",
         "Each operation that changes or exports library data is a "
-        "`home_keeper_library.*` service.",
+        "`home_keeper_games.*` service.",
     ),
     SurfaceKind(
         "Bus events",
         "published",
-        "Each state change fires a `home_keeper_library_<noun>_<verb>` event with a "
+        "Each state change fires a `home_keeper_games_<noun>_<verb>` event with a "
         "payload from a pure builder.",
     ),
     SurfaceKind(

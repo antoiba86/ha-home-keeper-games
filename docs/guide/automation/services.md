@@ -1,6 +1,6 @@
 # Services and events
 
-Each operation of the Library tab is a `home_keeper_library.*` service. Automations,
+Each operation of the Library tab is a `home_keeper_games.*` service. Automations,
 scripts and voice assistants can use the services to change the library, and the bus
 events to react to a change.
 
@@ -20,7 +20,7 @@ automation:
       - trigger: tag
         tag_id: bedside-book
     actions:
-      - action: home_keeper_library.set_reading
+      - action: home_keeper_games.set_reading
         data:
           book_id: "5f0c1b2a9d8e4f7a8b6c5d4e3f2a1b0c"
           person_id: "alice"
@@ -31,11 +31,11 @@ A read service returns a response. Example: find the shelf of a book.
 
 ```yaml
 actions:
-  - action: home_keeper_library.list_books
+  - action: home_keeper_games.list_books
     data:
       query: dune
     response_variable: found
-  - action: home_keeper_library.get_book
+  - action: home_keeper_games.get_book
     data:
       book_id: "{{ found.books[0].id }}"
     response_variable: detail
@@ -46,7 +46,7 @@ Open Library account ([Send books to Open Library](../library/open-library.md)).
 
 ```yaml
 actions:
-  - action: home_keeper_library.send_to_catalog
+  - action: home_keeper_games.send_to_catalog
     data:
       book_id: "5f0c1b2a9d8e4f7a8b6c5d4e3f2a1b0c"
       fields: [publisher, published, isbn]
@@ -66,15 +66,15 @@ those details stay as they are.
 ## Events
 
 The library fires an event for each change, such as
-`home_keeper_library_book_finished`, `home_keeper_library_loan_started` and
-`home_keeper_library_loan_overdue`. Use them with an **Event** trigger.
+`home_keeper_games_book_finished`, `home_keeper_games_loan_started` and
+`home_keeper_games_loan_overdue`. Use them with an **Event** trigger.
 
 ```yaml
 automation:
   - alias: Overdue loan reminder
     triggers:
       - trigger: event
-        event_type: home_keeper_library_loan_overdue
+        event_type: home_keeper_games_loan_overdue
     actions:
       - action: notify.notify
         data:

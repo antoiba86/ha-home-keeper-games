@@ -13,7 +13,7 @@ from unittest.mock import patch
 import pytest
 from blockbuster import BlockingError
 
-from custom_components.home_keeper_library import backend_i18n, const, covers
+from custom_components.home_keeper_games import backend_i18n, const, covers
 
 
 async def test_blockbuster_finds_a_blocking_call(tmp_path: Path) -> None:

@@ -5,13 +5,13 @@ over the websocket on each dashboard load. The plan must survive an upgrade (the
 ``?v=`` content hash changes), a restart (no rewrite), and an install that has a
 row that a user added by hand (no second row). The tests come from Home Keeper.
 
-``custom_components/home_keeper_library/card.py`` is the Home Assistant half.
+``custom_components/home_keeper_games/card.py`` is the Home Assistant half.
 """
 
 import ex.card_resource as card_resource
 from ex.card_resource import ResourcePlan
 
-CARD_PATH = "/home_keeper_library_static/library-card.js"
+CARD_PATH = "/home_keeper_games_static/library-card.js"
 URL = f"{CARD_PATH}?v=abc123def456"
 STALE = f"{CARD_PATH}?v=000000000000"
 
@@ -64,7 +64,7 @@ def test_a_stale_cache_token_is_updated_in_place():
 def test_a_resource_with_no_query_at_all_is_updated_to_the_tokened_url():
     # What a user gets if they added the card by hand, without a ?v=.
     assert _plan(
-        [_res("ours", "/home_keeper_library_static/library-card.js")]
+        [_res("ours", "/home_keeper_games_static/library-card.js")]
     ) == ResourcePlan(create=False, update_id="ours", delete_ids=())
 
 
@@ -115,7 +115,7 @@ def test_an_absolute_url_for_the_same_bundle_is_ours():
     # What a user gets if they typed the resource in with their full HA address.
     # Left unrecognised it would be joined by a second, relative row.
     absolute = (
-        "http://homeassistant.local:8123/home_keeper_library_static/library-card.js"
+        "http://homeassistant.local:8123/home_keeper_games_static/library-card.js"
     )
     assert _plan([_res("typed", absolute)]) == ResourcePlan(
         create=False, update_id="typed", delete_ids=()

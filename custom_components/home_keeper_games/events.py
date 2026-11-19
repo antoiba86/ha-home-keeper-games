@@ -1,6 +1,6 @@
 """Pure payload builders for the bus events of Home Keeper Library.
 
-Each state change fires a ``home_keeper_library_<noun>_<verb>`` event. The store
+Each state change fires a ``home_keeper_games_<noun>_<verb>`` event. The store
 fires it, and a builder here makes the payload, so a test and an integrator read
 the payload that ships. The book events share 1 spine:
 ``{book_id, title, person_id, origin}``. ``origin`` is the marker that the caller

@@ -2,10 +2,10 @@
 title: Loans and Home Keeper tasks
 summary: How the library records lent and borrowed books, and keeps 1 one-off Home Keeper task for each loan with a due date.
 implements:
-  - custom_components/home_keeper_library/loan_tasks.py
-  - custom_components/home_keeper_library/loan_sync.py
+  - custom_components/home_keeper_games/loan_tasks.py
+  - custom_components/home_keeper_games/loan_sync.py
 related: [store-models, home-keeper-dependency, events-api]
-source_hash: 2fc17ff1c066
+source_hash: 0b9a5a539747
 ---
 
 # Loans and Home Keeper tasks
@@ -64,7 +64,7 @@ and returns a `LoanTaskPlan`:
 The planner ignores a task with no id, because it cannot bind, change or delete it.
 
 `loan_tasks.add_task_payload` builds the fields of the Home Keeper service `add_task`:
-the name, the type `one-off`, the due date, `source: {"home_keeper_library": {"loan_id": id}}`, and
+the name, the type `one-off`, the due date, `source: {"home_keeper_games": {"loan_id": id}}`, and
 `managed_by` with the library name, the icon, the config entry id, the locked fields
 `name` and `recurrence_type`, and the completion prompt. The name comes from
 `backend_strings` in the Home Assistant language: "Get {title} back from {party}" for a
@@ -95,7 +95,7 @@ Keeper takes loan tasks.
 
 ## One-way doors
 
-- The task source key `home_keeper_library` and its field `loan_id`. Home Keeper stores it
+- The task source key `home_keeper_games` and its field `loan_id`. Home Keeper stores it
   in each task.
 - The loan fields `direction`, `party`, `started`, `due`, `returned`, `add_task` and
   `hk_task_id`.

@@ -38,7 +38,7 @@ Nothing here is committed scope. When an item ships, remove it. The design docs 
   its ISBN. Let the admin send that edition under the linked work.
 - **Title match for other books.** Offer the title match of a scan on the book page of
   each book that is not on Open Library, and in the CSV import.
-- **Event for a send to Open Library.** A `home_keeper_library_book_contributed` event
+- **Event for a send to Open Library.** A `home_keeper_games_book_contributed` event
   with the edition key, if an integrator needs more than `book_updated`.
 
 ### Shelf photo

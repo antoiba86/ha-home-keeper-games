@@ -7,14 +7,14 @@ Run from the repository root:
 
 The script writes:
 
-* ``tests/e2e/seed/home_keeper_library.json``: the store document that
-  ``ci/e2e-up.sh`` copies to ``.storage/home_keeper_library`` before Home
+* ``tests/e2e/seed/home_keeper_games.json``: the store document that
+  ``ci/e2e-up.sh`` copies to ``.storage/home_keeper_games`` before Home
   Assistant starts.
-* ``custom_components/home_keeper_library/frontend/test/fixtures/state.json``:
+* ``custom_components/home_keeper_games/frontend/test/fixtures/state.json``:
   the ``get_state`` reply that an admin (Alex) gets for that store. It comes from
   ``projections.project_state``, the same code as the websocket command.
 * With ``--covers``: ``tests/e2e/seed/covers/<file>.jpg``, which ``ci/e2e-up.sh``
-  copies to ``.storage/home_keeper_library_covers/``. The images need Pillow and
+  copies to ``.storage/home_keeper_games_covers/``. The images need Pillow and
   the DejaVu fonts, so they are made once and committed.
 
 Every record is built by the pure ``models`` builders, so the seed has the shape
@@ -40,8 +40,8 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[3]
 SEED_DIR = Path(__file__).resolve().parent
-COMPONENT = ROOT / "custom_components" / "home_keeper_library"
-STORE_OUT = SEED_DIR / "home_keeper_library.json"
+COMPONENT = ROOT / "custom_components" / "home_keeper_games"
+STORE_OUT = SEED_DIR / "home_keeper_games.json"
 STATE_OUT = COMPONENT / "frontend" / "test" / "fixtures" / "state.json"
 COVERS_OUT = SEED_DIR / "covers"
 
@@ -61,7 +61,7 @@ NOW = "2026-10-04T18:00:00+00:00"
 
 def _load_pure() -> tuple[types.ModuleType, types.ModuleType]:
     """Load ``models`` and ``projections`` with no Home Assistant (as tests/unit)."""
-    pkg = "custom_components.home_keeper_library"
+    pkg = "custom_components.home_keeper_games"
     for name, path in (
         ("custom_components", ROOT / "custom_components"),
         (pkg, COMPONENT),
@@ -626,7 +626,7 @@ def main() -> None:
     document = {
         "version": 1,
         "minor_version": 1,
-        "key": "home_keeper_library",
+        "key": "home_keeper_games",
         "data": state,
     }
     STORE_OUT.write_text(json.dumps(document, indent=1, ensure_ascii=False) + "\n")

@@ -12,9 +12,9 @@ on:
       # The API reference page is generated from the integration itself
       # (ci/generate_api_docs.py), so a PR that only adds a service or an event
       # still changes a doc page.
-      - 'custom_components/home_keeper_library/api_surface.py'
-      - 'custom_components/home_keeper_library/services.yaml'
-      - 'custom_components/home_keeper_library/strings.json'
+      - 'custom_components/home_keeper_games/api_surface.py'
+      - 'custom_components/home_keeper_games/services.yaml'
+      - 'custom_components/home_keeper_games/strings.json'
       - 'ci/generate_api_docs.py'
       - '.github/workflows/docs-preview.yml'
 

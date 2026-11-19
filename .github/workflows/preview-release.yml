@@ -44,7 +44,7 @@ jobs:
         env:
           PR: ${{ github.event.number }}
         run: |
-          BASE=$(python3 -c "import json;print(json.load(open('custom_components/home_keeper_library/manifest.json'))['version'])")
+          BASE=$(python3 -c "import json;print(json.load(open('custom_components/home_keeper_games/manifest.json'))['version'])")
           # X.Y.Z core of the current manifest version (drop any pre/dev suffix).
           CORE=$(python3 -c "import re;print(re.match(r'\d+\.\d+\.\d+', '$BASE').group())")
           # PEP 440 dev release keyed by PR number: a valid version HACS parses as a
@@ -61,7 +61,7 @@ jobs:
         run: |
           python3 - <<'PY'
           import json, os
-          path = "custom_components/home_keeper_library/manifest.json"
+          path = "custom_components/home_keeper_games/manifest.json"
           data = json.load(open(path))
           data["version"] = os.environ["VERSION"]
           json.dump(data, open(path, "w"), indent=2)
@@ -73,7 +73,7 @@ jobs:
           node-version: "22"
 
       - name: Install frontend deps
-        run: npm ci --prefix custom_components/home_keeper_library/frontend
+        run: npm ci --prefix custom_components/home_keeper_games/frontend
 
       - name: Build panel + card JS
         run: bash ci/build-panel.sh
@@ -83,11 +83,11 @@ jobs:
 
       - name: Verify release zip
         run: |
-          if [ ! -f home_keeper_library.zip ]; then
-            echo "::error::home_keeper_library.zip not found"
+          if [ ! -f home_keeper_games.zip ]; then
+            echo "::error::home_keeper_games.zip not found"
             exit 1
           fi
-          echo "home_keeper_library.zip exists ($(du -h home_keeper_library.zip | cut -f1))"
+          echo "home_keeper_games.zip exists ($(du -h home_keeper_games.zip | cut -f1))"
 
       - name: Replace any previous preview release for this PR
         uses: actions/github-script@v9
@@ -118,9 +118,9 @@ jobs:
 
             Built from commit `${{ github.event.pull_request.head.sha }}`.
 
-            **Install via HACS:** open *Home Keeper Library* → ⋮ → **Redownload**, enable **Show beta versions**, and pick `${{ steps.ver.outputs.version }}`. Or download `home_keeper_library.zip` below and unzip into `config/custom_components/home_keeper_library/`.
+            **Install via HACS:** open *Home Keeper Library* → ⋮ → **Redownload**, enable **Show beta versions**, and pick `${{ steps.ver.outputs.version }}`. Or download `home_keeper_games.zip` below and unzip into `config/custom_components/home_keeper_games/`.
           prerelease: true
-          files: home_keeper_library.zip
+          files: home_keeper_games.zip
 
       - name: Sticky comment with install instructions
         uses: actions/github-script@v9
@@ -141,7 +141,7 @@ jobs:
               '',
               '**Install via HACS:** open *Home Keeper Library* → ⋮ → **Redownload**, enable **Show beta versions**, and pick `' + version + '`. (HACS may need a refresh to see it.)',
               '',
-              'Or grab `home_keeper_library.zip` from the [release](' + url + ') and unzip into `config/custom_components/home_keeper_library/`.',
+              'Or grab `home_keeper_games.zip` from the [release](' + url + ') and unzip into `config/custom_components/home_keeper_games/`.',
               '',
               '> Ephemeral — this release is **deleted when the PR closes**, and re-published on each push.',
             ].join('\n');

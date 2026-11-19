@@ -2,10 +2,10 @@
 title: People and privilege
 summary: How the library finds the person of a caller, which operations are admin-only, which act for the caller's own person, and what each projection hides.
 implements:
-  - custom_components/home_keeper_library/people.py
-  - custom_components/home_keeper_library/projections.py
+  - custom_components/home_keeper_games/people.py
+  - custom_components/home_keeper_games/projections.py
 related: [events-api, entities, architecture]
-source_hash: 496683ae64cc
+source_hash: 5a5f3a9d6ca4
 ---
 
 # People and privilege

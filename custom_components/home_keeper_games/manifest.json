@@ -1,6 +1,6 @@
 {
-  "domain": "home_keeper_library",
-  "name": "Home Keeper Library",
+  "domain": "home_keeper_games",
+  "name": "Home Keeper Games",
   "after_dependencies": [
     "home_keeper",
     "lovelace"

@@ -209,10 +209,10 @@ def main() -> int:
         check_versions(
             head_changelog,
             manifest_version(
-                _file_at("HEAD", "custom_components/home_keeper_library/manifest.json")
+                _file_at("HEAD", "custom_components/home_keeper_games/manifest.json")
             ),
             panel_version(
-                _file_at("HEAD", "custom_components/home_keeper_library/const.py")
+                _file_at("HEAD", "custom_components/home_keeper_games/const.py")
             ),
             _tag_exists,
         ),

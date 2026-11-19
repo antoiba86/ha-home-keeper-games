@@ -45,9 +45,9 @@ afterEach(() => {
 describe('data', () => {
   it('fetches get_state, then subscribes, and fetches again on changed', async () => {
     const fake = await mount();
-    expect(fake.send.mock.calls[0][0]).toEqual({ type: 'home_keeper_library/get_state' });
+    expect(fake.send.mock.calls[0][0]).toEqual({ type: 'home_keeper_games/get_state' });
     expect(fake.hass.connection.subscribeMessage).toHaveBeenCalledTimes(1);
-    expect(fake.subs[0].msg).toEqual({ type: 'home_keeper_library/subscribe' });
+    expect(fake.subs[0].msg).toEqual({ type: 'home_keeper_games/subscribe' });
     fake.push();
     await flush();
     expect(fake.calls('get_state')).toHaveLength(2);
@@ -168,7 +168,7 @@ describe('covers', () => {
   it('signs each cover path, then shows the image with the signed URL', async () => {
     const state = fixture();
     const book = state.books.find((b) => b.title === 'The Left Hand of Darkness');
-    expect(book.cover_url).toMatch(/^\/api\/home_keeper_library\/cover\/[0-9a-f]{32}\?v=[0-9a-f]{8}$/);
+    expect(book.cover_url).toMatch(/^\/api\/home_keeper_games\/cover\/[0-9a-f]{32}\?v=[0-9a-f]{8}$/);
     const fake = await mount('/books');
     const signs = fake.send.mock.calls.map((c) => c[0]).filter((m) => m.type === 'auth/sign_path');
     expect(signs.length).toBe(state.books.filter((b) => b.owned && b.cover_url).length);
@@ -268,7 +268,7 @@ describe('book detail', () => {
     const fake = await mount(`/books/${bookId(state, 'The Left Hand of Darkness')}`);
     $('[data-act="return-loan"]').click();
     await flush();
-    expect(fake.calls('return_loan')).toEqual([{ type: 'home_keeper_library/return_loan', loan_id: expect.any(String) }]);
+    expect(fake.calls('return_loan')).toEqual([{ type: 'home_keeper_games/return_loan', loan_id: expect.any(String) }]);
     expect(host.showToast).toHaveBeenCalledWith('Book returned.');
   });
 
@@ -453,7 +453,7 @@ describe('shelves, loans, wishlist and settings', () => {
     expect($$('[data-key="wishlist_todo"] option').map((o) => o.textContent)).toContain('Books list');
     change($(`[data-k="pg-${ALEX}"]`), '30');
     await flush();
-    expect(fake.calls('set_person_settings')[0]).toEqual({ type: 'home_keeper_library/set_person_settings', person_id: ALEX, yearly_goal: 30 });
+    expect(fake.calls('set_person_settings')[0]).toEqual({ type: 'home_keeper_games/set_person_settings', person_id: ALEX, yearly_goal: 30 });
   });
 });
 
@@ -465,7 +465,7 @@ describe('settings currency', () => {
     input.value = 'usd';
     $('[data-k="currency-save"]').click();
     await flush();
-    expect(fake.calls('set_settings')).toEqual([{ type: 'home_keeper_library/set_settings', currency: 'USD' }]);
+    expect(fake.calls('set_settings')).toEqual([{ type: 'home_keeper_games/set_settings', currency: 'USD' }]);
     expect(host.showToast).toHaveBeenCalledWith('Settings saved.');
   });
 
@@ -686,7 +686,7 @@ describe('scan with no match', () => {
     await flush();
     const calls = fake.calls('update_book');
     expect(calls).toHaveLength(1);
-    expect(calls[0]).toEqual({ type: 'home_keeper_library/update_book', book_id: 'new', title: 'Field Notes on Moss' });
+    expect(calls[0]).toEqual({ type: 'home_keeper_games/update_book', book_id: 'new', title: 'Field Notes on Moss' });
     expect(fake.calls('update_copy')).toHaveLength(0);
     expect(fake.calls('set_cover')).toHaveLength(0);
     expect(sheet()).toBeNull();
@@ -758,14 +758,14 @@ describe('scan with no match', () => {
     sheet().querySelector('[data-k="d-submit"]').click();
     await flush();
     expect(fake.calls('update_book')[0]).toEqual({
-      type: 'home_keeper_library/update_book',
+      type: 'home_keeper_games/update_book',
       book_id: 'new',
       title: 'Field Notes on Moss',
       authors: ['A. Hollins', 'B. Reed'],
       published: '2004',
       pages: 120,
     });
-    expect(fake.calls('update_copy')[0]).toEqual({ type: 'home_keeper_library/update_copy', copy_id: 'c-new', format: 'hardcover' });
+    expect(fake.calls('update_copy')[0]).toEqual({ type: 'home_keeper_games/update_copy', copy_id: 'c-new', format: 'hardcover' });
     expect(sheet()).toBeNull();
   });
 
@@ -787,7 +787,7 @@ describe('scan with no match', () => {
     expect(remove.textContent).toBe('Remove this scan');
     remove.click();
     await flush();
-    expect(fake.calls('delete_book')).toEqual([{ type: 'home_keeper_library/delete_book', book_id: 'one' }]);
+    expect(fake.calls('delete_book')).toEqual([{ type: 'home_keeper_games/delete_book', book_id: 'one' }]);
     expect(sheet().querySelector('[data-k="d-isbn"]').textContent).toBe('ISBN 9780306406157');
     expect($$('[data-k^="removed-"]').map((p) => p.textContent)).toEqual(['Removed']);
 
@@ -816,7 +816,7 @@ describe('scan with no match', () => {
     sheet().querySelector('[data-k="d-submit"]').click();
     await flush();
     expect(fake.calls('search_catalog')).toEqual([
-      { type: 'home_keeper_library/search_catalog', title: 'Field notes on moss', authors: ['Hollins'] },
+      { type: 'home_keeper_games/search_catalog', title: 'Field notes on moss', authors: ['Hollins'] },
     ]);
     // The title sheet becomes the match dialog. It is not a sheet.
     expect(sheet()).toBeNull();
@@ -836,7 +836,7 @@ describe('scan with no match', () => {
 
     dlg.querySelector('[data-k="d-submit"]').click();
     await flush();
-    expect(fake.calls('link_catalog')).toEqual([{ type: 'home_keeper_library/link_catalog', book_id: 'new', record: 'OL45W' }]);
+    expect(fake.calls('link_catalog')).toEqual([{ type: 'home_keeper_games/link_catalog', book_id: 'new', record: 'OL45W' }]);
     expect($('.hkl-dialog')).toBeNull();
     expect(host.showToast).toHaveBeenCalledWith('Details added from Open Library.');
     // The row and the summary show the match, not a book that needs details.
@@ -1100,7 +1100,7 @@ describe('import', () => {
     pick('library.csv', big);
     await flush(10);
     expect(fake.calls('import_csv')).toEqual([]);
-    expect(callApi).toHaveBeenCalledWith('POST', 'services/home_keeper_library/import_csv?return_response', expect.objectContaining({ dry_run: true, source: 'goodreads', person_id: ALEX }));
+    expect(callApi).toHaveBeenCalledWith('POST', 'services/home_keeper_games/import_csv?return_response', expect.objectContaining({ dry_run: true, source: 'goodreads', person_id: ALEX }));
     expect(callApi.mock.calls[0][2].content).toBe(big);
     expect(text()).toContain('Import 1 row');
   });
@@ -1141,7 +1141,7 @@ describe('Open Library', () => {
     expect($('[data-k="ol-banner"]').textContent).toContain('Open Library does not have this book');
     $('[data-k="ol-not-now"]').click();
     await flush();
-    expect(fake.calls('skip_catalog')).toEqual([{ type: 'home_keeper_library/skip_catalog', book_id: id }]);
+    expect(fake.calls('skip_catalog')).toEqual([{ type: 'home_keeper_games/skip_catalog', book_id: id }]);
     expect(host.showToast).toHaveBeenCalledWith('The book is no longer in the Not on Open Library list.');
   });
 
@@ -1186,7 +1186,7 @@ describe('Open Library', () => {
     dlg.querySelector('[data-k="d-submit"]').click();
     await flush();
     expect(fake.calls('send_to_catalog')).toEqual([
-      { type: 'home_keeper_library/send_to_catalog', book_id: id, fields: ['publisher', 'isbn'], include_cover: true },
+      { type: 'home_keeper_games/send_to_catalog', book_id: id, fields: ['publisher', 'isbn'], include_cover: true },
     ]);
     expect(dlg.querySelector('[data-k="d-ol-added"]').textContent).toContain('OL5M');
     expect(dlg.querySelector('[data-k="d-ol-cover-failed"]')).not.toBeNull();
@@ -1219,7 +1219,7 @@ describe('Open Library', () => {
     expect(dlg.querySelector('[data-k="d-submit"]').textContent).toBe('Link to OL9M');
     dlg.querySelector('[data-k="d-submit"]').click();
     await flush();
-    expect(fake.calls('link_catalog')).toEqual([{ type: 'home_keeper_library/link_catalog', book_id: id, record: 'OL9M' }]);
+    expect(fake.calls('link_catalog')).toEqual([{ type: 'home_keeper_games/link_catalog', book_id: id, record: 'OL9M' }]);
     expect(host.showToast).toHaveBeenCalledWith('Book linked to Open Library.');
     expect(dlg.innerHTML).toBe('');
   });

@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
-const FRONTEND = 'custom_components/home_keeper_library/frontend';
+const FRONTEND = 'custom_components/home_keeper_games/frontend';
 
 export default defineConfig({
   resolve: {

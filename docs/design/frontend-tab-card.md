@@ -2,30 +2,30 @@
 title: Tab and card
 summary: How the Library tab runs inside the Home Keeper panel, how the card shows the reading of a person, and how both read the state, route, render, translate and ship.
 implements:
-  - custom_components/home_keeper_library/frontend_assets.py
-  - custom_components/home_keeper_library/card.py
-  - custom_components/home_keeper_library/card_resource.py
-  - custom_components/home_keeper_library/frontend/src/tab.ts
-  - custom_components/home_keeper_library/frontend/src/tab-index.ts
-  - custom_components/home_keeper_library/frontend/src/tab-types.ts
-  - custom_components/home_keeper_library/frontend/src/tab-books.ts
-  - custom_components/home_keeper_library/frontend/src/tab-shelves.ts
-  - custom_components/home_keeper_library/frontend/src/tab-lists.ts
-  - custom_components/home_keeper_library/frontend/src/tab-dialogs.ts
-  - custom_components/home_keeper_library/frontend/src/card.ts
-  - custom_components/home_keeper_library/frontend/src/card-index.ts
-  - custom_components/home_keeper_library/frontend/src/api.ts
-  - custom_components/home_keeper_library/frontend/src/types.ts
-  - custom_components/home_keeper_library/frontend/src/utils.ts
-  - custom_components/home_keeper_library/frontend/src/i18n.ts
-  - custom_components/home_keeper_library/frontend/src/locales/index.ts
-  - custom_components/home_keeper_library/frontend/src/markup.ts
-  - custom_components/home_keeper_library/frontend/src/markdown.ts
-  - custom_components/home_keeper_library/frontend/src/dom.ts
-  - custom_components/home_keeper_library/frontend/src/styles.ts
-  - custom_components/home_keeper_library/frontend/src/global.d.ts
+  - custom_components/home_keeper_games/frontend_assets.py
+  - custom_components/home_keeper_games/card.py
+  - custom_components/home_keeper_games/card_resource.py
+  - custom_components/home_keeper_games/frontend/src/tab.ts
+  - custom_components/home_keeper_games/frontend/src/tab-index.ts
+  - custom_components/home_keeper_games/frontend/src/tab-types.ts
+  - custom_components/home_keeper_games/frontend/src/tab-books.ts
+  - custom_components/home_keeper_games/frontend/src/tab-shelves.ts
+  - custom_components/home_keeper_games/frontend/src/tab-lists.ts
+  - custom_components/home_keeper_games/frontend/src/tab-dialogs.ts
+  - custom_components/home_keeper_games/frontend/src/card.ts
+  - custom_components/home_keeper_games/frontend/src/card-index.ts
+  - custom_components/home_keeper_games/frontend/src/api.ts
+  - custom_components/home_keeper_games/frontend/src/types.ts
+  - custom_components/home_keeper_games/frontend/src/utils.ts
+  - custom_components/home_keeper_games/frontend/src/i18n.ts
+  - custom_components/home_keeper_games/frontend/src/locales/index.ts
+  - custom_components/home_keeper_games/frontend/src/markup.ts
+  - custom_components/home_keeper_games/frontend/src/markdown.ts
+  - custom_components/home_keeper_games/frontend/src/dom.ts
+  - custom_components/home_keeper_games/frontend/src/styles.ts
+  - custom_components/home_keeper_games/frontend/src/global.d.ts
 related: [home-keeper-dependency, scan-and-isbn, csv-import-export, people-privilege]
-source_hash: 6b497947be8a
+source_hash: b9acf48b8590
 ---
 
 # Tab and card
@@ -55,7 +55,7 @@ with no runtime framework. The rules for a change are in
 
 ### Delivery
 
-`frontend_assets.async_register` serves `frontend/dist/` at `/home_keeper_library_static`.
+`frontend_assets.async_register` serves `frontend/dist/` at `/home_keeper_games_static`.
 The tab URL with its hash goes to Home Keeper ([home-keeper-dependency](home-keeper-dependency.md)).
 Rollup builds `tab-index.ts` and `card-index.ts` with the locale tables and `PANEL_VERSION`
 inlined, and the zxing decoder as a separate chunk. `card.async_register_card` delivers
@@ -145,6 +145,6 @@ their reading. Each section has a toggle in the visual editor. The card calls `s
 - The element names `home-keeper-library-tab` and `home-keeper-library-card`, and the
   bundle names `library-tab.js` and `library-card.js`.
 - The tab paths and the `;key=value` filter keys, because a user can bookmark them.
-- The Lovelace resource of type `module` at `/home_keeper_library_static/library-card.js`.
+- The Lovelace resource of type `module` at `/home_keeper_games_static/library-card.js`.
 - The card config keys `person`, `title`, `search`, `reading`, `want`, `goal` and
   `household`.

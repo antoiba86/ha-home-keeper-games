@@ -80,7 +80,7 @@ async def setup_entry(hass, persons, hk_entry):
     """Set up the library from a new config entry and return the entry."""
     from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-    from custom_components.home_keeper_library.const import DOMAIN
+    from custom_components.home_keeper_games.const import DOMAIN
 
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -101,7 +101,7 @@ def call(hass, persons):
     """Call a library service as `admin`, `user` or no user. Return the reply."""
     from homeassistant.core import Context
 
-    from custom_components.home_keeper_library.const import DOMAIN
+    from custom_components.home_keeper_games.const import DOMAIN
 
     async def _call(
         service: str, data: dict[str, Any] | None = None, *, as_: str | None = "admin"
@@ -157,7 +157,7 @@ def blockbuster() -> Iterator[BlockBuster]:
     Assistant and its test harness do blocking work of their own that the
     library cannot change, for example when the ``frontend`` component starts.
     """
-    with blockbuster_ctx("custom_components.home_keeper_library") as bb:
+    with blockbuster_ctx("custom_components.home_keeper_games") as bb:
         # The harness logs to a stream handler on the loop thread. A running
         # Home Assistant logs through a queue, so this write is a test artifact.
         bb.functions["io.TextIOWrapper.write"].can_block_in(

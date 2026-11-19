@@ -35,7 +35,7 @@ DASHBOARD = HA_CONFIG / "home-keeper-library-e2e.yaml"
 CARD_INDEX = (
     ROOT
     / "custom_components"
-    / "home_keeper_library"
+    / "home_keeper_games"
     / "frontend"
     / "src"
     / "card-index.ts"
@@ -97,7 +97,7 @@ def test_seeded_config_entries_carry_no_runtime_state() -> None:
     """The seed holds 1 entry for Home Keeper and 1 for the library."""
     entries = _payload()["data"]["entries"]
     domains = sorted(entry.get("domain") for entry in entries)
-    assert domains == ["home_keeper", "home_keeper_library"], (
+    assert domains == ["home_keeper", "home_keeper_games"], (
         f"the seed should hold 1 Home Keeper and 1 library entry, found {domains}. "
         f"A local container run adds its own. {RESTORE}"
     )

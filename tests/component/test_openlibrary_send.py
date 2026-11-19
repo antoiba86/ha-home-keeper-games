@@ -12,13 +12,13 @@ from homeassistant.exceptions import ServiceValidationError
 from PIL import Image
 from pytest_homeassistant_custom_component.common import async_capture_events
 
-from custom_components.home_keeper_library.const import (
+from custom_components.home_keeper_games.const import (
     CONF_OPENLIBRARY_ACCESS,
     CONF_OPENLIBRARY_SECRET,
     CONF_OPENLIBRARY_USERNAME,
 )
-from custom_components.home_keeper_library.covers import covers_dir
-from custom_components.home_keeper_library.diagnostics import (
+from custom_components.home_keeper_games.covers import covers_dir
+from custom_components.home_keeper_games.diagnostics import (
     async_get_config_entry_diagnostics,
 )
 
@@ -111,7 +111,7 @@ async def _openlibrary_step(hass, entry) -> dict:
 async def test_connect_keeps_the_keys_in_the_entry_data(
     hass, setup_entry, aioclient_mock
 ) -> None:
-    updated = async_capture_events(hass, "home_keeper_library_settings_updated")
+    updated = async_capture_events(hass, "home_keeper_games_settings_updated")
     _mock_login(aioclient_mock)
     result = await _openlibrary_step(hass, setup_entry)
     assert result["type"] is FlowResultType.FORM
@@ -429,7 +429,7 @@ async def test_link_work_errors(hass, setup_entry, call, aioclient_mock) -> None
 async def test_skip_catalog(hass, setup_entry, call) -> None:
     book = await _book(call)
     await setup_entry.runtime_data.lookup.async_join()
-    updated = async_capture_events(hass, "home_keeper_library_book_updated")
+    updated = async_capture_events(hass, "home_keeper_games_book_updated")
     reply = await call("skip_catalog", {"book_id": book["id"]})
     assert reply["book"]["catalog_status"] == {"openlibrary": "skipped"}
     reply = await call("skip_catalog", {"book_id": book["id"], "skip": False})

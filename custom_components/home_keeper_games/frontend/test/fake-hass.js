@@ -19,7 +19,7 @@ export function bookId(state, title) {
 export function fakeHass({ state = fixture(), replies = {}, language = 'en', callApi } = {}) {
   const subs = [];
   const send = vi.fn(async (msg) => {
-    const cmd = msg.type.replace('home_keeper_library/', '');
+    const cmd = msg.type.replace('home_keeper_games/', '');
     if (cmd === 'get_state') return structuredClone(state);
     if (msg.type === 'auth/sign_path' && !('auth/sign_path' in replies)) return { path: `${msg.path}&authSig=t${msg.expires}` };
     if (cmd in replies) {
@@ -51,7 +51,7 @@ export function fakeHass({ state = fixture(), replies = {}, language = 'en', cal
     state,
     subs,
     push: () => subs.forEach((s) => s.cb({ type: 'changed', revision: 2 })),
-    calls: (cmd) => send.mock.calls.map((c) => c[0]).filter((m) => m.type === `home_keeper_library/${cmd}`),
+    calls: (cmd) => send.mock.calls.map((c) => c[0]).filter((m) => m.type === `home_keeper_games/${cmd}`),
   };
 }
 

@@ -6,7 +6,7 @@ writes the loan changes through the store. The contract is sections 1 to 6 of
 ``docs/INTEGRATING.md`` in Home Keeper:
 
 * Each call to Home Keeper is guarded with ``has_service`` and sends
-  ``origin: "home_keeper_library"``.
+  ``origin: "home_keeper_games"``.
 * ``home_keeper_task_completed`` with the source of a loan returns the loan.
   The event of a completion that the library sent itself has the library origin
   and is ignored, so there is no loop.
@@ -96,7 +96,7 @@ class LoanSync:
         if self._pending is not None and not self._pending.done():
             return
         self._pending = self._coordinator.config_entry.async_create_background_task(
-            self._hass, self.async_reconcile(), "home_keeper_library loan sync"
+            self._hass, self.async_reconcile(), "home_keeper_games loan sync"
         )
 
     def _available(self) -> bool:

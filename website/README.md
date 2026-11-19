@@ -34,7 +34,7 @@ them from the canonical Markdown in the repository and rewrites links and images
 The full list is `DEV_DOCS` in `website/scripts/doc-map.mjs`.
 
 `ci/generate_api_docs.py` renders the **API reference** (website/developer/api.md)
-from the integration: `custom_components/home_keeper_library/api_surface.py` for the structure,
+from the integration: `custom_components/home_keeper_games/api_surface.py` for the structure,
 and `services.yaml` plus `strings.json` for each label and description. Thus the page
 and the Home Assistant dialogs use the same text. `npm run sync` runs it after
 `sync-docs.mjs`, which clears that directory first. It needs Python with `PyYAML`.

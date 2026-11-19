@@ -2,7 +2,7 @@
 
 The other tests in this tier check one behavior each. This module calls the
 diagnostics download, each config flow and options flow step, and every
-``home_keeper_library`` service against the real container. The CI log gate
+``home_keeper_games`` service against the real container. The CI log gate
 (``ci/check-ha-log.py``) then reads the container log. Home Assistant runs in
 Python dev mode there (see ``docker-compose.yml``), so a blocking call in the
 event loop, a coroutine that nobody awaited or a slow callback shows in the log.
@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import pytest
 
-DOMAIN = "home_keeper_library"
+DOMAIN = "home_keeper_games"
 
 # Services that Open Library would answer. A valid call reaches the network, so
 # the test sends input that fails validation, and the service answers with an error.

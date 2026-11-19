@@ -16,8 +16,8 @@ from fnmatch import fnmatch
 from pathlib import Path
 
 _SCRIPT = Path(__file__).resolve().parents[2] / "ci" / "mutation_scope.py"
-_PATH = "custom_components/home_keeper_library/fake.py"
-_MOD = "custom_components.home_keeper_library.fake"
+_PATH = "custom_components/home_keeper_games/fake.py"
+_MOD = "custom_components.home_keeper_games.fake"
 
 _SOURCE = (
     "def _parse_mmdd(value):\n"  # 1
@@ -49,7 +49,7 @@ scope = _load()
 
 
 def _filters(tmp_path, monkeypatch, line: int) -> list[str]:
-    pkg = tmp_path / "custom_components" / "home_keeper_library"
+    pkg = tmp_path / "custom_components" / "home_keeper_games"
     pkg.mkdir(parents=True)
     (pkg / "fake.py").write_text(_SOURCE)
     monkeypatch.setattr(scope, "ROOT", tmp_path)

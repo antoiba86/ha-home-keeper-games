@@ -1,10 +1,10 @@
 """The websocket commands of the library tab and the card.
 
-* ``home_keeper_library/get_state`` returns the whole library, projected for the
+* ``home_keeper_games/get_state`` returns the whole library, projected for the
   caller (see ``projections.project_state``).
-* ``home_keeper_library/subscribe`` sends ``{"type": "changed", "revision": n}``
+* ``home_keeper_games/subscribe`` sends ``{"type": "changed", "revision": n}``
   after each store change. The client then calls ``get_state`` again.
-* ``home_keeper_library/list_todo_entities`` lists the to-do entities for the
+* ``home_keeper_games/list_todo_entities`` lists the to-do entities for the
   wishlist list picker. Admin only.
 * Each other command is the twin of a service, with the same name, the same
   fields and the same gate. It calls the same handler in ``services.py``. The

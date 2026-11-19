@@ -12,8 +12,8 @@ it.
 
 from __future__ import annotations
 
-DOMAIN = "home_keeper_library"
-NAME = "Home Keeper Library"
+DOMAIN = "home_keeper_games"
+NAME = "Home Keeper Games"
 ICON = "mdi:bookshelf"
 DOCS_URL = "https://github.com/antoiba86/ha-home-keeper-games"
 USER_AGENT = "HomeKeeperLibrary/{version} (+" + DOCS_URL + ")"
@@ -45,7 +45,7 @@ PLATFORMS = ["sensor", "todo"]
 PANEL_VERSION = "0.4.0"
 
 # The built bundles are in frontend/dist/ and Home Assistant serves them here.
-STATIC_URL = "/home_keeper_library_static"
+STATIC_URL = "/home_keeper_games_static"
 TAB_JS_FILENAME = "library-tab.js"
 CARD_JS_FILENAME = "library-card.js"
 TAB_ID = "library"
@@ -54,8 +54,8 @@ TAB_ORDER = 50
 TAB_HOST_API = 1
 
 # The cover HTTP views.
-COVER_URL_PREFIX = "/api/home_keeper_library/cover"
-COVER_UPLOAD_URL = "/api/home_keeper_library/upload"
+COVER_URL_PREFIX = "/api/home_keeper_games/cover"
+COVER_UPLOAD_URL = "/api/home_keeper_games/upload"
 COVER_MAX_BYTES = 10 * 1024 * 1024
 COVER_MAX_PX = 1200
 # The cover files, below `.storage/`. The store file has the name of the domain.
@@ -65,7 +65,7 @@ SIGNAL_STORE_CHANGED = f"{DOMAIN}_store_changed"
 # The first bytes that the upload view reads to identify the image type.
 SNIFF_BYTES = 16
 
-# The storage document, ``.storage/home_keeper_library``.
+# The storage document, ``.storage/home_keeper_games``.
 STORAGE_KEY = DOMAIN
 STORAGE_VERSION = 1
 STORAGE_MINOR_VERSION = 1
@@ -94,8 +94,8 @@ OPENLIBRARY_COVERS_URL = "https://covers.openlibrary.org"
 # Environment variables that replace the 2 Open Library base URLs. Only the
 # browser test setup sets them, to point at a fixture server, because Open
 # Library is not reachable from the test container.
-OPENLIBRARY_URL_ENV = "HOME_KEEPER_LIBRARY_OPENLIBRARY_URL"
-OPENLIBRARY_COVERS_URL_ENV = "HOME_KEEPER_LIBRARY_OPENLIBRARY_COVERS_URL"
+OPENLIBRARY_URL_ENV = "HOME_KEEPER_GAMES_OPENLIBRARY_URL"
+OPENLIBRARY_COVERS_URL_ENV = "HOME_KEEPER_GAMES_OPENLIBRARY_COVERS_URL"
 OPENLIBRARY_TIMEOUT_S = 10
 OPENLIBRARY_MIN_INTERVAL_S = 1.0
 OPENLIBRARY_MISS_TTL_S = 24 * 60 * 60
@@ -112,7 +112,7 @@ READING_NOW_MAX_TITLES = 10
 # back in the events of Home Keeper to stop a loop.
 ORIGIN = DOMAIN
 
-# The bus events. Each name is ``home_keeper_library_<noun>_<verb>``. The pure
+# The bus events. Each name is ``home_keeper_games_<noun>_<verb>``. The pure
 # builders in events.py make the payloads, and the store fires them.
 EVENT_ROOM_ADDED = f"{DOMAIN}_room_added"
 EVENT_ROOM_UPDATED = f"{DOMAIN}_room_updated"

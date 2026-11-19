@@ -2,10 +2,10 @@
 title: CSV import and export
 summary: How the library reads Goodreads, StoryGraph and library CSV files with a dry run first, how it matches rows to books, and how it writes an export.
 implements:
-  - custom_components/home_keeper_library/csv_io.py
-  - custom_components/home_keeper_library/frontend/src/tab-import.ts
+  - custom_components/home_keeper_games/csv_io.py
+  - custom_components/home_keeper_games/frontend/src/tab-import.ts
 related: [store-models, open-library-covers, events-api]
-source_hash: be6af1ad44e6
+source_hash: 6f3e5adf847c
 ---
 
 # CSV import and export

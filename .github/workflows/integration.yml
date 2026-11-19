@@ -53,10 +53,10 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: custom_components/home_keeper_library/frontend/package-lock.json
+          cache-dependency-path: custom_components/home_keeper_games/frontend/package-lock.json
 
       - name: Install frontend deps
-        run: npm ci --prefix custom_components/home_keeper_library/frontend
+        run: npm ci --prefix custom_components/home_keeper_games/frontend
 
       - name: Build panel JS
         run: bash ci/build-panel.sh
@@ -99,7 +99,7 @@ jobs:
         run: docker compose logs homeassistant
 
       # The 3 steps below run even when the tests fail. The log has the records of
-      # Home Keeper too. The gate reads only the records of home_keeper_library.
+      # Home Keeper too. The gate reads only the records of home_keeper_games.
       # The file name has the lane, so the 2 lanes never share an artifact.
       - name: Save the Home Assistant log
         if: always()
@@ -116,7 +116,7 @@ jobs:
 
       - name: Check the Home Assistant log
         if: always()
-        run: python ci/check-ha-log.py --domain home_keeper_library "ha-${{ matrix.ha }}.log"
+        run: python ci/check-ha-log.py --domain home_keeper_games "ha-${{ matrix.ha }}.log"
 
       - name: Cleanup
         if: always()

@@ -1,4 +1,4 @@
-"""The ``home_keeper_library.*`` services and the operations behind them.
+"""The ``home_keeper_games.*`` services and the operations behind them.
 
 Each service has 1 handler here, ``async (ctx, data) -> response``. The service
 registration and the websocket twin of the service (``websocket_api.py``) both

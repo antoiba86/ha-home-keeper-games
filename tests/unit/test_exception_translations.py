@@ -19,7 +19,7 @@ from pathlib import Path
 import pytest
 
 _COMPONENT = (
-    Path(__file__).resolve().parents[2] / "custom_components" / "home_keeper_library"
+    Path(__file__).resolve().parents[2] / "custom_components" / "home_keeper_games"
 )
 # Exception types that surface to the user and therefore must be translatable.
 _TRANSLATABLE = {"ServiceValidationError", "HomeAssistantError"}

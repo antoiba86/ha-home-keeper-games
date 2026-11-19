@@ -23,21 +23,21 @@ TS = "2026-11-02 10:00:00.123"
 
 CLEAN_LOG = f"""\
 {TS} INFO (MainThread) [homeassistant.core] Starting Home Assistant
-{TS} WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration home_keeper_library which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
-{TS} DEBUG (MainThread) [custom_components.home_keeper_library.coordinator] debug line is fine
-{TS} INFO (MainThread) [custom_components.home_keeper_library] Setup done
+{TS} WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration home_keeper_games which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+{TS} DEBUG (MainThread) [custom_components.home_keeper_games.coordinator] debug line is fine
+{TS} INFO (MainThread) [custom_components.home_keeper_games] Setup done
 {TS} WARNING (MainThread) [homeassistant.components.foo] Other integration warning
 """
 
 BLOCKING_LOG = f"""\
 {TS} INFO (MainThread) [homeassistant.core] Starting Home Assistant
-{TS} WARNING (MainThread) [homeassistant.util.loop] Detected blocking call to read_text with args (PosixPath('/config/custom_components/home_keeper_library/manifest.json'),) inside the event loop by custom integration 'home_keeper_library' at custom_components/home_keeper_library/diagnostics.py, line 33: manifest_data = json.loads(manifest_path.read_text(encoding="utf-8")) (offender: /usr/local/lib/python3.13/pathlib/_local.py, line 546: return f.read()), please create a bug report at https://github.com/antoiba86/ha-home-keeper-games/issues
+{TS} WARNING (MainThread) [homeassistant.util.loop] Detected blocking call to read_text with args (PosixPath('/config/custom_components/home_keeper_games/manifest.json'),) inside the event loop by custom integration 'home_keeper_games' at custom_components/home_keeper_games/diagnostics.py, line 33: manifest_data = json.loads(manifest_path.read_text(encoding="utf-8")) (offender: /usr/local/lib/python3.13/pathlib/_local.py, line 546: return f.read()), please create a bug report at https://github.com/antoiba86/ha-home-keeper-games/issues
 Traceback (most recent call last):
-  File "/config/custom_components/home_keeper_library/diagnostics.py", line 33, in async_get_config_entry_diagnostics
+  File "/config/custom_components/home_keeper_games/diagnostics.py", line 33, in async_get_config_entry_diagnostics
 """
 
 
-def run(log: str, domain: str = "home_keeper_library", allowlist=None):
+def run(log: str, domain: str = "home_keeper_games", allowlist=None):
     records = check_ha_log.parse_records(log.splitlines())
     return check_ha_log.check_records(records, domain, allowlist or [])
 
@@ -49,7 +49,7 @@ def test_clean_log_has_no_findings():
 def test_generic_custom_integration_notice_is_ignored():
     log = (
         f"{TS} WARNING (SyncWorker_0) [homeassistant.loader] We found a custom "
-        "integration home_keeper_library which has not been tested by Home Assistant. "
+        "integration home_keeper_games which has not been tested by Home Assistant. "
         "This component might cause stability problems\n"
     )
     assert run(log) == []
@@ -57,21 +57,21 @@ def test_generic_custom_integration_notice_is_ignored():
 
 @pytest.mark.parametrize("level", ["WARNING", "ERROR", "CRITICAL"])
 def test_integration_logger_at_warning_or_higher_fails(level):
-    log = f"{TS} {level} (MainThread) [custom_components.home_keeper_library.engine] boom\n"
+    log = (
+        f"{TS} {level} (MainThread) [custom_components.home_keeper_games.engine] boom\n"
+    )
     findings = run(log)
     assert len(findings) == 1
-    assert "custom_components.home_keeper_library.engine" in findings[0].rule
+    assert "custom_components.home_keeper_games.engine" in findings[0].rule
 
 
 def test_integration_root_logger_fails():
-    log = f"{TS} ERROR (MainThread) [custom_components.home_keeper_library] boom\n"
+    log = f"{TS} ERROR (MainThread) [custom_components.home_keeper_games] boom\n"
     assert len(run(log)) == 1
 
 
 def test_logger_of_other_domain_is_not_ours():
-    log = (
-        f"{TS} ERROR (MainThread) [custom_components.home_keeper_library_extra] boom\n"
-    )
+    log = f"{TS} ERROR (MainThread) [custom_components.home_keeper_games_extra] boom\n"
     assert run(log) == []
     log = f"{TS} ERROR (MainThread) [custom_components.other] boom\n"
     assert run(log) == []
@@ -102,25 +102,25 @@ def test_docker_compose_prefix_is_accepted():
     "message",
     [
         (
-            "/config/custom_components/home_keeper_library/engine.py:10: RuntimeWarning: "
+            "/config/custom_components/home_keeper_games/engine.py:10: RuntimeWarning: "
             "coroutine 'foo' was never awaited"
         ),
         (
             "Task exception was never retrieved\nTraceback (most recent call last):\n"
-            '  File "/config/custom_components/home_keeper_library/coordinator.py", line 5'
+            '  File "/config/custom_components/home_keeper_games/coordinator.py", line 5'
         ),
         (
             "Executing <Task pending name='Task-9' coro=<run() running at "
-            "/config/custom_components/home_keeper_library/coordinator.py:55>> "
+            "/config/custom_components/home_keeper_games/coordinator.py:55>> "
             "took 0.350 seconds"
         ),
         (
             "Unclosed client session client_session: <aiohttp.ClientSession> "
-            "created at /config/custom_components/home_keeper_library/x.py:3"
+            "created at /config/custom_components/home_keeper_games/x.py:3"
         ),
         (
-            "The integration 'home_keeper_library' uses a deprecated call "
-            "(custom_components/home_keeper_library/__init__.py)"
+            "The integration 'home_keeper_games' uses a deprecated call "
+            "(custom_components/home_keeper_games/__init__.py)"
         ),
     ],
 )
@@ -144,7 +144,7 @@ def test_traceback_lines_belong_to_the_record_before_them():
         f"{TS} ERROR (MainThread) [asyncio] Task exception was never retrieved\n"
         "future: <Task finished>\n"
         "Traceback (most recent call last):\n"
-        '  File "/config/custom_components/home_keeper_library/engine.py", line 1, in f\n'
+        '  File "/config/custom_components/home_keeper_games/engine.py", line 1, in f\n'
         f"{TS} INFO (MainThread) [homeassistant.core] later line\n"
     )
     findings = run(log)
@@ -160,9 +160,9 @@ def test_allowlist_entry_hides_a_finding(tmp_path):
     )
     allow = check_ha_log.load_allowlist(path)
     log = (
-        f"{TS} WARNING (MainThread) [custom_components.home_keeper_library.engine] "
+        f"{TS} WARNING (MainThread) [custom_components.home_keeper_games.engine] "
         "light.missing is unavailable\n"
-        f"{TS} WARNING (MainThread) [custom_components.home_keeper_library.engine] other\n"
+        f"{TS} WARNING (MainThread) [custom_components.home_keeper_games.engine] other\n"
     )
     findings = run(log, allowlist=allow)
     assert len(findings) == 1
@@ -195,7 +195,7 @@ def _cli(tmp_path, log_text, *extra):
             sys.executable,
             str(SCRIPT),
             "--domain",
-            "home_keeper_library",
+            "home_keeper_games",
             *extra,
             str(log),
         ],
@@ -217,7 +217,7 @@ def test_cli_exit_codes(tmp_path):
 
 def test_cli_reads_stdin():
     result = subprocess.run(
-        [sys.executable, str(SCRIPT), "--domain", "home_keeper_library"],
+        [sys.executable, str(SCRIPT), "--domain", "home_keeper_games"],
         input=BLOCKING_LOG,
         capture_output=True,
         text=True,
@@ -241,9 +241,9 @@ PREFIX = "homeassistant-1  | "
 REAL_BLOCKING_LINE = (
     "2026-11-02 10:00:05.200 WARNING (MainThread) [homeassistant.util.loop] "
     "Detected blocking call to open with args "
-    "(PosixPath('/config/custom_components/home_keeper_library/manifest.json'),) "
-    "inside the event loop by custom integration 'home_keeper_library' at "
-    "custom_components/home_keeper_library/diagnostics.py, line 34: "
+    "(PosixPath('/config/custom_components/home_keeper_games/manifest.json'),) "
+    "inside the event loop by custom integration 'home_keeper_games' at "
+    "custom_components/home_keeper_games/diagnostics.py, line 34: "
     'manifest_data = json.loads(manifest_path.read_text(encoding="utf-8")) '
     "(offender: /usr/local/lib/python3.13/pathlib/_local.py, line 546: "
     "return f.read()), please create a bug report at "
@@ -255,10 +255,10 @@ REAL_COMPOSE_LOG = "\n".join(
     for line in [
         "s6-rc: info: service s6rc-oneshot-runner: starting",
         "2026-11-02 10:00:00.100 INFO (MainThread) [homeassistant.bootstrap] Starting Home Assistant",
-        "2026-11-02 10:00:01.000 WARNING (SyncWorker_3) [homeassistant.loader] We found a custom integration home_keeper_library which has not been tested by Home Assistant.",
+        "2026-11-02 10:00:01.000 WARNING (SyncWorker_3) [homeassistant.loader] We found a custom integration home_keeper_games which has not been tested by Home Assistant.",
         REAL_BLOCKING_LINE,
         "Traceback (most recent call last):",
-        '  File "/config/custom_components/home_keeper_library/diagnostics.py", line 34, in async_get_config_entry_diagnostics',
+        '  File "/config/custom_components/home_keeper_games/diagnostics.py", line 34, in async_get_config_entry_diagnostics',
         '    manifest_data = json.loads(manifest_path.read_text(encoding="utf-8"))',
         "2026-11-02 10:00:06.000 INFO (MainThread) [homeassistant.components.http] Request done",
     ]
@@ -303,12 +303,12 @@ def test_compose_prefix_with_colour_codes_is_removed():
     ],
 )
 def test_other_timestamp_forms(stamp):
-    log = f"{stamp} ERROR (MainThread) [custom_components.home_keeper_library] boom\n"
+    log = f"{stamp} ERROR (MainThread) [custom_components.home_keeper_games] boom\n"
     assert len(run(log)) == 1
 
 
 def test_prefix_forms():
-    line = "2026-11-02 10:00:05.200 ERROR (MainThread) [custom_components.home_keeper_library] boom"
+    line = "2026-11-02 10:00:05.200 ERROR (MainThread) [custom_components.home_keeper_games] boom"
     for prefix in ("ha-1 | ", "ha_test.1  |", "homeassistant  | "):
         assert len(run(prefix + line + "\n")) == 1
 
@@ -388,7 +388,7 @@ def test_home_keeper_bad_patterns_are_ignored():
 def test_home_keeper_is_not_a_prefix_match_of_our_domain():
     # The Home Keeper domain is the start of ours. The check must see the boundary
     # in both directions.
-    ours = _hk_line("WARNING", "custom_components.home_keeper_library.store", "boom")
+    ours = _hk_line("WARNING", "custom_components.home_keeper_games.store", "boom")
     theirs = _hk_line("WARNING", "custom_components.home_keeper.store", "boom")
     assert len(run(ours)) == 1
     assert run(theirs) == []
@@ -411,8 +411,8 @@ def test_home_keeper_blocking_call_is_ignored_but_ours_is_found():
                 "WARNING",
                 "homeassistant.util.loop",
                 "Detected blocking call to read_text inside the event loop by "
-                "custom integration 'home_keeper_library' at "
-                "custom_components/home_keeper_library/covers.py, line 7: x",
+                "custom integration 'home_keeper_games' at "
+                "custom_components/home_keeper_games/covers.py, line 7: x",
             ),
         ]
     )
@@ -432,7 +432,7 @@ def test_cli_ignores_home_keeper_and_fails_on_the_library(tmp_path):
     bad = (
         clean
         + "\n"
-        + _hk_line("ERROR", "custom_components.home_keeper_library.store", "boom")
+        + _hk_line("ERROR", "custom_components.home_keeper_games.store", "boom")
     )
     assert _cli(tmp_path, bad).returncode == 1
 
@@ -450,9 +450,9 @@ GROUP_LOG = "\n".join(
     PREFIX + line
     for line in [
         "2026-11-02 10:00:00.100 INFO (MainThread) [homeassistant.bootstrap] Start",
-        _hk_line("ERROR", "custom_components.home_keeper_library.store", "bad 1"),
-        _hk_line("ERROR", "custom_components.home_keeper_library.store", "bad 22"),
-        _hk_line("ERROR", "custom_components.home_keeper_library.store", "bad 333"),
+        _hk_line("ERROR", "custom_components.home_keeper_games.store", "bad 1"),
+        _hk_line("ERROR", "custom_components.home_keeper_games.store", "bad 22"),
+        _hk_line("ERROR", "custom_components.home_keeper_games.store", "bad 333"),
         _real_blocking_line("read_text"),
         _real_blocking_line("open"),
     ]
@@ -492,7 +492,7 @@ def test_cli_prints_the_final_line_last_in_one_stream(tmp_path):
     assert lines[-1].endswith(
         "Fix them, or add a reason and a pattern to the allowlist."
     )
-    assert "problem(s) found for 'home_keeper_library'" in lines[-1]
+    assert "problem(s) found for 'home_keeper_games'" in lines[-1]
 
 
 def test_shipped_allowlist_does_not_hide_blocking_calls():

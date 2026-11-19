@@ -28,7 +28,7 @@ async def _copy(call) -> dict:
 
 async def test_lend_adds_a_home_keeper_task(hass, setup_entry, call) -> None:
     copy = await _copy(call)
-    started = async_capture_events(hass, "home_keeper_library_loan_started")
+    started = async_capture_events(hass, "home_keeper_games_loan_started")
     reply = await call(
         "lend_book", {"copy_id": copy["id"], "party": "Zed", "due": "2026-12-01"}
     )
@@ -38,18 +38,16 @@ async def test_lend_adds_a_home_keeper_task(hass, setup_entry, call) -> None:
     add = _calls(hass, "add_task")[0]
     assert add["name"] == "Get Dune back from Zed"
     assert add["recurrence_type"] == "one-off" and add["due"] == "2026-12-01"
-    assert add["source"] == {"home_keeper_library": {"loan_id": loan["id"]}}
-    assert add["managed_by"]["integration"] == "home_keeper_library"
+    assert add["source"] == {"home_keeper_games": {"loan_id": loan["id"]}}
+    assert add["managed_by"]["integration"] == "home_keeper_games"
     assert add["managed_by"]["config_entry_id"] == setup_entry.entry_id
     assert add["managed_by"]["locked_fields"] == ["name", "recurrence_type"]
     assert add["managed_by"]["completion_prompt"] == "Completing returns the loan."
-    returned = async_capture_events(hass, "home_keeper_library_loan_returned")
+    returned = async_capture_events(hass, "home_keeper_games_loan_returned")
     reply = await call("return_loan", {"loan_id": loan["id"]})
     assert reply["loan"]["returned"] == dt_util.now().date().isoformat()
     complete = _calls(hass, "complete_task")
-    assert complete == [
-        {"task_id": loan["hk_task_id"], "origin": "home_keeper_library"}
-    ]
+    assert complete == [{"task_id": loan["hk_task_id"], "origin": "home_keeper_games"}]
     assert len(returned) == 1, "the echo of our completion returns nothing again"
     await call("return_loan", {"loan_id": loan["id"]})
     assert len(returned) == 1
@@ -161,7 +159,7 @@ async def test_reconcile_at_setup(hass, setup_entry, call) -> None:
     tasks["orphan"] = {
         "id": "orphan",
         "name": "x",
-        "source": {"home_keeper_library": {"loan_id": "gone"}},
+        "source": {"home_keeper_games": {"loan_id": "gone"}},
         "next_due": "2026-01-01",
         "last_completed": None,
     }
@@ -188,7 +186,7 @@ async def test_overdue_fires_once(hass, setup_entry, call, freezer) -> None:
             },
         )
     )["loan"]
-    overdue = async_capture_events(hass, "home_keeper_library_loan_overdue")
+    overdue = async_capture_events(hass, "home_keeper_games_loan_overdue")
     freezer.tick(timedelta(days=3))
     async_fire_time_changed(hass)
     await hass.async_block_till_done()
@@ -197,9 +195,9 @@ async def test_overdue_fires_once(hass, setup_entry, call, freezer) -> None:
     async_fire_time_changed(hass)
     await hass.async_block_till_done()
     assert len(overdue) == 1
-    entity = "sensor.home_keeper_library_loans_overdue"
+    entity = "sensor.home_keeper_games_loans_overdue"
     assert hass.states.get(entity).state == "1"
-    assert hass.states.get("sensor.home_keeper_library_loans_out").state == "1"
+    assert hass.states.get("sensor.home_keeper_games_loans_out").state == "1"
 
 
 async def test_home_keeper_removed_and_back(hass, setup_entry, call, hk_entry) -> None:
@@ -222,7 +220,7 @@ async def test_home_keeper_removed_and_back(hass, setup_entry, call, hk_entry) -
     assert await hass.config_entries.async_remove(hk_entry.entry_id)
     await hass.async_block_till_done(wait_background_tasks=True)
     registry = ir.async_get(hass)
-    assert registry.async_get_issue("home_keeper_library", "home_keeper_not_set_up")
+    assert registry.async_get_issue("home_keeper_games", "home_keeper_not_set_up")
     assert hass.data["home_keeper_panel_tabs"].tabs() == []
     assert setup_entry.runtime_data.loan_sync.enabled is False
     # Loan changes while Home Keeper is gone make no Home Keeper call.
@@ -237,7 +235,7 @@ async def test_home_keeper_removed_and_back(hass, setup_entry, call, hk_entry) -
     entry.add_to_hass(hass)
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done(wait_background_tasks=True)
-    assert not registry.async_get_issue("home_keeper_library", "home_keeper_not_set_up")
+    assert not registry.async_get_issue("home_keeper_games", "home_keeper_not_set_up")
     assert len(hass.data["home_keeper_panel_tabs"].tabs()) == 1
     assert len(_calls(hass, "register_companion")) > registered
     loans = setup_entry.runtime_data.store.state["loans"]
@@ -257,7 +255,7 @@ async def test_disabled_home_keeper_entry(hass, setup_entry, hk_entry) -> None:
     )
     await hass.async_block_till_done(wait_background_tasks=True)
     issue = ir.async_get(hass).async_get_issue(
-        "home_keeper_library", "home_keeper_not_set_up"
+        "home_keeper_games", "home_keeper_not_set_up"
     )
     assert issue is not None and issue.is_fixable is False
     assert issue.severity is ir.IssueSeverity.WARNING

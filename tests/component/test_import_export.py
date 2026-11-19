@@ -12,8 +12,8 @@ from homeassistant.helpers import area_registry as ar
 from PIL import Image
 from pytest_homeassistant_custom_component.common import async_capture_events
 
-from custom_components.home_keeper_library import models
-from custom_components.home_keeper_library.const import PANEL_VERSION
+from custom_components.home_keeper_games import models
+from custom_components.home_keeper_games.const import PANEL_VERSION
 
 ALICE = "p_alice"
 BOB = "p_bob"
@@ -159,8 +159,8 @@ async def test_import_data_into_a_new_install(
     assert preview["counts"]["covers"] == {"imported": 0, "skipped": 0}
     assert coordinator(setup_entry).store.state["books"] == {}
 
-    imported = async_capture_events(hass, "home_keeper_library_data_imported")
-    added = async_capture_events(hass, "home_keeper_library_book_added")
+    imported = async_capture_events(hass, "home_keeper_games_data_imported")
+    added = async_capture_events(hass, "home_keeper_games_book_added")
     reply = await call("import_data", {"document": exported})
     await hass.async_block_till_done(wait_background_tasks=True)
     assert reply["ok"] is True and reply["dry_run"] is False
@@ -179,7 +179,7 @@ async def test_import_data_into_a_new_install(
     task_id = state["loans"][ids["loan"]]["hk_task_id"]
     assert task_id in _fake(hass)["tasks"]
     assert _fake(hass)["tasks"][task_id]["source"] == {
-        "home_keeper_library": {"loan_id": ids["loan"]}
+        "home_keeper_games": {"loan_id": ids["loan"]}
     }
     # The wishlist sync made the to-do item again.
     items = await _todo_items(hass, todo_list)
@@ -236,12 +236,12 @@ async def test_services_refuse_a_non_admin_user(hass, setup_entry, call, ws) -> 
     with pytest.raises(Unauthorized):
         await call("import_data", {"document": {}}, as_="user")
     client = await ws("user")
-    await client.send_json_auto_id({"type": "home_keeper_library/export_data"})
+    await client.send_json_auto_id({"type": "home_keeper_games/export_data"})
     reply = await client.receive_json()
     assert reply["success"] is False
     assert reply["error"]["code"] == "unauthorized"
     await client.send_json_auto_id(
-        {"type": "home_keeper_library/import_data", "document": {"books": []}}
+        {"type": "home_keeper_games/import_data", "document": {"books": []}}
     )
     reply = await client.receive_json()
     assert reply["error"]["code"] == "unauthorized"
@@ -250,7 +250,7 @@ async def test_services_refuse_a_non_admin_user(hass, setup_entry, call, ws) -> 
 async def test_websocket_twin_for_an_admin(hass, setup_entry, call, ws) -> None:
     await call("add_book", {"title": "Dune", "lookup": False})
     client = await ws("admin")
-    await client.send_json_auto_id({"type": "home_keeper_library/export_data"})
+    await client.send_json_auto_id({"type": "home_keeper_games/export_data"})
     reply = await client.receive_json()
     assert reply["success"] is True
     assert [b["title"] for b in reply["result"]["data"]["books"]] == ["Dune"]
@@ -261,7 +261,7 @@ async def test_websocket_twin_for_an_admin(hass, setup_entry, call, ws) -> None:
     "files_dir",
     [
         "/tmp/elsewhere",
-        ".storage/home_keeper_import_export/../home_keeper_library_covers",
+        ".storage/home_keeper_import_export/../home_keeper_games_covers",
         ".storage",
     ],
 )
@@ -291,7 +291,7 @@ async def test_symbolic_link_out_of_the_bundles_is_refused(
 
 
 async def test_covers_travel_in_a_bundle(hass, setup_entry, call, todo_list) -> None:
-    from custom_components.home_keeper_library.covers import covers_dir
+    from custom_components.home_keeper_games.covers import covers_dir
 
     book = (await call("add_book", {"title": "Dune", "lookup": False}))["book"]
     plain = (await call("add_book", {"title": "Emma", "lookup": False}))["book"]

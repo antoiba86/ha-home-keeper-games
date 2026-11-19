@@ -12,8 +12,8 @@ import pytest
 from homeassistant.exceptions import ServiceValidationError
 from PIL import Image
 
-from custom_components.home_keeper_library.const import LOOKUP_MAX_TRIES, PANEL_VERSION
-from custom_components.home_keeper_library.openlibrary_client import (
+from custom_components.home_keeper_games.const import LOOKUP_MAX_TRIES, PANEL_VERSION
+from custom_components.home_keeper_games.openlibrary_client import (
     OpenLibraryClient,
     OpenLibraryError,
 )
@@ -97,7 +97,7 @@ async def test_client_search_and_cover(hass, setup_entry, aioclient_mock) -> Non
 async def test_client_rate_limit(
     hass, setup_entry, aioclient_mock, monkeypatch
 ) -> None:
-    from custom_components.home_keeper_library import openlibrary_client
+    from custom_components.home_keeper_games import openlibrary_client
 
     slept: list[float] = []
 
@@ -123,9 +123,7 @@ async def test_scan_isbn_adds_the_book_and_the_cover(
     assert book["title"] == "The Left Hand of Darkness" and book["owned"] is True
     assert book["pages"] == 304 and book["needs_details"] is False
     assert book["cover"]["kind"] == "openlibrary"
-    assert book["cover_url"].startswith(
-        f"/api/home_keeper_library/cover/{book['id']}?v="
-    )
+    assert book["cover_url"].startswith(f"/api/home_keeper_games/cover/{book['id']}?v=")
     assert reply["copy"]["book_id"] == book["id"]
     client = await hass_client()
     response = await client.get(book["cover_url"])
@@ -328,7 +326,7 @@ async def _upload(hass_client, data: bytes, name: str = "c.png"):
     client = await hass_client()
     form = aiohttp.FormData()
     form.add_field("file", data, filename=name, content_type="image/png")
-    return await client.post("/api/home_keeper_library/upload", data=form)
+    return await client.post("/api/home_keeper_games/upload", data=form)
 
 
 async def test_cover_upload_and_custom_cover(
@@ -364,11 +362,11 @@ async def test_cover_upload_and_custom_cover(
     reply = await call("set_cover", {"book_id": book["id"], "kind": "none"})
     assert reply["book"]["cover_url"] is None
     assert (await client.get(url)).status == HTTPStatus.NOT_FOUND
-    assert (await client.get("/api/home_keeper_library/cover/nope")).status == 404
+    assert (await client.get("/api/home_keeper_games/cover/nope")).status == 404
 
 
 async def test_custom_cover_wins_over_a_late_download(hass, setup_entry, call) -> None:
-    from custom_components.home_keeper_library import covers
+    from custom_components.home_keeper_games import covers
 
     coordinator = setup_entry.runtime_data
     store = coordinator.store
@@ -394,7 +392,7 @@ async def test_custom_cover_wins_over_a_late_download(hass, setup_entry, call) -
 
 
 def test_reencode_leaves_no_temp_file(tmp_path, monkeypatch) -> None:
-    from custom_components.home_keeper_library import covers
+    from custom_components.home_keeper_games import covers
 
     def _fail(_image, path, *_args, **_kwargs):
         Path(path).write_bytes(b"part")
@@ -421,19 +419,19 @@ async def test_cover_upload_rules(
     assert response.status == HTTPStatus.REQUEST_ENTITY_TOO_LARGE
     client = await hass_client()
     response = await client.post(
-        "/api/home_keeper_library/upload",
+        "/api/home_keeper_games/upload",
         data=b"x",
         headers={"Content-Type": "text/plain"},
     )
     assert response.status == HTTPStatus.BAD_REQUEST
     form = aiohttp.FormData()
     form.add_field("name", "no file", content_type="text/plain")
-    response = await client.post("/api/home_keeper_library/upload", data=form)
+    response = await client.post("/api/home_keeper_games/upload", data=form)
     assert (await response.json())["message"] == "The upload has no file."
     user = await hass_client(hass_read_only_access_token)
     form = aiohttp.FormData()
     form.add_field("file", _jpeg((10, 10)), filename="c.jpg")
-    response = await user.post("/api/home_keeper_library/upload", data=form)
+    response = await user.post("/api/home_keeper_games/upload", data=form)
     assert response.status == HTTPStatus.UNAUTHORIZED
     webp = _jpeg((20, 20), fmt="WEBP")
     response = await _upload(hass_client, webp, "c.webp")
@@ -441,16 +439,16 @@ async def test_cover_upload_rules(
 
 
 def test_openlibrary_urls_from_the_environment() -> None:
-    from custom_components.home_keeper_library.openlibrary_client import (
+    from custom_components.home_keeper_games.openlibrary_client import (
         openlibrary_urls,
     )
 
     assert openlibrary_urls({}) == {}
-    assert openlibrary_urls({"HOME_KEEPER_LIBRARY_OPENLIBRARY_URL": "  "}) == {}
+    assert openlibrary_urls({"HOME_KEEPER_GAMES_OPENLIBRARY_URL": "  "}) == {}
     assert openlibrary_urls(
         {
-            "HOME_KEEPER_LIBRARY_OPENLIBRARY_URL": "http://ol:8080/",
-            "HOME_KEEPER_LIBRARY_OPENLIBRARY_COVERS_URL": "http://ol:8080",
+            "HOME_KEEPER_GAMES_OPENLIBRARY_URL": "http://ol:8080/",
+            "HOME_KEEPER_GAMES_OPENLIBRARY_COVERS_URL": "http://ol:8080",
         }
     ) == {"base_url": "http://ol:8080", "covers_url": "http://ol:8080"}
 
@@ -466,9 +464,9 @@ async def test_client_reads_the_base_urls(hass, setup_entry, aioclient_mock) -> 
 
 
 async def test_covers_dir_is_not_the_store_file(hass, setup_entry) -> None:
-    from custom_components.home_keeper_library import covers
+    from custom_components.home_keeper_games import covers
 
-    store_file = Path(hass.config.path(".storage", "home_keeper_library"))
+    store_file = Path(hass.config.path(".storage", "home_keeper_games"))
     directory = covers.covers_dir(hass)
     assert directory.parent == store_file.parent
     assert directory != store_file and store_file not in directory.parents

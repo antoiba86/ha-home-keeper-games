@@ -57,7 +57,7 @@ test.describe('Library tab', { tag: '@responsive' }, () => {
 
   test('a cover loads through a signed URL', async ({ page }) => {
     const book = await bookByTitle('Piranesi');
-    expect(book.cover_url).toMatch(/^\/api\/home_keeper_library\/cover\//);
+    expect(book.cover_url).toMatch(/^\/api\/home_keeper_games\/cover\//);
     const tab = await openTab(page);
     const img = tab.locator(`[data-k="b-${book.id}"] img`);
     await expect(img).toHaveAttribute('src', /authSig=/);

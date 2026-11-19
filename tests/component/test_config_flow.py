@@ -5,7 +5,7 @@ from __future__ import annotations
 from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResultType
 
-from custom_components.home_keeper_library.const import DOMAIN
+from custom_components.home_keeper_games.const import DOMAIN
 
 
 async def test_user_flow_creates_the_entry(hass, persons, hk_entry) -> None:
@@ -22,7 +22,7 @@ async def test_user_flow_creates_the_entry(hass, persons, hk_entry) -> None:
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert result["options"] == {"currency": "EUR"}
-    assert result["title"] == "Home Keeper Library"
+    assert result["title"] == "Home Keeper Games"
 
 
 async def test_user_flow_rejects_a_bad_currency(hass, persons, hk_entry) -> None:
@@ -83,7 +83,7 @@ async def test_abort_when_home_keeper_is_not_set_up(hass, persons) -> None:
 async def test_abort_when_home_keeper_is_missing(hass, persons, monkeypatch) -> None:
     from homeassistant.loader import IntegrationNotFound
 
-    from custom_components.home_keeper_library import home_keeper
+    from custom_components.home_keeper_games import home_keeper
 
     async def _not_found(hass, domain):
         raise IntegrationNotFound(domain)

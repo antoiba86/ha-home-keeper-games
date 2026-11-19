@@ -274,7 +274,7 @@ if [ "$SKIP_NPM" = 1 ]; then
   log "SKIP    the npm packages (SKIP_NPM=1)"
 elif have npm; then
   npm_project "." "npm (root)"
-  npm_project "custom_components/home_keeper_library/frontend" "npm (panel frontend)"
+  npm_project "custom_components/home_keeper_games/frontend" "npm (panel frontend)"
   npm_project "tests/e2e" "npm (e2e)"
   npm_project "website" "npm (docs site)"
 else

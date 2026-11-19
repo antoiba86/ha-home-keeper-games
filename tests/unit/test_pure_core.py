@@ -19,7 +19,7 @@ import conftest
 import pytest
 
 _ROOT = Path(__file__).resolve().parents[2]
-_COMPONENT = _ROOT / "custom_components" / "home_keeper_library"
+_COMPONENT = _ROOT / "custom_components" / "home_keeper_games"
 
 
 def _bad_imports(source: str, pure: set[str]) -> list[str]:

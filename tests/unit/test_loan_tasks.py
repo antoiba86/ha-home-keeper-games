@@ -18,7 +18,7 @@ def _loan(**fields) -> dict:
 
 
 def _task(task_id: str = "t1", loan_id: str | None = "l1", **fields) -> dict:
-    source = {"home_keeper_library": {"loan_id": loan_id}} if loan_id else {}
+    source = {"home_keeper_games": {"loan_id": loan_id}} if loan_id else {}
     base = {"id": task_id, "source": source, "due": "2026-11-01", "next_due": None}
     base.setdefault("last_completed", None)
     base["next_due"] = base["due"]
@@ -28,8 +28,8 @@ def _task(task_id: str = "t1", loan_id: str | None = "l1", **fields) -> dict:
 def test_helpers() -> None:
     assert lt.loan_id_of(_task()) == "l1"
     assert lt.loan_id_of({"source": None}) is None
-    assert lt.loan_id_of({"source": {"home_keeper_library": "x"}}) is None
-    assert lt.loan_id_of({"source": {"home_keeper_library": {"loan_id": ""}}}) is None
+    assert lt.loan_id_of({"source": {"home_keeper_games": "x"}}) is None
+    assert lt.loan_id_of({"source": {"home_keeper_games": {"loan_id": ""}}}) is None
     assert lt.loan_id_of({"source": {"other": {"loan_id": "l1"}}}) is None
     assert lt.task_is_completed({"next_due": None, "last_completed": "t"})
     assert not lt.task_is_completed({"next_due": "d", "last_completed": "t"})
@@ -50,10 +50,10 @@ def test_add_task_payload() -> None:
         "name": "Get Dune back",
         "recurrence_type": "one-off",
         "due": "2026-11-01",
-        "source": {"home_keeper_library": {"loan_id": "l1"}},
+        "source": {"home_keeper_games": {"loan_id": "l1"}},
         "managed_by": {
-            "integration": "home_keeper_library",
-            "display_name": "Home Keeper Library",
+            "integration": "home_keeper_games",
+            "display_name": "Home Keeper Games",
             "icon": "mdi:bookshelf",
             "config_entry_id": "e",
             "locked_fields": ["name", "recurrence_type"],

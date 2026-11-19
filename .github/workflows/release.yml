@@ -33,7 +33,7 @@ jobs:
       - name: Determine release version
         id: check
         run: |
-          VERSION=$(python3 -c "import json; print(json.load(open('custom_components/home_keeper_library/manifest.json'))['version'])")
+          VERSION=$(python3 -c "import json; print(json.load(open('custom_components/home_keeper_games/manifest.json'))['version'])")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
           # Classify the version. Pre-release versions (e.g. 0.2.0b1, 0.2.0rc2)
@@ -59,7 +59,7 @@ jobs:
             exit 1
           fi
 
-          PANEL_VERSION=$(grep -E '^PANEL_VERSION\s*=' custom_components/home_keeper_library/const.py | sed -E 's/.*"([^"]+)".*/\1/')
+          PANEL_VERSION=$(grep -E '^PANEL_VERSION\s*=' custom_components/home_keeper_games/const.py | sed -E 's/.*"([^"]+)".*/\1/')
           if [ "$PANEL_VERSION" != "$VERSION" ]; then
             echo "::error::manifest.json version ($VERSION) does not match const.py PANEL_VERSION ($PANEL_VERSION). Bump both in the same PR."
             exit 1
@@ -109,7 +109,7 @@ jobs:
 
       - name: Install frontend deps
         if: steps.check.outputs.release == 'true'
-        run: npm ci --prefix custom_components/home_keeper_library/frontend
+        run: npm ci --prefix custom_components/home_keeper_games/frontend
 
       - name: Build panel JS
         if: steps.check.outputs.release == 'true'
@@ -122,11 +122,11 @@ jobs:
       - name: Verify release zip
         if: steps.check.outputs.release == 'true'
         run: |
-          if [ ! -f home_keeper_library.zip ]; then
-            echo "::error::home_keeper_library.zip not found"
+          if [ ! -f home_keeper_games.zip ]; then
+            echo "::error::home_keeper_games.zip not found"
             exit 1
           fi
-          echo "home_keeper_library.zip exists ($(du -h home_keeper_library.zip | cut -f1))"
+          echo "home_keeper_games.zip exists ($(du -h home_keeper_games.zip | cut -f1))"
 
       - name: Create and push tag
         if: steps.check.outputs.release == 'true' && steps.publish.outputs.publish == 'true'
@@ -147,7 +147,7 @@ jobs:
           body: ${{ steps.changelog.outputs.notes }}
           draft: false
           prerelease: ${{ steps.check.outputs.prerelease == 'true' }}
-          files: home_keeper_library.zip
+          files: home_keeper_games.zip
 
   # Deploy the docs site once a *stable* release has been cut. We call the deploy
   # workflow directly (workflow_call) rather than relying on a `release: [released]`

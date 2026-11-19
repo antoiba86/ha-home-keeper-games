@@ -224,7 +224,7 @@ class HomeKeeperLink:
     @callback
     def _schedule(self) -> None:
         self._entry.async_create_background_task(
-            self._hass, self.async_refresh(), "home_keeper_library home keeper check"
+            self._hass, self.async_refresh(), "home_keeper_games home keeper check"
         )
 
     def _remove_tab(self) -> None:

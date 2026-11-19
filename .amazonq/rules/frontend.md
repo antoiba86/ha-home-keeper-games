@@ -39,7 +39,7 @@ How the tab and the card work is in [frontend-tab-card](../../docs/design/fronte
 
 ## Bundles and the card
 
-- 2 ES module bundles ship from `frontend/dist/` at `/home_keeper_library_static`: the tab
+- 2 ES module bundles ship from `frontend/dist/` at `/home_keeper_games_static`: the tab
   (`library-tab.js`, loaded by the Home Keeper panel) and the card (`library-card.js`).
   Each URL carries a content hash in `?v=`.
 - **Deliver the card by 1 path only**: a Lovelace resource, or `frontend.add_extra_js_url`

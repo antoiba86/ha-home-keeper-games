@@ -180,7 +180,7 @@ class TestVersionsAtHead:
         assert _mod.manifest_version(manifest) == "0.28.0b3"
         assert _mod.manifest_version('{"domain": "x"}') is None
         assert _mod.manifest_version(None) is None
-        const = 'DOMAIN = "home_keeper_library"\nPANEL_VERSION = "0.28.0b3"\n'
+        const = 'DOMAIN = "home_keeper_games"\nPANEL_VERSION = "0.28.0b3"\n'
         assert _mod.panel_version(const) == "0.28.0b3"
         assert _mod.panel_version('X_PANEL_VERSION = "1"\n') is None
         assert _mod.panel_version(None) is None

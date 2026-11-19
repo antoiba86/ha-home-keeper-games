@@ -42,7 +42,7 @@ automation:
   - alias: Capture Home Keeper Library room added
     trigger:
       - platform: event
-        event_type: home_keeper_library_room_added
+        event_type: home_keeper_games_room_added
     action:
       - service: input_text.set_value
         target:
@@ -54,4 +54,4 @@ automation:
 logger:
   default: info
   logs:
-    custom_components.home_keeper_library: debug
+    custom_components.home_keeper_games: debug

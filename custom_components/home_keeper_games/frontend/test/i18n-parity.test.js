@@ -72,7 +72,7 @@ describe.each(OTHER)('locale %s', (lang) => {
 });
 
 describe('key usage', () => {
-  const rel = 'custom_components/home_keeper_library/frontend/src';
+  const rel = 'custom_components/home_keeper_games/frontend/src';
   const dir = existsSync(resolve(process.cwd(), rel)) ? resolve(process.cwd(), rel) : resolve(process.cwd(), 'src');
   const SRC = readdirSync(dir)
     .filter((f) => f.endsWith('.ts'))

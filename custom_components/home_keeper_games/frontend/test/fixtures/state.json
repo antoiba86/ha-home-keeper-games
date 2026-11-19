@@ -222,7 +222,7 @@
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
-   "cover_url": "/api/home_keeper_library/cover/e4b7df5e6eef4483b1751162204397b8?v=798c3698",
+   "cover_url": "/api/home_keeper_games/cover/e4b7df5e6eef4483b1751162204397b8?v=798c3698",
    "reading": {
     "alex": {
      "status": "read",
@@ -398,7 +398,7 @@
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
-   "cover_url": "/api/home_keeper_library/cover/eed5dacf0ada41059efc64fdefd6dfa9?v=543ed35b",
+   "cover_url": "/api/home_keeper_games/cover/eed5dacf0ada41059efc64fdefd6dfa9?v=543ed35b",
    "reading": {
     "alex": {
      "status": "read",
@@ -661,7 +661,7 @@
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
-   "cover_url": "/api/home_keeper_library/cover/af804c5b7f944aabb9462c114fab95d0?v=4a3dba00",
+   "cover_url": "/api/home_keeper_games/cover/af804c5b7f944aabb9462c114fab95d0?v=4a3dba00",
    "reading": {
     "sam": {
      "status": "read",
@@ -796,7 +796,7 @@
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
-   "cover_url": "/api/home_keeper_library/cover/e50273c278814a57b97033997476c0df?v=84379fb2",
+   "cover_url": "/api/home_keeper_games/cover/e50273c278814a57b97033997476c0df?v=84379fb2",
    "reading": {
     "alex": {
      "status": "read",
@@ -859,7 +859,7 @@
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
-   "cover_url": "/api/home_keeper_library/cover/d4c37434a7ea4a8e860517cd82ccc32b?v=fe79493e",
+   "cover_url": "/api/home_keeper_games/cover/d4c37434a7ea4a8e860517cd82ccc32b?v=fe79493e",
    "reading": {
     "alex": {
      "status": "reading",
@@ -918,7 +918,7 @@
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
-   "cover_url": "/api/home_keeper_library/cover/2ff469fc40f54abfbb1a50274f264dae?v=fb97e18d",
+   "cover_url": "/api/home_keeper_games/cover/2ff469fc40f54abfbb1a50274f264dae?v=fb97e18d",
    "reading": {}
   },
   {
@@ -1261,7 +1261,7 @@
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
-   "cover_url": "/api/home_keeper_library/cover/13be6b0e5c354e1981a89fe2766196e0?v=552257a9",
+   "cover_url": "/api/home_keeper_games/cover/13be6b0e5c354e1981a89fe2766196e0?v=552257a9",
    "reading": {
     "alex": {
      "status": "read",
@@ -1359,7 +1359,7 @@
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
-   "cover_url": "/api/home_keeper_library/cover/8ffa744031884f64a2b39c35342641c1?v=d2033a57",
+   "cover_url": "/api/home_keeper_games/cover/8ffa744031884f64a2b39c35342641c1?v=d2033a57",
    "reading": {
     "alex": {
      "status": "read",
@@ -1453,7 +1453,7 @@
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
-   "cover_url": "/api/home_keeper_library/cover/fd086096a83f483ab7219f131e678534?v=f18df7a1",
+   "cover_url": "/api/home_keeper_games/cover/fd086096a83f483ab7219f131e678534?v=f18df7a1",
    "reading": {
     "alex": {
      "status": "read",
@@ -1563,7 +1563,7 @@
    "wishlist": null,
    "owned": true,
    "copy_count": 2,
-   "cover_url": "/api/home_keeper_library/cover/58247cad1ced46248fefe4d2b0db71b5?v=cff560bf",
+   "cover_url": "/api/home_keeper_games/cover/58247cad1ced46248fefe4d2b0db71b5?v=cff560bf",
    "reading": {
     "alex": {
      "status": "read",
@@ -1620,7 +1620,7 @@
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
-   "cover_url": "/api/home_keeper_library/cover/ae18ed68fc3445f484544a09c13ece47?v=a66afeef",
+   "cover_url": "/api/home_keeper_games/cover/ae18ed68fc3445f484544a09c13ece47?v=a66afeef",
    "reading": {
     "alex": {
      "status": "reading",
@@ -1905,7 +1905,7 @@
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
-   "cover_url": "/api/home_keeper_library/cover/fb4f591ff96c45e5abc0fa81325c564c?v=7ccde4d9",
+   "cover_url": "/api/home_keeper_games/cover/fb4f591ff96c45e5abc0fa81325c564c?v=7ccde4d9",
    "reading": {
     "alex": {
      "status": "want",

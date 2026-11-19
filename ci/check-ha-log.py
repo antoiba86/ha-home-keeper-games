@@ -2,9 +2,9 @@
 """Fail when a Home Assistant log shows problems in one custom integration.
 
 Usage:
-    python ci/check-ha-log.py --domain home_keeper_library ha.log
+    python ci/check-ha-log.py --domain home_keeper_games ha.log
     docker compose logs homeassistant \
-        | python ci/check-ha-log.py --domain home_keeper_library -
+        | python ci/check-ha-log.py --domain home_keeper_games -
 
 Exit codes:
     0  no findings

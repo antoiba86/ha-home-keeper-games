@@ -1,12 +1,12 @@
 // The websocket client for the tab and the card.
 //
-// Each command name is `home_keeper_library/<service>` with the same fields as
+// Each command name is `home_keeper_games/<service>` with the same fields as
 // the service (build spec, section 5). The backend applies the same admin gate
 // and the same read projection as the service.
 
 import type { HomeAssistant, ImportSummary, RawState, ScanResult } from './types';
 
-export const DOMAIN = 'home_keeper_library';
+export const DOMAIN = 'home_keeper_games';
 
 /** The authenticated upload view for a custom cover (POST multipart, field `file`). */
 export const UPLOAD_URL = `/api/${DOMAIN}/upload`;

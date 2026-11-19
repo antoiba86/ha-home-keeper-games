@@ -199,7 +199,7 @@ def project_state(
     revision: int,
     catalog_accounts: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """The reply of ``home_keeper_library/get_state`` for the viewer.
+    """The reply of ``home_keeper_games/get_state`` for the viewer.
 
     Only an admin gets ``catalog_accounts``: for each catalog, if an account is
     connected, and its user name. The keys of an account are never in the reply.

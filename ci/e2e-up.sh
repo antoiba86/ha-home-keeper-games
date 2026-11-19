@@ -66,9 +66,9 @@ with open(extra, encoding="utf-8") as handle:
 with open(path, "w", encoding="utf-8") as handle:
     json.dump(document, handle, indent=2)
 PY
-mkdir -p "$CONFIG/.storage/home_keeper_library_covers"
-cp "$SEED/home_keeper_library.json" "$CONFIG/.storage/home_keeper_library"
-cp "$SEED"/covers/*.jpg "$CONFIG/.storage/home_keeper_library_covers/"
+mkdir -p "$CONFIG/.storage/home_keeper_games_covers"
+cp "$SEED/home_keeper_games.json" "$CONFIG/.storage/home_keeper_games"
+cp "$SEED"/covers/*.jpg "$CONFIG/.storage/home_keeper_games_covers/"
 
 echo "[e2e-up] starting Home Assistant..."
 "${COMPOSE[@]}" up -d

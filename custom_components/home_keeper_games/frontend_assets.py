@@ -1,6 +1,6 @@
 """The built frontend: the static path, and the card as a frontend module.
 
-Home Assistant serves ``frontend/dist/`` at ``/home_keeper_library_static``. It
+Home Assistant serves ``frontend/dist/`` at ``/home_keeper_games_static``. It
 serves a static path before authentication, so only the built bundles are in
 that directory. CI builds them, and git ignores them.
 

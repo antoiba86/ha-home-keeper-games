@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 npm ci
-npm ci --prefix custom_components/home_keeper_library/frontend
+npm ci --prefix custom_components/home_keeper_games/frontend
 pip install -r requirements-test.txt

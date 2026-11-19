@@ -70,7 +70,7 @@ export function adminState(): Promise<Record<string, any>> {
 
 /** The whole `get_state` reply as Sam, who is not an admin. */
 export function userState(): Promise<Record<string, any>> {
-  return withWs('user', (ws) => ws.call({ type: 'home_keeper_library/get_state' }));
+  return withWs('user', (ws) => ws.call({ type: 'home_keeper_games/get_state' }));
 }
 
 /** The Home Keeper tasks, as the library reads them. */

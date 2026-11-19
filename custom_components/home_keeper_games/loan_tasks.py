@@ -1,7 +1,7 @@
 """Pure planner for the Home Keeper tasks of the loans.
 
 A loan with ``add_task: true`` and a due date has 1 one-off task in Home Keeper.
-The task holds ``source = {"home_keeper_library": {"loan_id": <id>}}``.
+The task holds ``source = {"home_keeper_games": {"loan_id": <id>}}``.
 ``loan_sync.py`` reads the tasks with ``home_keeper.list_tasks``, calls
 :func:`plan_reconcile`, and applies the plan through the Home Keeper services
 and the store. The contract is ``docs/INTEGRATING.md`` of Home Keeper.

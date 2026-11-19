@@ -84,7 +84,7 @@ class WishlistSync:
         if self._pending is not None and not self._pending.done():
             return
         self._pending = self._coordinator.config_entry.async_create_background_task(
-            self._hass, self.async_run(), "home_keeper_library wishlist sync"
+            self._hass, self.async_run(), "home_keeper_games wishlist sync"
         )
 
     async def async_run(self) -> None:

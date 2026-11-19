@@ -2,15 +2,15 @@
 title: Store and models
 summary: The storage document, the records of the library, the pure model functions and the 1 write path that saves and fires events.
 implements:
-  - custom_components/home_keeper_library/store.py
-  - custom_components/home_keeper_library/models.py
+  - custom_components/home_keeper_games/store.py
+  - custom_components/home_keeper_games/models.py
 related: [architecture, events-api, people-privilege, csv-import-export]
-source_hash: b5287eccc59b
+source_hash: 664673bae82d
 ---
 
 # Store and models
 
-The library is 1 JSON document in `.storage/home_keeper_library`. `models.py` holds the
+The library is 1 JSON document in `.storage/home_keeper_games`. `models.py` holds the
 pure functions that check input and build records. `LibraryStore` in `store.py` is the
 only code that changes the document.
 

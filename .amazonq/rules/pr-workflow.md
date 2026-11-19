@@ -67,7 +67,7 @@ The maintainer can ask for a change to stay local, with no PR. Then:
 
 ## Screenshots: desktop and phone
 
-Every PR that touches `custom_components/home_keeper_library/frontend/src/` must embed
+Every PR that touches `custom_components/home_keeper_games/frontend/src/` must embed
 current screenshots of each changed surface in the PR body: **a desktop shot and a
 phone shot**. A phone viewport wraps and stacks the tab and the card, so a
 desktop-only shot leaves that half unreviewed.

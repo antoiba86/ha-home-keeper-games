@@ -186,7 +186,7 @@ def test_a_service_with_no_fields_says_so() -> None:
 
 def test_events_render_a_spine_table_per_payload_shape() -> None:
     spec = api_surface.EventSpec(
-        "home_keeper_library_demo_fired",
+        "home_keeper_games_demo_fired",
         "EVENT_DEMO_FIRED",
         "fired",
         "demo",
@@ -247,7 +247,7 @@ def test_render_covers_every_modelled_surface() -> None:
         if gone:
             missing[label] = gone
 
-    absent("services", (f"home_keeper_library.{n}" for n in api_surface.SERVICE_NAMES))
+    absent("services", (f"home_keeper_games.{n}" for n in api_surface.SERVICE_NAMES))
     absent("events", (s.name for s in api_surface.EVENTS))
     absent("device_triggers", (s.type for s in api_surface.DEVICE_TRIGGERS))
     absent("entity_platforms", (s.platform for s in api_surface.ENTITY_PLATFORMS))

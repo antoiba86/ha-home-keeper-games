@@ -12,7 +12,7 @@ pythonpath = ["tests/unit"]
 
 [tool.coverage.run]
 branch = true
-source = ["custom_components/home_keeper_library"]
+source = ["custom_components/home_keeper_games"]
 # Store paths relative to the repo root rather than absolute. `pytest_coverage.yml`
 # hands `.coverage` to py-cov-action, which runs `coverage json` inside a Docker
 # container where the workspace is mounted at a different path — an absolute
@@ -31,7 +31,7 @@ exclude_lines = [
 # Mutation testing (ci/test-mutation-python.sh). Coverage says a line ran;
 # mutation testing says a test would have *failed* if that line were wrong.
 [tool.mutmut]
-source_paths = ["custom_components/home_keeper_library"]
+source_paths = ["custom_components/home_keeper_games"]
 # mutmut runs the suite inside a `mutants/` copy that holds only the source paths
 # and the tests, so a unit test that reads a repo file off disk dies at collection
 # unless that file is listed here. `tests/unit/test_ci_check_ha_version.py` and
@@ -66,17 +66,17 @@ also_copy = [
 # api_surface against the real registrations. backend_i18n.py is a file reader
 # that the parity tests cover. card_resource.py is the pure half of card.py.
 only_mutate = [
-    "custom_components/home_keeper_library/models.py",
-    "custom_components/home_keeper_library/isbn.py",
-    "custom_components/home_keeper_library/events.py",
-    "custom_components/home_keeper_library/projections.py",
-    "custom_components/home_keeper_library/openlibrary.py",
-    "custom_components/home_keeper_library/openlibrary_contribute.py",
-    "custom_components/home_keeper_library/csv_io.py",
-    "custom_components/home_keeper_library/import_export.py",
-    "custom_components/home_keeper_library/wishlist.py",
-    "custom_components/home_keeper_library/loan_tasks.py",
-    "custom_components/home_keeper_library/card_resource.py",
+    "custom_components/home_keeper_games/models.py",
+    "custom_components/home_keeper_games/isbn.py",
+    "custom_components/home_keeper_games/events.py",
+    "custom_components/home_keeper_games/projections.py",
+    "custom_components/home_keeper_games/openlibrary.py",
+    "custom_components/home_keeper_games/openlibrary_contribute.py",
+    "custom_components/home_keeper_games/csv_io.py",
+    "custom_components/home_keeper_games/import_export.py",
+    "custom_components/home_keeper_games/wishlist.py",
+    "custom_components/home_keeper_games/loan_tasks.py",
+    "custom_components/home_keeper_games/card_resource.py",
 ]
 pytest_add_cli_args_test_selection = ["tests/unit"]
 # The HA harness plugin loads into every pytest run where it is installed, and its
@@ -97,8 +97,8 @@ max_exceptions = 2
 duplicate_min_words = 12
 # Every file here must be in at least one design doc's `implements`.
 coverage = [
-    "custom_components/home_keeper_library/*.py",
-    "custom_components/home_keeper_library/frontend/src/**/*.ts",
+    "custom_components/home_keeper_games/*.py",
+    "custom_components/home_keeper_games/frontend/src/**/*.ts",
 ]
 uncovered = []
 link_scan = ["**/*.md"]
@@ -110,9 +110,9 @@ link_skip = [
 ]
 # Where a backticked file or `module.func` reference may live.
 code_dirs = [
-    "custom_components/home_keeper_library",
-    "custom_components/home_keeper_library/frontend/src",
-    "custom_components/home_keeper_library/frontend",
+    "custom_components/home_keeper_games",
+    "custom_components/home_keeper_games/frontend/src",
+    "custom_components/home_keeper_games/frontend",
     "ci",
     "tests",
     "docs",
@@ -165,7 +165,7 @@ all = [
 design = ['(?<![\w/&-])#\d{2,}\b']
 
 # Strict typing is a Platinum quality-scale practice. CI (lint.yml) runs `mypy
-# custom_components/home_keeper_library` with Home Assistant installed so HA's own
+# custom_components/home_keeper_games` with Home Assistant installed so HA's own
 # types resolve; keep the integration error-free. The manifest declares no
 # quality_scale tier yet (see .amazonq/rules/ci-and-ha-versions.md).
 [tool.mypy]

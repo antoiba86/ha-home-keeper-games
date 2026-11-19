@@ -25,10 +25,10 @@
     "tests/e2e",
     "tests/integration/ha_config"
   ],
-  "disableTypeChecks": "custom_components/home_keeper_library/frontend/src/*.ts",
+  "disableTypeChecks": "custom_components/home_keeper_games/frontend/src/*.ts",
   "mutate": [
-    "custom_components/home_keeper_library/frontend/src/utils.ts",
-    "custom_components/home_keeper_library/frontend/src/i18n.ts"
+    "custom_components/home_keeper_games/frontend/src/utils.ts",
+    "custom_components/home_keeper_games/frontend/src/i18n.ts"
   ],
   "thresholds": {
     "high": 90,

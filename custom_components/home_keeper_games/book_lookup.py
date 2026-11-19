@@ -60,7 +60,7 @@ class BookLookup:
         if self._worker is not None and not self._worker.done():
             return
         self._worker = self._coordinator.config_entry.async_create_background_task(
-            self._hass, self._run(), "home_keeper_library book lookup"
+            self._hass, self._run(), "home_keeper_games book lookup"
         )
 
     @callback

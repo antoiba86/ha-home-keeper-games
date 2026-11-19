@@ -2,7 +2,7 @@
 
 A copy change with no move, a loan change, a deleted loan, a reading change
 that keeps the status, the settings of a person and the currency each fire a
-``home_keeper_library_<noun>_<verb>`` event from the store.
+``home_keeper_games_<noun>_<verb>`` event from the store.
 """
 
 from __future__ import annotations
@@ -10,7 +10,7 @@ from __future__ import annotations
 from pytest_homeassistant_custom_component.common import async_capture_events
 
 BOB = "p_bob"
-EVENT = "home_keeper_library_{}".format
+EVENT = "home_keeper_games_{}".format
 
 
 async def _book(call) -> dict:

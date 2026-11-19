@@ -62,9 +62,9 @@ The first release will have these features:
 
 ## Development
 
-- Backend: `custom_components/home_keeper_library/`. The pure core imports no Home
+- Backend: `custom_components/home_keeper_games/`. The pure core imports no Home
   Assistant code. The folder gets the name `home_keeper_games` in the rename step.
-- Panel frontend: `custom_components/home_keeper_library/frontend/`, built with
+- Panel frontend: `custom_components/home_keeper_games/frontend/`, built with
   TypeScript and Rollup.
 - Tests: `pytest` in `tests/unit`, `tests/component` and `tests/integration`,
   Playwright in `tests/e2e`, and vitest.

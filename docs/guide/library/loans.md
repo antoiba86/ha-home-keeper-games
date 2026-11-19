@@ -55,7 +55,7 @@ Keeper.
 ## Overdue loans
 
 A loan that passes its due date is overdue. The **Loans overdue** sensor counts them, and
-the library fires the `home_keeper_library_loan_overdue` event once for each due date.
+the library fires the `home_keeper_games_loan_overdue` event once for each due date.
 Use the event in an automation that sends a reminder.
 
 ## Phone

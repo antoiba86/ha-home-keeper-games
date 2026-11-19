@@ -35,7 +35,7 @@ summary: How the dev docs are typed, capped and checked, and how to keep a desig
   4. Run `python3 ci/docs.py stamp <id>`.
 - A PR that changes a design doc's Goals or Non-goals needs a **Goal changes** section in
   its body, and the maintainer must agree to it.
-- Each new source file under `custom_components/home_keeper_library/` must be in the `implements`
+- Each new source file under `custom_components/home_keeper_games/` must be in the `implements`
   list of a design doc. `check` fails on a file that no doc covers.
 - Work that is not built goes in `IDEAS.md`, never in a design doc. There are no plan
   files: a plan lives in the PR body.

@@ -65,10 +65,10 @@ describe('card', () => {
     input.value = '250';
     input.form.requestSubmit();
     await flush();
-    expect(fake.calls('set_reading')[0]).toEqual({ type: 'home_keeper_library/set_reading', book_id: id, page: 250 });
+    expect(fake.calls('set_reading')[0]).toEqual({ type: 'home_keeper_games/set_reading', book_id: id, page: 250 });
     $(`[data-k="rd-${id}"]`).click();
     await flush();
-    expect(fake.calls('set_reading')[1]).toEqual({ type: 'home_keeper_library/set_reading', book_id: id, status: 'read', finished: '2026-10-05', read_count: 1 });
+    expect(fake.calls('set_reading')[1]).toEqual({ type: 'home_keeper_games/set_reading', book_id: id, status: 'read', finished: '2026-10-05', read_count: 1 });
   });
 
   it('searches and adds a book to want to read', async () => {

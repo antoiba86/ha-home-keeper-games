@@ -113,9 +113,9 @@ export const GENERATED_DEV_PAGES = [
     title: 'API reference',
     pos: 2,
     sources: [
-      'custom_components/home_keeper_library/api_surface.py',
-      'custom_components/home_keeper_library/services.yaml',
-      'custom_components/home_keeper_library/strings.json',
+      'custom_components/home_keeper_games/api_surface.py',
+      'custom_components/home_keeper_games/services.yaml',
+      'custom_components/home_keeper_games/strings.json',
     ],
   },
 ];

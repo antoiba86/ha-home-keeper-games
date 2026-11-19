@@ -76,10 +76,10 @@ An admin can connect an Open Library account to send books
 
 | Command | Access |
 |---|---|
-| `home_keeper_library/get_state` | Open, projected |
-| `home_keeper_library/subscribe` | Open. It sends only a revision number. |
-| `home_keeper_library/list_todo_entities` | Admin |
-| `home_keeper_library/<service>` | The same access as the service of the same name |
+| `home_keeper_games/get_state` | Open, projected |
+| `home_keeper_games/subscribe` | Open. It sends only a revision number. |
+| `home_keeper_games/list_todo_entities` | Admin |
+| `home_keeper_games/<service>` | The same access as the service of the same name |
 
 Each command with the name of a service runs the same code and the same check as the
 service. A gate on the command alone would be no gate, because a user can call the
@@ -89,9 +89,9 @@ service directly.
 
 | Method and path | Access |
 |---|---|
-| `GET /home_keeper_library_static/...` | Public. It holds only the built bundles. |
-| `GET /api/home_keeper_library/cover/{book_id}` | Each signed-in user. Covers are not private. |
-| `POST /api/home_keeper_library/upload` | Admin, as a real user. At most 10 MB. JPEG, PNG or WebP. |
+| `GET /home_keeper_games_static/...` | Public. It holds only the built bundles. |
+| `GET /api/home_keeper_games/cover/{book_id}` | Each signed-in user. Covers are not private. |
+| `POST /api/home_keeper_games/upload` | Admin, as a real user. At most 10 MB. JPEG, PNG or WebP. |
 
 Home Assistant serves a static path before authentication, so the static path holds only
 `frontend/dist/`. The upload view reads the image type from the first bytes of the file,

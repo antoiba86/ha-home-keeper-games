@@ -2,7 +2,7 @@
 """Render the Developer Guide's API reference from the shipping integration.
 
 The page this writes is not authored anywhere. Its structure comes from
-``custom_components/home_keeper_library/api_surface.py`` — the model the runtime itself
+``custom_components/home_keeper_games/api_surface.py`` — the model the runtime itself
 consumes — and every human-readable string comes from ``services.yaml`` and
 ``strings.json``, the same two files Home Assistant reads to label the service
 dialog, the automation editor and the options form. So the reference and the
@@ -33,7 +33,7 @@ from types import ModuleType
 from typing import Any, NamedTuple
 
 ROOT = Path(__file__).resolve().parent.parent
-COMPONENT = ROOT / "custom_components" / "home_keeper_library"
+COMPONENT = ROOT / "custom_components" / "home_keeper_games"
 DEFAULT_OUT = ROOT / "website" / "developer" / "api.md"
 
 # Kept in step with the entry in website/scripts/doc-map.mjs, which tells the
@@ -83,7 +83,7 @@ def load_surface(component: Path = COMPONENT) -> ModuleType:
     packages — the same trick, and for the same reason: the real package
     ``__init__.py`` imports Home Assistant, which is not installed here.
     """
-    pkg = "custom_components.home_keeper_library"
+    pkg = "custom_components.home_keeper_games"
     if (loaded := sys.modules.get(f"{pkg}.api_surface")) is not None:
         return loaded
 
@@ -220,7 +220,7 @@ def render_services(sources: Sources) -> list[str]:
         "Every operation that changes or exports data is a Home Assistant action,",
         "so automations, scripts, voice assistants and other integrations all",
         "reach it the same way. Guard each call with",
-        '`hass.services.has_service("home_keeper_library", "<action>")` so your',
+        '`hass.services.has_service("home_keeper_games", "<action>")` so your',
         "integration still works when this one is not installed.",
         "",
     ]
@@ -235,7 +235,7 @@ def render_services(sources: Sources) -> list[str]:
         if label := _RESPONSE_LABELS.get(spec.response):
             badges.append(f"**{label}**")
 
-        lines += [f"### `home_keeper_library.{spec.name}`", ""]
+        lines += [f"### `home_keeper_games.{spec.name}`", ""]
         if title := localized.get("name"):
             lines += [f"*{cell(title)}*", ""]
         if description := localized.get("description"):
@@ -278,7 +278,7 @@ def render_events(sources: Sources) -> list[str]:
         "## Events",
         "",
         "The integration fires a bus event for every observable state change.",
-        "Names follow `home_keeper_library_<noun>_<verb>`. For when each one",
+        "Names follow `home_keeper_games_<noun>_<verb>`. For when each one",
         "fires in context, and worked automations, see the",
         f"[events guide]({_SITE}/developer/events).",
         "",

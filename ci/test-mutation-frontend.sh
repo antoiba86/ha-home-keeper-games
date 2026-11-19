@@ -39,7 +39,7 @@ else
   if [ ! -s "$SCOPE_FILE" ] &&
     [ -n "$(git diff --name-only "$(git merge-base "$BASE" HEAD)" HEAD -- "${TOOLCHAIN[@]}")" ]; then
     echo "[mutation] the mutation toolchain changed: smoke run on utils.ts"
-    echo "custom_components/home_keeper_library/frontend/src/utils.ts" > "$SCOPE_FILE"
+    echo "custom_components/home_keeper_games/frontend/src/utils.ts" > "$SCOPE_FILE"
   fi
   if [ ! -s "$SCOPE_FILE" ]; then
     python3 - <<'PY'

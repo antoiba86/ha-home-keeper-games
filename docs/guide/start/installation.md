@@ -55,5 +55,5 @@ ready again, the issue goes away. The tab and the tasks then come back with no r
 
 ## Data
 
-The library is 1 JSON document in `.storage/home_keeper_library`. The covers are JPEG
-files in `.storage/home_keeper_library_covers/`. Both are in each Home Assistant backup.
+The library is 1 JSON document in `.storage/home_keeper_games`. The covers are JPEG
+files in `.storage/home_keeper_games_covers/`. Both are in each Home Assistant backup.
