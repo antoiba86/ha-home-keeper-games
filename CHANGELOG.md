@@ -9,7 +9,7 @@ is the single source of truth (see `RELEASE.md`).
 
 ### Changed
 
-- **[Barcode scan](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/work-in-progress).**
+- **[Retail barcode scanning](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/work-in-progress).**
   A scan reads any EAN-13, EAN-8 or UPC-A barcode, and a new barcode asks for the title.
   A book has 1 barcode field in place of its 2 ISBN fields, and `scan_isbn` is now
   `scan_barcode`.
