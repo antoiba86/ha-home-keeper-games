@@ -16,7 +16,7 @@ const FEATURES: Feature[] = [
   {
     title: 'Scan a shelf',
     description:
-      'Scan the ISBN barcode of each book with a phone. Details and covers come from Open Library.',
+      'Scan the barcode of each item with a phone. Each scan adds a copy to the shelf.',
   },
   {
     title: 'Shelves and reading',

@@ -37,7 +37,7 @@ Keeper. The contract is sections 1 to 6 of the Home Keeper `docs/INTEGRATING.md`
 
 - `lend_book` takes a `copy_id` and a `party`. The copy keeps its shelf and can have only 1
   open loan.
-- `borrow_book` takes a `book_id`, an ISBN or a title, a `party` and a `person_id`. It
+- `borrow_book` takes a `book_id`, a barcode or a title, a `party` and a `person_id`. It
   adds the book when none matches, and adds no copy. The status of the person becomes
   `reading` if it is `want` or absent.
 - `return_loan` sets `returned`, today by default. A returned loan stays in the history.

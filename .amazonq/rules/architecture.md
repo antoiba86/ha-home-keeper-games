@@ -129,9 +129,8 @@ How the entities work is in [entities](../../docs/design/entities.md).
 
 ## Options
 
-- The only option is `currency`. The config flow and the `currency` step of the options
-  flow ask for it, and `set_settings` writes it. The `openlibrary` step of the options
-  flow writes the entry data, not the options.
+- The only option is `currency`. The config flow and the options flow ask for it, and
+  `set_settings` writes it.
 - **An options flow merges. It never replaces.** Return `config_flow.merge_flow_input`
   from `async_create_entry`, never `user_input`. Home Assistant stores the result as the
   whole options object, so a raw return deletes every key that the form does not show.

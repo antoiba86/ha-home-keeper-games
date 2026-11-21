@@ -1,6 +1,6 @@
 """Pytest configuration for the pure unit tests.
 
-The pure modules (the model, the ISBN, Open Library, CSV and projection
+The pure modules (the model, the CSV and projection
 helpers, the sync planners, the event builders and the API-surface index) import
 nothing from Home Assistant, so they load here under a synthetic ``ex``
 package. This lets the high-value core tests run without the full HA test

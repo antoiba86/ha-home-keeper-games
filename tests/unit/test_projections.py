@@ -75,9 +75,7 @@ def test_cover_url() -> None:
         None
     )
     assert (
-        pr.cover_url(
-            {"id": "b", "cover": {"kind": "openlibrary", "file": "b-ab12.jpg"}}
-        )
+        pr.cover_url({"id": "b", "cover": {"kind": "custom", "file": "b-ab12.jpg"}})
         == "/api/home_keeper_games/cover/b?v=ab12"
     )
 

@@ -5,7 +5,7 @@ implements:
   - custom_components/home_keeper_games/people.py
   - custom_components/home_keeper_games/projections.py
 related: [events-api, entities, architecture]
-source_hash: 5a5f3a9d6ca4
+source_hash: 530138d923d9
 ---
 
 # People and privilege
@@ -71,8 +71,7 @@ each signed-in user, because covers are not private.
   `private_notes`;
 - the settings of another person drop `wishlist_todo`;
 - the wishlist entry of another person drops `PRIVATE_WISHLIST_FIELDS` (`todo_entity`,
-  `todo_uid`);
-- the reply of `get_state` has no `catalog_accounts`.
+  `todo_uid`).
 
 `projections.project_export` drops the same fields from the section of a Home Keeper
 export for a non-admin viewer. `export_data` is admin-only, so an admin reads it full.

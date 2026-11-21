@@ -5,7 +5,7 @@ implements:
   - custom_components/home_keeper_games/store.py
   - custom_components/home_keeper_games/models.py
 related: [architecture, events-api, people-privilege, csv-import-export]
-source_hash: 664673bae82d
+source_hash: 9eb5c92b0617
 ---
 
 # Store and models
@@ -41,7 +41,7 @@ only code that changes the document.
 | `rooms` | `{id: room}` | `name`, `area_id`, `order` |
 | `bookcases` | `{id: bookcase}` | `room_id`, `name`, `note`, `order` |
 | `shelves` | `{id: shelf}` | `bookcase_id`, `name`, `order` |
-| `books` | `{id: book}` | `models.BOOK_FIELDS`, `cover`, `wishlist`, `lookup_tries`, `catalog_status`, time stamps |
+| `books` | `{id: book}` | `models.BOOK_FIELDS`, `cover`, `wishlist`, time stamps |
 | `copies` | `{id: copy}` | `book_id` and `models.COPY_FIELDS` |
 | `reading` | `{person_id: {book_id: row}}` | `models.READING_FIELDS` and `updated_at` |
 | `loans` | `{id: loan}` | `direction`, `book_id`, `copy_id`, `party`, dates, `hk_task_id` |
@@ -49,11 +49,8 @@ only code that changes the document.
 | `todo_orphans` | `[{entity_id, uid}]` | To-do items that the wishlist sync must remove |
 
 `models.normalize_state` runs on every load and in the storage migration hook. It gives
-each section its type, so a section that a later version adds needs no migration. It also
-gives each book a whole `lookup_tries` count of 0 or more, and a `catalogs` and a
-`catalog_status` object (`models.normalize_catalogs`). That function also moves the keys
-`openlibrary` and `openlibrary_status` of a store from 0.3.0b1 or older into those
-objects, so the storage version stays 1.1.
+each section its type, so a section that a later version adds needs no migration. The
+storage version stays 1.1.
 
 ### Model functions
 
@@ -62,12 +59,9 @@ objects, so the storage version stays 1.1.
   clock: the store passes `now` and `today`.
 - A bad value raises `models.LibraryError` with a key and placeholders. The key is in
   `strings.json` `exceptions`.
-- An ISBN goes through `isbn.normalize`. The book stores both forms when 1 converts to the
-  other ([scan-and-isbn](scan-and-isbn.md)). In `models.update_book`, a new ISBN-13 also
-  sets the ISBN-10, and an empty ISBN-13 clears it.
-- `models.fill_from_draft` writes only the empty `models.DRAFT_FIELDS` of a book, so an
-  edit by a user stays when Open Library fills the book.
-- `models.title_key` folds a title and its first author for a match with no ISBN.
+- A barcode goes through `models.barcode`
+  ([scan-and-barcode](scan-and-barcode.md#barcode-rules)).
+- `models.title_key` folds a title and its first author for a match with no barcode.
 
 ### The write path
 
@@ -81,8 +75,8 @@ listener. A listener that fails is logged and the others still run. The listener
 ### Rules
 
 - **Duplicates.** `add_book` returns the stored book with `existing: true` when the
-  ISBN-13 matches. A second copy is a separate call. If an Open Library draft gives an
-  ISBN-13 that another book has, `LibraryStore.fill_book` keeps the ISBNs of the book.
+  barcode matches. A second copy is a separate call. `update_book` refuses a barcode that
+  another book has with `duplicate_barcode`.
 - **Locations.** A room with bookcases, a bookcase with shelves and a shelf with copies
   fail to delete with a localized error, unless `force: true`. With `force`, each child
   is removed and each copy moves to no shelf.
@@ -100,10 +94,8 @@ listener. A listener that fails is logged and the others still run. The listener
   document and fires only `import_completed` ([csv-import-export](csv-import-export.md#steps)).
   `commit_data_import` does the same for a Home Keeper import and fires only
   `data_imported` ([import-export](import-export.md)).
-- **Bookkeeping.** `set_lookup_tries` and `set_loan_task` save a field that only a queue
-  or a sync reads, and fire no event.
-- **Catalog status.** `set_catalog_status` sets `missing`, `skipped` or None for 1
-  catalog, and fires `book_updated` ([open-library-contribute](open-library-contribute.md)).
+- **Bookkeeping.** `set_loan_task` saves a field that only the loan sync reads, and
+  fires no event.
 - **Currency.** The currency is an option of the config entry, not a field of the
   document. `async_settings_updated` fires `settings_updated` and tells the listeners,
   so the clients read it again.

@@ -17,7 +17,7 @@ Keeper as a task.
 | Room | A room of the home. It can link to a Home Assistant area. |
 | Bookcase | A piece of furniture in a room. It holds shelves. |
 | Shelf | 1 shelf of a bookcase. |
-| Book | A title, with its authors, ISBN, cover, series and notes. |
+| Book | A title, with its authors, barcode, cover, series and notes. |
 | Copy | 1 book that the household owns, on a shelf, in a format. A book can have 0, 1 or more copies. |
 | Reading status | Want to read, Reading, Read or Did not finish, for 1 person. |
 | Loan | A copy that the household lent out, or a book that a person borrowed. |
@@ -36,8 +36,8 @@ person and a book on the wishlist.
   with its cover and copies.
 - [Loans](../library/loans.md): the books that the household lent out or borrowed.
 - [Wishlist](../library/wishlist.md): a wishlist and a to-do list for each person.
-- [Import and export](../library/import-export.md): the CSV files of Goodreads and
-  StoryGraph.
+- [Import and export](../library/import-export.md): the CSV file of the library and the
+  Home Keeper export.
 - [Dashboard card](../views/dashboard-card.md): the reading of a person on a dashboard.
 - [People and privacy](people-and-privacy.md): what each user can read and change.
 - [Services and events](../automation/services.md): automations and other integrations.
@@ -46,5 +46,4 @@ person and a book on the wishlist.
 
 An admin manages the library in the **Library** tab of the Home Keeper panel. Every user
 can set the reading status of their own person on the dashboard card. Every user can use
-the entities of the library too. Book details and covers come from
-[Open Library](https://openlibrary.org).
+the entities of the library too.

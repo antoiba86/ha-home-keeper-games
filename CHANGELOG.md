@@ -5,6 +5,22 @@ Each change that a user can see is in this file. The format is based on
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). `manifest.json` `version`
 is the single source of truth (see `RELEASE.md`).
 
+## [0.5.0b1] - 2026-11-21
+
+### Changed
+
+- **[Barcode scan](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/scan-books).**
+  A scan reads any EAN-13, EAN-8 or UPC-A barcode, and a new barcode asks for the title.
+  A book has 1 barcode field in place of its 2 ISBN fields, and `scan_isbn` is now
+  `scan_barcode`.
+
+### Removed
+
+- **Open Library.** The library no longer reads details or covers from Open Library, and
+  no longer sends books to it. Upload a photo to give a book a cover.
+- **Goodreads and StoryGraph files.** The CSV import and export use only the format of
+  Home Keeper Games.
+
 ## [0.4.0] - 2026-10-25
 
 ### Added

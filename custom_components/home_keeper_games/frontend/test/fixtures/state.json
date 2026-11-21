@@ -95,7 +95,7 @@
  ],
  "books": [
   {
-   "id": "d863ec937ad1406fba8ce5f430d7d2ab",
+   "id": "b3ea7f88089c4b1fa3bfbcde8d2c1696",
    "title": "9780980123468",
    "subtitle": "",
    "authors": [],
@@ -2276,6 +2276,21 @@
    "created_at": "2026-03-15T10:00:00+00:00"
   },
   {
+   "id": "6dc6aef10a054292b045abbb9b99b621",
+   "book_id": "b3ea7f88089c4b1fa3bfbcde8d2c1696",
+   "shelf_id": null,
+   "format": "paperback",
+   "condition": null,
+   "acquired": null,
+   "acquired_from": "",
+   "price": null,
+   "value": null,
+   "signed": false,
+   "first_edition": false,
+   "note": "",
+   "created_at": "2026-03-21T10:00:00+00:00"
+  },
+  {
    "id": "9a1d67bb7f2c4e5196fef868185b18c7",
    "book_id": "b796ea67f1b14d51a21aea93829a5f3d",
    "shelf_id": null,
@@ -2349,21 +2364,6 @@
    "first_edition": false,
    "note": "",
    "created_at": "2026-01-23T10:00:00+00:00"
-  },
-  {
-   "id": "1a9d85cb52234ac6961f9fe0a470c037",
-   "book_id": "d863ec937ad1406fba8ce5f430d7d2ab",
-   "shelf_id": null,
-   "format": "paperback",
-   "condition": null,
-   "acquired": null,
-   "acquired_from": "",
-   "price": null,
-   "value": null,
-   "signed": false,
-   "first_edition": false,
-   "note": "",
-   "created_at": "2026-03-21T10:00:00+00:00"
   },
   {
    "id": "c15276857083418fb51ff73a994ea96b",

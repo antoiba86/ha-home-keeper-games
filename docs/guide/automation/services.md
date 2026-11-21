@@ -41,28 +41,6 @@ actions:
     response_variable: detail
 ```
 
-An admin-only service can also send a book to Open Library, after an admin connects an
-Open Library account ([Send books to Open Library](../library/open-library.md)).
-
-```yaml
-actions:
-  - action: home_keeper_games.send_to_catalog
-    data:
-      book_id: "5f0c1b2a9d8e4f7a8b6c5d4e3f2a1b0c"
-      fields: [publisher, published, isbn]
-    response_variable: sent
-```
-
-The response has `result` (`added` or `existing`) and `record`, the Open Library edition
-key. With `existing`, check the edition and link it with `link_catalog`. The service names
-say "catalog" because the library can support more catalogs of books later. Open Library
-is the only catalog now.
-
-`search_catalog` finds the Open Library work for a title and an author. It changes
-nothing. To fill the empty details of a book from that work, give the `work_key` of the
-`match` to `link_catalog` as `record`. A work has no ISBN, publisher or page count, so
-those details stay as they are.
-
 ## Events
 
 The library fires an event for each change, such as

@@ -104,8 +104,7 @@
     "authors": [
      "Ursula K. Le Guin"
     ],
-    "isbn13": "9780441478125",
-    "isbn10": "0441478123",
+    "barcode": "9780441478125",
     "publisher": "Ace Books",
     "published": "1969",
     "pages": 304,
@@ -123,14 +122,11 @@
      "Hugo winner"
     ],
     "shared_notes": "Book club pick, **Oct 2026**. Sam has the map of Gethen bookmarked on page 6.",
-    "catalogs": {},
     "cover": {
      "kind": "custom",
      "file": "58247cad1ced46248fefe4d2b0db71b5-cff560bf.jpg"
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-01-01T10:00:00+00:00",
     "updated_at": "2026-01-01T10:00:00+00:00",
     "wishlist": null
@@ -142,8 +138,7 @@
     "authors": [
      "Ursula K. Le Guin"
     ],
-    "isbn13": "9780547773742",
-    "isbn10": "0547773749",
+    "barcode": "9780547773742",
     "publisher": "Clarion Books",
     "published": "1968",
     "pages": 183,
@@ -158,20 +153,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {
-     "openlibrary": {
-      "edition_key": "OL5241542M",
-      "work_key": "/works/OL5241542W",
-      "cover_id": 12623421
-     }
-    },
     "cover": {
-     "kind": "openlibrary",
+     "kind": "custom",
      "file": "e4b7df5e6eef4483b1751162204397b8-798c3698.jpg"
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-01-03T10:00:00+00:00",
     "updated_at": "2026-01-03T10:00:00+00:00",
     "wishlist": null
@@ -183,8 +169,7 @@
     "authors": [
      "Ursula K. Le Guin"
     ],
-    "isbn13": "9780061054884",
-    "isbn10": "0061054887",
+    "barcode": "9780061054884",
     "publisher": "Harper Voyager",
     "published": "1974",
     "pages": 387,
@@ -202,20 +187,11 @@
      "Hugo winner"
     ],
     "shared_notes": "",
-    "catalogs": {
-     "openlibrary": {
-      "edition_key": "OL11947964M",
-      "work_key": "/works/OL11947964W",
-      "cover_id": 8231862
-     }
-    },
     "cover": {
-     "kind": "openlibrary",
+     "kind": "custom",
      "file": "13be6b0e5c354e1981a89fe2766196e0-552257a9.jpg"
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-01-05T10:00:00+00:00",
     "updated_at": "2026-01-05T10:00:00+00:00",
     "wishlist": null
@@ -227,8 +203,7 @@
     "authors": [
      "Ursula K. Le Guin"
     ],
-    "isbn13": "9781416556961",
-    "isbn10": "1416556966",
+    "barcode": "9781416556961",
     "publisher": "Scribner",
     "published": "1971",
     "pages": 184,
@@ -240,14 +215,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-01-07T10:00:00+00:00",
     "updated_at": "2026-01-07T10:00:00+00:00",
     "wishlist": null
@@ -259,8 +231,7 @@
     "authors": [
      "Ursula K. Le Guin"
     ],
-    "isbn13": "9781416509608",
-    "isbn10": "1416509607",
+    "barcode": "9781416509608",
     "publisher": "Atheneum",
     "published": "1970",
     "pages": 180,
@@ -275,20 +246,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {
-     "openlibrary": {
-      "edition_key": "OL7076247M",
-      "work_key": "/works/OL7076247W",
-      "cover_id": 12623433
-     }
-    },
     "cover": {
-     "kind": "openlibrary",
+     "kind": "custom",
      "file": "fb4f591ff96c45e5abc0fa81325c564c-7ccde4d9.jpg"
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-01-09T10:00:00+00:00",
     "updated_at": "2026-01-09T10:00:00+00:00",
     "wishlist": null
@@ -300,8 +262,7 @@
     "authors": [
      "Ursula K. Le Guin"
     ],
-    "isbn13": "9781416509639",
-    "isbn10": "1416509631",
+    "barcode": "9781416509639",
     "publisher": "Atheneum",
     "published": "1972",
     "pages": 223,
@@ -316,14 +277,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-01-11T10:00:00+00:00",
     "updated_at": "2026-01-11T10:00:00+00:00",
     "wishlist": null
@@ -335,8 +293,7 @@
     "authors": [
      "Ursula K. Le Guin"
     ],
-    "isbn13": "9780689315954",
-    "isbn10": "0689315953",
+    "barcode": "9780689315954",
     "publisher": "Atheneum",
     "published": "1990",
     "pages": 252,
@@ -353,14 +310,11 @@
      "Nebula winner"
     ],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-01-13T10:00:00+00:00",
     "updated_at": "2026-01-13T10:00:00+00:00",
     "wishlist": null
@@ -372,8 +326,7 @@
     "authors": [
      "Ursula K. Le Guin"
     ],
-    "isbn13": "9781598537055",
-    "isbn10": "1598537059",
+    "barcode": "9781598537055",
     "publisher": "Library of America",
     "published": "1985",
     "pages": 523,
@@ -385,14 +338,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-01-15T10:00:00+00:00",
     "updated_at": "2026-01-15T10:00:00+00:00",
     "wishlist": null
@@ -404,8 +354,7 @@
     "authors": [
      "Ursula K. Le Guin"
     ],
-    "isbn13": "9780765323453",
-    "isbn10": "0765323451",
+    "barcode": "9780765323453",
     "publisher": "Tor Books",
     "published": "1972",
     "pages": 189,
@@ -420,14 +369,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-01-17T10:00:00+00:00",
     "updated_at": "2026-01-17T10:00:00+00:00",
     "wishlist": null
@@ -439,8 +385,7 @@
     "authors": [
      "Ursula K. Le Guin"
     ],
-    "isbn13": "9780156033688",
-    "isbn10": "0156033682",
+    "barcode": "9780156033688",
     "publisher": "Mariner Books",
     "published": "2008",
     "pages": 279,
@@ -452,14 +397,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-01-19T10:00:00+00:00",
     "updated_at": "2026-01-19T10:00:00+00:00",
     "wishlist": null
@@ -471,8 +413,7 @@
     "authors": [
      "Susanna Clarke"
     ],
-    "isbn13": "9781635575637",
-    "isbn10": "163557563X",
+    "barcode": "9781635575637",
     "publisher": "Bloomsbury",
     "published": "2020",
     "pages": 272,
@@ -486,20 +427,11 @@
      "Book club"
     ],
     "shared_notes": "",
-    "catalogs": {
-     "openlibrary": {
-      "edition_key": "OL1382631M",
-      "work_key": "/works/OL1382631W",
-      "cover_id": 10307413
-     }
-    },
     "cover": {
-     "kind": "openlibrary",
+     "kind": "custom",
      "file": "e50273c278814a57b97033997476c0df-84379fb2.jpg"
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-01-21T10:00:00+00:00",
     "updated_at": "2026-01-21T10:00:00+00:00",
     "wishlist": null
@@ -511,8 +443,7 @@
     "authors": [
      "Andy Weir"
     ],
-    "isbn13": "9780593135204",
-    "isbn10": "0593135202",
+    "barcode": "9780593135204",
     "publisher": "Ballantine Books",
     "published": "2021",
     "pages": 476,
@@ -524,20 +455,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {
-     "openlibrary": {
-      "edition_key": "OL932852M",
-      "work_key": "/works/OL932852W",
-      "cover_id": 11200092
-     }
-    },
     "cover": {
-     "kind": "openlibrary",
+     "kind": "custom",
      "file": "d4c37434a7ea4a8e860517cd82ccc32b-fe79493e.jpg"
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-01-23T10:00:00+00:00",
     "updated_at": "2026-01-23T10:00:00+00:00",
     "wishlist": null
@@ -549,8 +471,7 @@
     "authors": [
      "N. K. Jemisin"
     ],
-    "isbn13": "9780316229296",
-    "isbn10": "0316229296",
+    "barcode": "9780316229296",
     "publisher": "Orbit",
     "published": "2015",
     "pages": 468,
@@ -568,20 +489,11 @@
      "Hugo winner"
     ],
     "shared_notes": "",
-    "catalogs": {
-     "openlibrary": {
-      "edition_key": "OL12869656M",
-      "work_key": "/works/OL12869656W",
-      "cover_id": 8296560
-     }
-    },
     "cover": {
-     "kind": "openlibrary",
+     "kind": "custom",
      "file": "8ffa744031884f64a2b39c35342641c1-d2033a57.jpg"
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-02-01T10:00:00+00:00",
     "updated_at": "2026-02-01T10:00:00+00:00",
     "wishlist": null
@@ -593,8 +505,7 @@
     "authors": [
      "Frank Herbert"
     ],
-    "isbn13": "9780441013593",
-    "isbn10": "0441013597",
+    "barcode": "9780441013593",
     "publisher": "Ace Books",
     "published": "1965",
     "pages": 688,
@@ -609,20 +520,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {
-     "openlibrary": {
-      "edition_key": "OL10492718M",
-      "work_key": "/works/OL10492718W",
-      "cover_id": 11481354
-     }
-    },
     "cover": {
-     "kind": "openlibrary",
+     "kind": "custom",
      "file": "eed5dacf0ada41059efc64fdefd6dfa9-543ed35b.jpg"
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-02-03T10:00:00+00:00",
     "updated_at": "2026-02-03T10:00:00+00:00",
     "wishlist": null
@@ -634,8 +536,7 @@
     "authors": [
      "Patrick Rothfuss"
     ],
-    "isbn13": "9780756404741",
-    "isbn10": "0756404746",
+    "barcode": "9780756404741",
     "publisher": "DAW Books",
     "published": "2007",
     "pages": 662,
@@ -650,14 +551,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-02-05T10:00:00+00:00",
     "updated_at": "2026-02-05T10:00:00+00:00",
     "wishlist": null
@@ -669,8 +567,7 @@
     "authors": [
      "Kazuo Ishiguro"
     ],
-    "isbn13": "9780593318171",
-    "isbn10": "059331817X",
+    "barcode": "9780593318171",
     "publisher": "Knopf",
     "published": "2021",
     "pages": 303,
@@ -682,20 +579,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {
-     "openlibrary": {
-      "edition_key": "OL14483060M",
-      "work_key": "/works/OL14483060W",
-      "cover_id": 10958358
-     }
-    },
     "cover": {
-     "kind": "openlibrary",
+     "kind": "custom",
      "file": "af804c5b7f944aabb9462c114fab95d0-4a3dba00.jpg"
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-02-07T10:00:00+00:00",
     "updated_at": "2026-02-07T10:00:00+00:00",
     "wishlist": null
@@ -707,8 +595,7 @@
     "authors": [
      "Fuchsia Dunlop"
     ],
-    "isbn13": "9780393089288",
-    "isbn10": "0393089282",
+    "barcode": "9780393089288",
     "publisher": "W. W. Norton",
     "published": "2012",
     "pages": 352,
@@ -723,16 +610,11 @@
      "Kitchen"
     ],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 3,
-    "catalog_status": {
-     "openlibrary": "missing"
-    },
     "created_at": "2026-02-09T10:00:00+00:00",
     "updated_at": "2026-02-09T10:00:00+00:00",
     "wishlist": null
@@ -744,8 +626,7 @@
     "authors": [
      "Samin Nosrat"
     ],
-    "isbn13": "9781476753836",
-    "isbn10": "1476753830",
+    "barcode": "9781476753836",
     "publisher": "Simon & Schuster",
     "published": "2017",
     "pages": 480,
@@ -759,14 +640,11 @@
      "Kitchen"
     ],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "custom",
      "file": "2ff469fc40f54abfbb1a50274f264dae-fb97e18d.jpg"
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-02-11T10:00:00+00:00",
     "updated_at": "2026-02-11T10:00:00+00:00",
     "wishlist": null
@@ -778,8 +656,7 @@
     "authors": [
      "J. Kenji López-Alt"
     ],
-    "isbn13": "9780393081084",
-    "isbn10": "0393081087",
+    "barcode": "9780393081084",
     "publisher": "W. W. Norton",
     "published": "2015",
     "pages": 958,
@@ -794,14 +671,11 @@
      "Kitchen"
     ],
     "shared_notes": "The *pancake* recipe is on page 102.\n\n- Sticky notes from Jo\n- Do not lend",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-02-13T10:00:00+00:00",
     "updated_at": "2026-02-13T10:00:00+00:00",
     "wishlist": null
@@ -813,8 +687,7 @@
     "authors": [
      "Judith Schalansky"
     ],
-    "isbn13": "9780143118206",
-    "isbn10": "014311820X",
+    "barcode": "9780143118206",
     "publisher": "Penguin Books",
     "published": "2009",
     "pages": 144,
@@ -827,14 +700,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-02-15T10:00:00+00:00",
     "updated_at": "2026-02-15T10:00:00+00:00",
     "wishlist": null
@@ -846,8 +716,7 @@
     "authors": [
      "Douglas Hofstadter"
     ],
-    "isbn13": "9780465026562",
-    "isbn10": "0465026567",
+    "barcode": "9780465026562",
     "publisher": "Basic Books",
     "published": "1979",
     "pages": 777,
@@ -860,14 +729,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-02-17T10:00:00+00:00",
     "updated_at": "2026-02-17T10:00:00+00:00",
     "wishlist": null
@@ -879,8 +745,7 @@
     "authors": [
      "Richard Powers"
     ],
-    "isbn13": "9780393635522",
-    "isbn10": "039363552X",
+    "barcode": "9780393635522",
     "publisher": "W. W. Norton",
     "published": "2018",
     "pages": 502,
@@ -895,14 +760,11 @@
      "Pulitzer winner"
     ],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-02-19T10:00:00+00:00",
     "updated_at": "2026-02-19T10:00:00+00:00",
     "wishlist": null
@@ -914,8 +776,7 @@
     "authors": [
      "Robin Wall Kimmerer"
     ],
-    "isbn13": "9781571313560",
-    "isbn10": "1571313567",
+    "barcode": "9781571313560",
     "publisher": "Milkweed Editions",
     "published": "2013",
     "pages": 391,
@@ -928,14 +789,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-02-21T10:00:00+00:00",
     "updated_at": "2026-02-21T10:00:00+00:00",
     "wishlist": null
@@ -947,8 +805,7 @@
     "authors": [
      "J. R. R. Tolkien"
     ],
-    "isbn13": "9780547928227",
-    "isbn10": "054792822X",
+    "barcode": "9780547928227",
     "publisher": "Mariner Books",
     "published": "1937",
     "pages": 310,
@@ -962,20 +819,11 @@
      "Family"
     ],
     "shared_notes": "First edition of the family. Keep it out of the sun.",
-    "catalogs": {
-     "openlibrary": {
-      "edition_key": "OL7500623M",
-      "work_key": "/works/OL7500623W",
-      "cover_id": 12003830
-     }
-    },
     "cover": {
-     "kind": "openlibrary",
+     "kind": "custom",
      "file": "fd086096a83f483ab7219f131e678534-f18df7a1.jpg"
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-02-23T10:00:00+00:00",
     "updated_at": "2026-02-23T10:00:00+00:00",
     "wishlist": null
@@ -987,8 +835,7 @@
     "authors": [
      "Maurice Sendak"
     ],
-    "isbn13": "9780060254926",
-    "isbn10": "0060254920",
+    "barcode": "9780060254926",
     "publisher": "HarperCollins",
     "published": "1963",
     "pages": 48,
@@ -1002,14 +849,11 @@
      "Family"
     ],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-03-01T10:00:00+00:00",
     "updated_at": "2026-03-01T10:00:00+00:00",
     "wishlist": null
@@ -1022,8 +866,7 @@
      "Yuehua Liu",
      "Tao-chung Yao"
     ],
-    "isbn13": "9781622911356",
-    "isbn10": "1622911350",
+    "barcode": "9781622911356",
     "publisher": "Cheng & Tsui",
     "published": "2017",
     "pages": 420,
@@ -1040,14 +883,11 @@
      "Study"
     ],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-03-03T10:00:00+00:00",
     "updated_at": "2026-03-03T10:00:00+00:00",
     "wishlist": null
@@ -1060,8 +900,7 @@
      "Harold Abelson",
      "Gerald Jay Sussman"
     ],
-    "isbn13": "9780262510875",
-    "isbn10": "0262510871",
+    "barcode": "9780262510875",
     "publisher": "MIT Press",
     "published": "1996",
     "pages": 657,
@@ -1075,14 +914,11 @@
      "Study"
     ],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-03-05T10:00:00+00:00",
     "updated_at": "2026-03-05T10:00:00+00:00",
     "wishlist": null
@@ -1095,8 +931,7 @@
      "Andrew Hunt",
      "David Thomas"
     ],
-    "isbn13": "9780201616224",
-    "isbn10": "020161622X",
+    "barcode": "9780201616224",
     "publisher": "Addison-Wesley",
     "published": "1999",
     "pages": 352,
@@ -1108,14 +943,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-03-07T10:00:00+00:00",
     "updated_at": "2026-03-07T10:00:00+00:00",
     "wishlist": null
@@ -1127,8 +959,7 @@
     "authors": [
      "Daniel Kahneman"
     ],
-    "isbn13": "9780374533557",
-    "isbn10": "0374533555",
+    "barcode": "9780374533557",
     "publisher": "Farrar, Straus and Giroux",
     "published": "2011",
     "pages": 499,
@@ -1140,14 +971,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-03-09T10:00:00+00:00",
     "updated_at": "2026-03-09T10:00:00+00:00",
     "wishlist": null
@@ -1159,8 +987,7 @@
     "authors": [
      "Yuval Noah Harari"
     ],
-    "isbn13": "9780062316097",
-    "isbn10": "0062316095",
+    "barcode": "9780062316097",
     "publisher": "Harper",
     "published": "2011",
     "pages": 443,
@@ -1172,14 +999,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-03-11T10:00:00+00:00",
     "updated_at": "2026-03-11T10:00:00+00:00",
     "wishlist": null
@@ -1191,8 +1015,7 @@
     "authors": [
      "Arkady Martine"
     ],
-    "isbn13": "9781250186430",
-    "isbn10": "1250186439",
+    "barcode": "9781250186430",
     "publisher": "Tor Books",
     "published": "2019",
     "pages": 462,
@@ -1209,14 +1032,11 @@
      "Hugo winner"
     ],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-03-13T10:00:00+00:00",
     "updated_at": "2026-03-13T10:00:00+00:00",
     "wishlist": null
@@ -1228,8 +1048,7 @@
     "authors": [
      "Emily St. John Mandel"
     ],
-    "isbn13": "9780804172448",
-    "isbn10": "0804172447",
+    "barcode": "9780804172448",
     "publisher": "Vintage",
     "published": "2014",
     "pages": 333,
@@ -1241,14 +1060,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-03-15T10:00:00+00:00",
     "updated_at": "2026-03-15T10:00:00+00:00",
     "wishlist": null
@@ -1260,8 +1076,7 @@
     "authors": [
      "Ursula K. Le Guin"
     ],
-    "isbn13": "9781618730794",
-    "isbn10": "1618730797",
+    "barcode": "9781618730794",
     "publisher": "Saga Press",
     "published": "2012",
     "pages": 320,
@@ -1273,14 +1088,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-03-17T10:00:00+00:00",
     "updated_at": "2026-03-17T10:00:00+00:00",
     "wishlist": null
@@ -1290,8 +1102,7 @@
     "title": "Untitled paperback",
     "subtitle": "",
     "authors": [],
-    "isbn13": "9780980123456",
-    "isbn10": "0980123453",
+    "barcode": "9780980123456",
     "publisher": "",
     "published": "",
     "pages": null,
@@ -1301,27 +1112,21 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": true,
-    "lookup_tries": 3,
-    "catalog_status": {
-     "openlibrary": "missing"
-    },
     "created_at": "2026-03-19T10:00:00+00:00",
     "updated_at": "2026-03-19T10:00:00+00:00",
     "wishlist": null
    },
-   "d863ec937ad1406fba8ce5f430d7d2ab": {
-    "id": "d863ec937ad1406fba8ce5f430d7d2ab",
+   "b3ea7f88089c4b1fa3bfbcde8d2c1696": {
+    "id": "b3ea7f88089c4b1fa3bfbcde8d2c1696",
     "title": "9780980123468",
     "subtitle": "",
     "authors": [],
-    "isbn13": "9780980123463",
-    "isbn10": "0980123461",
+    "barcode": "9780980123463",
     "publisher": "",
     "published": "",
     "pages": null,
@@ -1331,16 +1136,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": true,
-    "lookup_tries": 3,
-    "catalog_status": {
-     "openlibrary": "missing"
-    },
     "created_at": "2026-03-21T10:00:00+00:00",
     "updated_at": "2026-03-21T10:00:00+00:00",
     "wishlist": null
@@ -1352,8 +1152,7 @@
     "authors": [
      "Ursula K. Le Guin"
     ],
-    "isbn13": "9780544611610",
-    "isbn10": "0544611616",
+    "barcode": "9780544611610",
     "publisher": "Mariner Books",
     "published": "1998",
     "pages": 176,
@@ -1365,16 +1164,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 3,
-    "catalog_status": {
-     "openlibrary": "missing"
-    },
     "created_at": "2026-03-23T10:00:00+00:00",
     "updated_at": "2026-03-23T10:00:00+00:00",
     "wishlist": null
@@ -1386,8 +1180,7 @@
     "authors": [
      "Kim Stanley Robinson"
     ],
-    "isbn13": "9780316300131",
-    "isbn10": "0316300136",
+    "barcode": "9780316300131",
     "publisher": "Orbit",
     "published": "2020",
     "pages": 563,
@@ -1399,14 +1192,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "custom",
      "file": "ae18ed68fc3445f484544a09c13ece47-a66afeef.jpg"
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-04-01T10:00:00+00:00",
     "updated_at": "2026-04-01T10:00:00+00:00",
     "wishlist": null
@@ -1418,8 +1208,7 @@
     "authors": [
      "Gabrielle Zevin"
     ],
-    "isbn13": "9780593321201",
-    "isbn10": "0593321200",
+    "barcode": "9780593321201",
     "publisher": "Knopf",
     "published": "2022",
     "pages": 401,
@@ -1431,14 +1220,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-04-03T10:00:00+00:00",
     "updated_at": "2026-04-03T10:00:00+00:00",
     "wishlist": null
@@ -1450,8 +1236,7 @@
     "authors": [
      "Naomi Novik"
     ],
-    "isbn13": "9780399581038",
-    "isbn10": "0399581030",
+    "barcode": "9780399581038",
     "publisher": "Del Rey",
     "published": "2018",
     "pages": 466,
@@ -1463,14 +1248,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-04-05T10:00:00+00:00",
     "updated_at": "2026-04-05T10:00:00+00:00",
     "wishlist": null
@@ -1482,8 +1264,7 @@
     "authors": [
      "Emily St. John Mandel"
     ],
-    "isbn13": "9780593321447",
-    "isbn10": "0593321448",
+    "barcode": "9780593321447",
     "publisher": "Knopf",
     "published": "2022",
     "pages": 255,
@@ -1495,14 +1276,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-04-07T10:00:00+00:00",
     "updated_at": "2026-04-07T10:00:00+00:00",
     "wishlist": null
@@ -1514,8 +1292,7 @@
     "authors": [
      "Ursula K. Le Guin"
     ],
-    "isbn13": "9780547773766",
-    "isbn10": "0547773765",
+    "barcode": "9780547773766",
     "publisher": "Clarion Books",
     "published": "2001",
     "pages": 246,
@@ -1530,14 +1307,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-04-09T10:00:00+00:00",
     "updated_at": "2026-04-09T10:00:00+00:00",
     "wishlist": {
@@ -1556,8 +1330,7 @@
     "authors": [
      "N. K. Jemisin"
     ],
-    "isbn13": "9780316229265",
-    "isbn10": "0316229261",
+    "barcode": "9780316229265",
     "publisher": "Orbit",
     "published": "2016",
     "pages": 448,
@@ -1572,14 +1345,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-04-11T10:00:00+00:00",
     "updated_at": "2026-04-11T10:00:00+00:00",
     "wishlist": {
@@ -1598,8 +1368,7 @@
     "authors": [
      "Fuchsia Dunlop"
     ],
-    "isbn13": "9780393254389",
-    "isbn10": "0393254380",
+    "barcode": "9780393254389",
     "publisher": "W. W. Norton",
     "published": "2016",
     "pages": 368,
@@ -1612,14 +1381,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-04-13T10:00:00+00:00",
     "updated_at": "2026-04-13T10:00:00+00:00",
     "wishlist": {
@@ -1639,8 +1405,7 @@
      "Yuehua Liu",
      "Tao-chung Yao"
     ],
-    "isbn13": "9781622911400",
-    "isbn10": "1622911407",
+    "barcode": "9781622911400",
     "publisher": "Cheng & Tsui",
     "published": "2018",
     "pages": 412,
@@ -1655,14 +1420,11 @@
     "description": "",
     "tags": [],
     "shared_notes": "",
-    "catalogs": {},
     "cover": {
      "kind": "none",
      "file": null
     },
     "needs_details": false,
-    "lookup_tries": 0,
-    "catalog_status": {},
     "created_at": "2026-04-15T10:00:00+00:00",
     "updated_at": "2026-04-15T10:00:00+00:00",
     "wishlist": {
@@ -2201,9 +1963,9 @@
     "note": "",
     "created_at": "2026-03-19T10:00:00+00:00"
    },
-   "1a9d85cb52234ac6961f9fe0a470c037": {
-    "id": "1a9d85cb52234ac6961f9fe0a470c037",
-    "book_id": "d863ec937ad1406fba8ce5f430d7d2ab",
+   "6dc6aef10a054292b045abbb9b99b621": {
+    "id": "6dc6aef10a054292b045abbb9b99b621",
+    "book_id": "b3ea7f88089c4b1fa3bfbcde8d2c1696",
     "shelf_id": null,
     "format": "paperback",
     "condition": null,

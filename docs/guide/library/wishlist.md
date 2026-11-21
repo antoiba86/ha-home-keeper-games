@@ -9,13 +9,13 @@ as "*Title* by *Author*".
 ## Add a book to the wishlist
 
 1. Open the **Wishlist** page of the Library tab, and select **Add to wishlist**.
-2. Enter the ISBN or the title, and select the person.
+2. Enter the title or the barcode, and select the person.
 3. Set **Buy** if the book must go on the to-do list now.
 4. Select **Save**.
 
 You can also select **Add to wishlist** on the detail page of a book. A book is on the
-wishlist of 1 person at a time. A Goodreads or StoryGraph import puts each "to-read" book
-with no owned copy on the wishlist ([Import and export](import-export.md)).
+wishlist of 1 person at a time. A CSV import puts each row with `wishlist` set to `true`
+on the wishlist, if the book has no copy ([Import and export](import-export.md)).
 
 ## Got it
 

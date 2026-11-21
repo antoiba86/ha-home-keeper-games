@@ -1,50 +1,46 @@
 ---
 title: CSV import and export
-summary: How the library reads Goodreads, StoryGraph and library CSV files with a dry run first, how it matches rows to books, and how it writes an export.
+summary: How the integration reads its own CSV format with a dry run first, how it matches rows to books, and how it writes an export.
 implements:
   - custom_components/home_keeper_games/csv_io.py
   - custom_components/home_keeper_games/frontend/src/tab-import.ts
-related: [store-models, open-library-covers, events-api]
-source_hash: 6f3e5adf847c
+related: [store-models, events-api, import-export]
+source_hash: 7f87d748b480
 ---
 
 # CSV import and export
 
-An admin moves a reading history into the library from a Goodreads or StoryGraph export,
-or moves a library from 1 Home Assistant to another with the library format. The import
-runs as a dry run first, so the admin sees the counts before a write.
+An admin edits the collection in a spreadsheet, or moves it from 1 Home Assistant to
+another, with the CSV format of the integration. The import runs as a dry run first, so
+the admin sees the counts before a write.
 
 ## Goals
 
 - **G1. Preview before write.** A dry run is the same pure call as the import, with the
   result thrown away. The preview and the import cannot disagree.
-- **G2. No second book.** A row matches a stored book by ISBN-13, then ISBN-10, then
-  title and first author.
+- **G2. No second book.** A row matches a stored book by id, then barcode, then title
+  and first author.
 - **G3. Keep what is there.** A reading row that the person has now stays, unless the
-  admin asks to replace it. A book with a copy gets no second copy from a Goodreads or
-  StoryGraph row.
-- **G4. Round trips.** `parse(write(rows))` gives the rows back, for each format.
+  admin asks to replace it. A copy id that is already stored is not added again.
+- **G4. Round trips.** `parse(write(rows))` gives the rows back.
 
 ## Non-goals
 
-- A sync with Goodreads or StoryGraph. The import reads a file once.
-- Open Library calls inside the import. New books that need details go to the lookup
-  queue after the write.
+- The CSV formats of other apps. The integration reads only its own format.
+- Network calls inside the import.
 - The whole document. The Home Keeper export holds it ([import-export](import-export.md)).
 
 ## Design
 
 ### Steps
 
-1. `csv_io.parse` reads the text into import rows, with the same keys for each source.
-   `goodreads` needs the `Title` column, and so does `storygraph`. A file of more than
-   5 MB is refused with `csv_too_large`.
+1. `csv_io.parse` reads the text into import rows. The file needs the `title` column. A
+   file of more than 5 MB is refused with `csv_too_large`.
 2. `csv_io.apply_import` plans the import on a snapshot of the document in an executor
-   job. It returns the planned document, the counts, 1 result for each row and the ids of
-   the new books that need details.
+   job. It returns the planned document, the counts and 1 result for each row.
 3. With `dry_run: true` the service returns the counts and the first 200 row results.
-   Else `LibraryStore.commit_import` writes the plan and fires `import_completed`, and
-   the new books go to the lookup queue.
+   Else `LibraryStore.commit_import` writes the plan and fires `import_completed` with
+   the source `csv`.
 
 **An import never replaces the document.** Other changes can come in while the plan
 runs. `models.merge_changes` compares the snapshot with the plan, and writes into the
@@ -55,53 +51,33 @@ the save have no `await` between them, so no other change comes in the middle.
 - A record that a user deleted while the plan ran stays deleted.
 - A planned copy or reading row of a deleted book is dropped. A planned copy on a
   deleted shelf goes to no shelf.
-- A new book starts with `lookup_tries` 0
-  ([open-library-covers](open-library-covers.md#lookup-queue)).
 
-### Goodreads mapping
+### Columns
 
-- An ISBN cell such as `="0441478123"` loses the `=` and the quotes.
-- `Exclusive Shelf` gives the status: `read`, `currently-reading` gives `reading`,
-  `to-read` gives `want`, `did-not-finish` gives `dnf`.
-- A `to-read` row with `Owned Copies` 0 goes on the wishlist of the person, with
-  `buy: false`, and gets no reading row.
-- `Owned Copies` above 0 adds 1 copy on the chosen shelf, if the book has none. The
-  format comes from `Binding`: hardcover, paperback, ebook, audiobook, else other.
-- `My Rating` above 0 gives the rating. `Date Read` gives `finished`. `Read Count` gives
-  `read_count`.
-- `Bookshelves` other than the exclusive shelf become tags.
-- With `import_notes`, `My Review` and `Private Notes` become the private notes.
+The file has every book field, the copy fields, the location as a path of room, bookcase
+and shelf names, the reading row of the chosen person and the wishlist flags
+(`csv_io.LIBRARY_COLUMNS`). A list cell separates its items with `; `. The barcode cell
+is cleaned as in [scan-and-barcode](scan-and-barcode.md#barcode-rules).
 
-### StoryGraph mapping
-
-`Read Status` maps the same way, with `did-not-finish` as `dnf`. `Star Rating` can be a
-decimal and rounds to the nearest whole star from 1 to 5. `Owned?` adds a copy, and
-`Format` gives its format. `Tags` become tags, and `Review` becomes the private notes.
-
-### Library format
-
-The library format has every book field, the copy fields, the location as a path of room,
-bookcase and shelf names, and the reading row of the chosen person. A row puts its copy
-on the shelf of its path when that shelf exists, else on the chosen shelf. A copy id that
-is already stored is not added again.
-
+- A row puts its copy on the shelf of its path when that shelf exists, else on the
+  chosen shelf. A row with no copy id adds a copy only to a book with no copy.
 - A `book_id` or `copy_id` that is not 32 lower-case hex characters is dropped.
 - The import checks the copy of a row first, so a row with a bad copy changes no record.
 - A book has 1 row for each copy. The first row of the book sets the reading status.
+- A row with `wishlist` true puts a book with no copy on the wishlist of the person.
 
 ### Export
 
-`csv_io.export` writes the Goodreads header, which Goodreads and StoryGraph read, or the
-library format. With a person, the file has the reading status of that person. With no
-person, it has all books and no reading status. `csv_io.export_filename` names the file
-with the format and the date.
+`csv_io.export` writes 1 row for each copy, and 1 row for a book with no copy. With a
+person, the file has the reading status of that person. With no person, it has all books
+and no reading status. `csv_io.export_filename` names the file with the date.
 
 ### Tab
 
-`tab-import.ts` is the Import dialog at `/import`: source, person, shelf for new books,
-file, preview table and counts, then **Import**. It reads the file in the browser and
-sends the text to `import_csv`. A new source, person or shelf starts a new preview, and the
-tab uses only the reply of the latest preview.
+`tab-import.ts` is the Import dialog at `/import`: person, shelf for new books, file,
+preview table and counts, then **Import**. It reads the file in the browser and sends the
+text to `import_csv`. A new person or shelf starts a new preview, and the tab uses only
+the reply of the latest preview.
 
 ## Trade-offs
 
@@ -109,12 +85,11 @@ tab uses only the reply of the latest preview.
   an import of thousands of rows. The cost is the merge, which compares 3 documents.
 - **Text in a service field** over **a file upload**: an automation can call the import.
   The limit is 5 MB.
-- **Match by title and first author** over **ISBN only**: many Goodreads rows have no
-  ISBN. A wrong match is possible for 2 books with the same title by 1 author.
+- **Match by title and first author** after the barcode: a row that a user typed often
+  has no barcode. A wrong match is possible for 2 books with the same title by 1 author.
 
 ## One-way doors
 
-- The source names `goodreads`, `storygraph` and `library`, and the export formats
-  `goodreads` and `library`.
-- The column names of the library format.
+- The column names of the CSV format.
 - The count keys of the import reply (`csv_io.COUNT_KEYS`).
+- The `import_completed` source value `csv`.

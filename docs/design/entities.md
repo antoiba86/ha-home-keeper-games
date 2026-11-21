@@ -7,7 +7,7 @@ implements:
   - custom_components/home_keeper_games/sensor.py
   - custom_components/home_keeper_games/todo.py
 related: [store-models, people-privilege, events-api]
-source_hash: 773f98397273
+source_hash: 0ff44cfce6d5
 ---
 
 # Coordinator and entities
@@ -39,10 +39,9 @@ person wants to read.
 `LibraryCoordinator` is a `DataUpdateCoordinator` with no interval. The store calls
 `async_store_changed` after each change, and the coordinator sends the document with
 `async_set_updated_data`. The coordinator also holds the parts of the loaded entry that
-the services, the websocket commands and the views use: the store, the Open Library
-client, the lookup queue, the 2 syncs, the Home Keeper link and the currency option.
-`catalog_accounts` gives the account of each catalog of books, with no keys.
-`async_check_settings` fires `settings_updated` for a new currency or account
+the services, the websocket commands and the views use: the store, the 2 syncs, the Home
+Keeper link and the currency option. `async_check_settings` fires `settings_updated` for a
+new currency
 ([events-api](events-api.md#events)).
 `coordinator.find_coordinator` returns it for a call, or None while no entry is loaded.
 
@@ -76,8 +75,7 @@ is the book id.
 
 - Completing an item sets the status `read`, and the store sets `finished` to today.
 - Adding an item gives a `want` row to the book with that title, or to the book with that
-  summary. If no book matches, the list adds a book with `needs_details: true`, and the
-  lookup queue reads Open Library for it.
+  summary. If no book matches, the list adds a book with `needs_details: true`.
 - Deleting an item removes the `want` row.
 - Each change checks the caller first ([people-privilege](people-privilege.md#entities)).
 

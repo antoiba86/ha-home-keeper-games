@@ -4,7 +4,7 @@ summary: How the library joins the combined export and import of Home Keeper, wh
 implements:
   - custom_components/home_keeper_games/import_export.py
 related: [csv-import-export, home-keeper-dependency, store-models, events-api]
-source_hash: 56bf232675df
+source_hash: 262e3d832626
 ---
 
 # Home Keeper export and import
@@ -29,8 +29,7 @@ The contract is section 11 of the `INTEGRATING.md` of Home Keeper.
 
 - A sync between 2 installs. An import reads a document once.
 - A JSON export of the library alone. The export of Home Keeper holds it.
-- Open Library calls inside the import. The lookup queue takes the new books that need
-  details after the write.
+- Network calls inside the import.
 
 ## Design
 
@@ -48,7 +47,7 @@ the stored record, with these changes:
   `wishlist_todo_name`.
 - `book.cover` is `{kind, file}` with a relative path in a bundle, else `null`.
 
-`EXCLUDED_KEYS` drops `lookup_tries`, `hk_task_id`, the `todo_uid` and `todo_entity` of a
+`EXCLUDED_KEYS` drops `hk_task_id`, the `todo_uid` and `todo_entity` of a
 wishlist entry and `todo_orphans`. `services.py` reads the names from the person, area
 and entity registries and gives plain maps to the pure module. The reply of `export_data`
 is `{format, version, data, skipped}`, and `data` goes through
@@ -64,7 +63,7 @@ that is only `data` also imports.
 1. Refuse a `format` above `import_export.FORMAT`.
 2. Match a room by id, then by name. Match a bookcase or a shelf by id, then by name in
    its parent.
-3. Match a book by id, ISBN-13, ISBN-10, then title and first author, with the index of
+3. Match a book by id, barcode, then title and first author, with the index of
    `csv_io`.
 4. Match a copy or a loan by id. Else add it. A loan that exists keeps its task id.
 5. Find a person, an area or a to-do entity by id on this install, then by name. 2

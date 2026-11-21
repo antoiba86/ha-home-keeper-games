@@ -37,11 +37,8 @@ Both support Markdown. Select **Edit notes** to change them.
 
 ## Cover
 
-The library downloads the cover from Open Library when it adds a book.
-
 - Select **Change cover** to upload a photo. The library accepts a JPEG, PNG or WebP file
   of up to 10 MB. The stored cover is a JPEG of at most 1200 px.
-- Select **Use Open Library cover** to go back to the cover from Open Library.
 
 ## Copies and value
 
@@ -57,11 +54,6 @@ of the integration.
 
 - **Edit**: change the details of the book.
 - **Lend**: lend a copy ([Loans](loans.md)).
-- **Update from Open Library**: fill the empty details from Open Library. The library
-  keeps each detail that you changed.
-- **Send to Open Library**: add a book that Open Library does not have
-  ([Send books to Open Library](open-library.md)). A banner at the top shows this
-  action. Select **Not now** to hide the banner for this book.
 - **Delete**: delete the book with its copies, its reading status and its loans.
 
 ## Phone

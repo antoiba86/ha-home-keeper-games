@@ -1,8 +1,8 @@
 # Scan books
 
-The library supports a scan of the ISBN barcode on the back of each book with the camera
-of a phone. Each scan adds the book to the shelf that you select, with the details and
-the cover from [Open Library](https://openlibrary.org). Use it to fill a shelf in 1 pass.
+The library supports a scan of the barcode on the back of each item with the camera of a
+phone. Each scan adds a copy to the shelf that you select. Use it to fill a shelf in 1
+pass.
 
 ![A shelf scan on a phone with 3 results](../../images/scan-mobile.png)
 
@@ -18,19 +18,16 @@ the cover from [Open Library](https://openlibrary.org). Use it to fill a shelf i
 
 If the light is low and the phone has a torch, select **Light**.
 
-## Enter an ISBN
+## Enter a barcode
 
-Use **Enter ISBN** for a book with no barcode, or on a computer with no camera.
+Use **Enter barcode** for a barcode that the camera cannot read, or on a computer with no
+camera.
 
-1. Select the method **Enter ISBN**.
-2. Type the ISBN-10 or the ISBN-13, and press Enter.
+1. Select the method **Enter barcode**.
+2. Type the number of the barcode, and press Enter.
 
-The library accepts an ISBN with or without hyphens. It checks the check digit, and shows
-**This is not a valid ISBN.** for a typing error.
-
-A UK book from before 1974 can have a 9-digit SBN (Standard Book Number) and no ISBN.
-Type the SBN in the ISBN field. The library puts a `0` in front of the SBN to get the
-same ISBN-10.
+The library accepts a barcode with or without spaces and hyphens. It accepts letters and
+digits, up to 50 characters, and shows **This is not a valid barcode.** for other text.
 
 ## Results
 
@@ -38,7 +35,7 @@ same ISBN-10.
 |---|---|
 | **Added** | The book and a copy on this shelf are in the library. |
 | **Already in** *place* | The library has a copy of the book on another shelf. |
-| **No match** | Open Library has no book with this ISBN. The scan asks for the title. |
+| **No book has this barcode** | The barcode is new. The scan asks for the title. |
 
 For a book that is already in the library, select 1 of these:
 
@@ -46,9 +43,9 @@ For a book that is already in the library, select 1 of these:
 - **Add 2nd copy**: add 1 more copy on this shelf.
 - **Skip**: change nothing.
 
-## Books with no match
+## New barcodes
 
-If Open Library has no book with the ISBN, the scan stops and asks for the title. Then
+If no book in the library has the barcode, the scan stops and asks for the title. Then
 you can find each of these books on the shelf later and add the other details.
 
 ![The title sheet of a book with no match on a phone](../../images/scan-miss-mobile.png)
@@ -79,29 +76,6 @@ select **Add details**.
 
 ![The title sheet on a computer](../../images/scan-miss-desktop.png)
 
-If Open Library does not answer, the library saves the book with its ISBN and tries
-again later. The book shows **Needs details** until the details arrive.
-
-### Find the book by its title
-
-Open Library often has the same book under a different ISBN, such as an older printing.
-So when the title sheet closes, the library searches Open Library by title and author. If
-it finds the book, the **Found on Open Library** dialog opens with the year of the first
-edition.
-
-![The match on Open Library on a phone](../../images/scan-match-mobile.png)
-
-- Select **Use these details** if it is your book. The library fills only the empty
-  details, such as the description and the cover. Your ISBN, publisher and page
-  count do not change. A cover photo that you took stays.
-- Select **Not this book** if it is a different book. Nothing changes.
-- Select **View on Open Library** to compare the book on the Open Library website first.
-
-The camera reads no barcode until you select 1 of the 2 buttons. An author makes the
-search more accurate. To add an author, open **More details (optional)** before you save.
-
-![The match on Open Library on a computer](../../images/scan-match-desktop.png)
-
 ## Summary
 
 ![The summary of a shelf scan on a phone](../../images/scan-summary-mobile.png)
@@ -119,7 +93,7 @@ such as library books. Each scan adds a [loan](loans.md) with no copy.
 
 The browser gives the camera only to a page with an HTTPS address. On an `http://`
 address, **Scan barcodes** shows the message **The camera needs HTTPS**. You cannot start
-a camera scan there. Select **Enter ISBN** to add books without the camera.
+a camera scan there. Select **Enter barcode** to add books without the camera.
 
 ![The scan setup on a page with an http address](../../images/scan-https-mobile.png)
 

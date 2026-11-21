@@ -19,7 +19,7 @@ The copy keeps its shelf. A copy can have 1 open loan at a time.
 ## Add a borrowed book
 
 1. On the **Loans** page, select **Add borrowed book**.
-2. Enter the ISBN or the title, the lender, the person who borrowed it, and the due date.
+2. Enter the title or the barcode, the lender, the person who borrowed it, and the due date.
 3. Select **Save**.
 
 The library adds the book if it is not in the library, with no copy. The status of the

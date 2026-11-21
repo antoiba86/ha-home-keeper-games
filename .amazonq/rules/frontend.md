@@ -69,8 +69,8 @@ How the tab and the card work is in [frontend-tab-card](../../docs/design/fronte
 ## Camera
 
 - The camera needs a secure origin. If `navigator.mediaDevices` is missing, show the
-  HTTPS message and offer **Enter ISBN**.
-- An EAN-13 with the `978` or `979` prefix is an ISBN. The scanner ignores the same code
+  HTTPS message and offer **Enter barcode**.
+- The scanner reads EAN-13, EAN-8 and UPC-A codes. It ignores the same code
   for 3 seconds.
 
 ## Home Assistant elements

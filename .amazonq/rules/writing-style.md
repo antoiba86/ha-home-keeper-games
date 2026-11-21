@@ -141,7 +141,7 @@ Use these names and no others for these things.
 | tab | Library page, admin UI | The Library tab of the Home Keeper panel. |
 | card | dashboard card, Lovelace card | |
 | Home Keeper | HK, the parent integration | The integration that the library requires. |
-| Open Library | OpenLibrary, OL | `OL` is permitted in code comments. |
+| barcode | bar code, EAN, UPC | The code on the case. EAN-13 is permitted for the format. |
 | admin | administrator, owner | |
 | user | member | A Home Assistant user. "non-admin user" is permitted. |
 | Home Assistant | HA | `HA` is permitted in code comments and PR text. |

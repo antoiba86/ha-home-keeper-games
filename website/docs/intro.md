@@ -18,13 +18,12 @@ Keeper panel.
 
 ## Features
 
-- **Scan.** Fill a shelf with the camera of a phone. Details and covers come from Open
-  Library.
+- **Scan.** Fill a shelf with the camera of a phone. Each barcode adds a copy.
 - **Shelves.** Each copy has a room, a bookcase and a shelf, so a search finds the book.
 - **Reading.** Each person has a reading status, a rating, notes and a yearly goal.
 - **Loans.** Lent and borrowed books get a task in Home Keeper on the due date.
 - **Wishlist.** The books to buy go to a to-do list of the person.
-- **Import.** Goodreads and StoryGraph CSV files bring a reading history in.
+- **Import.** A CSV file moves the collection in and out.
 - **Card and entities.** Every user gets a dashboard card, sensors and a To read list.
 
 ## Next steps

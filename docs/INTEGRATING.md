@@ -26,29 +26,29 @@ Each operation of the tab is a `home_keeper_games.*` service. The groups are:
 | Group | Services |
 |---|---|
 | Locations | `add_room`, `update_room`, `delete_room`, the same 3 for `bookcase` and `shelf` |
-| Books | `lookup_isbn`, `add_book`, `update_book`, `delete_book`, `refresh_book`, `scan_isbn` |
+| Books | `add_book`, `update_book`, `delete_book`, `scan_barcode` |
 | Copies and covers | `add_copy`, `update_copy`, `move_copy`, `delete_copy`, `set_cover` |
 | Reading | `set_reading` |
 | Loans | `lend_book`, `borrow_book`, `return_loan`, `update_loan`, `delete_loan` |
 | Wishlist | `add_to_wishlist`, `update_wishlist`, `remove_from_wishlist`, `got_wishlist_book` |
 | People and settings | `set_person_settings`, `set_settings` |
 | Files | `import_csv`, `export_csv`, `export_data`, `import_data` |
-| Catalogs (Open Library) | `search_catalog`, `send_to_catalog`, `link_catalog`, `skip_catalog`, `disconnect_catalog` |
 | Reads | `list_books`, `get_book`, `list_locations`, `list_loans`, `list_people` |
 
 A service that changes data returns its record when the call asks for a response. A read
 service always returns a response. Use `book_id` to name a book, because 2 books can have
 the same title.
 
-### Add a book by ISBN
+### Add a book by barcode
 
 ```yaml
 action:
   - action: home_keeper_games.add_book
     data:
-      isbn: "9780441478125"
+      barcode: "0711719505012"
+      title: "Sky Garden"
     response_variable: result
-  # result.book.id is the book id. result.existing is true if the ISBN was stored.
+  # result.book.id is the book id. result.existing is true if the barcode was stored.
 ```
 
 ### Mark a book as read
@@ -124,10 +124,7 @@ matches each record and never deletes one
 - A record id is opaque and stays the same when the record changes. Use the id, not the
   name or the title.
 - A service raises `ServiceValidationError` with a translation key for bad input, such as
-  an unknown id, an invalid ISBN or a shelf that is not empty.
+  an unknown id, an invalid barcode or a shelf that is not empty.
 - A non-admin caller of an admin-only service gets `Unauthorized`.
-- `send_to_catalog` writes to Open Library with the account that an admin connects
-  in the options flow. It sends 1 book for each call. Do not call it in a loop. Open
-  Library asks for a bot account for bulk edits.
 - The services, the tab and the card use the same code for each operation. A change from
   any of them fires the same event.
