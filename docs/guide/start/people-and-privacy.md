@@ -39,12 +39,12 @@ An admin sets these in the **Settings** page of the Library tab, for each person
   notes. It is on by default.
 - **Yearly goal**: the number of books to read this year. The card and a sensor show it.
 - **Wishlist to-do list**: the to-do list that gets the wishlist books with **Buy** set
-  ([Wishlist](../library/wishlist.md)).
+  ([Work in progress](work-in-progress.md)).
 
 ![The people settings, the currency and the export](../../images/settings-desktop.png)
 
 The **Settings** page also shows the currency, and has the
-[export](../library/import-export.md) of the library.
+CSV export of the library.
 
 ## Entities
 

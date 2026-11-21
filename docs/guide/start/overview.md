@@ -28,16 +28,8 @@ person and a book on the wishlist.
 
 ## Features
 
-- [Rooms and shelves](../library/rooms-and-shelves.md): the rooms of the home and their
-  bookcases and shelves.
-- [Scan books](../library/scan-books.md): fill a shelf with the camera of a phone.
-- [Books](../library/books.md): search and filter the library.
-- [Book detail](../library/book-detail.md): the reading status and the notes of a book,
-  with its cover and copies.
-- [Loans](../library/loans.md): the books that the household lent out or borrowed.
-- [Wishlist](../library/wishlist.md): a wishlist and a to-do list for each person.
-- [Import and export](../library/import-export.md): the CSV file of the library and the
-  Home Keeper export.
+- [Work in progress](work-in-progress.md): what works now, while the change to games goes
+  on.
 - [Dashboard card](../views/dashboard-card.md): the reading of a person on a dashboard.
 - [People and privacy](people-and-privacy.md): what each user can read and change.
 - [Services and events](../automation/services.md): automations and other integrations.

@@ -117,7 +117,7 @@ integration.
 The library registers the capability `import_export`, so the Home Keeper export holds
 the library section. Home Keeper calls `export_data` and `import_data` for it. The import
 matches each record and never deletes one
-([import and export](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/import-export#home-keeper-export-includes-your-library)).
+([Home Keeper export](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/work-in-progress#home-keeper-export)).
 
 ## Contract
 
