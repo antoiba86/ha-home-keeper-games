@@ -527,15 +527,13 @@ SURFACE_KINDS: tuple[SurfaceKind, ...] = (
     SurfaceKind(
         "Config entry options",
         "published",
-        "The currency of the prices and values of the copies. The Open Library "
-        "account is in the entry data, not in the options.",
+        "The currency of the prices and values of the copies.",
     ),
     SurfaceKind(
         "Config flow",
         "published",
-        "A single-instance setup flow with a currency field. The options flow has "
-        "a menu: the currency, and the Archive.org S3 keys of an Open Library "
-        "account.",
+        "A single-instance setup flow with a currency field. The options flow "
+        "changes the currency.",
     ),
     SurfaceKind(
         "Websocket commands",
@@ -555,8 +553,7 @@ SURFACE_KINDS: tuple[SurfaceKind, ...] = (
     SurfaceKind(
         "Reauth / reconfigure flows",
         "not_applicable",
-        "The storage is local. The admin sets the Open Library keys again in the "
-        "options flow, and a send with refused keys says so.",
+        "The storage is local, and the integration has no account to sign in to.",
     ),
     SurfaceKind(
         "Repairs / issue registry",

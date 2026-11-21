@@ -11,24 +11,24 @@ const EN = LOCALES[DEFAULT_LOCALE];
 const OTHER = Object.keys(LOCALES).filter((l) => l !== DEFAULT_LOCALE);
 const PLURAL = /^(.*)\.(zero|one|two|few|many|other)$/;
 
-// Values that are the same as English by design: the product name, file format
-// names, the "ISBN" code and a bare "{name}: {list}" pair. Keep this list short.
-const IDENTICAL = new Set(['card.name', 'scan.isbn', 'import.source_goodreads', 'import.source_storygraph', 'wishlist.list_for']);
+// Values that are the same as English by design: the product name
+// and a bare "{name}: {list}" pair. Keep this list short.
+const IDENTICAL = new Set(['card.name', 'wishlist.list_for']);
 
 // Words that are the same as English in one language, reviewed one by one. "Person",
 // "Format", "Status", "Version", "Export" and "Optional" are the native words in the
-// Germanic languages listed. French uses "Page", "Format", "Source" and "Sections".
+// Germanic languages listed. French uses "Page", "Format" and "Sections".
 // Italian uses "Area". Dutch and Danish use "Paperback", Polish uses "Audiobook",
-// Danish uses "Note" and the verb "Scan". Danish and Norwegian use the verb "Send".
+// Danish uses "Note" and the verb "Scan". German and Dutch use "Barcode".
 const COGNATES = {
   ca: ['copy.format'],
   cs: ['settings.export'],
-  da: ['action.scan', 'common.person', 'common.version', 'copy.format', 'copy.note', 'filter.status_label', 'format.kind_paperback', 'ol.send_button', 'scan.scan_shelf'],
-  de: ['common.optional', 'common.person', 'common.version', 'copy.format', 'dialog.name', 'filter.status_label', 'import.source_library', 'settings.export'],
-  fr: ['book.page', 'book.page_n', 'book.pages.one', 'book.pages.other', 'common.version', 'copy.format', 'editor.sections', 'import.source'],
+  da: ['action.scan', 'common.person', 'common.version', 'copy.format', 'copy.note', 'filter.status_label', 'format.kind_paperback', 'scan.scan_shelf'],
+  de: ['book.barcode', 'book.barcode_label', 'common.optional', 'common.person', 'common.version', 'copy.format', 'dialog.name', 'filter.status_label', 'scan.barcode', 'settings.export'],
+  fr: ['book.page', 'book.page_n', 'book.pages.one', 'book.pages.other', 'common.version', 'copy.format', 'editor.sections'],
   it: ['dialog.area', 'shelves.area'],
-  nb: ['common.person', 'copy.format', 'filter.status_label', 'ol.send_button'],
-  nl: ['filter.status_label', 'format.kind_paperback'],
+  nb: ['common.person', 'copy.format', 'filter.status_label'],
+  nl: ['book.barcode', 'book.barcode_label', 'filter.status_label', 'format.kind_paperback', 'scan.barcode'],
   pl: ['copy.format', 'format.kind_audiobook'],
   sv: ['common.person', 'common.version', 'copy.format', 'filter.status_label', 'settings.export'],
 };

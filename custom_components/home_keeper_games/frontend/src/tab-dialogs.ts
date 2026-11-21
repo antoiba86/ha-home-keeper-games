@@ -5,8 +5,8 @@
 import { t } from './i18n';
 import { formatOptions, ICONS, options, personOptions, shelfOptions } from './markup';
 import type { ViewCtx } from './tab-types';
-import type { Book, CatalogMatch, Copy } from './types';
-import { escapeHTML, locationLabel, openLibraryUrl } from './utils';
+import type { Copy } from './types';
+import { escapeHTML, locationLabel } from './utils';
 
 export type Dialog =
   | { kind: 'add-book' }
@@ -14,10 +14,8 @@ export type Dialog =
   | { kind: 'copy'; bookId: string; copyId: string | null }
   | { kind: 'move'; copyId: string }
   | { kind: 'set-shelf' }
-  /** A scan found no match in Open Library: ask for the title before the next scan. */
-  | { kind: 'scan-title'; key: number; bookId: string; copyId: string | null; isbn: string }
-  /** Open Library has a work with the title of a scan with no match: ask to use it. */
-  | { kind: 'scan-match'; key: number; bookId: string; match: CatalogMatch }
+  /** No book had the scanned barcode: ask for the title before the next scan. */
+  | { kind: 'scan-title'; key: number; bookId: string; copyId: string | null; barcode: string }
   | { kind: 'lend'; bookId: string | null }
   | { kind: 'borrow' }
   | { kind: 'wish-add'; bookId: string | null }
@@ -25,14 +23,6 @@ export type Dialog =
   | { kind: 'room'; roomId: string | null }
   | { kind: 'bookcase'; roomId: string; bookcaseId: string | null }
   | { kind: 'shelf'; bookcaseId: string; shelfId: string | null }
-  | {
-      kind: 'send-ol';
-      bookId: string;
-      /** `review` before the send. `added` and `existing` show the reply of Open Library. */
-      phase: 'review' | 'added' | 'existing';
-      editionKey?: string;
-      coverFailed?: boolean;
-    }
   | {
       kind: 'confirm';
       title: string;
@@ -57,64 +47,6 @@ const text = (name: string, value: unknown = '', attrs = '') =>
 
 const check = (name: string, label: string, on: boolean, hint = '') =>
   `<label class="hkl-check"><input type="checkbox" name="${name}" data-k="d-${name}"${on ? ' checked' : ''} /><span>${escapeHTML(label)}${hint ? `<span class="hkl-muted small block">${escapeHTML(hint)}</span>` : ''}</span></label>`;
-
-/** The optional fields of a send, with the value that goes to Open Library. */
-export function sendRows(book: Book): Array<[string, string, string]> {
-  return [
-    ['publisher', t('book.publisher'), book.publisher],
-    ['published', t('book.published'), book.published],
-    ['isbn', 'ISBN', book.isbn13 || book.isbn10 || ''],
-  ];
-}
-
-const olLink = (key: string, label: string, edit = false, k = '') =>
-  `<a class="hkl-btn text" href="${escapeHTML(openLibraryUrl(key, edit))}" target="_blank" rel="noreferrer noopener" data-k="${k}">${escapeHTML(label)}</a>`;
-
-function sendBody(ctx: ViewCtx, d: Extract<Dialog, { kind: 'send-ol' }>): { title: string; html: string; submit: string; noCancel?: boolean } {
-  const book = ctx.lib.books.find((b) => b.id === d.bookId);
-  const key = d.editionKey ?? '';
-  if (d.phase === 'added') {
-    return {
-      title: t('ol.added_title'),
-      submit: t('action.done'),
-      noCancel: true,
-      html: `<div class="hkl-note ok" role="status" data-k="d-ol-added">${escapeHTML(t('ol.added_text', { key }))}</div>
-        ${d.coverFailed ? `<div class="hkl-note warn" data-k="d-ol-cover-failed">${escapeHTML(t('ol.cover_failed'))}</div>` : ''}
-        <p class="hkl-muted">${escapeHTML(t('ol.more_details_hint'))}</p>
-        <div class="hkl-actions">${olLink(key, t('ol.view'), false, 'd-ol-view')}${olLink(key, t('ol.more_details'), true, 'd-ol-edit')}</div>`,
-    };
-  }
-  if (d.phase === 'existing') {
-    return {
-      title: t('ol.existing_title'),
-      submit: t('ol.link_to', { key }),
-      html: `<div class="hkl-note warn" role="status" data-k="d-ol-existing">${escapeHTML(t('ol.existing_text', { key }))}</div>
-        <p class="hkl-muted">${escapeHTML(t('ol.existing_hint'))}</p>
-        <div class="hkl-actions">${olLink(key, t('ol.compare'), false, 'd-ol-compare')}</div>`,
-    };
-  }
-  const user = ctx.lib.openlibrary?.username ?? '';
-  const fixed = book
-    ? [
-        [t('book.title'), book.title],
-        [t('ol.author'), book.authors[0] ?? ''],
-      ].map(([label, value]) => `<label class="hkl-check"><input type="checkbox" checked disabled /><span>${escapeHTML(label)}<small>${escapeHTML(value)}</small></span></label>`).join('')
-    : '';
-  const optional = book
-    ? sendRows(book).map(([name, label, value]) => `<label class="hkl-check"><input type="checkbox" name="send_${name}" data-k="d-send-${name}"${value ? ' checked' : ' disabled'} /><span>${escapeHTML(label)}<small>${escapeHTML(value || t('ol.empty'))}</small></span></label>`).join('')
-    : '';
-  const coverRow = book?.cover?.kind === 'custom'
-    ? `<label class="hkl-check"><input type="checkbox" name="include_cover" data-k="d-send-cover" /><span>${escapeHTML(t('ol.cover'))}<small>${escapeHTML(t('ol.cover_hint'))}</small></span></label>`
-    : '';
-  return {
-    title: t('ol.send_title'),
-    submit: t('ol.send_button'),
-    html: `<p class="hkl-muted">${escapeHTML(user ? t('ol.public_as', { user }) : t('ol.public'))}</p>
-      <div class="hkl-sendlist">${fixed}${optional}${coverRow}</div>
-      <span class="hkl-muted small">${escapeHTML(t('ol.never_sent'))}</span>
-      <div class="hkl-sendrow" data-k="d-sending" role="status" hidden><span class="hkl-spin"></span>${escapeHTML(t('ol.sending'))}</div>`,
-  };
-}
 
 function copyFields(ctx: ViewCtx, copy: Copy | null): string {
   const conditions: Array<[string, string]> = [['', t('common.none')], ...['new', 'fine', 'good', 'fair', 'poor'].map((c): [string, string] => [c, t(`condition.${c}`)])];
@@ -151,7 +83,7 @@ function scanTitleBody(ctx: ViewCtx, d: Extract<Dialog, { kind: 'scan-title' }>)
     title: t('scan.no_match'),
     submit: t('scan.miss_save'),
     sheet: true,
-    html: `<div class="hkl-miss-head"><span class="hkl-cover hkl-cover-thumb miss" aria-hidden="true"></span><span class="hkl-row-main"><span class="hkl-muted" data-k="d-isbn">ISBN ${escapeHTML(d.isbn)}</span><span class="hkl-muted">${escapeHTML(t('scan.miss_hint'))}</span></span></div>
+    html: `<div class="hkl-miss-head"><span class="hkl-cover hkl-cover-thumb miss" aria-hidden="true"></span><span class="hkl-row-main"><span class="hkl-muted" data-k="d-barcode">${escapeHTML(t('book.barcode', { code: d.barcode }))}</span><span class="hkl-muted">${escapeHTML(t('scan.miss_hint'))}</span></span></div>
       ${field(t('book.title'), text('title', '', `required autocomplete="off" data-input="miss-title" placeholder="${escapeHTML(t('scan.miss_placeholder'))}"`), 'wide')}
       <details class="hkl-miss-more" data-k="d-more"><summary data-k="d-more-toggle">${escapeHTML(t('scan.miss_more'))}</summary>
         <div class="hkl-fields">
@@ -167,32 +99,14 @@ function scanTitleBody(ctx: ViewCtx, d: Extract<Dialog, { kind: 'scan-title' }>)
   };
 }
 
-/** The work that Open Library has for the title of a scan. The user confirms it. */
-function scanMatchBody(d: Extract<Dialog, { kind: 'scan-match' }>): DialogBody {
-  const m = d.match;
-  const year = m.first_published ? t('match.first_published', { year: m.first_published }) : '';
-  const by = [m.authors.join(', '), year].filter(Boolean).join(' · ');
-  return {
-    title: t('match.title'),
-    submit: t('match.use'),
-    cancel: t('match.not_this'),
-    html: `<div class="hkl-miss-head"><span class="hkl-cover hkl-cover-thumb blank" aria-hidden="true"></span><span class="hkl-row-main"><b data-k="d-match-title">${escapeHTML(m.title)}</b><span class="hkl-muted" data-k="d-match-by">${escapeHTML(by)}</span></span></div>
-      <p class="hkl-muted" data-k="d-match-hint">${escapeHTML(t('match.hint'))}</p>
-      <div class="hkl-actions">${olLink(m.work_key, t('ol.view'), false, 'd-match-view')}</div>`,
-  };
-}
-
 function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBody {
   switch (d.kind) {
-    case 'send-ol':
-      return sendBody(ctx, d);
     case 'add-book':
       return {
         title: t('dialog.add_book'),
         submit: t('action.add'),
-        html: `${field(t('dialog.isbn_or_title'), text('query', '', 'required autocomplete="off"'), 'wide')}
+        html: `${field(t('dialog.barcode_or_title'), text('query', '', 'required autocomplete="off"'), 'wide')}
           ${field(t('book.authors'), text('authors'), 'wide')}
-          ${check('lookup', t('dialog.lookup'), true)}
           ${check('own', t('dialog.own_copy'), true)}
           <div class="hkl-fields">
             ${field(t('copy.shelf'), `<select name="shelf_id" data-k="d-shelf">${shelfOptions(ctx.lib, null)}</select>`)}
@@ -201,8 +115,6 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
       };
     case 'scan-title':
       return scanTitleBody(ctx, d);
-    case 'scan-match':
-      return scanMatchBody(d);
     case 'edit-book': {
       const b = ctx.idx.book.get(d.bookId);
       return {
@@ -212,7 +124,7 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
           ${field(t('book.title'), text('title', b?.title, 'required'), 'wide')}
           ${field(t('book.subtitle'), text('subtitle', b?.subtitle), 'wide')}
           ${field(t('book.authors'), text('authors', b?.authors.join(', ')), 'wide')}
-          ${field('ISBN', text('isbn', b?.isbn13 ?? b?.isbn10 ?? '', 'inputmode="numeric"'))}
+          ${field(t('book.barcode_label'), text('barcode', b?.barcode ?? '', 'autocomplete="off"'))}
           ${field(t('book.publisher'), text('publisher', b?.publisher))}
           ${field(t('book.published'), text('published', b?.published), 'small')}
           ${field(t('book.pages_label'), text('pages', b?.pages, 'type="number" min="0"'), 'small')}
@@ -273,7 +185,7 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
       return {
         title: t('dialog.borrow'),
         submit: t('action.add'),
-        html: `${field(t('dialog.isbn_or_title'), text('query', '', 'required autocomplete="off"'), 'wide')}
+        html: `${field(t('dialog.barcode_or_title'), text('query', '', 'required autocomplete="off"'), 'wide')}
           <div class="hkl-fields">
             ${field(t('loan.lender'), text('party', '', 'required'))}
             ${field(t('common.person'), `<select name="person_id" data-k="d-person">${personOptions(ctx.lib, ctx.me)}</select>`)}
@@ -290,7 +202,7 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
       return {
         title: t('dialog.wish_add'),
         submit: t('action.add'),
-        html: `${b ? `<p><b>${escapeHTML(b.title)}</b></p>` : field(t('dialog.isbn_or_title'), text('query', '', 'required autocomplete="off"'), 'wide')}
+        html: `${b ? `<p><b>${escapeHTML(b.title)}</b></p>` : field(t('dialog.barcode_or_title'), text('query', '', 'required autocomplete="off"'), 'wide')}
           ${field(t('common.person'), `<select name="person_id" data-k="d-person">${personOptions(ctx.lib, ctx.me)}</select>`, 'wide')}
           ${check('buy', t('wishlist.buy'), false, t('wishlist.buy_hint'))}`,
       };

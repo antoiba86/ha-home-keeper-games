@@ -10,7 +10,6 @@ import type {
   Copy,
   Lib,
   Loan,
-  OpenLibraryRecord,
   Person,
   RawPerson,
   RawState,
@@ -104,12 +103,6 @@ export function normalizeState(raw: Partial<RawState>): Lib {
     people: normalizePeople(raw.people),
     me: { person_id: raw.me?.person_id ?? null, name: raw.me?.name ?? null, is_admin: raw.me?.is_admin === true },
     currency: raw.currency || 'USD',
-    openlibrary: raw.catalog_accounts?.openlibrary
-      ? {
-          connected: raw.catalog_accounts.openlibrary.connected === true,
-          username: raw.catalog_accounts.openlibrary.username ?? null,
-        }
-      : null,
   };
 }
 
@@ -358,10 +351,8 @@ export function withQuery(
 
 // ── Book filters ─────────────────────────────────────────────────────────────
 
-export type StatusFilter = 'all' | 'unread' | 'reading' | 'read' | 'needs' | 'not_on_ol';
-export const STATUS_FILTERS: StatusFilter[] = ['all', 'unread', 'reading', 'read', 'needs', 'not_on_ol'];
-/** The status filters that only an admin sees. */
-export const ADMIN_STATUS_FILTERS: StatusFilter[] = ['not_on_ol'];
+export type StatusFilter = 'all' | 'unread' | 'reading' | 'read' | 'needs';
+export const STATUS_FILTERS: StatusFilter[] = ['all', 'unread', 'reading', 'read', 'needs'];
 export type SortKey = 'author' | 'title' | 'added' | 'published' | 'rating';
 export const SORT_KEYS: SortKey[] = ['author', 'title', 'added', 'published', 'rating'];
 
@@ -418,8 +409,7 @@ export function searchText(book: Book, personId: string | null): string {
     book.title,
     book.subtitle,
     ...book.authors,
-    book.isbn13,
-    book.isbn10,
+    book.barcode,
     book.series?.name,
     book.shared_notes,
     ...book.tags,
@@ -434,7 +424,7 @@ export function matchesSearch(book: Book, q: string, personId: string | null): b
   if (!words.length) return true;
   const text = searchText(book, personId);
   const digits = text.replace(/-/g, '');
-  return words.every((w) => text.includes(w) || (/^[\d-]+x?$/.test(w) && digits.includes(w.replace(/-/g, ''))));
+  return words.every((w) => text.includes(w) || (/^[\d-]+$/.test(w) && digits.includes(w.replace(/-/g, ''))));
 }
 
 export interface FilterContext {
@@ -464,40 +454,9 @@ function matchesStatus(book: Book, status: StatusFilter, me: string | null): boo
       return mine === 'read';
     case 'needs':
       return book.needs_details;
-    case 'not_on_ol':
-      return notOnOpenLibrary(book);
     default:
       return true;
   }
-}
-
-/** The record of *book* in Open Library, or null. */
-export function olRecord(book: Book): OpenLibraryRecord | null {
-  return book.catalogs?.openlibrary ?? null;
-}
-
-/** The Open Library send status of *book*: `missing`, `skipped` or null. */
-export function olStatus(book: Book): 'missing' | 'skipped' | null {
-  return book.catalog_status?.openlibrary ?? null;
-}
-
-/** True if Open Library does not have *book* and no admin skipped it. */
-export function notOnOpenLibrary(book: Book): boolean {
-  return !olRecord(book) && olStatus(book) === 'missing';
-}
-
-/** The edition key `OL…M` in a key or an openlibrary.org URL, or null. */
-export function editionKey(text: string | null | undefined): string | null {
-  // Stryker disable next-line StringLiteral: an empty text and any other text with no key both give null.
-  const m = String(text ?? '').trim().match(/(?:^|\/books\/)(OL\d+M)(?:[/?#.]|$)/);
-  return m ? m[1] : null;
-}
-
-/** The page of an edition on Open Library. */
-export function openLibraryUrl(key: string, edit = false): string {
-  const bare = key.replace(/^\/(books|works)\//, '');
-  const kind = /^OL\d+W$/.test(bare) ? 'works' : 'books';
-  return `https://openlibrary.org/${kind}/${encodeURIComponent(bare)}${edit ? '/edit' : ''}`;
 }
 
 /** True if *book* passes every filter except the status filter. */
@@ -518,7 +477,7 @@ export function filterBooks(books: Book[], f: BookFilters, ctx: FilterContext): 
 
 /** The count for each status chip, with the other filters applied. */
 export function statusCounts(books: Book[], f: BookFilters, ctx: FilterContext): Record<StatusFilter, number> {
-  const counts: Record<StatusFilter, number> = { all: 0, unread: 0, reading: 0, read: 0, needs: 0, not_on_ol: 0 };
+  const counts: Record<StatusFilter, number> = { all: 0, unread: 0, reading: 0, read: 0, needs: 0 };
   for (const book of books) {
     if (!matchesBase(book, f, ctx)) continue;
     for (const s of STATUS_FILTERS) if (matchesStatus(book, s, ctx.me)) counts[s] += 1;
@@ -566,61 +525,44 @@ export function allSubjects(books: Book[]): string[] {
   return [...new Set(books.flatMap((b) => b.subjects))].sort((a, b) => a.localeCompare(b));
 }
 
-// ── ISBN ─────────────────────────────────────────────────────────────────────
+// ── Barcodes ─────────────────────────────────────────────────────────────────
 
-/** Digits and a final X only. */
-export function cleanIsbn(value: string): string {
+/** The longest barcode that the integration stores. */
+export const MAX_BARCODE = 50;
+
+/** A barcode with no spaces and hyphens, in capital letters. */
+export function cleanBarcode(value: string): string {
   return String(value ?? '')
-    .toUpperCase()
-    .replace(/[^0-9X]/g, '');
+    .replace(/[\s-]/g, '')
+    .toUpperCase();
 }
 
-/** True for an ISBN-10 with a correct check digit. */
-export function isValidIsbn10(value: string): boolean {
-  if (!/^\d{9}[\dX]$/.test(value)) return false;
+/** A typed or scanned barcode that the integration accepts, or null. */
+export function normalizeBarcode(value: string): string | null {
+  const code = cleanBarcode(value);
+  return code.length > 0 && code.length <= MAX_BARCODE && /^[0-9A-Z]+$/.test(code) ? code : null;
+}
+
+/** True if the last digit of *digits* is the check digit of an EAN or a UPC code. */
+export function hasRetailCheckDigit(digits: string): boolean {
   let sum = 0;
-  for (let i = 0; i < 10; i++) {
-    const d = value[i] === 'X' ? 10 : Number(value[i]);
-    sum += d * (10 - i);
+  const body = digits.slice(0, -1);
+  for (let i = 0; i < body.length; i++) {
+    // The digit next to the check digit has the weight 3.
+    sum += Number(body[body.length - 1 - i]) * (i % 2 ? 1 : 3);
   }
-  return sum % 11 === 0;
-}
-
-/** The EAN-13 check digit of the first 12 digits. */
-export function ean13Check(first12: string): number {
-  let sum = 0;
-  for (let i = 0; i < 12; i++) sum += Number(first12[i]) * (i % 2 ? 3 : 1);
-  return (10 - (sum % 10)) % 10;
-}
-
-/** True for an ISBN-13 (978 or 979) with a correct check digit. */
-export function isValidIsbn13(value: string): boolean {
-  if (!/^97[89]\d{10}$/.test(value)) return false;
-  return ean13Check(value.slice(0, 12)) === Number(value[12]);
-}
-
-/** Convert a valid ISBN-10 to ISBN-13. */
-export function isbn10to13(isbn10: string): string {
-  const core = `978${isbn10.slice(0, 9)}`;
-  return `${core}${ean13Check(core)}`;
-}
-
-/** An ISBN-13 from a scanned EAN-13 code, or null if the code is not a book. */
-export function isbnFromEan(code: string): string | null {
-  const digits = String(code ?? '').trim();
-  return isValidIsbn13(digits) ? digits : null;
+  return (10 - (sum % 10)) % 10 === Number(digits[digits.length - 1]);
 }
 
 /**
- * A typed ISBN as ISBN-13, or null if it is not a valid ISBN-10 or ISBN-13. A
- * 9-character SBN (UK, before 1974) is the ISBN-10 with no leading 0.
+ * The EAN-8, UPC-A or EAN-13 code in a text, or null. A field that takes a title or
+ * a barcode reads the text as a barcode only when the check digit is correct, so a
+ * title such as "1984" stays a title.
  */
-export function normalizeIsbn(value: string): string | null {
-  let v = cleanIsbn(value);
-  if (v.length === 9) v = `0${v}`;
-  if (v.length === 13) return isValidIsbn13(v) ? v : null;
-  if (v.length === 10) return isValidIsbn10(v) ? isbn10to13(v) : null;
-  return null;
+export function retailBarcode(value: string): string | null {
+  const code = cleanBarcode(value);
+  if (!/^(\d{8}|\d{12}|\d{13})$/.test(code)) return null;
+  return hasRetailCheckDigit(code) ? code : null;
 }
 
 /**
@@ -860,8 +802,8 @@ export interface MissRow {
 }
 
 /**
- * The first scan that found no match in Open Library and still has no title
- * from the user, or null. The scan pauses until the user names or removes it.
+ * The first scan of a barcode that no book had, and that still has no title from
+ * the user, or null. The scan pauses until the user names or removes it.
  */
 export function nextMiss<T extends MissRow>(results: T[]): T | null {
   return results.find((r) => r.res?.result === 'not_found' && r.res.book !== null && !r.named && !r.removed) ?? null;

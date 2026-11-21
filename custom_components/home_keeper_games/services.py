@@ -500,7 +500,7 @@ async def _scan_barcode(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
     book, _ = await _add_book(ctx, {"barcode": code})
     copy, from_wishlist = await _new_copy(ctx, {**copy_data, "book_id": book["id"]})
     return {
-        "result": "new",
+        "result": "not_found",
         "book": ctx.book_reply(book),
         "copy": copy,
         "existing_copies": [],

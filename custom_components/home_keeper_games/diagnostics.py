@@ -1,9 +1,7 @@
 """Diagnostics of Home Keeper Games.
 
 The download has the config entry, the counts and the library document. The
-names of the loan parties and all notes are redacted. The Open Library keys are
-in the entry data, which the download does not have. It only says if an account
-is connected.
+names of the loan parties and all notes are redacted.
 """
 
 from __future__ import annotations

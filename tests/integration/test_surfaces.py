@@ -113,7 +113,7 @@ def test_every_service_is_touched(api):
     scanned = _service(
         api, "scan_barcode", {"barcode": "0000000000017", "shelf_id": shelf["id"]}
     )
-    assert scanned["result"] == "new", scanned
+    assert scanned["result"] == "not_found", scanned
 
     for name in ("list_books", "list_locations", "list_loans"):
         _service(api, name)

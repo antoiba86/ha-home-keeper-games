@@ -55,8 +55,7 @@ export interface Book {
   title: string;
   subtitle: string;
   authors: string[];
-  isbn13: string | null;
-  isbn10: string | null;
+  barcode: string | null;
   publisher: string;
   published: string;
   pages: number | null;
@@ -66,15 +65,8 @@ export interface Book {
   description: string;
   tags: string[];
   shared_notes: string;
-  /** The record of the book in each catalog, by catalog name. */
-  catalogs: { openlibrary?: OpenLibraryRecord };
-  cover: { kind: 'openlibrary' | 'custom' | 'none'; file: string | null };
+  cover: { kind: 'custom' | 'none'; file: string | null };
   needs_details: boolean;
-  /**
-   * The send status of the book for each catalog. `missing`: the catalog does not have
-   * the book. `skipped`: an admin hid it from that list.
-   */
-  catalog_status?: { openlibrary?: 'missing' | 'skipped' };
   created_at: string;
   updated_at: string;
   wishlist: Wishlist | null;
@@ -160,44 +152,6 @@ export interface RawState {
   me: Me;
   currency: string;
   home_keeper: { tab: boolean };
-  /** Admins only. */
-  catalog_accounts?: { openlibrary?: OpenLibraryAccount };
-}
-
-/** The record of a book in Open Library. */
-export interface OpenLibraryRecord {
-  edition_key: string | null;
-  work_key: string | null;
-  cover_id: number | null;
-}
-
-/** The Open Library account of the household. The keys never reach the browser. */
-export interface OpenLibraryAccount {
-  connected: boolean;
-  username: string | null;
-}
-
-/** The reply of `send_to_catalog`. */
-export interface SendResult {
-  result: 'added' | 'existing';
-  /** The edition key in Open Library. */
-  record: string;
-  cover: 'sent' | 'failed' | 'skipped';
-  book: Book;
-}
-
-/** The work that `search_catalog` found for a title. */
-export interface CatalogMatch {
-  title: string;
-  authors: string[];
-  first_published: string;
-  work_key: string;
-}
-
-/** The reply of `search_catalog`. */
-export interface SearchResult {
-  status: 'found' | 'not_found' | 'unavailable';
-  match: CatalogMatch | null;
 }
 
 /** The normalized library that every view reads. */
@@ -211,7 +165,6 @@ export interface Lib {
   people: Person[];
   me: Me;
   currency: string;
-  openlibrary: OpenLibraryAccount | null;
 }
 
 /** The subset of the `hass` object that the tab and the card use. */
@@ -251,7 +204,7 @@ export interface TabHost {
   showToast(text: string): void;
 }
 
-/** The result of `scan_isbn`. */
+/** The result of `scan_barcode`. */
 export interface ScanResult {
   result: 'added' | 'duplicate' | 'moved' | 'skipped' | 'not_found';
   book: Book | null;
@@ -266,7 +219,7 @@ export interface ImportRow {
   line: number;
   title: string;
   authors: string[];
-  isbn: string | null;
+  barcode: string | null;
   book_id: string | null;
   action: 'new' | 'existing' | 'title_match' | 'error';
   /** The error text, or '' for a row with no error. */

@@ -24,7 +24,7 @@ async def test_scan_of_a_new_barcode_adds_a_book_that_needs_details(
     hass, setup_entry, call
 ) -> None:
     reply = await call("scan_barcode", {"barcode": " 0711-7195 05012 "})
-    assert reply["result"] == "new"
+    assert reply["result"] == "not_found"
     book = reply["book"]
     assert book["barcode"] == EAN and book["title"] == EAN
     assert book["needs_details"] is True and book["owned"] is True
