@@ -18,12 +18,12 @@ This file gives the rules for code that changes it.
   the tab and the loan tasks off. The store, the services, the card and the entities
   still work ([home-keeper-dependency](../../docs/design/home-keeper-dependency.md)).
 - Each call to a Home Keeper service is guarded with `has_service` and sends
-  `origin: "home_keeper_library"`. A listener ignores an event with that origin.
+  `origin: "home_keeper_games"`. A listener ignores an event with that origin.
 
 ## Administration and usage
 
 - **Administration is the Library tab of the Home Keeper panel** at
-  `/home-keeper/library/...`. The library has no sidebar panel of its own. The Home
+  `/home-keeper/games/...`. The library has no sidebar panel of its own. The Home
   Keeper panel is admin-only, so the tab is admin-only.
 - **Usage goes through the card, the per-person `sensor` and `todo` entities, and the
   open services**, which act for the person of the caller. Never put management UI in

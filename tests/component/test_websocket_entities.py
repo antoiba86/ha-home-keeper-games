@@ -8,7 +8,7 @@ from homeassistant.components.todo import DOMAIN as TODO
 ALICE = "p_alice"
 BOB = "p_bob"
 CAROL = "p_carol"
-WS = "home_keeper_library/"
+WS = "home_keeper_games/"
 
 
 async def _send(client, **msg):
@@ -129,17 +129,17 @@ async def test_sensors(hass, setup_entry, call) -> None:
     await call(
         "set_reading", {"book_id": other["id"], "person_id": BOB, "status": "reading"}
     )
-    assert hass.states.get("sensor.home_keeper_library_books").state == "1"
-    read = hass.states.get("sensor.home_keeper_library_alice_books_read_this_year")
+    assert hass.states.get("sensor.home_keeper_games_books").state == "1"
+    read = hass.states.get("sensor.home_keeper_games_alice_books_read_this_year")
     assert read.state == "1"
     assert read.attributes["goal"] == 12 and read.attributes["pages"] == 400
     assert read.attributes["person_id"] == ALICE
-    now = hass.states.get("sensor.home_keeper_library_bob_reading_now")
+    now = hass.states.get("sensor.home_keeper_games_bob_reading_now")
     assert now.state == "1" and now.attributes["books"] == ["Emma"]
 
 
 async def test_to_read_list(hass, setup_entry, call) -> None:
-    entity = "todo.home_keeper_library_bob_to_read"
+    entity = "todo.home_keeper_games_bob_to_read"
     book = await _book(call, authors=["Frank Herbert"])
     await call(
         "set_reading", {"book_id": book["id"], "person_id": BOB, "status": "want"}
@@ -264,8 +264,8 @@ async def test_first_copy_of_a_wishlist_book_clears_the_wishlist(
 
     aioclient_mock.get("https://openlibrary.org/isbn/9780441478125.json", status=404)
 
-    removed = async_capture_events(hass, "home_keeper_library_wishlist_removed")
-    added = async_capture_events(hass, "home_keeper_library_copy_added")
+    removed = async_capture_events(hass, "home_keeper_games_wishlist_removed")
+    added = async_capture_events(hass, "home_keeper_games_copy_added")
     await call("set_person_settings", {"person_id": BOB, "wishlist_todo": todo_list})
     book = await _book(call, title="Emma", authors=["Jane Austen"], isbn="0441478123")
     await call(
@@ -312,8 +312,8 @@ async def test_to_read_list_refuses_other_users(
     store = setup_entry.runtime_data.store
     book = await _book(call)
     bob_id = persons["user"].id
-    own = _todo_entity(hass, "todo.home_keeper_library_bob_to_read")
-    other = _todo_entity(hass, "todo.home_keeper_library_alice_to_read")
+    own = _todo_entity(hass, "todo.home_keeper_games_bob_to_read")
+    other = _todo_entity(hass, "todo.home_keeper_games_alice_to_read")
     # Bob changes his own list.
     own.async_set_context(Context(user_id=bob_id))
     await own.async_create_todo_item(TodoItem(summary="Dune"))
@@ -348,7 +348,7 @@ async def test_to_read_list_refuses_other_users(
             TODO,
             "remove_item",
             {"item": [book["id"]]},
-            target={"entity_id": "todo.home_keeper_library_alice_to_read"},
+            target={"entity_id": "todo.home_keeper_games_alice_to_read"},
             blocking=True,
             context=Context(user_id=dan.id),
         )
@@ -364,9 +364,9 @@ async def test_entities_are_unavailable_while_sharing_is_off(
         "set_reading", {"book_id": book["id"], "person_id": BOB, "status": "want"}
     )
     ids = (
-        "todo.home_keeper_library_bob_to_read",
-        "sensor.home_keeper_library_bob_books_read_this_year",
-        "sensor.home_keeper_library_bob_reading_now",
+        "todo.home_keeper_games_bob_to_read",
+        "sensor.home_keeper_games_bob_books_read_this_year",
+        "sensor.home_keeper_games_bob_reading_now",
     )
     assert all(hass.states.get(e).state != "unavailable" for e in ids)
     await call("set_person_settings", {"person_id": BOB, "share_reading": False})
@@ -381,7 +381,7 @@ async def test_entities_are_unavailable_while_sharing_is_off(
     reply = await _send(client, type="todo/item/list", entity_id=ids[0])
     assert reply["result"] == {"items": []}
     # Alice still shares her reading.
-    alice = hass.states.get("sensor.home_keeper_library_alice_reading_now")
+    alice = hass.states.get("sensor.home_keeper_games_alice_reading_now")
     assert alice.state == "0"
     await call("set_person_settings", {"person_id": BOB, "share_reading": True})
     await hass.async_block_till_done()

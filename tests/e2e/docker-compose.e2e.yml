@@ -12,8 +12,8 @@
 services:
   homeassistant:
     environment:
-      - HOME_KEEPER_LIBRARY_OPENLIBRARY_URL=http://openlibrary:8080
-      - HOME_KEEPER_LIBRARY_OPENLIBRARY_COVERS_URL=http://openlibrary:8080
+      - HOME_KEEPER_GAMES_OPENLIBRARY_URL=http://openlibrary:8080
+      - HOME_KEEPER_GAMES_OPENLIBRARY_COVERS_URL=http://openlibrary:8080
     depends_on:
       - openlibrary
   openlibrary:

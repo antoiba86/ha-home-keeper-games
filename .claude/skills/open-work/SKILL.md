@@ -1,6 +1,6 @@
 ---
 name: open-work
-description: Report the open work on Home Keeper Library and sort it by who must act next, and show a draft of the CHANGELOG for the next stable release. Reads the open issues, the open PRs, the CHANGELOG and the to-do files in the repository. Use when asked what is open, what is actionable, what to work on next, what waits on a release or on a user, or what the next stable release will contain.
+description: Report the open work on Home Keeper Games and sort it by who must act next, and show a draft of the CHANGELOG for the next stable release. Reads the open issues, the open PRs, the CHANGELOG and the to-do files in the repository. Use when asked what is open, what is actionable, what to work on next, what waits on a release or on a user, or what the next stable release will contain.
 ---
 
 # Open work
@@ -44,7 +44,7 @@ agrees with the next release. Only `(Fixes #N)` counts.
 
 - **Maintainer:** `author_association` is `OWNER`, `MEMBER` or `COLLABORATOR`.
 - **Bot:** a login that ends in `[bot]`, or `github-actions`. Two bot comments carry a
-  state: `<!-- home-keeper-library-release vX.Y.Z... -->` (that release has the fix) and, on a PR,
+  state: `<!-- home-keeper-games-release vX.Y.Z... -->` (that release has the fix) and, on a PR,
   `<!-- preview-release -->` (a preview build is available; use the newest one).
 - **User:** any other author.
 

@@ -1,9 +1,9 @@
 ---
 title: Integrating with the library
-summary: How automations, scripts, voice assistants and other integrations use the services, events and entities of Home Keeper Library, for integrators.
+summary: How automations, scripts, voice assistants and other integrations use the services, events and entities of Home Keeper Games, for integrators.
 ---
 
-# Integrate with Home Keeper Library
+# Integrate with Home Keeper Games
 
 Automations, scripts, voice assistants and other integrations use 3 stable surfaces:
 
@@ -21,7 +21,7 @@ from the integration. Which service an admin or a user can call is in
 
 ## Services
 
-Each operation of the tab is a `home_keeper_library.*` service. The groups are:
+Each operation of the tab is a `home_keeper_games.*` service. The groups are:
 
 | Group | Services |
 |---|---|
@@ -44,7 +44,7 @@ the same title.
 
 ```yaml
 action:
-  - action: home_keeper_library.add_book
+  - action: home_keeper_games.add_book
     data:
       isbn: "9780441478125"
     response_variable: result
@@ -55,7 +55,7 @@ action:
 
 ```yaml
 action:
-  - action: home_keeper_library.set_reading
+  - action: home_keeper_games.set_reading
     data:
       book_id: "5f0c1b2a9d8e4f7a8b6c5d4e3f2a1b0c"
       person_id: "alice"
@@ -71,7 +71,7 @@ no user, so it names the person.
 
 ```yaml
 action:
-  - action: home_keeper_library.list_books
+  - action: home_keeper_games.list_books
     data:
       query: dune
       owned: true
@@ -82,14 +82,14 @@ Each book in the reply has `owned`, `copy_count`, `cover_url` and the reading ro
 the caller can read.
 
 Guard each call from another integration with
-`hass.services.has_service("home_keeper_library", "<service>")`, so that integration
+`hass.services.has_service("home_keeper_games", "<service>")`, so that integration
 still works when the library is not installed.
 
 ## Events
 
 [EVENTS.md](EVENTS.md) has the catalog, the payloads and an example automation. Use an
-`event` trigger on a `home_keeper_library_<noun>_<verb>` event, such as
-`home_keeper_library_book_finished` or `home_keeper_library_loan_overdue`.
+`event` trigger on a `home_keeper_games_<noun>_<verb>` event, such as
+`home_keeper_games_book_finished` or `home_keeper_games_loan_overdue`.
 
 ## Entities
 
@@ -102,7 +102,7 @@ still works when the library is not installed.
 | `sensor` *person* reading now | The books with status Reading, with `books` |
 | `todo` *person* to read | The books with status Want to read |
 
-The entities are on 1 service device, Home Keeper Library. The unique id of a
+The entities are on 1 service device, Home Keeper Games. The unique id of a
 per-person entity holds the person id, so a new name of the person keeps the entity.
 
 ## Home Keeper
@@ -111,7 +111,7 @@ The library calls the Home Keeper services `register_companion`, `add_task`,
 `update_task`, `complete_task`, `delete_task` and `list_tasks`, and listens for
 `home_keeper_task_completed`, `home_keeper_task_deleted` and
 `home_keeper_register_companions`. A loan task in Home Keeper has the source
-`{"home_keeper_library": {"loan_id": "<id>"}}`. Do not change that source from another
+`{"home_keeper_games": {"loan_id": "<id>"}}`. Do not change that source from another
 integration.
 
 The library registers the capability `import_export`, so the Home Keeper export holds

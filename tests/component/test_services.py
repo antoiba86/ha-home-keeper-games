@@ -6,12 +6,12 @@ import pytest
 from homeassistant.exceptions import ServiceValidationError, Unauthorized
 from pytest_homeassistant_custom_component.common import async_capture_events
 
-from custom_components.home_keeper_library.api_surface import SERVICES
+from custom_components.home_keeper_games.api_surface import SERVICES
 
 ALICE = "p_alice"
 BOB = "p_bob"
 CAROL = "p_carol"
-EVENT = "home_keeper_library_{}".format
+EVENT = "home_keeper_games_{}".format
 
 # The smallest valid data for each admin-only service. A non-admin user must
 # get Unauthorized before the data is even read.
@@ -478,7 +478,7 @@ async def test_import_and_export(hass, setup_entry, call) -> None:
 
 
 async def test_service_without_a_loaded_entry(hass, setup_entry, call) -> None:
-    from custom_components.home_keeper_library import services
+    from custom_components.home_keeper_games import services
 
     await hass.config_entries.async_unload(setup_entry.entry_id)
     with pytest.raises(ServiceValidationError) as info:
@@ -502,7 +502,7 @@ async def test_import_row_error_message(hass, setup_entry, call) -> None:
 
 async def test_set_settings_changes_the_currency(hass, setup_entry, call, ws) -> None:
     client = await ws("admin")
-    await client.send_json_auto_id({"type": "home_keeper_library/subscribe"})
+    await client.send_json_auto_id({"type": "home_keeper_games/subscribe"})
     first = await client.receive_json()
     reply = await call("set_settings", {"currency": "usd"})
     assert reply == {"currency": "USD"}

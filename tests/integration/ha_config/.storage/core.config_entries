@@ -19,17 +19,17 @@
         "disabled_by": null
       },
       {
-        "entry_id": "home_keeper_library_test_entry",
+        "entry_id": "home_keeper_games_test_entry",
         "version": 1,
         "minor_version": 1,
-        "domain": "home_keeper_library",
-        "title": "Home Keeper Library",
+        "domain": "home_keeper_games",
+        "title": "Home Keeper Games",
         "data": {},
         "options": {"currency": "EUR"},
         "pref_disable_new_entities": false,
         "pref_disable_polling": false,
         "source": "user",
-        "unique_id": "home_keeper_library",
+        "unique_id": "home_keeper_games",
         "disabled_by": null
       }
     ]

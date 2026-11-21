@@ -3,9 +3,9 @@ title: Agent instructions
 summary: The hard gates for every change to the integration, and the rules file for each topic.
 ---
 
-# AGENTS.md — Home Keeper Library
+# AGENTS.md — Home Keeper Games
 
-Home Keeper Library is a Home Assistant integration (domain `home_keeper_library`) for the
+Home Keeper Games is a Home Assistant integration (domain `home_keeper_games`) for the
 books of a household: rooms, shelves, copies, reading status, loans and a wishlist. It is
 a companion of Home Keeper and requires it. This page lists the hard gates. The detail is
 in the rules files below. Read the file for your topic before you change code or push.
@@ -29,14 +29,14 @@ in the rules files below. Read the file for your topic before you change code or
 
 ## Project in brief
 
-- Backend: `custom_components/home_keeper_library/`. The pure core imports no Home
+- Backend: `custom_components/home_keeper_games/`. The pure core imports no Home
   Assistant code.
-- Storage: 1 JSON document, `.storage/home_keeper_library`, changed only through
-  `LibraryStore`. Covers are files in `.storage/home_keeper_library_covers/`.
+- Storage: 1 JSON document, `.storage/home_keeper_games`, changed only through
+  `LibraryStore`. Covers are files in `.storage/home_keeper_games_covers/`.
 - Home Keeper is an `after_dependencies` entry. The admin UI is the Library tab of the
   Home Keeper panel. Without Home Keeper, a repair issue shows and the tab is gone.
-- Frontend: TypeScript and Rollup in `custom_components/home_keeper_library/frontend/`.
-  CI builds `frontend/dist/` (`library-tab.js`, `library-card.js`), which is gitignored.
+- Frontend: TypeScript and Rollup in `custom_components/home_keeper_games/frontend/`.
+  CI builds `frontend/dist/` (`games-tab.js`, `games-card.js`), which is gitignored.
 - Administration is in the tab. Usage is through the card, the per-person `sensor` and
   `todo` entities and the open services. Do not mix the 2.
 - Docs site: `website/` (Docusaurus). It renders `docs/guide/` and copies some `docs/*.md`.
@@ -53,6 +53,9 @@ in the rules files below. Read the file for your topic before you change code or
 ### Branches and merges
 
 - **Never push to `main`.** Use a feature branch and a PR.
+- **Local work is allowed when the maintainer asks for it.** Work on a local branch, run
+  every local tier, and squash merge into local `main`. Push only when the maintainer
+  says so ([pr-workflow.md](.amazonq/rules/pr-workflow.md#local-work)).
 - **Every check green, plus approval, before a merge.** A failure you did not cause is
   still yours to clear. Never merge on a red or running check.
 - **Read what a soft gate produced.** A `continue-on-error` step is always green.
@@ -119,14 +122,14 @@ in the rules files below. Read the file for your topic before you change code or
 
 ### Code contracts
 
-- **Every data action is a `home_keeper_library.*` service.** A websocket command never
+- **Every data action is a `home_keeper_games.*` service.** A websocket command never
   replaces it ([services-and-events.md](.amazonq/rules/services-and-events.md)).
 - **Gate an admin-only operation for the service and its websocket twin**, through
   `services.async_run` ([architecture.md](.amazonq/rules/architecture.md#privilege-model)).
 - **A reply never leaks.** Every read goes through `projections.py`. Test it as an admin
   and as a non-admin user.
 - **Never raise `ConfigEntryNotReady` for Home Keeper.** Show the repair issue.
-- **Every state change fires a `home_keeper_library_<noun>_<verb>` event** from the store.
+- **Every state change fires a `home_keeper_games_<noun>_<verb>` event** from the store.
 - **Every integrator surface is declared in `api_surface.py`.**
 - **An options flow returns `config_flow.merge_flow_input(...)`**, never `user_input`
   ([architecture.md](.amazonq/rules/architecture.md#options)).
@@ -148,7 +151,7 @@ in the rules files below. Read the file for your topic before you change code or
   run `python3 ci/docs.py stamp <id>`.
 - **A change to Goals or Non-goals needs a "Goal changes" PR section** that the
   maintainer agreed to.
-- **Each new source file under `custom_components/home_keeper_library/` goes in exactly 1
+- **Each new source file under `custom_components/home_keeper_games/` goes in exactly 1
   design doc's `implements`.**
 - **Caps**: design 150 lines, reference 300, rules 200, process 200, backlog 300, skill
   200; 100 characters a line; `CLAUDE.md` plus this file 250. At most 2 length exceptions.

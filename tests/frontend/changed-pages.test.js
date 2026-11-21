@@ -32,7 +32,7 @@ describe('pagesForChanges', () => {
       ],
     });
     expect(pages).toEqual([
-      {title: 'Integrating with Home Keeper Library', route: '/developer/integrating'},
+      {title: 'Integrating with Home Keeper Games', route: '/developer/integrating'},
       {title: 'Events reference', route: '/developer/events'},
       {title: 'Release Notes', route: '/docs/release-notes'},
       {title: 'Introduction', route: '/docs/intro'},
@@ -44,9 +44,9 @@ describe('pagesForChanges', () => {
     // The page has no canonical Markdown file, so a PR that only adds a service
     // or an event would otherwise show no changed doc page at all.
     for (const source of [
-      'custom_components/home_keeper_library/api_surface.py',
-      'custom_components/home_keeper_library/services.yaml',
-      'custom_components/home_keeper_library/strings.json',
+      'custom_components/home_keeper_games/api_surface.py',
+      'custom_components/home_keeper_games/services.yaml',
+      'custom_components/home_keeper_games/strings.json',
     ]) {
       expect(pagesForChanges({changedFiles: [source]})).toEqual([
         {title: 'API reference', route: '/developer/api'},
@@ -56,7 +56,7 @@ describe('pagesForChanges', () => {
 
   it('ignores files with no page mapping', () => {
     expect(
-      pagesForChanges({changedFiles: ['custom_components/home_keeper_library/store.py']}),
+      pagesForChanges({changedFiles: ['custom_components/home_keeper_games/store.py']}),
     ).toEqual([]);
   });
 

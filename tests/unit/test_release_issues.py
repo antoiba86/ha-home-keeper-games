@@ -233,7 +233,7 @@ class TestFencedCode:
     """A `Fixes #N` in a code sample is not a claim that this release fixed it."""
 
     def test_reference_inside_a_fence_is_ignored(self):
-        text = "- **A.** HomeKeeperLibrary:\n\n```\ngit commit -m 'Fixes #4'\n```\n"
+        text = "- **A.** HomeKeeperGames:\n\n```\ngit commit -m 'Fixes #4'\n```\n"
         assert _numbers(text) == []
 
     def test_indented_fence_inside_a_bullet_is_ignored(self):

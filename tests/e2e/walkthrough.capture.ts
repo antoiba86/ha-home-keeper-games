@@ -20,7 +20,7 @@ import { library } from './ha-ws';
 import { adminState, bookByTitle, noServiceWorker, openCard, openTab, restoreReading } from './tests/helpers';
 import { DESKTOP } from './viewports';
 
-const OUT = process.env.VIDEO_DIR || '/tmp/home-keeper-library-video';
+const OUT = process.env.VIDEO_DIR || '/tmp/home-keeper-games-video';
 const BEAT = 900;
 const NEW_ISBN = '9780553418606';
 // A scanned book that the fixture Open Library does not have. The scan asks for its title.

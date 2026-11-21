@@ -2,10 +2,10 @@
 title: Wishlist and to-do sync
 summary: How a book goes on the wishlist of a person, and how the books to buy go to a to-do list of that person and come back as bought.
 implements:
-  - custom_components/home_keeper_library/wishlist.py
-  - custom_components/home_keeper_library/wishlist_sync.py
+  - custom_components/home_keeper_games/wishlist.py
+  - custom_components/home_keeper_games/wishlist_sync.py
 related: [store-models, entities, events-api]
-source_hash: 485c719f8fc0
+source_hash: 0d24ce127bfe
 ---
 
 # Wishlist and to-do sync

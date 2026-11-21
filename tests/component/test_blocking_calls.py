@@ -13,7 +13,7 @@ from unittest.mock import patch
 import pytest
 from blockbuster import BlockingError
 
-from custom_components.home_keeper_library import backend_i18n, const, covers
+from custom_components.home_keeper_games import backend_i18n, const, covers
 
 
 async def test_blockbuster_finds_a_blocking_call(tmp_path: Path) -> None:
@@ -59,7 +59,7 @@ async def test_a_language_without_a_file_reads_no_file(hass, setup_entry) -> Non
     assert backend_i18n.resolve_exception("xx", "not_loaded") == (
         backend_i18n.resolve_exception("en", "not_loaded")
     )
-    assert backend_i18n.resolve_string("xx", "tab.title") == "Library"
+    assert backend_i18n.resolve_string("xx", "tab.title") == "Games"
 
 
 async def test_a_second_preload_reads_nothing(hass, setup_entry) -> None:

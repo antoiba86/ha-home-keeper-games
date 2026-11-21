@@ -1,9 +1,9 @@
 ---
-title: Developing Home Keeper Library
-summary: How to run the tests of Home Keeper Library, and the automated checks that guard each pull request, for contributors.
+title: Developing Home Keeper Games
+summary: How to run the tests of Home Keeper Games, and the automated checks that guard each pull request, for contributors.
 ---
 
-# Develop Home Keeper Library
+# Develop Home Keeper Games
 
 The workflow, the branch rules and the release steps are in [AGENTS.md](../AGENTS.md) and
 [RELEASE.md](../RELEASE.md). The detail of each topic is in `.amazonq/rules/`.
@@ -18,7 +18,7 @@ bash ci/test-python-unit.sh         # pure unit, no Home Assistant
 bash ci/test-python-component.sh    # in-process Home Assistant, fake Home Keeper
 bash ci/test-frontend.sh            # vitest
 bash ci/e2e-up.sh                   # Docker and Playwright, with the real Home Keeper
-ruff check . && ruff format --check . && mypy custom_components/home_keeper_library
+ruff check . && ruff format --check . && mypy custom_components/home_keeper_games
 python3 ci/docs.py check
 ```
 
@@ -50,7 +50,7 @@ conventions behind them are in [`AGENTS.md`](../AGENTS.md) and
 | **Localized exceptions** | `tests/unit/test_exception_translations.py` | An error that a user can see with no `translation_key`, and a key with no message. |
 | **Exact shapes** | `tests/unit/test_shapes.py` | A record or reply key that changed name on both sides of a round trip. |
 | **Blocking calls** | `tests/component/conftest.py` (`blockbuster`) | Code of the integration that blocks the event loop in a component test, such as a file read or a `sleep`. |
-| **Home Assistant log gate** | `integration.yml`, `ci/check-ha-log.py` | A warning or an error from `custom_components.home_keeper_library`, a "Detected blocking call", a slow callback, a coroutine that nobody awaited or a deprecation notice in the log of the Docker container. Home Keeper's own records do not count. |
+| **Home Assistant log gate** | `integration.yml`, `ci/check-ha-log.py` | A warning or an error from `custom_components.home_keeper_games`, a "Detected blocking call", a slow callback, a coroutine that nobody awaited or a deprecation notice in the log of the Docker container. Home Keeper's own records do not count. |
 | **Pure core** | `tests/unit/test_pure_core.py` | A Home Assistant import in a pure module, and a module map that does not match the code. |
 | **API-surface drift** | `tests/unit/test_api_surface.py` | A service, event, payload field, websocket command, entity platform or HTTP view added to 1 registry and not to `api_surface.py`. |
 | **Generated API reference** | `tests/unit/test_generate_api_docs.py` | A surface in `api_surface.py` that the reference page leaves out. |

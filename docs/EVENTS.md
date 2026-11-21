@@ -1,11 +1,11 @@
 ---
 title: Events reference
-summary: The bus events of Home Keeper Library for integrators. When each event fires, with its payload and an example automation.
+summary: The bus events of Home Keeper Games for integrators. When each event fires, with its payload and an example automation.
 ---
 
 # Events reference
 
-Home Keeper Library fires a Home Assistant bus event for each change to the
+Home Keeper Games fires a Home Assistant bus event for each change to the
 library. Automations and other integrations use these events. Each event
 observes a change that a service already makes, so an event needs no service of
 its own.
@@ -19,40 +19,40 @@ to-do list or a Home Keeper task fires the same event.
 
 ## Event catalog
 
-Names follow `home_keeper_library_<noun>_<verb>`.
+Names follow `home_keeper_games_<noun>_<verb>`.
 
 | Event | Fires when |
 |---|---|
-| `home_keeper_library_room_added` | A room is added. |
-| `home_keeper_library_room_updated` | A room changes. The payload has `changed_fields`. |
-| `home_keeper_library_room_removed` | A room is deleted. |
-| `home_keeper_library_bookcase_added` | A bookcase is added. |
-| `home_keeper_library_bookcase_updated` | A bookcase changes or moves to another room. |
-| `home_keeper_library_bookcase_removed` | A bookcase is deleted. |
-| `home_keeper_library_shelf_added` | A shelf is added. |
-| `home_keeper_library_shelf_updated` | A shelf changes or moves to another bookcase. |
-| `home_keeper_library_shelf_removed` | A shelf is deleted. |
-| `home_keeper_library_book_added` | A book is added. |
-| `home_keeper_library_book_updated` | The fields, the cover or the wishlist entry of a book change. |
-| `home_keeper_library_book_removed` | A book is deleted with its copies, reading rows and loans. |
-| `home_keeper_library_copy_added` | A copy is added. |
-| `home_keeper_library_copy_moved` | A copy moves to another shelf, or to no shelf. |
-| `home_keeper_library_copy_updated` | A field of a copy other than its shelf changes. |
-| `home_keeper_library_copy_removed` | A copy is deleted. |
-| `home_keeper_library_reading_changed` | The reading status of a person changes. |
-| `home_keeper_library_reading_updated` | The rating, page, dates, count or notes of a reading row change, and the status stays. |
-| `home_keeper_library_book_finished` | The reading status of a person becomes `read`. |
-| `home_keeper_library_loan_started` | A book is lent or borrowed. |
-| `home_keeper_library_loan_returned` | A loan is returned. |
-| `home_keeper_library_loan_overdue` | An open loan passes its due date. |
-| `home_keeper_library_loan_updated` | The party, the dates, the format or the note of a loan change. |
-| `home_keeper_library_loan_removed` | A loan is deleted. |
-| `home_keeper_library_wishlist_added` | A book goes on the wishlist of a person. |
-| `home_keeper_library_wishlist_removed` | A book leaves the wishlist. |
-| `home_keeper_library_import_completed` | A CSV import is written. |
-| `home_keeper_library_data_imported` | The library section of a Home Keeper import is written. |
-| `home_keeper_library_person_settings_updated` | The library settings of a person change. |
-| `home_keeper_library_settings_updated` | The options of the library change, such as the currency. |
+| `home_keeper_games_room_added` | A room is added. |
+| `home_keeper_games_room_updated` | A room changes. The payload has `changed_fields`. |
+| `home_keeper_games_room_removed` | A room is deleted. |
+| `home_keeper_games_bookcase_added` | A bookcase is added. |
+| `home_keeper_games_bookcase_updated` | A bookcase changes or moves to another room. |
+| `home_keeper_games_bookcase_removed` | A bookcase is deleted. |
+| `home_keeper_games_shelf_added` | A shelf is added. |
+| `home_keeper_games_shelf_updated` | A shelf changes or moves to another bookcase. |
+| `home_keeper_games_shelf_removed` | A shelf is deleted. |
+| `home_keeper_games_book_added` | A book is added. |
+| `home_keeper_games_book_updated` | The fields, the cover or the wishlist entry of a book change. |
+| `home_keeper_games_book_removed` | A book is deleted with its copies, reading rows and loans. |
+| `home_keeper_games_copy_added` | A copy is added. |
+| `home_keeper_games_copy_moved` | A copy moves to another shelf, or to no shelf. |
+| `home_keeper_games_copy_updated` | A field of a copy other than its shelf changes. |
+| `home_keeper_games_copy_removed` | A copy is deleted. |
+| `home_keeper_games_reading_changed` | The reading status of a person changes. |
+| `home_keeper_games_reading_updated` | The rating, page, dates, count or notes of a reading row change, and the status stays. |
+| `home_keeper_games_book_finished` | The reading status of a person becomes `read`. |
+| `home_keeper_games_loan_started` | A book is lent or borrowed. |
+| `home_keeper_games_loan_returned` | A loan is returned. |
+| `home_keeper_games_loan_overdue` | An open loan passes its due date. |
+| `home_keeper_games_loan_updated` | The party, the dates, the format or the note of a loan change. |
+| `home_keeper_games_loan_removed` | A loan is deleted. |
+| `home_keeper_games_wishlist_added` | A book goes on the wishlist of a person. |
+| `home_keeper_games_wishlist_removed` | A book leaves the wishlist. |
+| `home_keeper_games_import_completed` | A CSV import is written. |
+| `home_keeper_games_data_imported` | The library section of a Home Keeper import is written. |
+| `home_keeper_games_person_settings_updated` | The library settings of a person change. |
+| `home_keeper_games_settings_updated` | The options of the library change, such as the currency. |
 
 ## Payloads
 
@@ -69,7 +69,7 @@ The book, copy, reading, loan and wishlist events share 1 spine:
 
 `person_id` is the id of the Home Assistant person, or `null`. `origin` is the
 marker of the caller, or `null` for a user. A change that comes from a Home
-Keeper task has the origin `home_keeper_library`.
+Keeper task has the origin `home_keeper_games`.
 
 The other keys of each event are in the generated API reference and in
 `api_surface.EVENTS`:
@@ -128,7 +128,7 @@ The other keys of each event are in the generated API reference and in
 | `home_keeper_task_deleted` | If the task is the task of a loan, the loan forgets the task and gets no new one. |
 | `home_keeper_register_companions` | The library registers as a Home Keeper companion again. |
 
-The library ignores a Home Keeper event with the origin `home_keeper_library`, because
+The library ignores a Home Keeper event with the origin `home_keeper_games`, because
 the library made that change itself.
 
 ## Example automation
@@ -138,7 +138,7 @@ automation:
   - alias: Notify when a loan is overdue
     triggers:
       - trigger: event
-        event_type: home_keeper_library_loan_overdue
+        event_type: home_keeper_games_loan_overdue
     actions:
       - action: persistent_notification.create
         data:
@@ -153,7 +153,7 @@ automation:
   - alias: Book finished
     triggers:
       - trigger: event
-        event_type: home_keeper_library_book_finished
+        event_type: home_keeper_games_book_finished
     actions:
       - action: notify.notify
         data:

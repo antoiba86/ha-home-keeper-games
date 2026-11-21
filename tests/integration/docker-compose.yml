@@ -11,7 +11,7 @@ services:
       - ./ha_config:/config
       # Each component is its own mount, so the real Home Keeper from
       # ci/fetch-home-keeper.sh sits next to the library.
-      - ../../custom_components/home_keeper_library:/config/custom_components/home_keeper_library:ro
+      - ../../custom_components/home_keeper_games:/config/custom_components/home_keeper_games:ro
       - ./.home_keeper/custom_components/home_keeper:/config/custom_components/home_keeper:ro
     environment:
       - TZ=America/New_York

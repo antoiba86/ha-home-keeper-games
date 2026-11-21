@@ -2,12 +2,12 @@
 title: Open Library and covers
 summary: How the library reads book details from Open Library, retries a failed lookup in the background, and stores, uploads and serves cover files.
 implements:
-  - custom_components/home_keeper_library/openlibrary.py
-  - custom_components/home_keeper_library/openlibrary_client.py
-  - custom_components/home_keeper_library/book_lookup.py
-  - custom_components/home_keeper_library/covers.py
+  - custom_components/home_keeper_games/openlibrary.py
+  - custom_components/home_keeper_games/openlibrary_client.py
+  - custom_components/home_keeper_games/book_lookup.py
+  - custom_components/home_keeper_games/covers.py
 related: [scan-and-isbn, csv-import-export, store-models, people-privilege]
-source_hash: 8e0672d2f71b
+source_hash: f4ca0d72b62e
 ---
 
 # Open Library and covers
@@ -53,8 +53,8 @@ key, and `forget_miss` clears the miss of an ISBN. `async_post` is the write pat
 ([open-library-contribute](open-library-contribute.md)).
 
 The base URLs are `const.OPENLIBRARY_URL` and `const.OPENLIBRARY_COVERS_URL`. The
-environment variables `HOME_KEEPER_LIBRARY_OPENLIBRARY_URL` and
-`HOME_KEEPER_LIBRARY_OPENLIBRARY_COVERS_URL` replace them (`openlibrary_client.openlibrary_urls`).
+environment variables `HOME_KEEPER_GAMES_OPENLIBRARY_URL` and
+`HOME_KEEPER_GAMES_OPENLIBRARY_COVERS_URL` replace them (`openlibrary_client.openlibrary_urls`).
 They are for tests only: `tests/e2e/docker-compose.e2e.yml` sets them to point the
 container at a fixture server.
 
@@ -73,7 +73,7 @@ search for a book with an ISBN, because no person checks the match.
 `BookLookup` holds a queue of book ids and runs 1 worker while the queue has ids. For each
 book that still has `needs_details: true`, it reads Open Library by ISBN, else by title
 and first author. A draft fills the book with `LibraryStore.fill_book` and the origin
-`home_keeper_library`, and then the cover downloads. After a network error the queue
+`home_keeper_games`, and then the cover downloads. After a network error the queue
 tries again after 1 minute, then after 5 minutes: `const.LOOKUP_MAX_TRIES` (3) tries in
 all. A book that Open Library does not have keeps `needs_details: true` for the user to
 fill, and `async_mark_missing` gives it the `catalog_status` `openlibrary: missing`.
@@ -91,10 +91,10 @@ network error.
 
 ### Cover files
 
-A cover file is `<book_id>-<token>.jpg` in `.storage/home_keeper_library_covers/`. The
-directory is not below `.storage/home_keeper_library`, because that path is the store
+A cover file is `<book_id>-<token>.jpg` in `.storage/home_keeper_games_covers/`. The
+directory is not below `.storage/home_keeper_games`, because that path is the store
 file. The token changes with each new cover. `cover_url` is
-`/api/home_keeper_library/cover/<id>?v=<token>`, so a browser never shows an old cover
+`/api/home_keeper_games/cover/<id>?v=<token>`, so a browser never shows an old cover
 from its cache.
 
 - **Open Library.** `covers.async_store_openlibrary_cover` downloads the large image of
@@ -126,11 +126,11 @@ from its cache.
 
 ## One-way doors
 
-- The cover URL path `/api/home_keeper_library/cover/{book_id}` and the upload path
-  `/api/home_keeper_library/upload`.
+- The cover URL path `/api/home_keeper_games/cover/{book_id}` and the upload path
+  `/api/home_keeper_games/upload`.
 - The `catalogs` block of a book, keyed by catalog name. The `openlibrary` record has
   `edition_key`, `work_key` and `cover_id`. The `lookup_isbn` draft has the same block.
 - The `search_catalog` fields `title` and `authors`, the reply keys `status` and `match`,
   and the `match` keys.
-- The book field `lookup_tries` and the covers directory `home_keeper_library_covers`.
+- The book field `lookup_tries` and the covers directory `home_keeper_games_covers`.
 - The cover `kind` values and the file name format.

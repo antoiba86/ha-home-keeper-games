@@ -19,7 +19,7 @@ import conftest
 import pytest
 
 _ROOT = Path(__file__).resolve().parents[2]
-_COMPONENT = _ROOT / "custom_components" / "home_keeper_library"
+_COMPONENT = _ROOT / "custom_components" / "home_keeper_games"
 
 
 def _bad_imports(source: str, pure: set[str]) -> list[str]:
@@ -63,7 +63,7 @@ def test_the_check_sees_each_kind_of_import() -> None:
     source = (
         "import homeassistant.core\n"
         "from homeassistant.util import dt\n"
-        "from .store import HomeKeeperLibraryStore\n"
+        "from .store import HomeKeeperGamesStore\n"
         "from . import coordinator, const\n"
         "from .const import DOMAIN\n"
         "import json\n"

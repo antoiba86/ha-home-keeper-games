@@ -2,12 +2,12 @@
 title: Coordinator and entities
 summary: The coordinator that pushes each store change to the entities, the library and per-person sensors, the To read list of each person, and the service device.
 implements:
-  - custom_components/home_keeper_library/coordinator.py
-  - custom_components/home_keeper_library/entity.py
-  - custom_components/home_keeper_library/sensor.py
-  - custom_components/home_keeper_library/todo.py
+  - custom_components/home_keeper_games/coordinator.py
+  - custom_components/home_keeper_games/entity.py
+  - custom_components/home_keeper_games/sensor.py
+  - custom_components/home_keeper_games/todo.py
 related: [store-models, people-privilege, events-api]
-source_hash: 824211118988
+source_hash: 773f98397273
 ---
 
 # Coordinator and entities
@@ -93,6 +93,6 @@ is the book id.
 
 ## One-way doors
 
-- The unique ids `home_keeper_library_<key>` and `home_keeper_library_<person_id>_<key>`.
+- The unique ids `home_keeper_games_<key>` and `home_keeper_games_<person_id>_<key>`.
 - The sensor keys and the attributes `goal`, `pages`, `year`, `books` and `person_id`.
 - The uid of a To read item is the book id.

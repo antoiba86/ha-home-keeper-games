@@ -1,20 +1,20 @@
 ---
 title: Architecture
-summary: The split of Home Keeper Library into a pure core and Home Assistant glue. The setup steps. The index of the design docs.
+summary: The split of Home Keeper Games into a pure core and Home Assistant glue. The setup steps. The index of the design docs.
 implements:
-  - custom_components/home_keeper_library/__init__.py
-  - custom_components/home_keeper_library/const.py
-  - custom_components/home_keeper_library/config_flow.py
-  - custom_components/home_keeper_library/diagnostics.py
-  - custom_components/home_keeper_library/backend_i18n.py
-  - custom_components/home_keeper_library/manifest.json
+  - custom_components/home_keeper_games/__init__.py
+  - custom_components/home_keeper_games/const.py
+  - custom_components/home_keeper_games/config_flow.py
+  - custom_components/home_keeper_games/diagnostics.py
+  - custom_components/home_keeper_games/backend_i18n.py
+  - custom_components/home_keeper_games/manifest.json
 related: [store-models, people-privilege, events-api, home-keeper-dependency, frontend-tab-card]
-source_hash: cc51ade6a3d3
+source_hash: fca3397f8e0b
 ---
 
 # Architecture
 
-Home Keeper Library is a Home Assistant integration for the books of a household. It
+Home Keeper Games is a Home Assistant integration for the books of a household. It
 records the rooms, bookcases and shelves of the home, the books and their copies, the
 reading status of each person, the loans and a wishlist. It is a companion of Home
 Keeper: admins manage the library in a tab of the Home Keeper panel. Every user reads and
@@ -27,7 +27,7 @@ updates their own reading status through a card, native entities and services.
   the mutation gate can check them.
 - **G2. One write path.** Every change goes through 1 store method. That method checks
   the input, saves the change and fires its events ([store-models](store-models.md)).
-- **G3. Services first.** Each data action is a `home_keeper_library.*` service, so
+- **G3. Services first.** Each data action is a `home_keeper_games.*` service, so
   automations, scripts, voice and other integrations can do what the tab does.
 - **G4. Per-person privacy.** A non-admin user changes only their own reading data, and
   reads only what the projections allow ([people-privilege](people-privilege.md)).
@@ -142,9 +142,9 @@ notes and `acquired_from`, and it has no Open Library key.
 
 ## One-way doors
 
-- The domain `home_keeper_library`, the static path `/home_keeper_library_static` and the
-  tab path `/home-keeper/library`.
+- The domain `home_keeper_games`, the static path `/home_keeper_games_static` and the
+  tab path `/home-keeper/games`.
 - The service names and fields, and the event names and payloads
   ([INTEGRATING.md](../INTEGRATING.md)).
-- The storage key `home_keeper_library`, `const.STORAGE_VERSION` and the option key
+- The storage key `home_keeper_games`, `const.STORAGE_VERSION` and the option key
   `currency`.

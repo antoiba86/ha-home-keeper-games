@@ -23,7 +23,7 @@ import ex.events as events
 import pytest
 
 _COMPONENT = (
-    Path(__file__).resolve().parents[2] / "custom_components" / "home_keeper_library"
+    Path(__file__).resolve().parents[2] / "custom_components" / "home_keeper_games"
 )
 
 
@@ -39,7 +39,7 @@ _COVERS_TREE = _tree("covers.py")
 _SURFACE_TREE = _tree("api_surface.py")
 _STRINGS = json.loads((_COMPONENT / "strings.json").read_text(encoding="utf-8"))
 
-_FIX = "Add or update its spec in custom_components/home_keeper_library/api_surface.py."
+_FIX = "Add or update its spec in custom_components/home_keeper_games/api_surface.py."
 
 
 def _services_yaml() -> dict:

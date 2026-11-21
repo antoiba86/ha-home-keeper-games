@@ -1,6 +1,6 @@
 ---
 title: Ideas and open work
-summary: The single backlog of Home Keeper Library work that is not built, for maintainers and agents.
+summary: The single backlog of Home Keeper Games work that is not built, for maintainers and agents.
 ---
 
 # Ideas and open work
@@ -21,7 +21,7 @@ Nothing here is committed scope. When an item ships, remove it. The design docs 
 ## Product ideas
 
 - **QR shelf labels.** Print a QR label for each shelf, built on the QR label work of
-  Home Keeper. A scan of the label opens `/home-keeper/library/scan;shelf=<id>`.
+  Home Keeper. A scan of the label opens `/home-keeper/games/scan;shelf=<id>`.
 - **Series gaps.** List the numbers that are missing from each series that the library
   holds, and put them on the wishlist in 1 step.
 - **Reading log for children.** Minutes or pages for each day, a streak, and a goal for a
@@ -38,7 +38,7 @@ Nothing here is committed scope. When an item ships, remove it. The design docs 
   its ISBN. Let the admin send that edition under the linked work.
 - **Title match for other books.** Offer the title match of a scan on the book page of
   each book that is not on Open Library, and in the CSV import.
-- **Event for a send to Open Library.** A `home_keeper_library_book_contributed` event
+- **Event for a send to Open Library.** A `home_keeper_games_book_contributed` event
   with the edition key, if an integrator needs more than `book_updated`.
 
 ### Shelf photo

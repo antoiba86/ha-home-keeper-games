@@ -13,7 +13,7 @@ import pytest
 _DIR = (
     Path(__file__).resolve().parents[2]
     / "custom_components"
-    / "home_keeper_library"
+    / "home_keeper_games"
     / "backend_strings"
 )
 _SOURCE = json.loads((_DIR / "en.json").read_text(encoding="utf-8"))
@@ -49,9 +49,9 @@ def test_resolve_string() -> None:
     assert i18n.resolve_string(
         "en", "loan_task.name_out", title="Dune", party="Al"
     ) == ("Get Dune back from Al")
-    assert i18n.resolve_string("de", "tab.title") == "Bibliothek"
-    assert i18n.resolve_string("de-CH", "tab.title") == "Bibliothek"
-    assert i18n.resolve_string("xx", "tab.title") == "Library"
+    assert i18n.resolve_string("de", "tab.title") == "Spiele"
+    assert i18n.resolve_string("de-CH", "tab.title") == "Spiele"
+    assert i18n.resolve_string("xx", "tab.title") == "Games"
     assert i18n.resolve_string("en", "missing.key") == "missing.key"
     assert i18n.resolve_string("en", "loan_task.name_in", title="X") == (
         "Return X to {party}"
@@ -68,6 +68,6 @@ def test_resolve_exception() -> None:
 def test_all_strings_and_preload() -> None:
     titles = i18n.all_strings("tab.title")
     assert set(titles) == set(const.LANGUAGES)
-    assert titles["en"] == "Library"
+    assert titles["en"] == "Games"
     assert i18n.all_strings("missing") == {}
     i18n.preload()

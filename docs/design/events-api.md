@@ -2,12 +2,12 @@
 title: Services, websocket commands, events and the API surface
 summary: How each operation is 1 handler behind a service and its websocket twin, how the events are built and fired, and how api_surface.py declares the whole surface.
 implements:
-  - custom_components/home_keeper_library/api_surface.py
-  - custom_components/home_keeper_library/services.py
-  - custom_components/home_keeper_library/websocket_api.py
-  - custom_components/home_keeper_library/events.py
+  - custom_components/home_keeper_games/api_surface.py
+  - custom_components/home_keeper_games/services.py
+  - custom_components/home_keeper_games/websocket_api.py
+  - custom_components/home_keeper_games/events.py
 related: [people-privilege, store-models, entities, architecture]
-source_hash: 7230d8b32e43
+source_hash: 83d85656d32b
 ---
 
 # Services, websocket commands, events and the API surface
@@ -22,7 +22,7 @@ integrator view is [INTEGRATING.md](../INTEGRATING.md) and [EVENTS.md](../EVENTS
 - **G1. 1 handler for each operation.** A service and its websocket twin call the same
   handler with the same fields and the same gate, so they cannot differ.
 - **G2. Every change is observable.** The store fires a
-  `home_keeper_library_<noun>_<verb>` event after it saves.
+  `home_keeper_games_<noun>_<verb>` event after it saves.
 - **G3. 1 declared surface.** The runtime registers and removes the surfaces from
   `api_surface.py`, and a drift test reads the source against it.
 - **G4. Localized errors.** A refused call gives a key and a message in the language of
@@ -57,15 +57,15 @@ caller asks for a response.
 `websocket_api.async_register` registers 3 commands of its own and 1 twin for each service
 that is not a read service:
 
-- `home_keeper_library/get_state` returns the projected document, the caller (`me`), the
+- `home_keeper_games/get_state` returns the projected document, the caller (`me`), the
   currency, the tab state and the revision. An admin also gets `catalog_accounts`.
-- `home_keeper_library/subscribe` sends `{"type": "changed", "revision": n}` after each
+- `home_keeper_games/subscribe` sends `{"type": "changed", "revision": n}` after each
   store change. The client then calls `get_state` again. The command listens to the
   dispatcher signal `const.SIGNAL_STORE_CHANGED`, so a subscription stays after a reload
   of the entry.
-- `home_keeper_library/list_todo_entities` lists the `todo` entities for the wishlist
+- `home_keeper_games/list_todo_entities` lists the `todo` entities for the wishlist
   picker, without the library's own lists. It is admin-only.
-- `home_keeper_library/<service>` takes the fields of the service and calls
+- `home_keeper_games/<service>` takes the fields of the service and calls
   `services.async_run`, which applies the gate. A `LibraryError` or a
   `ServiceValidationError` becomes `send_error` with the key as the code and the message
   resolved with its placeholders.

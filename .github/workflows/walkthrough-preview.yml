@@ -64,7 +64,7 @@ jobs:
       # --ignore-scripts: no package in these lockfiles needs an install script
       # (fsevents is macOS-only), so none gets to run.
       - name: Install frontend deps
-        run: npm ci --ignore-scripts --prefix custom_components/home_keeper_library/frontend
+        run: npm ci --ignore-scripts --prefix custom_components/home_keeper_games/frontend
 
       - name: Install e2e deps
         run: npm ci --ignore-scripts --prefix tests/e2e
@@ -214,7 +214,7 @@ jobs:
                 marker,
                 '### 🎥 Panel walkthrough',
                 '',
-                `<img src="${gif}" alt="Home Keeper Library panel walkthrough" width="820">`,
+                `<img src="${gif}" alt="Home Keeper Games panel walkthrough" width="820">`,
                 '',
                 `▶️ [Higher-quality MP4](${mp4})`,
                 '',

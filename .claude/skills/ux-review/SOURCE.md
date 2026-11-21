@@ -16,7 +16,7 @@ this file.
 
 - **The running app.** Start Home Assistant with the seeded data:
   `KEEP_UP=1 bash ci/e2e-up.sh`. The library tab is at
-  `http://localhost:8123/home-keeper/library`, in the Home Keeper panel. Log in as the e2e user from
+  `http://localhost:8123/home-keeper/games`, in the Home Keeper panel. Log in as the e2e user from
   `tests/e2e/global-setup.ts`, or use the saved session state that the global setup
   writes.
 - **The screenshots.** Use the Playwright harness in `tests/e2e/` in place of the

@@ -67,7 +67,7 @@ jobs:
       - name: Extract version
         id: version
         run: |
-          VERSION=$(python3 -c "import json; print(json.load(open('custom_components/home_keeper_library/manifest.json'))['version'])")
+          VERSION=$(python3 -c "import json; print(json.load(open('custom_components/home_keeper_games/manifest.json'))['version'])")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Build

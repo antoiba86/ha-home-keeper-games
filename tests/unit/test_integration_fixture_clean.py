@@ -31,11 +31,11 @@ ROOT = Path(__file__).resolve().parents[2]
 
 HA_CONFIG = ROOT / "tests" / "integration" / "ha_config"
 CONFIG_ENTRIES = HA_CONFIG / ".storage" / "core.config_entries"
-DASHBOARD = HA_CONFIG / "home-keeper-library-e2e.yaml"
+DASHBOARD = HA_CONFIG / "home-keeper-games-e2e.yaml"
 CARD_INDEX = (
     ROOT
     / "custom_components"
-    / "home_keeper_library"
+    / "home_keeper_games"
     / "frontend"
     / "src"
     / "card-index.ts"
@@ -65,10 +65,10 @@ SEEDED_ENTRY_KEYS = {
     "disabled_by",
 }
 
-#: `- type: custom:home-keeper-library-card` in the seeded YAML dashboard.
+#: `- type: custom:home-keeper-games-card` in the seeded YAML dashboard.
 _YAML_CUSTOM_CARD = re.compile(r"type:\s*custom:([\w-]+)")
 
-#: `customElements.define('home-keeper-library-card', …)` in the card entry point.
+#: `customElements.define('home-keeper-games-card', …)` in the card entry point.
 _DEFINED_ELEMENT = re.compile(r"customElements\.define\(\s*['\"]([\w-]+)['\"]")
 
 #: `customElements.define(CARD_TAG, …)`, with `export const CARD_TAG = '…'` in a module.
@@ -97,7 +97,7 @@ def test_seeded_config_entries_carry_no_runtime_state() -> None:
     """The seed holds 1 entry for Home Keeper and 1 for the library."""
     entries = _payload()["data"]["entries"]
     domains = sorted(entry.get("domain") for entry in entries)
-    assert domains == ["home_keeper", "home_keeper_library"], (
+    assert domains == ["home_keeper", "home_keeper_games"], (
         f"the seed should hold 1 Home Keeper and 1 library entry, found {domains}. "
         f"A local container run adds its own. {RESTORE}"
     )

@@ -6,9 +6,9 @@ import sys
 
 from homeassistant.helpers import issue_registry as ir
 
-from custom_components.home_keeper_library.api_surface import SERVICE_NAMES
-from custom_components.home_keeper_library.const import DOMAIN, LANGUAGES
-from custom_components.home_keeper_library.diagnostics import (
+from custom_components.home_keeper_games.api_surface import SERVICE_NAMES
+from custom_components.home_keeper_games.const import DOMAIN, LANGUAGES
+from custom_components.home_keeper_games.diagnostics import (
     async_get_config_entry_diagnostics,
 )
 
@@ -26,12 +26,12 @@ async def test_tab_is_registered_with_home_keeper(hass, setup_entry) -> None:
     tabs = hass.data[TABS].tabs()
     assert len(tabs) == 1
     tab = tabs[0]
-    assert tab.companion == DOMAIN and tab.id == "library"
-    assert tab.element == "home-keeper-library-tab"
-    assert tab.icon == "mdi:bookshelf" and tab.order == 50 and tab.host_api == 1
-    assert tab.module_url.startswith("/home_keeper_library_static/library-tab.js?v=")
+    assert tab.companion == DOMAIN and tab.id == "games"
+    assert tab.element == "home-keeper-games-tab"
+    assert tab.icon == "mdi:bookshelf" and tab.order == 60 and tab.host_api == 1
+    assert tab.module_url.startswith("/home_keeper_games_static/games-tab.js?v=")
     assert set(tab.titles) == set(LANGUAGES)
-    assert tab.titles["en"] == "Library" and tab.titles["de"] == "Bibliothek"
+    assert tab.titles["en"] == "Games" and tab.titles["de"] == "Spiele"
     assert setup_entry.runtime_data.tab_registered is True
     assert _issues(hass) == set()
 
@@ -51,7 +51,7 @@ async def test_companion_registration(hass, setup_entry) -> None:
     companion = hass.data["home_keeper_fake"]["companions"][DOMAIN]
     assert companion == {
         "domain": DOMAIN,
-        "name": "Home Keeper Library",
+        "name": "Home Keeper Games",
         "icon": "mdi:bookshelf",
         "description": "Books, shelves, loans and reading status.",
         "config_entry_id": setup_entry.entry_id,
@@ -71,7 +71,7 @@ async def test_companion_registration_survives_a_schema_error(
 ) -> None:
     import voluptuous as vol
 
-    from custom_components.home_keeper_library import home_keeper
+    from custom_components.home_keeper_games import home_keeper
 
     async def _handler(_call) -> None:
         raise AssertionError("the schema refuses the data first")
@@ -159,7 +159,7 @@ async def test_old_home_keeper_version_is_not_checked(
 async def test_missing_home_keeper(hass, persons, monkeypatch) -> None:
     from homeassistant.loader import IntegrationNotFound
 
-    from custom_components.home_keeper_library import home_keeper
+    from custom_components.home_keeper_games import home_keeper
 
     async def _not_found(hass, domain):
         raise IntegrationNotFound(domain)
@@ -172,7 +172,7 @@ async def test_missing_home_keeper(hass, persons, monkeypatch) -> None:
         DOMAIN, "add_room", {"name": "Den"}, blocking=True, return_response=True
     )
     assert room["room"]["name"] == "Den"
-    assert hass.states.get("sensor.home_keeper_library_books").state == "0"
+    assert hass.states.get("sensor.home_keeper_games_books").state == "0"
     issue = ir.async_get(hass).async_get_issue(DOMAIN, "home_keeper_missing")
     assert issue.translation_placeholders == {
         "url": "https://github.com/prestomation/ha-home-keeper#installation"
@@ -185,7 +185,7 @@ def _card_resources(hass) -> list[dict]:
     return [
         item
         for item in hass.data[LOVELACE_DATA].resources.async_items()
-        if "library-card.js" in str(item.get("url"))
+        if "games-card.js" in str(item.get("url"))
     ]
 
 
@@ -195,7 +195,7 @@ async def test_resources_read_the_mode_of_an_older_home_assistant(hass) -> None:
 
     from homeassistant.components.lovelace.const import LOVELACE_DATA
 
-    from custom_components.home_keeper_library.card import _storage_resources
+    from custom_components.home_keeper_games.card import _storage_resources
 
     resources = object()
     hass.data[LOVELACE_DATA] = SimpleNamespace(mode="storage", resources=resources)
@@ -212,7 +212,7 @@ async def test_resources_read_the_mode_of_an_older_home_assistant(hass) -> None:
 def _extra_card_urls(hass) -> list[str]:
     from homeassistant.components.frontend import DATA_EXTRA_MODULE_URL
 
-    return [u for u in hass.data[DATA_EXTRA_MODULE_URL].urls if "library-card.js" in u]
+    return [u for u in hass.data[DATA_EXTRA_MODULE_URL].urls if "games-card.js" in u]
 
 
 async def test_card_is_a_lovelace_resource_and_not_a_module(hass, setup_entry) -> None:
@@ -221,7 +221,7 @@ async def test_card_is_a_lovelace_resource_and_not_a_module(hass, setup_entry) -
     rows = _card_resources(hass)
     assert len(rows) == 1
     assert rows[0]["type"] == "module"
-    assert rows[0]["url"].startswith("/home_keeper_library_static/library-card.js?v=")
+    assert rows[0]["url"].startswith("/home_keeper_games_static/games-card.js?v=")
     assert _extra_card_urls(hass) == []
     # A reload keeps the 1 row and adds no module URL.
     assert await hass.config_entries.async_reload(setup_entry.entry_id)
@@ -247,7 +247,7 @@ async def test_card_is_a_module_when_resources_are_yaml(
 ) -> None:
     from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-    from custom_components.home_keeper_library import card
+    from custom_components.home_keeper_games import card
 
     monkeypatch.setattr(card, "_storage_resources", lambda hass: None)
     entry = MockConfigEntry(domain=DOMAIN, data={}, options={}, unique_id=DOMAIN)
@@ -256,7 +256,7 @@ async def test_card_is_a_module_when_resources_are_yaml(
     await hass.async_block_till_done()
     urls = _extra_card_urls(hass)
     assert len(urls) == 1
-    assert urls[0].startswith("/home_keeper_library_static/library-card.js?v=")
+    assert urls[0].startswith("/home_keeper_games_static/games-card.js?v=")
     assert _card_resources(hass) == []
     assert await hass.config_entries.async_remove(entry.entry_id)
     await hass.async_block_till_done()

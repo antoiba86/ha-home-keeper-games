@@ -49,7 +49,7 @@ jobs:
       # harness installed above) blocks.
       #
       # Two invocations, not one: `tests/unit/conftest.py` installs stub
-      # `custom_components.home_keeper_library` parent packages so the pure core
+      # `custom_components.home_keeper_games` parent packages so the pure core
       # loads without Home Assistant. Collected in the same process as the
       # component tier, that stub shadows the real integration and HA sets it up
       # to find no `async_setup_entry`. `--cov-append` on the second run
@@ -59,12 +59,12 @@ jobs:
       - name: Run unit tests with coverage
         run: |
           python -m pytest tests/unit -p no:homeassistant \
-            --cov=custom_components/home_keeper_library --cov-report=
+            --cov=custom_components/home_keeper_games --cov-report=
 
       - name: Run component tests with coverage
         run: |
           python -m pytest tests/component -o asyncio_mode=auto \
-            --cov=custom_components/home_keeper_library --cov-append \
+            --cov=custom_components/home_keeper_games --cov-append \
             --cov-report=term-missing
 
       - name: "Generate coverage Comment (and possibly Post to PR)"

@@ -1,0 +1,24 @@
+{
+  "domain": "home_keeper_games",
+  "name": "Home Keeper Games",
+  "after_dependencies": [
+    "home_keeper",
+    "lovelace"
+  ],
+  "codeowners": [
+    "@antoiba86"
+  ],
+  "config_flow": true,
+  "dependencies": [
+    "frontend",
+    "http",
+    "person"
+  ],
+  "documentation": "https://github.com/antoiba86/ha-home-keeper-games",
+  "integration_type": "service",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/antoiba86/ha-home-keeper-games/issues",
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "0.4.0"
+}

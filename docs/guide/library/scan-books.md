@@ -143,9 +143,9 @@ this, open **Settings** > **Companion app** in the app and turn on **Autoplay vi
 
 If the camera stops again and again, open the camera debug view and send a screenshot of
 it with your bug report. Add `;debug=1` to the end of the scan address:
-`/home-keeper/library/scan;debug=1`. The Home Assistant app has no address bar, so put
+`/home-keeper/games/scan;debug=1`. The Home Assistant app has no address bar, so put
 this address in a link on a dashboard. A Markdown card can show the link:
-`[Scan debug](/home-keeper/library/scan;debug=1)`. The debug view shows the camera state
+`[Scan debug](/home-keeper/games/scan;debug=1)`. The debug view shows the camera state
 and the last camera events under the picture.
 
 ![The camera debug view under the camera picture](../../images/scan-camera-debug-mobile.png)

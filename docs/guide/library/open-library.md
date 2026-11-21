@@ -43,7 +43,7 @@ account.
 
 The library checks the keys with 1 sign-in. Then the card shows **Connected as** and
 the user name. You can also connect the account in the options of the integration, at
-**Settings > Devices & services > Home Keeper Library > Configure**.
+**Settings > Devices & services > Home Keeper Games > Configure**.
 
 The keys stay in the config entry of Home Assistant. No reply, event or diagnostics
 file shows them. To remove the keys, select **Disconnect**. If you revoke the keys on

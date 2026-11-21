@@ -2,10 +2,10 @@
 title: Send books to Open Library
 summary: How an admin connects an Open Library account, how the library adds a book that Open Library does not have, and how the "Not on Open Library" list is kept.
 implements:
-  - custom_components/home_keeper_library/openlibrary_contribute.py
-  - custom_components/home_keeper_library/openlibrary_account.py
+  - custom_components/home_keeper_games/openlibrary_contribute.py
+  - custom_components/home_keeper_games/openlibrary_account.py
 related: [open-library-covers, people-privilege, events-api, frontend-tab-card]
-source_hash: bf2ef5a2e1e3
+source_hash: e897b388dd5c
 ---
 
 # Send books to Open Library

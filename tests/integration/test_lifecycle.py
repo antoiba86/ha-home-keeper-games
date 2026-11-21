@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-DOMAIN = "home_keeper_library"
+DOMAIN = "home_keeper_games"
 DIST = (
     Path(__file__).resolve().parents[2]
     / "custom_components"
@@ -51,13 +51,13 @@ def test_services_registered(api):
 
 def test_entities_exist(api):
     ids = {s["entity_id"] for s in api.get("/api/states").json()}
-    assert "sensor.home_keeper_library_books" in ids
-    assert "sensor.home_keeper_library_loans_overdue" in ids
-    assert any(i.startswith("todo.home_keeper_library_") for i in ids), sorted(ids)
+    assert "sensor.home_keeper_games_books" in ids
+    assert "sensor.home_keeper_games_loans_overdue" in ids
+    assert any(i.startswith("todo.home_keeper_games_") for i in ids), sorted(ids)
 
 
 def test_get_state_and_the_tab(ws):
-    state = ws("home_keeper_library/get_state")
+    state = ws("home_keeper_games/get_state")
     assert state["success"], state
     result = state["result"]
     assert result["me"]["is_admin"] is True and result["currency"] == "EUR"
@@ -70,9 +70,9 @@ def test_get_state_and_the_tab(ws):
     rows = tabs["result"]
     rows = rows["tabs"] if isinstance(rows, dict) else rows
     tab = next(t for t in rows if t["companion"] == DOMAIN)
-    assert tab["id"] == "library" and tab["element"] == "home-keeper-library-tab"
-    assert tab["module_url"].startswith("/home_keeper_library_static/library-tab.js")
-    assert tab["title"] == "Library"
+    assert tab["id"] == "games" and tab["element"] == "home-keeper-games-tab"
+    assert tab["module_url"].startswith("/home_keeper_games_static/games-tab.js")
+    assert tab["title"] == "Games"
 
 
 def test_no_repair_issue_with_home_keeper(ws):
@@ -87,15 +87,15 @@ def test_no_repair_issue_with_home_keeper(ws):
 
 def test_loan_adds_a_home_keeper_task(api):
     book = api.post(
-        "/api/services/home_keeper_library/add_book?return_response",
+        "/api/services/home_keeper_games/add_book?return_response",
         json={"title": "Integration loan book", "lookup": False},
     ).json()["service_response"]["book"]
     copy = api.post(
-        "/api/services/home_keeper_library/add_copy?return_response",
+        "/api/services/home_keeper_games/add_copy?return_response",
         json={"book_id": book["id"]},
     ).json()["service_response"]["copy"]
     loan = api.post(
-        "/api/services/home_keeper_library/lend_book?return_response",
+        "/api/services/home_keeper_games/lend_book?return_response",
         json={"copy_id": copy["id"], "party": "Zed", "due": "2030-01-01"},
     ).json()["service_response"]["loan"]
     try:
@@ -108,20 +108,20 @@ def test_loan_adds_a_home_keeper_task(api):
         ).json()["service_response"]["tasks"]
         task = next(t for t in tasks if t["id"] == loan["hk_task_id"])
         assert task["name"] == "Get Integration loan book back from Zed"
-        assert task["source"] == {"home_keeper_library": {"loan_id": loan["id"]}}
+        assert task["source"] == {"home_keeper_games": {"loan_id": loan["id"]}}
         assert task["managed_by"]["integration"] == DOMAIN
     finally:
         api.post(
-            "/api/services/home_keeper_library/delete_book",
+            "/api/services/home_keeper_games/delete_book",
             json={"book_id": book["id"]},
         )
 
 
-@pytest.mark.parametrize("bundle", ["library-tab.js", "library-card.js"])
+@pytest.mark.parametrize("bundle", ["games-tab.js", "games-card.js"])
 def test_bundles_served(api, bundle):
     if not (DIST / bundle).exists():
         pytest.skip(f"frontend/dist/{bundle} is not built")
-    resp = api.get(f"/home_keeper_library_static/{bundle}")
+    resp = api.get(f"/home_keeper_games_static/{bundle}")
     assert resp.status_code == 200
     assert len(resp.text) > 100
 
@@ -130,7 +130,7 @@ def test_cover_view_needs_auth(api):
     import requests
 
     resp = requests.get(
-        "http://localhost:8123/api/home_keeper_library/cover/nope", timeout=10
+        "http://localhost:8123/api/home_keeper_games/cover/nope", timeout=10
     )
     assert resp.status_code == 401
-    assert api.get("/api/home_keeper_library/cover/nope").status_code == 404
+    assert api.get("/api/home_keeper_games/cover/nope").status_code == 404

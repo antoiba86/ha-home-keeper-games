@@ -2,9 +2,9 @@
 title: Home Keeper export and import
 summary: How the library joins the combined export and import of Home Keeper, what its section holds, how an import matches records, and how the cover files travel in a bundle.
 implements:
-  - custom_components/home_keeper_library/import_export.py
+  - custom_components/home_keeper_games/import_export.py
 related: [csv-import-export, home-keeper-dependency, store-models, events-api]
-source_hash: c1adcfbe536a
+source_hash: 56bf232675df
 ---
 
 # Home Keeper export and import
@@ -108,4 +108,4 @@ with `..`. The service checks the real path again, after it resolves symbolic li
 - The service names `export_data` and `import_data`, their fields and their replies.
 - The keys of the section and `import_export.FORMAT`. A change of the meaning of a key
   needs a new format.
-- The capability `import_export` and the event `home_keeper_library_data_imported`.
+- The capability `import_export` and the event `home_keeper_games_data_imported`.

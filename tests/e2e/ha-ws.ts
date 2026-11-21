@@ -67,7 +67,7 @@ export async function withWs<T>(who: 'admin' | 'user', fn: (ws: HaWs) => Promise
   }
 }
 
-/** A `home_keeper_library/<command>` call as Alex. */
+/** A `home_keeper_games/<command>` call as Alex. */
 export function library<T = unknown>(command: string, fields: Record<string, unknown> = {}): Promise<T> {
-  return withWs('admin', (ws) => ws.call<T>({ type: `home_keeper_library/${command}`, ...fields }));
+  return withWs('admin', (ws) => ws.call<T>({ type: `home_keeper_games/${command}`, ...fields }));
 }

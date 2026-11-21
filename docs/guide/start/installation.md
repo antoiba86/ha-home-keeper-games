@@ -1,6 +1,6 @@
 # Installation
 
-Home Keeper Library is a custom integration in the [HACS](https://hacs.xyz/) default list.
+Home Keeper Games is a custom integration in the [HACS](https://hacs.xyz/) default list.
 It requires Home Assistant 2025.7 or later, and Home Keeper.
 
 ## Install Home Keeper first
@@ -15,9 +15,9 @@ The Library tab needs Home Keeper version 0.30.0 or later.
 
 ## Install the library
 
-1. In HACS, search for **Home Keeper Library**, or
+1. In HACS, search for **Home Keeper Games**, or
    [open it in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=antoiba86&repository=ha-home-keeper-games&category=integration).
-2. Download **Home Keeper Library** and restart Home Assistant.
+2. Download **Home Keeper Games** and restart Home Assistant.
 3. Go to **Settings → Devices & services → Add integration**, and select **Home Keeper
    Library**.
 4. Enter the currency of the prices and values of your books, such as `EUR` or `USD`.
@@ -36,9 +36,9 @@ If Home Keeper is not ready, the setup stops with 1 of these messages:
 
 | Message | What to do |
 |---|---|
-| Home Keeper Library requires Home Keeper. | Install Home Keeper from HACS, restart Home Assistant, then add Home Keeper Library again. |
-| Add the Home Keeper integration first. | Add the Home Keeper integration, then add Home Keeper Library again. |
-| Update Home Keeper to version 0.30.0 or later. | Update Home Keeper in HACS, restart Home Assistant, then add Home Keeper Library again. |
+| Home Keeper Games requires Home Keeper. | Install Home Keeper from HACS, restart Home Assistant, then add Home Keeper Games again. |
+| Add the Home Keeper integration first. | Add the Home Keeper integration, then add Home Keeper Games again. |
+| Update Home Keeper to version 0.30.0 or later. | Update Home Keeper in HACS, restart Home Assistant, then add Home Keeper Games again. |
 
 ## Repair issues
 
@@ -55,5 +55,5 @@ ready again, the issue goes away. The tab and the tasks then come back with no r
 
 ## Data
 
-The library is 1 JSON document in `.storage/home_keeper_library`. The covers are JPEG
-files in `.storage/home_keeper_library_covers/`. Both are in each Home Assistant backup.
+The library is 1 JSON document in `.storage/home_keeper_games`. The covers are JPEG
+files in `.storage/home_keeper_games_covers/`. Both are in each Home Assistant backup.

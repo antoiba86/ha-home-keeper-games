@@ -110,7 +110,7 @@ def ensure_integration_loaded(access_token) -> None:
     session.headers.update({"Authorization": f"Bearer {access_token}"})
     resp = session.post(
         f"{HA_URL}/api/config/config_entries/flow",
-        json={"handler": "home_keeper_library"},
+        json={"handler": "home_keeper_games"},
         timeout=10,
     )
     data = resp.json()
@@ -124,7 +124,7 @@ def ensure_integration_loaded(access_token) -> None:
     deadline = time.monotonic() + 30
     while time.monotonic() < deadline:
         services = session.get(f"{HA_URL}/api/services", timeout=10).json()
-        if any(b["domain"] == "home_keeper_library" for b in services):
+        if any(b["domain"] == "home_keeper_games" for b in services):
             return
         time.sleep(1)
 

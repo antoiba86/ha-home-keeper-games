@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 import { DESKTOP, PHONE } from './viewports';
 
 /**
- * Playwright config for the Home Keeper Library browser tests.
+ * Playwright config for the Home Keeper Games browser tests.
  *
  * Drives a real Chromium against the Home Assistant Docker container with the real
  * Home Keeper (`bash ci/e2e-up.sh` starts it). global-setup completes onboarding as

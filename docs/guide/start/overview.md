@@ -1,9 +1,9 @@
-# Home Keeper Library
+# Home Keeper Games
 
-Home Keeper Library is a Home Assistant integration for the books of a household. It
+Home Keeper Games is a Home Assistant integration for the books of a household. It
 records where each book is, who reads it, who borrowed it and what to buy next.
 
-**Home Keeper Library requires Home Keeper.** Install and set up
+**Home Keeper Games requires Home Keeper.** Install and set up
 [Home Keeper](https://github.com/prestomation/ha-home-keeper) first. The library adds a
 **Library** tab to the Home Keeper panel, and puts the return date of each loan in Home
 Keeper as a task.

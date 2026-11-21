@@ -78,7 +78,7 @@ def test_cover_url() -> None:
         pr.cover_url(
             {"id": "b", "cover": {"kind": "openlibrary", "file": "b-ab12.jpg"}}
         )
-        == "/api/home_keeper_library/cover/b?v=ab12"
+        == "/api/home_keeper_games/cover/b?v=ab12"
     )
 
 

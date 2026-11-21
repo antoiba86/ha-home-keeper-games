@@ -504,4 +504,4 @@ def test_book_detail_order_and_projection() -> None:
 
 def test_cover_url_token() -> None:
     book = {"id": "b", "cover": {"kind": "custom", "file": "b-12ab34cd.jpg"}}
-    assert pr.cover_url(book) == "/api/home_keeper_library/cover/b?v=12ab34cd"
+    assert pr.cover_url(book) == "/api/home_keeper_games/cover/b?v=12ab34cd"

@@ -93,7 +93,7 @@ bash ci/test-mutation-frontend.sh          # Stryker, changed line ranges only
   **Platinum** quality scale, but `manifest.json` declares no `quality_scale` tier yet
   ([IDEAS.md](../../IDEAS.md#quality-scale-ledger)).
 - Run mypy before you push:
-  `pip install -r requirements-typing.txt && mypy custom_components/home_keeper_library`.
+  `pip install -r requirements-typing.txt && mypy custom_components/home_keeper_games`.
 - **`requirements-typing.txt` is the only place that names a mypy dependency.** `lint.yml`,
   `ha-beta.yml` and `ci/setup-ci-deps.sh` install from it. Add a new stub package there.
 - `typings/voluptuous/*.pyi` makes mypy read `voluptuous` as probatio, the way HA 2026.9

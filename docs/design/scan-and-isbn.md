@@ -2,12 +2,12 @@
 title: Scan and ISBN
 summary: The ISBN rules, the camera scanner with its lazy decoder chunk, the scan flow of the tab, and the scan_isbn service with its duplicate choices.
 implements:
-  - custom_components/home_keeper_library/isbn.py
-  - custom_components/home_keeper_library/frontend/src/scanner.ts
-  - custom_components/home_keeper_library/frontend/src/zxing-decoder.ts
-  - custom_components/home_keeper_library/frontend/src/tab-scan.ts
+  - custom_components/home_keeper_games/isbn.py
+  - custom_components/home_keeper_games/frontend/src/scanner.ts
+  - custom_components/home_keeper_games/frontend/src/zxing-decoder.ts
+  - custom_components/home_keeper_games/frontend/src/tab-scan.ts
 related: [open-library-covers, store-models, frontend-tab-card, loans-home-keeper]
-source_hash: 0b666d83ea06
+source_hash: baa43f592082
 ---
 
 # Scan and ISBN

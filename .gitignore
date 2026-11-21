@@ -1,5 +1,5 @@
 # Built frontend bundles (CI builds them; never commit).
-custom_components/home_keeper_library/frontend/dist/
+custom_components/home_keeper_games/frontend/dist/
 
 # Node
 node_modules/
@@ -46,7 +46,7 @@ stryker.log
 reports/
 
 # Build artifacts
-home_keeper_library.zip
+home_keeper_games.zip
 # The lock that ci/setup-ci-deps.sh takes while it runs.
 .setup-ci-deps.lock/
 

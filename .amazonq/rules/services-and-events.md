@@ -10,7 +10,7 @@ How the surfaces work is in [events-api](../../docs/design/events-api.md). Integ
 
 ## Services are the contract
 
-- **Every action that changes or exports data is a `home_keeper_library.*` service.**
+- **Every action that changes or exports data is a `home_keeper_games.*` service.**
   Automations, scripts, voice assistants and other integrations build on services. A
   websocket command is only a UI speed-up and never replaces a service.
 - **A new action is a service first.** Add 1 handler to `SERVICE_HANDLERS` and 1 field
@@ -42,7 +42,7 @@ How the surfaces work is in [events-api](../../docs/design/events-api.md). Integ
 
 ## Events
 
-- **Every state change fires a `home_keeper_library_<noun>_<verb>` event.** Build the
+- **Every state change fires a `home_keeper_games_<noun>_<verb>` event.** Build the
   payload with a pure function in `events.py`, so tests and integrators check the payload
   that ships.
 - **Fire at the `store.py` chokepoint**, after the save, not in a handler. Then a change

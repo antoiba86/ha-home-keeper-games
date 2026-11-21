@@ -94,5 +94,5 @@ feature PR must follow so that its work ships.
   `preview-release.yml` then publishes an installable `X.Y.Z.dev<pr>` pre-release from the
   PR head, so testers can try it in HACS before the merge. A bug-fix or developer-only PR
   does not need the label.
-- The built bundles in `frontend/dist/` (`library-tab.js` and `library-card.js`) are gitignored.
+- The built bundles in `frontend/dist/` (`games-tab.js` and `games-card.js`) are gitignored.
   CI builds them.

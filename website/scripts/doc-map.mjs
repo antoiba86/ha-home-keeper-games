@@ -93,11 +93,11 @@ export function guideFileDrift(files, userSections = USER_SECTIONS) {
 // generated filename under `website/developer/`; the served route drops `.md`.
 // Position 2 is left to the generated API reference below.
 export const DEV_DOCS = [
-  {file: 'docs/INTEGRATING.md', out: 'integrating.md', title: 'Integrating with Home Keeper Library', label: 'Integrating', pos: 1},
+  {file: 'docs/INTEGRATING.md', out: 'integrating.md', title: 'Integrating with Home Keeper Games', label: 'Integrating', pos: 1},
   {file: 'docs/EVENTS.md', out: 'events.md', title: 'Events reference', label: 'Events', pos: 3},
   {file: 'docs/design/architecture.md', out: 'architecture.md', title: 'Architecture', label: 'Architecture', pos: 4},
   {file: 'docs/SECURITY.md', out: 'security.md', title: 'Security model', label: 'Security', pos: 5},
-  {file: 'docs/DEVELOPING.md', out: 'developing.md', title: 'Developing Home Keeper Library', label: 'Developing', pos: 6},
+  {file: 'docs/DEVELOPING.md', out: 'developing.md', title: 'Developing Home Keeper Games', label: 'Developing', pos: 6},
 ];
 
 // Developer Guide pages with no canonical Markdown source: `ci/generate_api_docs.py`
@@ -113,9 +113,9 @@ export const GENERATED_DEV_PAGES = [
     title: 'API reference',
     pos: 2,
     sources: [
-      'custom_components/home_keeper_library/api_surface.py',
-      'custom_components/home_keeper_library/services.yaml',
-      'custom_components/home_keeper_library/strings.json',
+      'custom_components/home_keeper_games/api_surface.py',
+      'custom_components/home_keeper_games/services.yaml',
+      'custom_components/home_keeper_games/strings.json',
     ],
   },
 ];

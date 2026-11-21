@@ -24,6 +24,6 @@ test.describe('Import', { tag: '@responsive' }, () => {
     const after = await adminState();
     expect(after.books.length).toBe(before.books.length);
     await dialog.locator('[data-k="import-cancel"]').click();
-    await expect(page).toHaveURL(/\/home-keeper\/library\/books$/);
+    await expect(page).toHaveURL(/\/home-keeper\/games\/books$/);
   });
 });

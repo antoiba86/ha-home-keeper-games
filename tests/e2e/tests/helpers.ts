@@ -27,18 +27,18 @@ export const test = base.extend({
 
 export { expect };
 
-/** The panel URL of the Library tab in Home Keeper. */
-export const TAB_URL = '/home-keeper/library';
+/** The panel URL of the Games tab in Home Keeper. */
+export const TAB_URL = '/home-keeper/games';
 
 /** The seeded dashboard with the card (tests/integration/ha_config). */
-export const DASHBOARD_URL = '/home-keeper-library-e2e/library';
+export const DASHBOARD_URL = '/home-keeper-games-e2e/library';
 
 /** The tab element inside the Home Keeper panel. */
 export function libraryTab(page: Page): Locator {
-  return page.locator('home-keeper-panel home-keeper-library-tab');
+  return page.locator('home-keeper-panel home-keeper-games-tab');
 }
 
-/** Open a tab path (after `/home-keeper/library`) and wait for the library data. */
+/** Open a tab path (after `/home-keeper/games`) and wait for the library data. */
 export async function openTab(page: Page, path = ''): Promise<Locator> {
   await page.goto(`${TAB_URL}${path}`, { waitUntil: 'domcontentloaded' });
   const tab = libraryTab(page);
@@ -50,7 +50,7 @@ export async function openTab(page: Page, path = ''): Promise<Locator> {
 /** Open the seeded dashboard and wait for the card to show its data. */
 export async function openCard(page: Page): Promise<Locator> {
   await page.goto(DASHBOARD_URL, { waitUntil: 'domcontentloaded' });
-  const card = page.locator('home-keeper-library-card');
+  const card = page.locator('home-keeper-games-card');
   await expect(card.locator('.head h2')).toBeVisible({ timeout: 45_000 });
   return card;
 }
@@ -70,7 +70,7 @@ export function adminState(): Promise<Record<string, any>> {
 
 /** The whole `get_state` reply as Sam, who is not an admin. */
 export function userState(): Promise<Record<string, any>> {
-  return withWs('user', (ws) => ws.call({ type: 'home_keeper_library/get_state' }));
+  return withWs('user', (ws) => ws.call({ type: 'home_keeper_games/get_state' }));
 }
 
 /** The Home Keeper tasks, as the library reads them. */

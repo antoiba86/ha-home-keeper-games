@@ -14,8 +14,8 @@ There is no manual `git tag` step.
 ## Steps
 
 1. **Open a release PR** that contains exactly these changes:
-   - `custom_components/home_keeper_library/manifest.json`: bump `version` to `X.Y.Z`.
-   - `custom_components/home_keeper_library/const.py`: bump `PANEL_VERSION` to `"X.Y.Z"`.
+   - `custom_components/home_keeper_games/manifest.json`: bump `version` to `X.Y.Z`.
+   - `custom_components/home_keeper_games/const.py`: bump `PANEL_VERSION` to `"X.Y.Z"`.
    - `CHANGELOG.md`: add a `## [X.Y.Z] - YYYY-MM-DD` section.
 
    The two version values must match. The release workflow does not ship if they differ.
@@ -29,16 +29,16 @@ There is no manual `git tag` step.
       section without a bump merges clean and ships nothing. `lint.yml`'s
       `changelog-release-gap` job (`ci/check-changelog-release-gap.py`) catches this at
       PR time.
-   4. Builds `frontend/dist/` (`library-tab.js`, its decoder chunk and `library-card.js`)
+   4. Builds `frontend/dist/` (`games-tab.js`, its decoder chunk and `games-card.js`)
       from TypeScript with Rollup.
-   5. Builds `home_keeper_library.zip` (the HACS asset).
+   5. Builds `home_keeper_games.zip` (the HACS asset).
    6. Pushes tag `vX.Y.Z` and creates the GitHub Release. The body is the changelog
-      section, and `home_keeper_library.zip` is attached.
+      section, and `home_keeper_games.zip` is attached.
    7. Comments on every issue that the section says this version fixes. On a stable
       release, it also closes the issue. See [Issue notifications](#issue-notifications).
 
 3. **HACS finds the release** through `hacs.json` (`zip_release: true`,
-   `filename: home_keeper_library.zip`).
+   `filename: home_keeper_games.zip`).
 
 ### Link the docs from every feature bullet
 
@@ -101,7 +101,7 @@ How the job behaves:
   against the previous tag of any kind.
 - **The job ignores a bare `(#N)`**, because squash-merge adds the PR number to commit
   subjects in that form. It also ignores `(Related to #N)`.
-- **You can run it again safely.** Each comment has a `<!-- home-keeper-library-release vX.Y.Z -->`
+- **You can run it again safely.** Each comment has a `<!-- home-keeper-games-release vX.Y.Z -->`
   marker, and the job skips an issue that has one.
 - **It cannot fail a release.** The release is tagged and published before the job runs.
   A bad issue number becomes a warning and a row in the job summary.
@@ -147,12 +147,12 @@ does not bump the version or cut a real release. `preview-release.yml` does the 
   release gates do not apply. The `.dev<pr>` version sorts *below* `X.Y.Z`, so HACS
   never offers it as an update. The PR number keeps it unique.
 - **Build.** It runs `ci/build-panel.sh` and `ci/build-zip.sh`, as `release.yml` does.
-  It then publishes a GitHub pre-release with tag `vX.Y.Z.dev<pr>` and `home_keeper_library.zip`
+  It then publishes a GitHub pre-release with tag `vX.Y.Z.dev<pr>` and `home_keeper_games.zip`
   attached, and posts a sticky PR comment with the install steps.
-- **Install.** In HACS, open *Home Keeper Library* → ⋮ → **Redownload**, turn on **Show beta
+- **Install.** In HACS, open *Home Keeper Games* → ⋮ → **Redownload**, turn on **Show beta
   versions**, and select `X.Y.Z.dev<pr>`. HACS can need a refresh to show it. As an
-  alternative, unzip `home_keeper_library.zip` from the release into
-  `config/custom_components/home_keeper_library/`.
+  alternative, unzip `home_keeper_games.zip` from the release into
+  `config/custom_components/home_keeper_games/`.
 - **Cleanup.** Each push deletes the previous preview release and tag first. When the PR
   closes, the `cleanup` job deletes every release named `Preview · PR #<n> (…)` and its
   tag.
@@ -172,7 +172,7 @@ change `const.HOME_KEEPER_MIN_VERSION`.
 - **Never create GitHub releases manually.** `release.yml` makes the tag, zip, and
   release.
 - **Git ignores `frontend/dist/`.** CI builds the bundles from the TypeScript source.
-- **`hacs.json` must have `zip_release: true`** with `filename: home_keeper_library.zip`.
+- **`hacs.json` must have `zip_release: true`** with `filename: home_keeper_games.zip`.
 
 ## Troubleshooting
 
@@ -181,4 +181,4 @@ change `const.HOME_KEEPER_MIN_VERSION`.
 | "manifest.json is at X.Y.Z but CHANGELOG.md has no '## [X.Y.Z]' section" | Missing changelog entry | Add it in a follow-up PR |
 | "manifest.json version does not match const.py PANEL_VERSION" | Bumped one but not the other | Align both in a PR |
 | "Tag vX.Y.Z already exists" | Version wasn't bumped | Bump the version in a new PR |
-| HACS install fails / "No valid version found" | Missing `home_keeper_library.zip` asset | Check `hacs.json` `zip_release: true` |
+| HACS install fails / "No valid version found" | Missing `home_keeper_games.zip` asset | Check `hacs.json` `zip_release: true` |

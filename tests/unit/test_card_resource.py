@@ -5,13 +5,13 @@ over the websocket on each dashboard load. The plan must survive an upgrade (the
 ``?v=`` content hash changes), a restart (no rewrite), and an install that has a
 row that a user added by hand (no second row). The tests come from Home Keeper.
 
-``custom_components/home_keeper_library/card.py`` is the Home Assistant half.
+``custom_components/home_keeper_games/card.py`` is the Home Assistant half.
 """
 
 import ex.card_resource as card_resource
 from ex.card_resource import ResourcePlan
 
-CARD_PATH = "/home_keeper_library_static/library-card.js"
+CARD_PATH = "/home_keeper_games_static/games-card.js"
 URL = f"{CARD_PATH}?v=abc123def456"
 STALE = f"{CARD_PATH}?v=000000000000"
 
@@ -64,7 +64,7 @@ def test_a_stale_cache_token_is_updated_in_place():
 def test_a_resource_with_no_query_at_all_is_updated_to_the_tokened_url():
     # What a user gets if they added the card by hand, without a ?v=.
     assert _plan(
-        [_res("ours", "/home_keeper_library_static/library-card.js")]
+        [_res("ours", "/home_keeper_games_static/games-card.js")]
     ) == ResourcePlan(create=False, update_id="ours", delete_ids=())
 
 
@@ -100,7 +100,7 @@ def test_a_duplicate_of_an_already_correct_entry_is_still_removed():
 def test_a_copy_of_the_bundle_served_from_elsewhere_is_not_ours():
     # Someone who copied the file into `www/` owns that entry; we neither adopt
     # nor delete it — we just add our own, canonical one.
-    strays = [_res("local", "/local/library-card.js")]
+    strays = [_res("local", "/local/games-card.js")]
     assert _plan(strays) == ResourcePlan(create=True, update_id=None, delete_ids=())
 
 
@@ -114,9 +114,7 @@ def test_a_resource_without_a_url_is_ignored():
 def test_an_absolute_url_for_the_same_bundle_is_ours():
     # What a user gets if they typed the resource in with their full HA address.
     # Left unrecognised it would be joined by a second, relative row.
-    absolute = (
-        "http://homeassistant.local:8123/home_keeper_library_static/library-card.js"
-    )
+    absolute = "http://homeassistant.local:8123/home_keeper_games_static/games-card.js"
     assert _plan([_res("typed", absolute)]) == ResourcePlan(
         create=False, update_id="typed", delete_ids=()
     )
@@ -137,7 +135,7 @@ def test_matching_ids_finds_every_copy_of_the_bundle_whatever_its_token():
         HACS,
         _res("a", URL),
         _res("b", STALE),
-        _res("c", "/local/library-card.js"),
+        _res("c", "/local/games-card.js"),
     ]
     assert card_resource.matching_ids(existing, CARD_PATH) == ("a", "b")
 

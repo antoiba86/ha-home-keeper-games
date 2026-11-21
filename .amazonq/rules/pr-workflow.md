@@ -51,9 +51,23 @@ summary: The branch, review, screenshot, walkthrough and documentation gates tha
 - The PR body follows `.github/pull_request_template.md`. Bug reports and feature
   requests use the forms in `.github/ISSUE_TEMPLATE/`.
 
+## Local work
+
+The maintainer can ask for a change to stay local, with no PR. Then:
+
+- Work on a local branch. Make 1 commit for each step, and keep the tests green at each
+  commit.
+- Before the merge, run every local tier: `pytest tests/unit` in a clean environment,
+  the component tier, `npx vitest run`, `mypy` and `python3 ci/docs.py check`. For a
+  change to the tab, the card or the Home Keeper link, run the e2e tier too.
+- Write the plan, the one-way doors and the security table in the reply to the
+  maintainer, not in a PR body.
+- Squash merge into local `main`. Push only when the maintainer says so. CI, Amazon Q
+  and the walkthrough run after that push, and their findings are still yours to clear.
+
 ## Screenshots: desktop and phone
 
-Every PR that touches `custom_components/home_keeper_library/frontend/src/` must embed
+Every PR that touches `custom_components/home_keeper_games/frontend/src/` must embed
 current screenshots of each changed surface in the PR body: **a desktop shot and a
 phone shot**. A phone viewport wraps and stacks the tab and the card, so a
 desktop-only shot leaves that half unreviewed.
