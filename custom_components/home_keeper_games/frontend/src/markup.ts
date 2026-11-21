@@ -2,7 +2,7 @@
 // and escapes every user value.
 
 import { t } from './i18n';
-import type { Book, Lib, Person, ReadingStatus } from './types';
+import type { Game, Lib, Person, ReadingStatus } from './types';
 import type { LibraryApi } from './api';
 import { COVER_SIGN_SECONDS, coverColors, CoverUrls, escapeHTML, initials, type TabRoute } from './utils';
 
@@ -40,17 +40,17 @@ export function link(path: string, label: string): string {
 export const coverUrls = new CoverUrls();
 
 /**
- * The cover of a book: the image, or a colored block with the title. A cover
+ * The cover of a game: the image, or a colored block with the title. A cover
  * with no signed URL yet shows the block, and `wireCovers` signs it.
  */
-export function cover(book: Book, size: 'tile' | 'thumb' | 'large' = 'tile', badge = ''): string {
-  const { bg, ink } = coverColors(book.id);
-  const author = book.authors[0] ?? '';
-  const src = book.cover_url ? coverUrls.get(book.cover_url, Date.now()) : undefined;
+export function cover(game: Game, size: 'tile' | 'thumb' | 'large' = 'tile', badge = ''): string {
+  const { bg, ink } = coverColors(game.id);
+  const author = game.authors[0] ?? '';
+  const src = game.cover_url ? coverUrls.get(game.cover_url, Date.now()) : undefined;
   const img = src
     ? `<img src="${escapeHTML(src)}" alt="" loading="lazy" />`
-    : `<span class="hkl-cover-title">${escapeHTML(book.title)}</span>${size === 'thumb' ? '' : `<span class="hkl-cover-author">${escapeHTML(author)}</span>`}`;
-  const path = book.cover_url ? ` data-cover="${escapeHTML(book.cover_url)}"` : '';
+    : `<span class="hkl-cover-title">${escapeHTML(game.title)}</span>${size === 'thumb' ? '' : `<span class="hkl-cover-author">${escapeHTML(author)}</span>`}`;
+  const path = game.cover_url ? ` data-cover="${escapeHTML(game.cover_url)}"` : '';
   return `<span class="hkl-cover hkl-cover-${size}${src ? ' has-img' : ''}" style="--c:${bg};--ink:${ink}"${path} aria-hidden="true">${img}${badge}</span>`;
 }
 
@@ -104,8 +104,8 @@ export function options(items: Array<[string, string]>, selected: string | null 
 export function shelfOptions(lib: Lib, selected: string | null, withNone = true): string {
   const items: Array<[string, string]> = withNone ? [['', t('common.no_shelf')]] : [];
   for (const room of lib.rooms) {
-    for (const bc of lib.bookcases.filter((c) => c.room_id === room.id)) {
-      for (const sh of lib.shelves.filter((s) => s.bookcase_id === bc.id)) {
+    for (const bc of lib.units.filter((c) => c.room_id === room.id)) {
+      for (const sh of lib.shelves.filter((s) => s.unit_id === bc.id)) {
         items.push([sh.id, `${room.name} › ${bc.name} › ${sh.name}`]);
       }
     }
@@ -133,13 +133,13 @@ export function formatOptions(selected: string | null, withEmpty = false): strin
 /** The top navigation of the tab, with the view actions on the right. */
 export function navBar(route: TabRoute, counts: { loans: number; wishlist: number }, actions = ''): string {
   const items: Array<[string, string, string, number | null]> = [
-    ['books', '/books', t('nav.books'), null],
+    ['games', '/games', t('nav.games'), null],
     ['shelves', '/shelves', t('nav.shelves'), null],
     ['loans', '/loans', t('nav.loans'), counts.loans],
     ['wishlist', '/wishlist', t('nav.wishlist'), counts.wishlist],
     ['settings', '/settings', t('nav.settings'), null],
   ];
-  const current = route.view === 'book' || route.view === 'import' ? 'books' : route.view;
+  const current = route.view === 'game' || route.view === 'import' ? 'games' : route.view;
   const chips = items
     .map(([view, path, label, count]) => {
       const on = view === current;

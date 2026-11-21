@@ -15,7 +15,7 @@ export interface Room {
   order: number;
 }
 
-export interface Bookcase {
+export interface Unit {
   id: string;
   room_id: string;
   name: string;
@@ -25,7 +25,7 @@ export interface Bookcase {
 
 export interface Shelf {
   id: string;
-  bookcase_id: string;
+  unit_id: string;
   name: string;
   order: number;
 }
@@ -50,7 +50,7 @@ export interface Wishlist {
   bought: boolean;
 }
 
-export interface Book {
+export interface Game {
   id: string;
   title: string;
   subtitle: string;
@@ -78,7 +78,7 @@ export interface Book {
 
 export interface Copy {
   id: string;
-  book_id: string;
+  game_id: string;
   shelf_id: string | null;
   format: CopyFormat;
   condition: CopyCondition | null;
@@ -95,7 +95,7 @@ export interface Copy {
 export interface Loan {
   id: string;
   direction: 'out' | 'in';
-  book_id: string;
+  game_id: string;
   copy_id: string | null;
   party?: string;
   person_id: string | null;
@@ -142,9 +142,9 @@ export interface Me {
 export interface RawState {
   revision: number;
   rooms: Room[];
-  bookcases: Bookcase[];
+  units: Unit[];
   shelves: Shelf[];
-  books: Book[];
+  games: Game[];
   copies: Copy[];
   loans: Loan[];
   /** The people of Home Assistant, by person id. */
@@ -157,9 +157,9 @@ export interface RawState {
 /** The normalized library that every view reads. */
 export interface Lib {
   rooms: Room[];
-  bookcases: Bookcase[];
+  units: Unit[];
   shelves: Shelf[];
-  books: Book[];
+  games: Game[];
   copies: Copy[];
   loans: Loan[];
   people: Person[];
@@ -207,10 +207,10 @@ export interface TabHost {
 /** The result of `scan_barcode`. */
 export interface ScanResult {
   result: 'added' | 'duplicate' | 'moved' | 'skipped' | 'not_found';
-  book: Book | null;
+  game: Game | null;
   copy: Copy | null;
   existing_copies: Copy[];
-  /** True when the scan added the first copy of a wishlist book. Missing reads as false. */
+  /** True when the scan added the first copy of a wishlist game. Missing reads as false. */
   from_wishlist?: boolean;
 }
 
@@ -220,7 +220,7 @@ export interface ImportRow {
   title: string;
   authors: string[];
   barcode: string | null;
-  book_id: string | null;
+  game_id: string | null;
   action: 'new' | 'existing' | 'title_match' | 'error';
   /** The error text, or '' for a row with no error. */
   message: string;

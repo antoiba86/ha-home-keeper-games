@@ -6,7 +6,7 @@ summary: The access of admins and of non-admin users to each surface of Home Kee
 # Security model
 
 In Home Keeper Games, an admin manages the library. Each signed-in user keeps the
-reading of their own person. Admins manage the locations, the books and their copies, the
+reading of their own person. Admins manage the locations, the games and their copies, the
 loans and the wishlist. A non-admin user sets the reading status, the rating and the
 notes of their own person, and reads what the projections allow.
 
@@ -17,8 +17,8 @@ children, a housemate or a guest account on a wall tablet. The library follows t
 of Home Assistant itself: a user who is not an admin cannot change the setup of the home.
 For the library, a guest account must not:
 
-- delete books or move copies;
-- read the price and the value of a copy, or the names of the people who borrowed a book;
+- delete games or move copies;
+- read the price and the value of a copy, or the names of the people who borrowed a game;
 - read the private notes of another person;
 - read the reading status of a person who does not share it.
 
@@ -38,19 +38,19 @@ no user, as Home Assistant does. An automation makes that kind of call.
 | Service | Access |
 |---|---|
 | `add_room`, `update_room`, `delete_room` | Admin |
-| `add_bookcase`, `update_bookcase`, `delete_bookcase` | Admin |
+| `add_unit`, `update_unit`, `delete_unit` | Admin |
 | `add_shelf`, `update_shelf`, `delete_shelf` | Admin |
-| `add_book`, `update_book`, `delete_book` | Admin |
+| `add_game`, `update_game`, `delete_game` | Admin |
 | `scan_barcode`, `add_copy`, `update_copy`, `move_copy`, `delete_copy`, `set_cover` | Admin |
-| `lend_book`, `borrow_book`, `return_loan`, `update_loan`, `delete_loan` | Admin |
-| `add_to_wishlist`, `update_wishlist`, `remove_from_wishlist`, `got_wishlist_book` | Admin |
+| `lend_game`, `borrow_game`, `return_loan`, `update_loan`, `delete_loan` | Admin |
+| `add_to_wishlist`, `update_wishlist`, `remove_from_wishlist`, `got_wishlist_game` | Admin |
 | `set_settings`, `import_csv`, `export_csv` | Admin |
 | `export_data`, `import_data` | Admin |
 | `set_reading` | Open, for the caller's own person. An admin can name any person. |
 | `set_person_settings` | Open, for the caller's own person, with no `wishlist_todo`. An admin can set each field of any person. |
-| `list_books`, `get_book`, `list_locations`, `list_loans`, `list_people` | Open, projected |
+| `list_games`, `get_game`, `list_locations`, `list_loans`, `list_people` | Open, projected |
 
-`wishlist_todo` is admin-only because it sends book titles to a to-do list. Import and
+`wishlist_todo` is admin-only because it sends game titles to a to-do list. Import and
 export are admin-only because they read or write the whole library.
 
 ## Websocket commands
@@ -71,7 +71,7 @@ service directly.
 | Method and path | Access |
 |---|---|
 | `GET /home_keeper_games_static/...` | Public. It holds only the built bundles. |
-| `GET /api/home_keeper_games/cover/{book_id}` | Each signed-in user. Covers are not private. |
+| `GET /api/home_keeper_games/cover/{game_id}` | Each signed-in user. Covers are not private. |
 | `POST /api/home_keeper_games/upload` | Admin, as a real user. At most 10 MB. JPEG, PNG or WebP. |
 
 Home Assistant serves a static path before authentication, so the static path holds only
@@ -92,7 +92,7 @@ projection:
 | Settings of another person | `wishlist_todo` |
 | Wishlist entry of another person | `todo_entity`, `todo_uid` |
 
-The book records, the shared notes and the covers are open to every user. Only an admin
+The game records, the shared notes and the covers are open to every user. Only an admin
 can download the diagnostics. The download redacts the loan
 parties, the notes and `acquired_from`.
 
@@ -106,7 +106,7 @@ library:
   from an admin user. A call with no user, such as an automation, is trusted. A change
   from another user fails with the error `todo_not_allowed`.
 - If a person has `share_reading: false`, the 3 entities of that person are unavailable:
-  the To read list and the sensors that show the books read this year and the books that
+  the To read list and the sensors that show the games read this year and the games that
   the person reads now. The list gives
   no items, also over the `todo/item/list` websocket command. They come back when the
   person shares the reading again.
@@ -115,7 +115,7 @@ The library sensors show only counts, with no title and no person.
 
 ## Events
 
-The payload of a bus event holds the book title, the person id and, for a loan, the party. Home
+The payload of a bus event holds the game title, the person id and, for a loan, the party. Home
 Assistant lets only an admin subscribe to these events over the websocket API. An
 automation that copies an event to a notification sends that data to the place that the
 automation names.

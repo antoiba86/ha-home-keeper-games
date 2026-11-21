@@ -9,7 +9,7 @@ import { renderKeepFocus } from './dom';
 import { formatAgo, formatNumber, setLanguage, t, tn } from './i18n';
 import { cover, personDot, statusLabel, wireCovers } from './markup';
 import { TOKENS } from './styles';
-import type { Book, HomeAssistant, Lib } from './types';
+import type { Game, HomeAssistant, Lib } from './types';
 import {
   buildIndex,
   cardModel,
@@ -231,9 +231,9 @@ export class HomeKeeperGamesCard extends HTMLElement {
     const pid = this._person();
     const person = pid ? idx.person.get(pid) : undefined;
     const on = sectionsOn(this._config);
-    const owned = lib.books.filter((b) => b.owned).length;
+    const owned = lib.games.filter((b) => b.owned).length;
     const title = this._config.title || t('card.title', { name: person?.name ?? '' });
-    const head = `<div class="head">${personDot(person)}<h2>${escapeHTML(title)}</h2><span class="muted small">${escapeHTML(tn('count.books', owned))}</span></div>`;
+    const head = `<div class="head">${personDot(person)}<h2>${escapeHTML(title)}</h2><span class="muted small">${escapeHTML(tn('count.games', owned))}</span></div>`;
     if (!pid) {
       this._body.innerHTML = `${head}<div class="muted">${escapeHTML(t('card.no_person'))}</div>`;
       return;
@@ -246,14 +246,14 @@ export class HomeKeeperGamesCard extends HTMLElement {
     if (on.search) parts.push(this._searchHtml(lib, idx, pid));
     if (on.reading) {
       const rows = model.reading
-        .map(({ book, row }) => {
-          const pr = progress(row.page, book.pages);
-          const page = row.page != null ? (book.pages ? t('book.page_of', { page: row.page, pages: book.pages }) : t('book.page_n', { page: row.page })) : '';
-          const id = escapeHTML(book.id);
-          const pageForm = this._pageFor === book.id
-            ? `<form class="page" data-book="${id}"><input name="page" type="number" min="0" inputmode="numeric" data-k="page-${id}" value="${escapeHTML(row.page ?? '')}" aria-label="${escapeHTML(t('book.page'))}" /><button class="btn" type="submit">${escapeHTML(t('action.save'))}</button></form>`
+        .map(({ game, row }) => {
+          const pr = progress(row.page, game.pages);
+          const page = row.page != null ? (game.pages ? t('game.page_of', { page: row.page, pages: game.pages }) : t('game.page_n', { page: row.page })) : '';
+          const id = escapeHTML(game.id);
+          const pageForm = this._pageFor === game.id
+            ? `<form class="page" data-game="${id}"><input name="page" type="number" min="0" inputmode="numeric" data-k="page-${id}" value="${escapeHTML(row.page ?? '')}" aria-label="${escapeHTML(t('game.page'))}" /><button class="btn" type="submit">${escapeHTML(t('action.save'))}</button></form>`
             : `<div class="btns"><button class="btn" data-act="page" data-id="${id}" data-k="sp-${id}">${escapeHTML(t('card.set_page'))}</button><button class="btn" data-act="read" data-id="${id}" data-k="rd-${id}">${escapeHTML(t('status.read'))}</button></div>`;
-          return `<div class="item big">${cover(book, 'thumb')}<div class="main"><b>${escapeHTML(book.title)}</b><span class="muted small">${escapeHTML(book.authors.join(', '))}</span>${pr != null ? `<span class="bar" role="img" aria-label="${pr}%"><span style="width:${pr}%"></span></span>` : ''}${page ? `<span class="muted small">${escapeHTML(page)}</span>` : ''}${pageForm}</div></div>`;
+          return `<div class="item big">${cover(game, 'thumb')}<div class="main"><b>${escapeHTML(game.title)}</b><span class="muted small">${escapeHTML(game.authors.join(', '))}</span>${pr != null ? `<span class="bar" role="img" aria-label="${pr}%"><span style="width:${pr}%"></span></span>` : ''}${page ? `<span class="muted small">${escapeHTML(page)}</span>` : ''}${pageForm}</div></div>`;
         })
         .join('');
       parts.push(`<div class="sec"><span class="eyebrow">${escapeHTML(t('status.reading'))}</span>${rows || `<span class="muted">${escapeHTML(t('card.no_reading'))}</span>`}</div>`);
@@ -263,7 +263,7 @@ export class HomeKeeperGamesCard extends HTMLElement {
         .slice(0, 12)
         .map((b) => `<span class="${b.id === this._pick ? 'pick' : ''}" title="${escapeHTML(b.title)}">${cover(b, 'tile')}</span>`)
         .join('');
-      const pick = this._pick ? idx.book.get(this._pick) : undefined;
+      const pick = this._pick ? idx.game.get(this._pick) : undefined;
       const where = pick ? this._where(idx, pick) : '';
       const pickLine = pick
         ? `<span class="small">${escapeHTML(t('card.pick', { title: pick.title }))}${where ? ` · ${escapeHTML(where)}` : ''}</span>`
@@ -276,51 +276,51 @@ export class HomeKeeperGamesCard extends HTMLElement {
       const c = 2 * Math.PI * 26;
       const ring = `<svg class="ring" width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle class="bg" cx="32" cy="32" r="26"/><circle class="fg" cx="32" cy="32" r="26" stroke-dasharray="${(c * pct).toFixed(1)} ${c.toFixed(1)}"/><text x="32" y="38" text-anchor="middle">${done}</text></svg>`;
       const line = goal ? t('card.goal_of', { done, goal, year }) : tn('card.goal_none', done, { year });
-      const sub = [goal ? t('card.goal', { goal }) : '', tn('book.pages', pages, { n: formatNumber(pages) })].filter(Boolean).join(' · ');
+      const sub = [goal ? t('card.goal', { goal }) : '', tn('game.pages', pages, { n: formatNumber(pages) })].filter(Boolean).join(' · ');
       parts.push(`<div class="goal">${ring}<div class="main"><b>${escapeHTML(line)}</b><span class="muted small">${escapeHTML(sub)}</span></div></div>`);
     }
     if (on.household) {
       const rows = model.household
-        .map(({ person: p, book, row }) => {
+        .map(({ person: p, game, row }) => {
           const days = row.updated_at ? Math.max(0, daysBetween(row.updated_at.slice(0, 10), today)) : null;
-          const extra = [row.rating ? tn('book.stars', row.rating) : '', days != null ? formatAgo(days) : ''].filter(Boolean).join(' · ');
-          return `<div class="act">${personDot(p)}<span>${escapeHTML(t(`card.act_${row.status}`, { name: p.name }))} <b>${escapeHTML(book.title)}</b>${extra ? ` <span class="muted">· ${escapeHTML(extra)}</span>` : ''}</span></div>`;
+          const extra = [row.rating ? tn('game.stars', row.rating) : '', days != null ? formatAgo(days) : ''].filter(Boolean).join(' · ');
+          return `<div class="act">${personDot(p)}<span>${escapeHTML(t(`card.act_${row.status}`, { name: p.name }))} <b>${escapeHTML(game.title)}</b>${extra ? ` <span class="muted">· ${escapeHTML(extra)}</span>` : ''}</span></div>`;
         })
         .join('');
-      parts.push(`<div class="sec"><span class="eyebrow">${escapeHTML(t('book.household'))}</span>${rows || `<span class="muted">${escapeHTML(t('card.no_activity'))}</span>`}</div>`);
+      parts.push(`<div class="sec"><span class="eyebrow">${escapeHTML(t('game.household'))}</span>${rows || `<span class="muted">${escapeHTML(t('card.no_activity'))}</span>`}</div>`);
     }
     renderKeepFocus(this._root, this._body, parts.join(''));
     wireCovers(this._body, this._api, () => this._render());
   }
 
-  private _where(idx: Index, book: Book): string {
-    const copy = (idx.copiesByBook.get(book.id) ?? []).find((c) => c.shelf_id);
+  private _where(idx: Index, game: Game): string {
+    const copy = (idx.copiesByGame.get(game.id) ?? []).find((c) => c.shelf_id);
     return copy ? locationLabel(idx, copy.shelf_id) : '';
   }
 
   private _searchHtml(lib: Lib, idx: Index, pid: string): string {
     const input = `<label class="search"><input type="search" data-k="q" value="${escapeHTML(this._q)}" placeholder="${escapeHTML(t('card.search_placeholder'))}" aria-label="${escapeHTML(t('card.search_label'))}" /></label>`;
     if (!this._q.trim()) return `<div class="sec">${input}</div>`;
-    const hits = lib.books.filter((b) => matchesSearch(b, this._q, pid)).slice(0, 5);
+    const hits = lib.games.filter((b) => matchesSearch(b, this._q, pid)).slice(0, 5);
     const rows = hits
       .map((b) => {
         const st = readingOf(b, pid)?.status ?? null;
-        const where = this._where(idx, b) || (b.owned ? t('common.no_shelf') : t('book.not_owned'));
+        const where = this._where(idx, b) || (b.owned ? t('common.no_shelf') : t('game.not_owned'));
         const action = st
           ? `<span class="pill">${escapeHTML(statusLabel(st))}</span>`
           : `<button class="btn" data-act="want" data-id="${escapeHTML(b.id)}" data-k="w-${escapeHTML(b.id)}">${escapeHTML(t('status.want'))}</button>`;
         return `<div class="item">${cover(b, 'thumb')}<div class="main"><b>${escapeHTML(b.title)}</b><span class="muted small">${escapeHTML(where)}</span></div>${action}</div>`;
       })
       .join('');
-    return `<div class="sec">${input}${rows || `<span class="muted">${escapeHTML(t('books.no_match'))}</span>`}</div>`;
+    return `<div class="sec">${input}${rows || `<span class="muted">${escapeHTML(t('games.no_match'))}</span>`}</div>`;
   }
 
   /** `set_reading` for the card person. A caller sends `person_id` only for another person. */
-  private async _setReading(bookId: string, fields: Record<string, unknown>): Promise<void> {
+  private async _setReading(gameId: string, fields: Record<string, unknown>): Promise<void> {
     const pid = this._person();
     const self = pid === this._lib?.me.person_id;
     try {
-      await this._api!.call('set_reading', { book_id: bookId, ...(self ? {} : { person_id: pid }), ...fields });
+      await this._api!.call('set_reading', { game_id: gameId, ...(self ? {} : { person_id: pid }), ...fields });
       await this._refresh();
     } catch (err) {
       this._error = errorText(err);
@@ -337,8 +337,8 @@ export class HomeKeeperGamesCard extends HTMLElement {
         await this._setReading(id, { status: 'want' });
         return;
       case 'read': {
-        const book = this._idx?.book.get(id);
-        const row = book ? readingOf(book, this._person()) : null;
+        const game = this._idx?.game.get(id);
+        const row = game ? readingOf(game, this._person()) : null;
         await this._setReading(id, { status: 'read', finished: todayISO(new Date()), read_count: (row?.read_count ?? 0) + 1 });
         return;
       }
@@ -357,12 +357,12 @@ export class HomeKeeperGamesCard extends HTMLElement {
   }
 
   private async _savePage(form: HTMLFormElement): Promise<void> {
-    const bookId = form.dataset.book;
-    if (!bookId) return;
+    const gameId = form.dataset.game;
+    if (!gameId) return;
     const raw = (form.elements.namedItem('page') as HTMLInputElement).value;
     const page = raw === '' ? null : Math.max(0, Math.round(Number(raw)));
     this._pageFor = null;
-    await this._setReading(bookId, { page: Number.isFinite(page) ? page : null });
+    await this._setReading(gameId, { page: Number.isFinite(page) ? page : null });
   }
 }
 

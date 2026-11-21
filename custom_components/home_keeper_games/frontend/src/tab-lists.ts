@@ -2,9 +2,9 @@
 
 import { formatDate, t, tn } from './i18n';
 import { button, cover, navBar, options, personDot, statusLabel, taskLinkHtml } from './markup';
-import { navCounts } from './tab-books';
+import { navCounts } from './tab-games';
 import type { ViewCtx } from './tab-types';
-import type { Book, Loan } from './types';
+import type { Game, Loan } from './types';
 import { buildPath, dueState, escapeHTML, loansFor, readingOf, type LoanTab } from './utils';
 
 const LOAN_TABS: LoanTab[] = ['out', 'in', 'returned'];
@@ -27,14 +27,14 @@ function dueText(ctx: ViewCtx, loan: Loan): { text: string; cls: string } {
 }
 
 function loanRow(ctx: ViewCtx, loan: Loan): string {
-  const book = ctx.idx.book.get(loan.book_id);
-  const title = book?.title ?? t('loan.unknown_book');
+  const game = ctx.idx.game.get(loan.game_id);
+  const title = game?.title ?? t('loan.unknown_game');
   const meta: string[] = [loan.party ?? ''];
   if (loan.direction === 'in') {
     const person = loan.person_id ? ctx.idx.person.get(loan.person_id) : undefined;
     if (person) meta.push(person.name);
     if (loan.format) meta.push(t(`format.kind_${loan.format}`));
-    if (book && loan.person_id) meta.push(statusLabel(readingOf(book, loan.person_id)?.status ?? null));
+    if (game && loan.person_id) meta.push(statusLabel(readingOf(game, loan.person_id)?.status ?? null));
   } else {
     meta.push(t('loan.since', { date: formatDate(loan.started) }));
   }
@@ -46,10 +46,10 @@ function loanRow(ctx: ViewCtx, loan: Loan): string {
   const act = loan.returned
     ? button(escapeHTML(t('action.delete')), 'delete-loan', 'text', `data-id="${id}" data-k="dl-${id}"`)
     : button(escapeHTML(t('action.return')), 'return-loan', 'tonal', `data-id="${id}" data-k="rl-${id}"`);
-  const open = book ? `data-act="nav" data-path="/books/${escapeHTML(encodeURIComponent(book.id))}"` : '';
+  const open = game ? `data-act="nav" data-path="/games/${escapeHTML(encodeURIComponent(game.id))}"` : '';
   return `<div class="hkl-listrow ${due.cls}">
     <span class="hkl-edge"></span>
-    ${book ? cover(book, 'thumb') : ''}
+    ${game ? cover(game, 'thumb') : ''}
     <span class="hkl-row-main"><button class="hkl-row-title hkl-link plain" ${open} data-k="lb-${id}">${escapeHTML(title)}</button><span class="hkl-row-sub">${escapeHTML(meta.filter(Boolean).join(' · '))}</span>${loan.note ? `<span class="hkl-row-loc">${escapeHTML(loan.note)}</span>` : ''}</span>
     ${task}
     <span class="hkl-pill due ${due.cls}">${escapeHTML(due.text)}</span>
@@ -66,7 +66,7 @@ export function renderLoans(ctx: ViewCtx): string {
     return `<button class="hkl-subtab${on ? ' on' : ''}" data-act="nav" data-replace="1" data-path="${escapeHTML(buildPath({ view: 'loans', query: { tab: k } }))}" data-k="lt-${k}"${on ? ' aria-current="page"' : ''}>${escapeHTML(t(`loans.tab_${k}`))} <span class="hkl-seg-n">${n}</span></button>`;
   }).join('');
   const rows = loansFor(ctx.lib.loans, tab);
-  const actions = `${button(escapeHTML(t('action.lend_book')), 'lend', 'primary', 'data-k="lend-book"')}${button(escapeHTML(t('action.add_borrowed')), 'borrow', 'tonal', 'data-k="add-borrowed"')}${button(escapeHTML(t('action.scan_borrowed')), 'nav', 'text', `data-path="${escapeHTML(buildPath({ view: 'scan', query: { mode: 'borrowed' } }))}" data-k="scan-borrowed"`)}`;
+  const actions = `${button(escapeHTML(t('action.lend_game')), 'lend', 'primary', 'data-k="lend-game"')}${button(escapeHTML(t('action.add_borrowed')), 'borrow', 'tonal', 'data-k="add-borrowed"')}${button(escapeHTML(t('action.scan_borrowed')), 'nav', 'text', `data-path="${escapeHTML(buildPath({ view: 'scan', query: { mode: 'borrowed' } }))}" data-k="scan-borrowed"`)}`;
   return `${navBar(ctx.route, navCounts(ctx), actions)}
   <section class="hkl-card">
     <div class="hkl-subtabs">${tabs}</div>
@@ -74,15 +74,15 @@ export function renderLoans(ctx: ViewCtx): string {
   </section>`;
 }
 
-function wishRow(ctx: ViewCtx, book: Book): string {
-  const w = book.wishlist!;
+function wishRow(ctx: ViewCtx, game: Game): string {
+  const w = game.wishlist!;
   const person = ctx.idx.person.get(w.person_id);
-  const series = book.series?.name ? (book.series.number != null ? t('book.series_n', { name: book.series.name, n: book.series.number }) : book.series.name) : '';
-  const meta = [book.authors.join(', '), series, w.bought ? t('wishlist.bought') : ''].filter(Boolean).join(' · ');
-  const id = escapeHTML(book.id);
+  const series = game.series?.name ? (game.series.number != null ? t('game.series_n', { name: game.series.name, n: game.series.number }) : game.series.name) : '';
+  const meta = [game.authors.join(', '), series, w.bought ? t('wishlist.bought') : ''].filter(Boolean).join(' · ');
+  const id = escapeHTML(game.id);
   return `<div class="hkl-listrow">
-    ${cover(book, 'thumb')}
-    <span class="hkl-row-main"><button class="hkl-row-title hkl-link plain" data-act="nav" data-path="/books/${escapeHTML(encodeURIComponent(book.id))}" data-k="wb-${id}">${escapeHTML(book.title)}</button><span class="hkl-row-sub">${escapeHTML(meta)}</span></span>
+    ${cover(game, 'thumb')}
+    <span class="hkl-row-main"><button class="hkl-row-title hkl-link plain" data-act="nav" data-path="/games/${escapeHTML(encodeURIComponent(game.id))}" data-k="wb-${id}">${escapeHTML(game.title)}</button><span class="hkl-row-sub">${escapeHTML(meta)}</span></span>
     <span class="hkl-who">${personDot(person)}<span>${escapeHTML(person?.name ?? '')}</span></span>
     <label class="hkl-check"><input type="checkbox" data-chg="wish-buy" data-id="${id}" data-k="buy-${id}"${w.buy ? ' checked' : ''} />${escapeHTML(t('wishlist.buy'))}</label>
     ${button(escapeHTML(t('action.got_it')), 'got-it', 'tonal', `data-id="${id}" data-k="got-${id}"`)}
@@ -92,7 +92,7 @@ function wishRow(ctx: ViewCtx, book: Book): string {
 
 /** The Wishlist view. */
 export function renderWishlist(ctx: ViewCtx): string {
-  const books = ctx.lib.books
+  const games = ctx.lib.games
     .filter((b) => b.wishlist)
     .sort((a, b) => String(b.wishlist!.added_at).localeCompare(String(a.wishlist!.added_at)));
   const lists = ctx.lib.people
@@ -104,7 +104,7 @@ export function renderWishlist(ctx: ViewCtx): string {
   const actions = button(escapeHTML(t('action.add_to_wishlist')), 'wish-add', 'primary', 'data-k="wish-add"');
   return `${navBar(ctx.route, navCounts(ctx), actions)}
   <div class="hkl-banner info"><div class="hkl-todos">${lists}<span class="hkl-muted small">${escapeHTML(t('wishlist.buy_hint'))}</span></div><span class="hkl-spacer"></span>${button(escapeHTML(t('action.change')), 'nav', 'text', 'data-path="/settings" data-k="wish-change"')}</div>
-  <section class="hkl-card"><div class="hkl-list">${books.map((b) => wishRow(ctx, b)).join('') || `<div class="hkl-empty">${escapeHTML(t('wishlist.empty'))}</div>`}</div></section>
+  <section class="hkl-card"><div class="hkl-list">${games.map((b) => wishRow(ctx, b)).join('') || `<div class="hkl-empty">${escapeHTML(t('wishlist.empty'))}</div>`}</div></section>
   <p class="hkl-muted small">${escapeHTML(t('wishlist.scan_hint'))}</p>`;
 }
 

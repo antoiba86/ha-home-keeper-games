@@ -12,8 +12,8 @@ export function fixture() {
   return structuredClone(FIXTURE);
 }
 
-export function bookId(state, title) {
-  return Object.values(state.books).find((b) => b.title === title).id;
+export function gameId(state, title) {
+  return Object.values(state.games).find((b) => b.title === title).id;
 }
 
 export function fakeHass({ state = fixture(), replies = {}, language = 'en', callApi } = {}) {

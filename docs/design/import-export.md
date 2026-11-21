@@ -4,7 +4,7 @@ summary: How the library joins the combined export and import of Home Keeper, wh
 implements:
   - custom_components/home_keeper_games/import_export.py
 related: [csv-import-export, home-keeper-dependency, store-models, events-api]
-source_hash: 262e3d832626
+source_hash: 32e207930709
 ---
 
 # Home Keeper export and import
@@ -36,16 +36,16 @@ The contract is section 11 of the `INTEGRATING.md` of Home Keeper.
 ### Section
 
 `import_export.build_export` makes the `data`: `format` and 1 list for each of `rooms`,
-`bookcases`, `shelves`, `books`, `copies`, `loans`, `reading` and `people`. A record is
+`units`, `shelves`, `games`, `copies`, `loans`, `reading` and `people`. A record is
 the stored record, with these changes:
 
-- A room has `area_name`. A loan has `person_name`. The wishlist entry of a book has
+- A room has `area_name`. A loan has `person_name`. The wishlist entry of a game has
   `person_name`.
-- `reading` has 1 entry for each person: `person_id`, `person_name` and `books`, the
-  rows with their `book_id`.
+- `reading` has 1 entry for each person: `person_id`, `person_name` and `games`, the
+  rows with their `game_id`.
 - `people` has the settings of each stored person with `person_name` and
   `wishlist_todo_name`.
-- `book.cover` is `{kind, file}` with a relative path in a bundle, else `null`.
+- `game.cover` is `{kind, file}` with a relative path in a bundle, else `null`.
 
 `EXCLUDED_KEYS` drops `hk_task_id`, the `todo_uid` and `todo_entity` of a
 wishlist entry and `todo_orphans`. `services.py` reads the names from the person, area
@@ -61,9 +61,9 @@ skipped}`. `unwrap_document` takes its `data` and keeps the outer `format`. A do
 that is only `data` also imports.
 
 1. Refuse a `format` above `import_export.FORMAT`.
-2. Match a room by id, then by name. Match a bookcase or a shelf by id, then by name in
+2. Match a room by id, then by name. Match a unit or a shelf by id, then by name in
    its parent.
-3. Match a book by id, barcode, then title and first author, with the index of
+3. Match a game by id, barcode, then title and first author, with the index of
    `csv_io`.
 4. Match a copy or a loan by id. Else add it. A loan that exists keeps its task id.
 5. Find a person, an area or a to-do entity by id on this install, then by name. 2
@@ -73,7 +73,7 @@ that is only `data` also imports.
    that is not in the document or in the library is an `error`.
 
 A problem is `{level, path, message}`. `path` starts at the document, such as
-`books[3].title`. The reply is `{ok, dry_run, counts, records, problems}`. `counts` has
+`games[3].title`. The reply is `{ok, dry_run, counts, records, problems}`. `counts` has
 `created`, `updated` and `skipped` for each section, and `covers` has `imported` and
 `skipped`. If the plan has no `error` and `dry_run` is false,
 `LibraryStore.commit_data_import` merges the plan, as a CSV import does
@@ -86,7 +86,7 @@ the loan sync and the wishlist sync run, so the loan tasks and the to-do items c
 is not at or below `<config>/.storage/home_keeper_import_export/`, and a relative path
 with `..`. The service checks the real path again, after it resolves symbolic links.
 
-- **Export.** `covers.copy_covers_out` copies each cover file to `covers/<book_id>.jpg`
+- **Export.** `covers.copy_covers_out` copies each cover file to `covers/<game_id>.jpg`
   in `files_dir`. A cover file that the export does not copy, such as with no bundle, is
   counted in `skipped.covers`.
 - **Import.** `covers.read_bundle_cover` reads a file at most 10 MB in `files_dir` and
@@ -97,8 +97,8 @@ with `..`. The service checks the real path again, after it resolves symbolic li
 
 - **Upsert** over **replace**: an import cannot lose data. The cost is that a record that
   the user deleted from the document stays.
-- **Match a copy by id only** over **match by book**: a copy has no natural key. An
-  import into an install that has the book adds the copy of the document next to it.
+- **Match a copy by id only** over **match by game**: a copy has no natural key. An
+  import into an install that has the game adds the copy of the document next to it.
 - **Names next to ids** over **ids only**: a person or an area moves to a new install by
   name. 2 people with 1 name match neither.
 

@@ -30,10 +30,10 @@ def test_empty_state_has_every_section() -> None:
 def test_normalize_state_fills_and_filters() -> None:
     assert m.normalize_state(None) == m.empty_state()
     raw = {
-        "books": {
+        "games": {
             "b": {"id": "b"},
             "t": {"id": "t", "barcode": "1"},
-            "x": "not a book",
+            "x": "not a game",
         },
         "rooms": [],
         "todo_orphans": [
@@ -44,10 +44,10 @@ def test_normalize_state_fills_and_filters() -> None:
         ],
     }
     state = m.normalize_state(raw)
-    assert state["books"] == {
+    assert state["games"] == {
         "b": {"id": "b"},
         "t": {"id": "t", "barcode": "1"},
-        "x": "not a book",
+        "x": "not a game",
     }
     assert state["rooms"] == {}
     assert state["todo_orphans"] == [{"entity_id": "todo.a", "uid": "1"}]
@@ -64,7 +64,7 @@ def _merge_state(**sections):
 def test_merge_changes_writes_only_what_the_plan_changed() -> None:
     before = _merge_state(
         rooms={"r": {"id": "r", "name": "Den"}},
-        books={
+        games={
             "b": {"id": "b", "title": "Dune", "tags": [], "gone": 1},
             "same": {"id": "same", "title": "Same"},
             "drop": {"id": "drop", "title": "Drop"},
@@ -72,23 +72,23 @@ def test_merge_changes_writes_only_what_the_plan_changed() -> None:
         },
     )
     after = m.clone(before)
-    after["books"]["b"]["tags"] = ["sf"]
-    after["books"]["b"]["series"] = {"name": "Dune"}
-    del after["books"]["b"]["gone"]
-    after["books"]["lost"]["tags"] = ["x"]
-    del after["books"]["drop"]
-    after["books"]["new"] = {"id": "new", "title": "New", "tags": ["a"]}
-    after["books"]["taken"] = {"id": "taken", "title": "Mine"}
+    after["games"]["b"]["tags"] = ["sf"]
+    after["games"]["b"]["series"] = {"name": "Dune"}
+    del after["games"]["b"]["gone"]
+    after["games"]["lost"]["tags"] = ["x"]
+    del after["games"]["drop"]
+    after["games"]["new"] = {"id": "new", "title": "New", "tags": ["a"]}
+    after["games"]["taken"] = {"id": "taken", "title": "Mine"}
     current = m.clone(before)
-    current["books"]["b"]["title"] = "Dune (edited)"
-    current["books"]["same"]["title"] = "Same (edited)"
-    del current["books"]["lost"]
-    current["books"]["taken"] = {"id": "taken", "title": "Theirs"}
+    current["games"]["b"]["title"] = "Dune (edited)"
+    current["games"]["same"]["title"] = "Same (edited)"
+    del current["games"]["lost"]
+    current["games"]["taken"] = {"id": "taken", "title": "Theirs"}
     current["rooms"]["r2"] = {"id": "r2", "name": "Attic"}
     kept = m.clone(current)
     merged = m.merge_changes(current, before, after)
     assert current == kept, "the merge must not change its input"
-    assert merged["books"] == {
+    assert merged["games"] == {
         "b": {
             "id": "b",
             "title": "Dune (edited)",
@@ -100,40 +100,40 @@ def test_merge_changes_writes_only_what_the_plan_changed() -> None:
         "taken": {"id": "taken", "title": "Theirs"},
     }
     assert merged["rooms"] == current["rooms"]
-    after["books"]["new"]["tags"].append("b")
-    after["books"]["b"]["tags"].append("c")
-    assert merged["books"]["new"]["tags"] == ["a"], "no alias of the plan"
-    assert merged["books"]["b"]["tags"] == ["sf"], "no alias of the plan"
+    after["games"]["new"]["tags"].append("b")
+    after["games"]["b"]["tags"].append("c")
+    assert merged["games"]["new"]["tags"] == ["a"], "no alias of the plan"
+    assert merged["games"]["b"]["tags"] == ["sf"], "no alias of the plan"
 
 
 def test_merge_changes_keeps_links() -> None:
-    books = {"b": {"id": "b"}, "gone": {"id": "gone"}}
+    games = {"b": {"id": "b"}, "gone": {"id": "gone"}}
     shelves = {"s": {"id": "s"}, "old": {"id": "old"}}
-    before = _merge_state(books=dict(books), shelves=dict(shelves))
+    before = _merge_state(games=dict(games), shelves=dict(shelves))
     before["reading"] = {"p": {"b": {"status": "want"}}}
     after = m.clone(before)
     after["copies"] = {
-        "c1": {"id": "c1", "book_id": "b", "shelf_id": "s"},
-        "c2": {"id": "c2", "book_id": "b", "shelf_id": "old"},
-        "c3": {"id": "c3", "book_id": "gone", "shelf_id": None},
-        "c4": {"id": "c4", "book_id": "b", "shelf_id": None},
+        "c1": {"id": "c1", "game_id": "b", "shelf_id": "s"},
+        "c2": {"id": "c2", "game_id": "b", "shelf_id": "old"},
+        "c3": {"id": "c3", "game_id": "gone", "shelf_id": None},
+        "c4": {"id": "c4", "game_id": "b", "shelf_id": None},
     }
     after["reading"] = {
         "p": {"b": {"status": "read"}, "gone": {"status": "read"}},
         "q": {"gone": {"status": "want"}},
     }
     current = m.clone(before)
-    del current["books"]["gone"]
+    del current["games"]["gone"]
     del current["shelves"]["old"]
     current["reading"]["p"]["other"] = {"status": "reading"}
     current["reading"]["r"] = {"x": {"status": "want"}}
-    current["copies"]["mine"] = {"id": "mine", "book_id": "zzz", "shelf_id": "zz"}
+    current["copies"]["mine"] = {"id": "mine", "game_id": "zzz", "shelf_id": "zz"}
     merged = m.merge_changes(current, before, after)
     assert merged["copies"] == {
-        "c1": {"id": "c1", "book_id": "b", "shelf_id": "s"},
-        "c2": {"id": "c2", "book_id": "b", "shelf_id": None},
-        "c4": {"id": "c4", "book_id": "b", "shelf_id": None},
-        "mine": {"id": "mine", "book_id": "zzz", "shelf_id": "zz"},
+        "c1": {"id": "c1", "game_id": "b", "shelf_id": "s"},
+        "c2": {"id": "c2", "game_id": "b", "shelf_id": None},
+        "c4": {"id": "c4", "game_id": "b", "shelf_id": None},
+        "mine": {"id": "mine", "game_id": "zzz", "shelf_id": "zz"},
     }
     assert merged["reading"] == {
         "p": {"b": {"status": "read"}, "other": {"status": "reading"}},
@@ -142,7 +142,7 @@ def test_merge_changes_keeps_links() -> None:
 
 
 def test_merge_changes_removes_a_person_with_no_rows() -> None:
-    before = _merge_state(books={"b": {"id": "b"}})
+    before = _merge_state(games={"b": {"id": "b"}})
     before["reading"] = {"p": {"b": {"status": "want"}}}
     after = m.clone(before)
     after["reading"] = {}
@@ -152,11 +152,11 @@ def test_merge_changes_removes_a_person_with_no_rows() -> None:
 
 
 def test_merge_changes_when_the_current_data_already_lost_it() -> None:
-    before = _merge_state(books={"b": {"id": "b", "x": 1}, "d": {"id": "d"}})
-    after = _merge_state(books={"b": {"id": "b", "y": 2}})
-    current = _merge_state(books={"b": {"id": "b"}})
+    before = _merge_state(games={"b": {"id": "b", "x": 1}, "d": {"id": "d"}})
+    after = _merge_state(games={"b": {"id": "b", "y": 2}})
+    current = _merge_state(games={"b": {"id": "b"}})
     merged = m.merge_changes(current, before, after)
-    assert merged["books"] == {"b": {"id": "b", "y": 2}}
+    assert merged["games"] == {"b": {"id": "b", "y": 2}}
 
 
 def test_new_id_and_clone() -> None:
@@ -275,11 +275,11 @@ def test_build_locations() -> None:
     assert room["name"] == "Den" and room["area_id"] is None and room["order"] == 4
     assert m.build_room({"name": "Den", "order": 1}, order=4)["order"] == 1
     assert _err(m.build_room, {"name": ""}, order=0).key == "field_required"
-    case = m.build_bookcase({"room_id": "r", "name": "Left", "note": "n"}, order=0)
+    case = m.build_unit({"room_id": "r", "name": "Left", "note": "n"}, order=0)
     assert case["room_id"] == "r" and case["note"] == "n" and case["order"] == 0
-    assert _err(m.build_bookcase, {"name": "x"}, order=0).key == "field_required"
-    shelf = m.build_shelf({"bookcase_id": "k", "name": "Top"}, order=2)
-    assert shelf == {"id": shelf["id"], "bookcase_id": "k", "name": "Top", "order": 2}
+    assert _err(m.build_unit, {"name": "x"}, order=0).key == "field_required"
+    shelf = m.build_shelf({"unit_id": "k", "name": "Top"}, order=2)
+    assert shelf == {"id": shelf["id"], "unit_id": "k", "name": "Top", "order": 2}
     assert _err(m.build_shelf, {"name": "x"}, order=0).key == "field_required"
     assert _err(m.build_room, {"name": "x", "order": -1}, order=0).key == "out_of_range"
 
@@ -293,15 +293,13 @@ def test_update_location() -> None:
     )
     assert changed == ["name", "area_id", "order"]
     assert updated["name"] == "Study" and room["name"] == "Den"
-    case = m.build_bookcase({"room_id": "r", "name": "A"}, order=0)
-    updated, changed = m.update_location(
-        "bookcase", case, {"note": "x", "room_id": "s"}
-    )
+    case = m.build_unit({"room_id": "r", "name": "A"}, order=0)
+    updated, changed = m.update_location("unit", case, {"note": "x", "room_id": "s"})
     assert changed == ["note", "room_id"] and updated["room_id"] == "s"
-    shelf = m.build_shelf({"bookcase_id": "k", "name": "A"}, order=0)
-    updated, changed = m.update_location("shelf", shelf, {"bookcase_id": "j"})
-    assert changed == ["bookcase_id"]
-    err = _err(m.update_location, "shelf", shelf, {"bookcase_id": ""})
+    shelf = m.build_shelf({"unit_id": "k", "name": "A"}, order=0)
+    updated, changed = m.update_location("shelf", shelf, {"unit_id": "j"})
+    assert changed == ["unit_id"]
+    err = _err(m.update_location, "shelf", shelf, {"unit_id": ""})
     assert err.key == "field_required"
 
 
@@ -316,89 +314,89 @@ def test_next_order() -> None:
     assert m.next_order(records, room_id="z") == 0
 
 
-# ── Books ────────────────────────────────────────────────────────────────────
+# ── Games ────────────────────────────────────────────────────────────────────
 
 
-def test_build_book_defaults() -> None:
-    book = m.build_book({"title": "Dune"}, now=NOW)
-    assert book["title"] == "Dune"
-    assert book["cover"] == {"kind": "none", "file": None}
-    assert book["created_at"] == book["updated_at"] == NOW
-    assert book["needs_details"] is False
-    assert m.build_book({"title": "Dune", "barcode": ""}, now=NOW)["barcode"] is None
-    assert book["wishlist"] is None and book["barcode"] is None
-    assert _err(m.build_book, {}, now=NOW).key == "field_required"
+def test_build_game_defaults() -> None:
+    game = m.build_game({"title": "Dune"}, now=NOW)
+    assert game["title"] == "Dune"
+    assert game["cover"] == {"kind": "none", "file": None}
+    assert game["created_at"] == game["updated_at"] == NOW
+    assert game["needs_details"] is False
+    assert m.build_game({"title": "Dune", "barcode": ""}, now=NOW)["barcode"] is None
+    assert game["wishlist"] is None and game["barcode"] is None
+    assert _err(m.build_game, {}, now=NOW).key == "field_required"
 
 
-def test_build_book_barcode() -> None:
-    book = m.build_book({"title": "x", "barcode": "0711 7195-05012"}, now=NOW)
-    assert book["barcode"] == "0711719505012"
-    err = _err(m.build_book, {"title": "x", "barcode": "12/3"}, now=NOW)
+def test_build_game_barcode() -> None:
+    game = m.build_game({"title": "x", "barcode": "0711 7195-05012"}, now=NOW)
+    assert game["barcode"] == "0711719505012"
+    err = _err(m.build_game, {"title": "x", "barcode": "12/3"}, now=NOW)
     assert err.key == "invalid_barcode" and err.placeholders == {"barcode": "12/3"}
-    old = m.build_book({"title": "x", "isbn": "0441478123"}, now=NOW)
+    old = m.build_game({"title": "x", "isbn": "0441478123"}, now=NOW)
     assert "isbn" not in old and old["barcode"] is None
 
 
-def test_book_fields() -> None:
-    assert m.book_field("barcode", "") is None
-    assert m.book_field("pages", 300) == 300
-    assert _err(m.book_field, "pages", 0).key == "out_of_range"
-    assert m.book_field("language", " en ") == "en"
-    assert m.book_field("series", "Dune") == {"name": "Dune", "number": None}
-    assert m.book_field("series", {"name": "Dune", "number": 2}) == {
+def test_game_fields() -> None:
+    assert m.game_field("barcode", "") is None
+    assert m.game_field("pages", 300) == 300
+    assert _err(m.game_field, "pages", 0).key == "out_of_range"
+    assert m.game_field("language", " en ") == "en"
+    assert m.game_field("series", "Dune") == {"name": "Dune", "number": None}
+    assert m.game_field("series", {"name": "Dune", "number": 2}) == {
         "name": "Dune",
         "number": "2",
     }
-    assert m.book_field("series", {"name": " "}) is None
-    assert m.book_field("series", None) is None
-    assert m.book_field("series", {"name": "D", "number": ""}) == {
+    assert m.game_field("series", {"name": " "}) is None
+    assert m.game_field("series", None) is None
+    assert m.game_field("series", {"name": "D", "number": ""}) == {
         "name": "D",
         "number": None,
     }
-    assert _err(m.book_field, "series", 3).key == "invalid_field"
-    assert _err(m.book_field, "series", {"name": "D", "number": [1]}).key == (
+    assert _err(m.game_field, "series", 3).key == "invalid_field"
+    assert _err(m.game_field, "series", {"name": "D", "number": [1]}).key == (
         "invalid_field"
     )
     for gone in ("catalogs", "isbn13", "isbn10"):
-        err = _err(m.book_field, gone, None)
+        err = _err(m.game_field, gone, None)
         assert (err.key, err.placeholders) == ("invalid_field", {"field": gone})
-    assert m.book_field("needs_details", True) is True
-    assert m.book_field("tags", ["a", "a"]) == ["a"]
-    assert _err(m.book_field, "nope", 1).key == "invalid_field"
-    assert m.book_field("title", " T ") == "T"
-    assert _err(m.book_field, "title", "").key == "field_required"
-    assert m.book_field("subtitle", "") == ""
+    assert m.game_field("needs_details", True) is True
+    assert m.game_field("tags", ["a", "a"]) == ["a"]
+    assert _err(m.game_field, "nope", 1).key == "invalid_field"
+    assert m.game_field("title", " T ") == "T"
+    assert _err(m.game_field, "title", "").key == "field_required"
+    assert m.game_field("subtitle", "") == ""
 
 
-def test_update_book() -> None:
-    book = m.build_book({"title": "Dune"}, now="t0")
-    same, changed = m.update_book(book, {"title": "Dune"}, now="t1")
+def test_update_game() -> None:
+    game = m.build_game({"title": "Dune"}, now="t0")
+    same, changed = m.update_game(game, {"title": "Dune"}, now="t1")
     assert changed == [] and same["updated_at"] == "t0"
-    updated, changed = m.update_book(
-        book, {"subtitle": "S", "pages": 10, "id": "x"}, now="t1"
+    updated, changed = m.update_game(
+        game, {"subtitle": "S", "pages": 10, "id": "x"}, now="t1"
     )
     assert changed == ["subtitle", "pages"]
-    assert updated["updated_at"] == "t1" and updated["id"] == book["id"]
-    updated, changed = m.update_book(book, {"barcode": "ab-12"}, now="t1")
+    assert updated["updated_at"] == "t1" and updated["id"] == game["id"]
+    updated, changed = m.update_game(game, {"barcode": "ab-12"}, now="t1")
     assert changed == ["barcode"] and updated["barcode"] == "AB12"
-    same, changed = m.update_book(updated, {"barcode": "AB 12"}, now="t2")
+    same, changed = m.update_game(updated, {"barcode": "AB 12"}, now="t2")
     assert changed == [] and same["updated_at"] == "t1"
-    cleared, changed = m.update_book(updated, {"barcode": None}, now="t2")
+    cleared, changed = m.update_game(updated, {"barcode": None}, now="t2")
     assert changed == ["barcode"] and cleared["barcode"] is None
-    # The old ISBN keys are not book fields now, so an update ignores them.
-    _, changed = m.update_book(book, {"isbn": "0441478123"}, now="t1")
+    # The old ISBN keys are not game fields now, so an update ignores them.
+    _, changed = m.update_game(game, {"isbn": "0441478123"}, now="t1")
     assert changed == []
-    assert _err(m.update_book, updated, {"barcode": "#"}, now="t2").key == (
+    assert _err(m.update_game, updated, {"barcode": "#"}, now="t2").key == (
         "invalid_barcode"
     )
 
 
-def test_book_summary_and_keys() -> None:
-    assert m.book_summary({"title": "Dune", "authors": ["Frank Herbert"]}) == (
+def test_game_summary_and_keys() -> None:
+    assert m.game_summary({"title": "Dune", "authors": ["Frank Herbert"]}) == (
         "Dune by Frank Herbert"
     )
-    assert m.book_summary({"title": "Dune", "authors": []}) == "Dune"
-    assert m.book_summary({"title": "Dune", "authors": ["F"]}, "{author}: {title}") == (
+    assert m.game_summary({"title": "Dune", "authors": []}) == "Dune"
+    assert m.game_summary({"title": "Dune", "authors": ["F"]}, "{author}: {title}") == (
         "F: Dune"
     )
     assert m.fold("Élan, Vital!") == "elan vital"
@@ -414,13 +412,13 @@ def test_book_summary_and_keys() -> None:
 
 
 def test_build_and_update_copy() -> None:
-    copy = m.build_copy({"book_id": "b"}, now=NOW)
+    copy = m.build_copy({"game_id": "b"}, now=NOW)
     assert copy["format"] == m.DEFAULT_FORMAT and copy["shelf_id"] is None
     assert copy["signed"] is False and copy["created_at"] == NOW
     assert _err(m.build_copy, {}, now=NOW).key == "field_required"
     full = m.build_copy(
         {
-            "book_id": "b",
+            "game_id": "b",
             "shelf_id": "s",
             "format": "hardcover",
             "condition": "fine",
@@ -501,7 +499,7 @@ def test_apply_reading_fields_and_errors() -> None:
 
 
 def _loan(**data):
-    base = {"direction": "out", "copy_id": "c", "book_id": "b", "party": "Alex"}
+    base = {"direction": "out", "copy_id": "c", "game_id": "b", "party": "Alex"}
     return m.build_loan({**base, **data}, today=TODAY)
 
 
@@ -594,11 +592,11 @@ def test_build_wishlist() -> None:
 def test_copy_clears_wishlist() -> None:
     state = m.empty_state()
     entry = m.build_wishlist("p", buy=False, now=NOW)
-    state["books"]["w"] = {"id": "w", "wishlist": entry}
-    state["books"]["plain"] = {"id": "plain", "wishlist": None}
-    state["books"]["owned"] = {"id": "owned", "wishlist": dict(entry)}
-    state["copies"]["c"] = {"id": "c", "book_id": "owned"}
-    state["copies"]["d"] = {"id": "d", "book_id": "plain"}
+    state["games"]["w"] = {"id": "w", "wishlist": entry}
+    state["games"]["plain"] = {"id": "plain", "wishlist": None}
+    state["games"]["owned"] = {"id": "owned", "wishlist": dict(entry)}
+    state["copies"]["c"] = {"id": "c", "game_id": "owned"}
+    state["copies"]["d"] = {"id": "d", "game_id": "plain"}
     assert m.copy_clears_wishlist(state, "w") is True
     assert m.copy_clears_wishlist(state, "plain") is False
     assert m.copy_clears_wishlist(state, "owned") is False
@@ -611,13 +609,13 @@ def test_copy_clears_wishlist() -> None:
 def _state():
     state = m.empty_state()
     state["rooms"]["r"] = {"id": "r", "name": "Den"}
-    state["bookcases"]["k"] = {"id": "k", "room_id": "r", "name": "Left"}
-    state["shelves"]["s"] = {"id": "s", "bookcase_id": "k", "name": "Top"}
-    state["books"]["b"] = {"id": "b", "barcode": "9780441478125"}
-    state["books"]["c"] = {"id": "c", "barcode": None}
-    state["copies"]["x2"] = {"id": "x2", "book_id": "b", "created_at": "2"}
-    state["copies"]["x1"] = {"id": "x1", "book_id": "b", "created_at": "1"}
-    state["copies"]["y"] = {"id": "y", "book_id": "c", "created_at": "0"}
+    state["units"]["k"] = {"id": "k", "room_id": "r", "name": "Left"}
+    state["shelves"]["s"] = {"id": "s", "unit_id": "k", "name": "Top"}
+    state["games"]["b"] = {"id": "b", "barcode": "9780441478125"}
+    state["games"]["c"] = {"id": "c", "barcode": None}
+    state["copies"]["x2"] = {"id": "x2", "game_id": "b", "created_at": "2"}
+    state["copies"]["x1"] = {"id": "x1", "game_id": "b", "created_at": "1"}
+    state["copies"]["y"] = {"id": "y", "game_id": "c", "created_at": "0"}
     state["loans"]["l"] = {"id": "l", "copy_id": "x1", "returned": None}
     state["loans"]["old"] = {"id": "old", "copy_id": "y", "returned": "2020-01-01"}
     return state
@@ -634,7 +632,7 @@ def test_derived_reads() -> None:
     assert m.find_shelf_by_path(state, ["den", "LEFT", "top"]) == "s"
     assert m.find_shelf_by_path(state, ["Den", "Left"]) is None
     assert m.find_shelf_by_path(state, ["Den", "Left", "Low"]) is None
-    assert m.find_book_by_barcode(state, "9780441478125")["id"] == "b"
-    assert m.find_book_by_barcode(state, "9780000000002") is None
-    assert m.find_book_by_barcode(state, None) is None
-    assert m.find_book_by_barcode(state, "") is None
+    assert m.find_game_by_barcode(state, "9780441478125")["id"] == "b"
+    assert m.find_game_by_barcode(state, "9780000000002") is None
+    assert m.find_game_by_barcode(state, None) is None
+    assert m.find_game_by_barcode(state, "") is None

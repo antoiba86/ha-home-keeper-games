@@ -62,62 +62,62 @@ def test_every_service_is_touched(api):
 
     room = _service(api, "add_room", {"name": "Surface room"})["room"]
     _service(api, "update_room", {"room_id": room["id"], "name": "Surface room 2"})
-    case = _service(
-        api, "add_bookcase", {"room_id": room["id"], "name": "Surface case"}
-    )["bookcase"]
-    _service(api, "update_bookcase", {"bookcase_id": case["id"], "name": "Case 2"})
-    shelf = _service(api, "add_shelf", {"bookcase_id": case["id"], "name": "Shelf"})[
+    case = _service(api, "add_unit", {"room_id": room["id"], "name": "Surface case"})[
+        "unit"
+    ]
+    _service(api, "update_unit", {"unit_id": case["id"], "name": "Case 2"})
+    shelf = _service(api, "add_shelf", {"unit_id": case["id"], "name": "Shelf"})[
         "shelf"
     ]
     _service(api, "update_shelf", {"shelf_id": shelf["id"], "name": "Shelf 2"})
 
-    book = _service(api, "add_book", {"title": "Surface book"})["book"]
-    _service(api, "update_book", {"book_id": book["id"], "title": "Surface book 2"})
-    copy = _service(api, "add_copy", {"book_id": book["id"], "shelf_id": shelf["id"]})[
+    game = _service(api, "add_game", {"title": "Surface game"})["game"]
+    _service(api, "update_game", {"game_id": game["id"], "title": "Surface game 2"})
+    copy = _service(api, "add_copy", {"game_id": game["id"], "shelf_id": shelf["id"]})[
         "copy"
     ]
     _service(api, "update_copy", {"copy_id": copy["id"], "note": "Signed"})
     _service(api, "move_copy", {"copy_id": copy["id"], "shelf_id": shelf["id"]})
-    _service(api, "set_cover", {"book_id": book["id"], "kind": "none"})
+    _service(api, "set_cover", {"game_id": game["id"], "kind": "none"})
     _service(
         api,
         "set_reading",
-        {"book_id": book["id"], "person_id": person, "status": "reading", "page": 3},
+        {"game_id": game["id"], "person_id": person, "status": "reading", "page": 3},
     )
     _service(api, "set_person_settings", {"person_id": person, "yearly_goal": 12})
     _service(api, "set_settings", {"currency": "EUR"})
 
     loan = _service(
-        api, "lend_book", {"copy_id": copy["id"], "party": "Zed", "due": "2030-01-01"}
+        api, "lend_game", {"copy_id": copy["id"], "party": "Zed", "due": "2030-01-01"}
     )["loan"]
     _service(api, "update_loan", {"loan_id": loan["id"], "note": "Be kind"})
     _service(api, "return_loan", {"loan_id": loan["id"]})
     _service(api, "delete_loan", {"loan_id": loan["id"]})
     borrowed = _service(
         api,
-        "borrow_book",
+        "borrow_game",
         {"title": "Surface borrowed", "party": "Library", "person_id": person},
     )["loan"]
     _service(api, "delete_loan", {"loan_id": borrowed["id"]})
 
     wish = _service(
         api, "add_to_wishlist", {"person_id": person, "title": "Surface wish"}
-    )["book"]
-    _service(api, "update_wishlist", {"book_id": wish["id"], "person_id": person})
-    _service(api, "got_wishlist_book", {"book_id": wish["id"]})
+    )["game"]
+    _service(api, "update_wishlist", {"game_id": wish["id"], "person_id": person})
+    _service(api, "got_wishlist_game", {"game_id": wish["id"]})
     other = _service(api, "add_to_wishlist", {"person_id": person, "title": "Other"})[
-        "book"
+        "game"
     ]
-    _service(api, "remove_from_wishlist", {"book_id": other["id"]})
+    _service(api, "remove_from_wishlist", {"game_id": other["id"]})
 
     scanned = _service(
         api, "scan_barcode", {"barcode": "0000000000017", "shelf_id": shelf["id"]}
     )
     assert scanned["result"] == "not_found", scanned
 
-    for name in ("list_books", "list_locations", "list_loans"):
+    for name in ("list_games", "list_locations", "list_loans"):
         _service(api, name)
-    _service(api, "get_book", {"book_id": book["id"]})
+    _service(api, "get_game", {"game_id": game["id"]})
     csv_text = _service(api, "export_csv")["content"]
     _service(
         api,
@@ -133,11 +133,11 @@ def test_every_service_is_touched(api):
 
     for name in ("delete_copy",):
         _service(api, name, {"copy_id": copy["id"]})
-    _service(api, "delete_book", {"book_id": book["id"]})
-    _service(api, "delete_book", {"book_id": wish["id"]})
-    _service(api, "delete_book", {"book_id": scanned["book"]["id"]})
+    _service(api, "delete_game", {"game_id": game["id"]})
+    _service(api, "delete_game", {"game_id": wish["id"]})
+    _service(api, "delete_game", {"game_id": scanned["game"]["id"]})
     _service(api, "delete_shelf", {"shelf_id": shelf["id"]})
-    _service(api, "delete_bookcase", {"bookcase_id": case["id"]})
+    _service(api, "delete_unit", {"unit_id": case["id"]})
     _service(api, "delete_room", {"room_id": room["id"]})
 
 

@@ -55,12 +55,12 @@ export async function openCard(page: Page): Promise<Locator> {
   return card;
 }
 
-/** The book with *title* in the library of Alex. */
-export async function bookByTitle(title: string): Promise<Record<string, any>> {
-  const state = await library<{ books: Array<Record<string, any>> }>('get_state');
-  const book = state.books.find((b) => b.title === title);
-  if (!book) throw new Error(`no book "${title}" in the seed`);
-  return book;
+/** The game with *title* in the library of Alex. */
+export async function gameByTitle(title: string): Promise<Record<string, any>> {
+  const state = await library<{ games: Array<Record<string, any>> }>('get_state');
+  const game = state.games.find((b) => b.title === title);
+  if (!game) throw new Error(`no game "${title}" in the seed`);
+  return game;
 }
 
 /** The whole `get_state` reply as Alex. */
@@ -88,7 +88,7 @@ export async function homeKeeperTasks(): Promise<Array<Record<string, any>>> {
 }
 
 /** Set the reading row of a person back to what the seed had. */
-export async function restoreReading(bookId: string, personId: string, row: Record<string, any> | undefined): Promise<void> {
+export async function restoreReading(gameId: string, personId: string, row: Record<string, any> | undefined): Promise<void> {
   const fields = row
     ? {
         status: row.status,
@@ -99,7 +99,7 @@ export async function restoreReading(bookId: string, personId: string, row: Reco
         read_count: row.read_count,
       }
     : { status: 'want' };
-  await library('set_reading', { book_id: bookId, person_id: personId, ...fields });
+  await library('set_reading', { game_id: gameId, person_id: personId, ...fields });
 }
 
 /** Collect the uncaught page errors and the console errors of the library code. */

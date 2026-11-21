@@ -13,19 +13,19 @@ BOB = "p_bob"
 EVENT = "home_keeper_games_{}".format
 
 
-async def _book(call) -> dict:
-    return (await call("add_book", {"title": "Dune"}))["book"]
+async def _game(call) -> dict:
+    return (await call("add_game", {"title": "Dune"}))["game"]
 
 
 async def test_copy_updated(hass, setup_entry, call) -> None:
     updated = async_capture_events(hass, EVENT("copy_updated"))
     moved = async_capture_events(hass, EVENT("copy_moved"))
-    book = await _book(call)
-    copy = (await call("add_copy", {"book_id": book["id"]}))["copy"]
+    game = await _game(call)
+    copy = (await call("add_copy", {"game_id": game["id"]}))["copy"]
     await call("update_copy", {"copy_id": copy["id"], "price": 12, "signed": True})
     assert [e.data for e in updated] == [
         {
-            "book_id": book["id"],
+            "game_id": game["id"],
             "title": "Dune",
             "person_id": None,
             "origin": None,
@@ -43,11 +43,11 @@ async def test_copy_updated(hass, setup_entry, call) -> None:
 async def test_loan_updated_and_removed(hass, setup_entry, call) -> None:
     updated = async_capture_events(hass, EVENT("loan_updated"))
     removed = async_capture_events(hass, EVENT("loan_removed"))
-    book = await _book(call)
-    copy = (await call("add_copy", {"book_id": book["id"]}))["copy"]
+    game = await _game(call)
+    copy = (await call("add_copy", {"game_id": game["id"]}))["copy"]
     loan = (
         await call(
-            "lend_book", {"copy_id": copy["id"], "party": "Zed", "add_task": False}
+            "lend_game", {"copy_id": copy["id"], "party": "Zed", "add_task": False}
         )
     )["loan"]
     await call("update_loan", {"loan_id": loan["id"], "due": "2099-01-01"})
@@ -60,22 +60,22 @@ async def test_loan_updated_and_removed(hass, setup_entry, call) -> None:
     assert len(updated) == 1
     await call("delete_loan", {"loan_id": loan["id"]})
     assert [e.data["loan_id"] for e in removed] == [loan["id"]]
-    assert removed[0].data["book_id"] == book["id"]
+    assert removed[0].data["game_id"] == game["id"]
     assert "changed_fields" not in removed[0].data
 
 
 async def test_reading_updated_keeps_the_notes_private(hass, setup_entry, call) -> None:
     updated = async_capture_events(hass, EVENT("reading_updated"))
     changed = async_capture_events(hass, EVENT("reading_changed"))
-    book = await _book(call)
+    game = await _game(call)
     await call(
-        "set_reading", {"book_id": book["id"], "person_id": BOB, "status": "reading"}
+        "set_reading", {"game_id": game["id"], "person_id": BOB, "status": "reading"}
     )
     assert len(changed) == 1 and updated == []
     await call(
         "set_reading",
         {
-            "book_id": book["id"],
+            "game_id": game["id"],
             "person_id": BOB,
             "page": 40,
             "private_notes": "secret",
@@ -84,7 +84,7 @@ async def test_reading_updated_keeps_the_notes_private(hass, setup_entry, call) 
     assert len(changed) == 1
     assert [e.data for e in updated] == [
         {
-            "book_id": book["id"],
+            "game_id": game["id"],
             "title": "Dune",
             "person_id": BOB,
             "origin": None,
@@ -93,7 +93,7 @@ async def test_reading_updated_keeps_the_notes_private(hass, setup_entry, call) 
         }
     ]
     assert "secret" not in str(updated[0].data)
-    await call("set_reading", {"book_id": book["id"], "person_id": BOB, "page": 40})
+    await call("set_reading", {"game_id": game["id"], "person_id": BOB, "page": 40})
     assert len(updated) == 1
 
 

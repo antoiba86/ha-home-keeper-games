@@ -7,7 +7,7 @@ implements:
   - custom_components/home_keeper_games/websocket_api.py
   - custom_components/home_keeper_games/events.py
 related: [people-privilege, store-models, entities, architecture]
-source_hash: 3921b712bbd3
+source_hash: 9baee1d9b5f6
 ---
 
 # Services, websocket commands, events and the API surface
@@ -48,8 +48,8 @@ integrator view is [INTEGRATING.md](../INTEGRATING.md) and [EVENTS.md](../EVENTS
 3. Run the handler with a `Ctx` of Home Assistant, the coordinator and the caller.
 
 A handler raises `models.LibraryError`. The service wrapper turns it into a
-`ServiceValidationError` with the key and the placeholders. A reply that holds a book goes
-through `projections.project_book` for the caller. A mutation returns its record when the
+`ServiceValidationError` with the key and the placeholders. A reply that holds a game goes
+through `projections.project_game` for the caller. A mutation returns its record when the
 caller asks for a response.
 
 ### Websocket commands
@@ -72,13 +72,13 @@ that is not a read service:
 
 ### Events
 
-`events.py` has 1 pure builder for each payload shape. The book events share the spine
-`{book_id, title, person_id, origin}` from `events.book_event_data`. The room, bookcase
+`events.py` has 1 pure builder for each payload shape. The game events share the spine
+`{game_id, title, person_id, origin}` from `events.game_event_data`. The room, unit
 and shelf events have their own id, their parent id and the name. `import_completed` has
 the person, the source and the counts. `data_imported` has the counts of each section of
 a Home Keeper import ([import-export](import-export.md)). The store fires each event after
 the save, in the order of the change: a `force` delete fires each `copy_moved`, then the
-`*_removed` of each child, then the `*_removed` of the parent. `book_finished` follows
+`*_removed` of each child, then the `*_removed` of the parent. `game_finished` follows
 its `reading_changed`.
 
 An update fires an event only if a field changed. Each `*_updated` event names the

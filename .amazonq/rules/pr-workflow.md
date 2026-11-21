@@ -86,7 +86,7 @@ desktop-only shot leaves that half unreviewed.
 3. When a change adds a surface, add a step for it to `tests/e2e/screenshots.capture.ts`.
    Add the phone step to the `page.setViewportSize(PHONE)` block at the end of the file,
    and name the pair `<surface>-desktop.png` and `<surface>-mobile.png`:
-   `books-desktop.png` and `books-mobile.png`. A phone-only flow, such as the scan, has
+   `games-desktop.png` and `games-mobile.png`. A phone-only flow, such as the scan, has
    only the `-mobile` shot. 1 module of the harness writes the widths.
 4. **Open every PNG with the Read tool before you commit it.** Make sure that the changed
    surface shows: dialogs have their heading and buttons, lists are full, and no content

@@ -143,9 +143,9 @@ async function waitForLibrary(token: string, timeoutMs = 120_000): Promise<void>
   while (Date.now() < deadline) {
     const ws = await haWs(token);
     try {
-      const state = await ws.call<{ books: unknown[]; home_keeper: { tab: boolean } }>({ type: 'home_keeper_games/get_state' });
-      if (state.books.length && state.home_keeper.tab) return;
-      last = `books ${state.books.length}, tab ${state.home_keeper.tab}`;
+      const state = await ws.call<{ games: unknown[]; home_keeper: { tab: boolean } }>({ type: 'home_keeper_games/get_state' });
+      if (state.games.length && state.home_keeper.tab) return;
+      last = `games ${state.games.length}, tab ${state.home_keeper.tab}`;
     } catch (err) {
       last = String((err as Error).message ?? err);
     } finally {

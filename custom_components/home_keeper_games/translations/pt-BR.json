@@ -41,7 +41,7 @@
   },
   "entity": {
     "sensor": {
-      "books": {
+      "games": {
         "name": "Livros"
       },
       "loans_out": {
@@ -50,7 +50,7 @@
       "loans_overdue": {
         "name": "Empréstimos vencidos"
       },
-      "books_read_this_year": {
+      "games_read_this_year": {
         "name": "{person} livros lidos neste ano"
       },
       "reading_now": {
@@ -132,7 +132,7 @@
         }
       }
     },
-    "add_bookcase": {
+    "add_unit": {
       "name": "Adicionar estante",
       "description": "Adicionar uma estante a um cômodo.",
       "fields": {
@@ -154,11 +154,11 @@
         }
       }
     },
-    "update_bookcase": {
+    "update_unit": {
       "name": "Alterar estante",
       "description": "Alterar uma estante ou movê-la para outro cômodo.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Estante",
           "description": "O ID da estante."
         },
@@ -180,11 +180,11 @@
         }
       }
     },
-    "delete_bookcase": {
+    "delete_unit": {
       "name": "Excluir estante",
       "description": "Excluir uma estante. Uma estante com prateleiras precisa de force.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Estante",
           "description": "O ID da estante."
         },
@@ -198,7 +198,7 @@
       "name": "Adicionar prateleira",
       "description": "Adicionar uma prateleira a uma estante.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Estante",
           "description": "O ID da estante."
         },
@@ -220,7 +220,7 @@
           "name": "Prateleira",
           "description": "O ID da prateleira. Vazio para nenhuma prateleira."
         },
-        "bookcase_id": {
+        "unit_id": {
           "name": "Estante",
           "description": "O ID da estante."
         },
@@ -248,7 +248,7 @@
         }
       }
     },
-    "add_book": {
+    "add_game": {
       "name": "Adicionar livro",
       "description": "Adicionar um livro. Se um livro tiver o mesmo código de barras, o serviço devolve esse livro.",
       "fields": {
@@ -310,11 +310,11 @@
         }
       }
     },
-    "update_book": {
+    "update_game": {
       "name": "Alterar livro",
       "description": "Alterar os detalhes de um livro.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livro",
           "description": "O ID do livro."
         },
@@ -376,11 +376,11 @@
         }
       }
     },
-    "delete_book": {
+    "delete_game": {
       "name": "Excluir livro",
       "description": "Excluir um livro com seus exemplares, status de leitura, empréstimos e capa.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livro",
           "description": "O ID do livro."
         }
@@ -412,7 +412,7 @@
       "name": "Adicionar exemplar",
       "description": "Adicionar um exemplar de um livro.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livro",
           "description": "O ID do livro."
         },
@@ -536,7 +536,7 @@
       "name": "Definir capa",
       "description": "Definir a capa de um livro.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livro",
           "description": "O ID do livro."
         },
@@ -554,7 +554,7 @@
       "name": "Definir status de leitura",
       "description": "Definir o status de leitura de um livro para uma pessoa. Um usuário que não é administrador só pode definir o próprio status.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livro",
           "description": "O ID do livro."
         },
@@ -592,7 +592,7 @@
         }
       }
     },
-    "lend_book": {
+    "lend_game": {
       "name": "Emprestar livro",
       "description": "Emprestar um exemplar para outra pessoa.",
       "fields": {
@@ -622,11 +622,11 @@
         }
       }
     },
-    "borrow_book": {
+    "borrow_game": {
       "name": "Adicionar livro emprestado",
       "description": "Registrar um livro que uma pessoa pegou emprestado.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livro",
           "description": "O ID do livro."
         },
@@ -730,7 +730,7 @@
       "name": "Adicionar aos desejos",
       "description": "Colocar um livro na lista de desejos de uma pessoa.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livro",
           "description": "O ID do livro."
         },
@@ -760,7 +760,7 @@
       "name": "Alterar desejo",
       "description": "Alterar uma entrada da lista de desejos.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livro",
           "description": "O ID do livro."
         },
@@ -778,17 +778,17 @@
       "name": "Remover dos desejos",
       "description": "Tirar um livro da lista de desejos.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livro",
           "description": "O ID do livro."
         }
       }
     },
-    "got_wishlist_book": {
+    "got_wishlist_game": {
       "name": "Livro desejado recebido",
       "description": "Adicionar um exemplar de um livro desejado e tirá-lo da lista de desejos.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livro",
           "description": "O ID do livro."
         },
@@ -874,7 +874,7 @@
         }
       }
     },
-    "list_books": {
+    "list_games": {
       "name": "Listar livros",
       "description": "Devolver os livros que correspondem aos filtros.",
       "fields": {
@@ -908,11 +908,11 @@
         }
       }
     },
-    "get_book": {
+    "get_game": {
       "name": "Obter livro",
       "description": "Devolver um livro com seus exemplares e empréstimos.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livro",
           "description": "O ID do livro."
         }
@@ -1000,13 +1000,13 @@
     "room_not_found": {
       "message": "Nenhum cômodo tem o ID {id}."
     },
-    "bookcase_not_found": {
+    "unit_not_found": {
       "message": "Nenhuma estante tem o ID {id}."
     },
     "shelf_not_found": {
       "message": "Nenhuma prateleira tem o ID {id}."
     },
-    "book_not_found": {
+    "game_not_found": {
       "message": "Nenhum livro tem o ID {id}."
     },
     "copy_not_found": {
@@ -1024,7 +1024,7 @@
     "room_not_empty": {
       "message": "O cômodo tem {count} estantes. Use force para excluí-las também."
     },
-    "bookcase_not_empty": {
+    "unit_not_empty": {
       "message": "A estante tem {count} prateleiras. Use force para excluí-las também."
     },
     "shelf_not_empty": {

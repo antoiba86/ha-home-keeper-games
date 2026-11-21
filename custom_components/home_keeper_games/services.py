@@ -71,11 +71,11 @@ class Ctx:
         """The store."""
         return self.coordinator.store
 
-    def book_reply(self, book: dict[str, Any]) -> dict[str, Any]:
-        """A book in a reply, projected for the caller."""
+    def game_reply(self, game: dict[str, Any]) -> dict[str, Any]:
+        """A game in a reply, projected for the caller."""
         state = self.store.state
-        current = state["books"].get(book["id"], book)
-        return projections.project_book(
+        current = state["games"].get(game["id"], game)
+        return projections.project_game(
             state,
             current,
             viewer=self.actor.person_id,
@@ -94,7 +94,7 @@ _STR_LIST = vol.All(cv.ensure_list, [cv.string])
 _FORMAT = vol.In(models.FORMATS)
 _ORDER = vol.All(vol.Coerce(int), vol.Range(min=0))
 
-_BOOK_FIELDS = {
+_GAME_FIELDS = {
     vol.Optional("title"): cv.string,
     vol.Optional("subtitle"): _OPT_STR,
     vol.Optional("authors"): _STR_LIST,
@@ -122,8 +122,8 @@ _COPY_FIELDS = {
     vol.Optional("first_edition"): cv.boolean,
     vol.Optional("note"): _OPT_STR,
 }
-_BOOK_REF = {
-    vol.Optional("book_id"): cv.string,
+_GAME_REF = {
+    vol.Optional("game_id"): cv.string,
     vol.Optional("barcode"): cv.string,
     vol.Optional("title"): cv.string,
     vol.Optional("authors"): _STR_LIST,
@@ -152,31 +152,31 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
         vol.Required("room_id"): cv.string,
         vol.Optional("force", default=False): cv.boolean,
     },
-    "add_bookcase": {
+    "add_unit": {
         vol.Required("room_id"): cv.string,
         vol.Required("name"): cv.string,
         vol.Optional("note"): _OPT_STR,
         vol.Optional("order"): _ORDER,
     },
-    "update_bookcase": {
-        vol.Required("bookcase_id"): cv.string,
+    "update_unit": {
+        vol.Required("unit_id"): cv.string,
         vol.Optional("room_id"): cv.string,
         vol.Optional("name"): cv.string,
         vol.Optional("note"): _OPT_STR,
         vol.Optional("order"): _ORDER,
     },
-    "delete_bookcase": {
-        vol.Required("bookcase_id"): cv.string,
+    "delete_unit": {
+        vol.Required("unit_id"): cv.string,
         vol.Optional("force", default=False): cv.boolean,
     },
     "add_shelf": {
-        vol.Required("bookcase_id"): cv.string,
+        vol.Required("unit_id"): cv.string,
         vol.Required("name"): cv.string,
         vol.Optional("order"): _ORDER,
     },
     "update_shelf": {
         vol.Required("shelf_id"): cv.string,
-        vol.Optional("bookcase_id"): cv.string,
+        vol.Optional("unit_id"): cv.string,
         vol.Optional("name"): cv.string,
         vol.Optional("order"): _ORDER,
     },
@@ -184,9 +184,9 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
         vol.Required("shelf_id"): cv.string,
         vol.Optional("force", default=False): cv.boolean,
     },
-    "add_book": {**_BOOK_FIELDS},
-    "update_book": {vol.Required("book_id"): cv.string, **_BOOK_FIELDS},
-    "delete_book": {vol.Required("book_id"): cv.string},
+    "add_game": {**_GAME_FIELDS},
+    "update_game": {vol.Required("game_id"): cv.string, **_GAME_FIELDS},
+    "delete_game": {vol.Required("game_id"): cv.string},
     "scan_barcode": {
         vol.Required("barcode"): cv.string,
         vol.Optional("shelf_id"): _OPT_STR,
@@ -195,7 +195,7 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
             ("ask", "add_copy", "move", "skip")
         ),
     },
-    "add_copy": {vol.Required("book_id"): cv.string, **_COPY_FIELDS},
+    "add_copy": {vol.Required("game_id"): cv.string, **_COPY_FIELDS},
     "update_copy": {vol.Required("copy_id"): cv.string, **_COPY_FIELDS},
     "move_copy": {
         vol.Required("copy_id"): cv.string,
@@ -203,12 +203,12 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
     },
     "delete_copy": {vol.Required("copy_id"): cv.string},
     "set_cover": {
-        vol.Required("book_id"): cv.string,
+        vol.Required("game_id"): cv.string,
         vol.Required("kind"): vol.In(models.COVER_KINDS),
         vol.Optional("file_id"): cv.string,
     },
     "set_reading": {
-        vol.Required("book_id"): cv.string,
+        vol.Required("game_id"): cv.string,
         vol.Optional("person_id"): cv.string,
         vol.Optional("status"): vol.In((*models.STATUSES, models.STATUS_NONE)),
         vol.Optional("rating"): _OPT_INT,
@@ -218,9 +218,9 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
         vol.Optional("read_count"): vol.Coerce(int),
         vol.Optional("private_notes"): _OPT_STR,
     },
-    "lend_book": {vol.Required("copy_id"): cv.string, **_LOAN_FIELDS},
-    "borrow_book": {
-        **_BOOK_REF,
+    "lend_game": {vol.Required("copy_id"): cv.string, **_LOAN_FIELDS},
+    "borrow_game": {
+        **_GAME_REF,
         **_LOAN_FIELDS,
         vol.Required("person_id"): cv.string,
         vol.Optional("format"): vol.Any(None, _FORMAT),
@@ -239,18 +239,18 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
     },
     "delete_loan": {vol.Required("loan_id"): cv.string},
     "add_to_wishlist": {
-        **_BOOK_REF,
+        **_GAME_REF,
         vol.Required("person_id"): cv.string,
         vol.Optional("buy", default=False): cv.boolean,
     },
     "update_wishlist": {
-        vol.Required("book_id"): cv.string,
+        vol.Required("game_id"): cv.string,
         vol.Optional("buy"): cv.boolean,
         vol.Optional("person_id"): cv.string,
     },
-    "remove_from_wishlist": {vol.Required("book_id"): cv.string},
-    "got_wishlist_book": {
-        vol.Required("book_id"): cv.string,
+    "remove_from_wishlist": {vol.Required("game_id"): cv.string},
+    "got_wishlist_game": {
+        vol.Required("game_id"): cv.string,
         vol.Optional("shelf_id"): _OPT_STR,
         vol.Optional("format"): _FORMAT,
     },
@@ -276,7 +276,7 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
         vol.Optional("dry_run", default=False): cv.boolean,
         vol.Optional("files_dir"): _OPT_STR,
     },
-    "list_books": {
+    "list_games": {
         vol.Optional("query"): cv.string,
         vol.Optional("room_id"): cv.string,
         vol.Optional("shelf_id"): cv.string,
@@ -285,7 +285,7 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
         vol.Optional("person_id"): cv.string,
         vol.Optional("limit"): vol.All(vol.Coerce(int), vol.Range(min=1)),
     },
-    "get_book": {vol.Required("book_id"): cv.string},
+    "get_game": {vol.Required("game_id"): cv.string},
     "list_locations": {},
     "list_loans": {
         vol.Optional("status", default="all"): vol.In(("open", "returned", "all")),
@@ -319,16 +319,16 @@ def _self_or_admin(ctx: Ctx, person_id: str | None) -> str:
     return _person_or_error(ctx, target)
 
 
-async def _add_book(ctx: Ctx, data: dict[str, Any]) -> tuple[dict[str, Any], bool]:
-    """Add a book. Return ``(book, existing)``.
+async def _add_game(ctx: Ctx, data: dict[str, Any]) -> tuple[dict[str, Any], bool]:
+    """Add a game. Return ``(game, existing)``.
 
-    With a barcode, a stored book with that barcode is returned. A book with a
+    With a barcode, a stored game with that barcode is returned. A game with a
     barcode and no title takes the barcode as its title and needs details.
     """
     fields = dict(data)
     code = models.barcode(fields.get("barcode"))
     if code is not None:
-        if found := models.find_book_by_barcode(ctx.store.state, code):
+        if found := models.find_game_by_barcode(ctx.store.state, code):
             return dict(found), True
         fields["barcode"] = code
         if not fields.get("title"):
@@ -336,26 +336,26 @@ async def _add_book(ctx: Ctx, data: dict[str, Any]) -> tuple[dict[str, Any], boo
             fields["needs_details"] = True
     elif not fields.get("title"):
         raise LibraryError("barcode_or_title_required")
-    book, existing = await ctx.store.add_book(fields)
-    return ctx.store.book(book["id"]), existing
+    game, existing = await ctx.store.add_game(fields)
+    return ctx.store.game(game["id"]), existing
 
 
-async def _resolve_book(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
-    """The book of ``book_id``, ``barcode`` or ``title``. A new book if none matches."""
-    if data.get("book_id"):
-        return ctx.store.book(data["book_id"])
+async def _resolve_game(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+    """The game of ``game_id``, ``barcode`` or ``title``. A new game if none matches."""
+    if data.get("game_id"):
+        return ctx.store.game(data["game_id"])
     if data.get("barcode"):
-        book, _ = await _add_book(ctx, {"barcode": data["barcode"]})
-        return book
+        game, _ = await _add_game(ctx, {"barcode": data["barcode"]})
+        return game
     if data.get("title"):
         key = models.title_key(data["title"], data.get("authors") or [])
-        for book in ctx.store.state["books"].values():
-            if models.title_key(book.get("title"), book.get("authors")) == key:
-                return dict(book)
-        book, _ = await _add_book(
+        for game in ctx.store.state["games"].values():
+            if models.title_key(game.get("title"), game.get("authors")) == key:
+                return dict(game)
+        game, _ = await _add_game(
             ctx, {"title": data["title"], "authors": data.get("authors") or []}
         )
-        return book
+        return game
     raise LibraryError("barcode_or_title_required")
 
 
@@ -382,20 +382,18 @@ async def _delete_room(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
     return {"room": room}
 
 
-async def _add_bookcase(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
-    return {"bookcase": await ctx.store.add_bookcase(data)}
+async def _add_unit(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+    return {"unit": await ctx.store.add_unit(data)}
 
 
-async def _update_bookcase(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
-    bookcase = await ctx.store.update_bookcase(data["bookcase_id"], _clean(data))
-    return {"bookcase": bookcase}
+async def _update_unit(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+    unit = await ctx.store.update_unit(data["unit_id"], _clean(data))
+    return {"unit": unit}
 
 
-async def _delete_bookcase(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
-    bookcase = await ctx.store.delete_bookcase(
-        data["bookcase_id"], force=data.get("force", False)
-    )
-    return {"bookcase": bookcase}
+async def _delete_unit(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+    unit = await ctx.store.delete_unit(data["unit_id"], force=data.get("force", False))
+    return {"unit": unit}
 
 
 async def _add_shelf(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
@@ -413,29 +411,29 @@ async def _delete_shelf(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
     return {"shelf": shelf}
 
 
-# ── Books ────────────────────────────────────────────────────────────────────
+# ── Games ────────────────────────────────────────────────────────────────────
 
 
-async def _add_book_service(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
-    book, existing = await _add_book(ctx, data)
-    return {"book": ctx.book_reply(book), "existing": existing}
+async def _add_game_service(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+    game, existing = await _add_game(ctx, data)
+    return {"game": ctx.game_reply(game), "existing": existing}
 
 
-async def _update_book(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
-    book = await ctx.store.update_book(data["book_id"], _clean(data, "book_id"))
-    return {"book": ctx.book_reply(book)}
+async def _update_game(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+    game = await ctx.store.update_game(data["game_id"], _clean(data, "game_id"))
+    return {"game": ctx.game_reply(game)}
 
 
-async def _delete_book(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
-    book = await ctx.store.delete_book(data["book_id"])
+async def _delete_game(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+    game = await ctx.store.delete_game(data["game_id"])
     await ctx.coordinator.loan_sync.async_reconcile()
-    return {"book": book}
+    return {"game": game}
 
 
-def _copies_with_location(ctx: Ctx, book_id: str) -> list[dict[str, Any]]:
+def _copies_with_location(ctx: Ctx, game_id: str) -> list[dict[str, Any]]:
     state = ctx.store.state
     out = []
-    for copy in models.copies_of(state, book_id):
+    for copy in models.copies_of(state, game_id):
         row = projections.project_copy(copy, is_admin=ctx.actor.is_admin)
         row["location"] = models.location_path(state, copy.get("shelf_id"))
         out.append(row)
@@ -445,10 +443,10 @@ def _copies_with_location(ctx: Ctx, book_id: str) -> list[dict[str, Any]]:
 async def _new_copy(ctx: Ctx, data: dict[str, Any]) -> tuple[dict[str, Any], bool]:
     """Add a copy. Return ``(copy, from_wishlist)``.
 
-    ``from_wishlist`` is True when the copy took its book off the wishlist.
+    ``from_wishlist`` is True when the copy took its game off the wishlist.
     """
-    book_id = str(data.get("book_id"))
-    from_wishlist = models.copy_clears_wishlist(ctx.store.state, book_id)
+    game_id = str(data.get("game_id"))
+    from_wishlist = models.copy_clears_wishlist(ctx.store.state, game_id)
     copy = await ctx.store.add_copy(data)
     if from_wishlist:
         await ctx.coordinator.wishlist_sync.async_run()
@@ -463,14 +461,14 @@ async def _scan_barcode(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
     code = models.barcode(data["barcode"])
     if code is None:
         raise LibraryError("field_required", field="barcode")
-    existing = models.find_book_by_barcode(ctx.store.state, code)
+    existing = models.find_game_by_barcode(ctx.store.state, code)
     if existing is not None:
         copies = models.copies_of(ctx.store.state, existing["id"])
         mode = data.get("on_duplicate", "ask")
         if copies and mode in ("ask", "skip"):
             return {
                 "result": "duplicate" if mode == "ask" else "skipped",
-                "book": ctx.book_reply(existing),
+                "game": ctx.game_reply(existing),
                 "copy": None,
                 "existing_copies": _copies_with_location(ctx, existing["id"]),
                 "from_wishlist": False,
@@ -482,26 +480,26 @@ async def _scan_barcode(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
             moved = await ctx.store.move_copy(target["id"], shelf_id)
             return {
                 "result": "moved",
-                "book": ctx.book_reply(existing),
+                "game": ctx.game_reply(existing),
                 "copy": moved,
                 "existing_copies": _copies_with_location(ctx, existing["id"]),
                 "from_wishlist": False,
             }
         copy, from_wishlist = await _new_copy(
-            ctx, {**copy_data, "book_id": existing["id"]}
+            ctx, {**copy_data, "game_id": existing["id"]}
         )
         return {
             "result": "added",
-            "book": ctx.book_reply(existing),
+            "game": ctx.game_reply(existing),
             "copy": copy,
             "existing_copies": _copies_with_location(ctx, existing["id"]),
             "from_wishlist": from_wishlist,
         }
-    book, _ = await _add_book(ctx, {"barcode": code})
-    copy, from_wishlist = await _new_copy(ctx, {**copy_data, "book_id": book["id"]})
+    game, _ = await _add_game(ctx, {"barcode": code})
+    copy, from_wishlist = await _new_copy(ctx, {**copy_data, "game_id": game["id"]})
     return {
         "result": "not_found",
-        "book": ctx.book_reply(book),
+        "game": ctx.game_reply(game),
         "copy": copy,
         "existing_copies": [],
         "from_wishlist": from_wishlist,
@@ -530,17 +528,17 @@ async def _delete_copy(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
 
 
 async def _set_cover(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
-    book_id = data["book_id"]
+    game_id = data["game_id"]
     kind = data["kind"]
     if kind == "custom":
         if not data.get("file_id"):
             raise LibraryError("field_required", field="file_id")
-        book = await async_use_upload(
-            ctx.hass, ctx.coordinator, book_id, data["file_id"]
+        game = await async_use_upload(
+            ctx.hass, ctx.coordinator, game_id, data["file_id"]
         )
     else:
-        book = await ctx.store.set_cover(book_id, "none", None)
-    return {"book": ctx.book_reply(book)}
+        game = await ctx.store.set_cover(game_id, "none", None)
+    return {"game": ctx.game_reply(game)}
 
 
 # ── Reading ──────────────────────────────────────────────────────────────────
@@ -549,34 +547,34 @@ async def _set_cover(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
 async def _set_reading(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
     person_id = _self_or_admin(ctx, data.get("person_id"))
     row = await ctx.store.set_reading(
-        data["book_id"], person_id, _clean(data, "book_id", "person_id")
+        data["game_id"], person_id, _clean(data, "game_id", "person_id")
     )
-    return {"book_id": data["book_id"], "person_id": person_id, "reading": row}
+    return {"game_id": data["game_id"], "person_id": person_id, "reading": row}
 
 
 # ── Loans ────────────────────────────────────────────────────────────────────
 
 
-async def _lend_book(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+async def _lend_game(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
     loan = await ctx.store.add_loan({**data, "direction": "out"})
     return await _loan_reply(ctx, loan["id"])
 
 
-async def _borrow_book(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+async def _borrow_game(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
     person_id = _person_or_error(ctx, data["person_id"])
     if not data.get("party"):
         raise LibraryError("field_required", field="party")
-    book = await _resolve_book(ctx, data)
+    game = await _resolve_game(ctx, data)
     loan = await ctx.store.add_loan(
         {
-            **_clean(data, "book_id", "barcode", "title", "authors"),
+            **_clean(data, "game_id", "barcode", "title", "authors"),
             "direction": "in",
-            "book_id": book["id"],
+            "game_id": game["id"],
             "person_id": person_id,
         }
     )
     reply = await _loan_reply(ctx, loan["id"])
-    reply["book"] = ctx.book_reply(book)
+    reply["game"] = ctx.game_reply(game)
     return reply
 
 
@@ -601,30 +599,30 @@ async def _delete_loan(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
 
 async def _add_to_wishlist(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
     person_id = _person_or_error(ctx, data["person_id"])
-    book = await _resolve_book(ctx, data)
-    book = await ctx.store.add_to_wishlist(
-        book["id"], person_id, buy=data.get("buy", False)
+    game = await _resolve_game(ctx, data)
+    game = await ctx.store.add_to_wishlist(
+        game["id"], person_id, buy=data.get("buy", False)
     )
     await ctx.coordinator.wishlist_sync.async_run()
-    return {"book": ctx.book_reply(book)}
+    return {"game": ctx.game_reply(game)}
 
 
 async def _update_wishlist(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
     if "person_id" in data:
         _person_or_error(ctx, data["person_id"])
-    book = await ctx.store.update_wishlist(data["book_id"], _clean(data, "book_id"))
+    game = await ctx.store.update_wishlist(data["game_id"], _clean(data, "game_id"))
     await ctx.coordinator.wishlist_sync.async_run()
-    return {"book": ctx.book_reply(book)}
+    return {"game": ctx.game_reply(game)}
 
 
 async def _remove_from_wishlist(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
-    book = await ctx.store.remove_from_wishlist(data["book_id"])
+    game = await ctx.store.remove_from_wishlist(data["game_id"])
     await ctx.coordinator.wishlist_sync.async_run()
-    return {"book": ctx.book_reply(book)}
+    return {"game": ctx.game_reply(game)}
 
 
-async def _got_wishlist_book(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
-    copy = await ctx.store.got_wishlist_book(data["book_id"], _clean(data, "book_id"))
+async def _got_wishlist_game(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+    copy = await ctx.store.got_wishlist_game(data["game_id"], _clean(data, "game_id"))
     await ctx.coordinator.wishlist_sync.async_run()
     return {"copy": copy}
 
@@ -792,7 +790,7 @@ async def _bundle_covers(
 ) -> tuple[dict[str, int], list[str]]:
     """Read the cover files of the plan. Return the counts and the old files.
 
-    With *write*, each new cover file is on its book in ``plan.state``, so the
+    With *write*, each new cover file is on its game in ``plan.state``, so the
     import writes the covers with the records.
     """
     covers = {"imported": 0, "skipped": 0}
@@ -801,7 +799,7 @@ async def _bundle_covers(
         name = None
         if files_dir is not None:
             name = await async_bundle_cover(
-                ctx.hass, files_dir, job.book_id, job.file, write=write
+                ctx.hass, files_dir, job.game_id, job.file, write=write
             )
             if name is None:
                 plan.problems.append(
@@ -814,9 +812,9 @@ async def _bundle_covers(
                 )
         covers["skipped" if name is None else "imported"] += 1
         if write and name is not None:
-            book = plan.state["books"][job.book_id]
-            old = (book.get("cover") or {}).get("file")
-            book["cover"] = {"kind": job.kind, "file": name}
+            game = plan.state["games"][job.game_id]
+            old = (game.get("cover") or {}).get("file")
+            game["cover"] = {"kind": job.kind, "file": name}
             if old:
                 released.append(old)
     return covers, released
@@ -865,7 +863,7 @@ async def _import_data(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
 # ── Reads ────────────────────────────────────────────────────────────────────
 
 
-async def _list_books(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+async def _list_games(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
     filters = dict(data)
     if filters.get("status"):
         person_id = filters.get("person_id") or ctx.actor.person_id
@@ -876,9 +874,9 @@ async def _list_books(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
             and person_id != ctx.actor.person_id
             and not shared["share_reading"]
         ):
-            return {"books": []}
+            return {"games": []}
     return {
-        "books": projections.list_books(
+        "games": projections.list_games(
             ctx.store.state,
             filters,
             viewer=ctx.actor.person_id,
@@ -887,16 +885,16 @@ async def _list_books(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-async def _get_book(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
-    detail = projections.book_detail(
+async def _get_game(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+    detail = projections.game_detail(
         ctx.store.state,
-        data["book_id"],
+        data["game_id"],
         viewer=ctx.actor.person_id,
         is_admin=ctx.actor.is_admin,
     )
     if detail is None:
-        raise LibraryError("book_not_found", id=data["book_id"])
-    return {"book": detail}
+        raise LibraryError("game_not_found", id=data["game_id"])
+    return {"game": detail}
 
 
 async def _list_locations(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
@@ -906,9 +904,9 @@ async def _list_locations(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
         counts[copy.get("shelf_id")] = counts.get(copy.get("shelf_id"), 0) + 1
     rooms = []
     for room in sorted(state["rooms"].values(), key=lambda r: (r["order"], r["name"])):
-        bookcases = []
-        for bookcase in sorted(
-            (b for b in state["bookcases"].values() if b["room_id"] == room["id"]),
+        units = []
+        for unit in sorted(
+            (b for b in state["units"].values() if b["room_id"] == room["id"]),
             key=lambda b: (b["order"], b["name"]),
         ):
             shelves = [
@@ -917,13 +915,13 @@ async def _list_locations(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
                     (
                         s
                         for s in state["shelves"].values()
-                        if s["bookcase_id"] == bookcase["id"]
+                        if s["unit_id"] == unit["id"]
                     ),
                     key=lambda s: (s["order"], s["name"]),
                 )
             ]
-            bookcases.append({**bookcase, "shelves": shelves})
-        rooms.append({**room, "bookcases": bookcases})
+            units.append({**unit, "shelves": shelves})
+        rooms.append({**room, "units": units})
     return {"rooms": rooms, "no_shelf": counts.get(None, 0)}
 
 
@@ -938,7 +936,7 @@ async def _list_loans(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
         if data.get("direction") and loan["direction"] != data["direction"]:
             continue
         row = projections.project_loan(loan, is_admin=ctx.actor.is_admin)
-        row["title"] = (state["books"].get(loan["book_id"]) or {}).get("title", "")
+        row["title"] = (state["games"].get(loan["game_id"]) or {}).get("title", "")
         row["overdue"] = models.is_overdue(loan, today())
         out.append(row)
     return {"loans": out}
@@ -959,15 +957,15 @@ SERVICE_HANDLERS: dict[str, Handler] = {
     "add_room": _add_room,
     "update_room": _update_room,
     "delete_room": _delete_room,
-    "add_bookcase": _add_bookcase,
-    "update_bookcase": _update_bookcase,
-    "delete_bookcase": _delete_bookcase,
+    "add_unit": _add_unit,
+    "update_unit": _update_unit,
+    "delete_unit": _delete_unit,
     "add_shelf": _add_shelf,
     "update_shelf": _update_shelf,
     "delete_shelf": _delete_shelf,
-    "add_book": _add_book_service,
-    "update_book": _update_book,
-    "delete_book": _delete_book,
+    "add_game": _add_game_service,
+    "update_game": _update_game,
+    "delete_game": _delete_game,
     "scan_barcode": _scan_barcode,
     "add_copy": _add_copy,
     "update_copy": _update_copy,
@@ -975,23 +973,23 @@ SERVICE_HANDLERS: dict[str, Handler] = {
     "delete_copy": _delete_copy,
     "set_cover": _set_cover,
     "set_reading": _set_reading,
-    "lend_book": _lend_book,
-    "borrow_book": _borrow_book,
+    "lend_game": _lend_game,
+    "borrow_game": _borrow_game,
     "return_loan": _return_loan,
     "update_loan": _update_loan,
     "delete_loan": _delete_loan,
     "add_to_wishlist": _add_to_wishlist,
     "update_wishlist": _update_wishlist,
     "remove_from_wishlist": _remove_from_wishlist,
-    "got_wishlist_book": _got_wishlist_book,
+    "got_wishlist_game": _got_wishlist_game,
     "set_person_settings": _set_person_settings,
     "set_settings": _set_settings,
     "import_csv": _import_csv,
     "export_csv": _export_csv,
     "export_data": _export_data,
     "import_data": _import_data,
-    "list_books": _list_books,
-    "get_book": _get_book,
+    "list_games": _list_games,
+    "get_game": _get_game,
     "list_locations": _list_locations,
     "list_loans": _list_loans,
     "list_people": _list_people,

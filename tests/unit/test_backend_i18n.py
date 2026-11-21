@@ -59,7 +59,7 @@ def test_resolve_string() -> None:
 
 
 def test_resolve_exception() -> None:
-    assert i18n.resolve_exception("en", "book_not_found", id="b1") == (
+    assert i18n.resolve_exception("en", "game_not_found", id="b1") == (
         "No book has the ID b1."
     )
     assert i18n.resolve_exception("en", "not_a_key") == "not_a_key"

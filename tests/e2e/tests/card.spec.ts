@@ -27,8 +27,8 @@ test.describe('Card for a user who is not an admin', { tag: '@responsive' }, () 
       expect(copy).not.toHaveProperty('acquired_from');
     }
     for (const loan of state.loans) expect(loan).not.toHaveProperty('party');
-    for (const book of state.books) {
-      for (const [pid, row] of Object.entries(book.reading as Record<string, Record<string, unknown>>)) {
+    for (const game of state.games) {
+      for (const [pid, row] of Object.entries(game.reading as Record<string, Record<string, unknown>>)) {
         if (pid !== 'sam') expect(row).not.toHaveProperty('private_notes');
       }
     }

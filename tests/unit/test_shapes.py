@@ -23,7 +23,7 @@ def _raises(fn, *args, **kwargs) -> m.LibraryError:
 def test_empty_row() -> None:
     assert cio.empty_row(7) == {
         "line": 7,
-        "book_id": None,
+        "game_id": None,
         "title": "",
         "subtitle": "",
         "authors": [],
@@ -53,10 +53,10 @@ def test_empty_row() -> None:
     }
 
 
-def test_build_book_shape() -> None:
-    book = m.build_book({"title": "Dune"}, now=NOW)
-    assert book == {
-        "id": book["id"],
+def test_build_game_shape() -> None:
+    game = m.build_game({"title": "Dune"}, now=NOW)
+    assert game == {
+        "id": game["id"],
         "title": "Dune",
         "subtitle": "",
         "authors": [],
@@ -81,7 +81,7 @@ def test_build_book_shape() -> None:
 def test_location_shapes() -> None:
     room = m.build_room({"name": "Den", "area_id": "office"}, order=2)
     assert room == {"id": room["id"], "name": "Den", "area_id": "office", "order": 2}
-    case = m.build_bookcase({"room_id": "r", "name": "Left"}, order=1)
+    case = m.build_unit({"room_id": "r", "name": "Left"}, order=1)
     assert case == {
         "id": case["id"],
         "room_id": "r",
@@ -89,15 +89,15 @@ def test_location_shapes() -> None:
         "note": "",
         "order": 1,
     }
-    shelf = m.build_shelf({"bookcase_id": "k", "name": "Top", "order": 4}, order=0)
-    assert shelf == {"id": shelf["id"], "bookcase_id": "k", "name": "Top", "order": 4}
+    shelf = m.build_shelf({"unit_id": "k", "name": "Top", "order": 4}, order=0)
+    assert shelf == {"id": shelf["id"], "unit_id": "k", "name": "Top", "order": 4}
 
 
 def test_copy_and_loan_shapes() -> None:
-    copy = m.build_copy({"book_id": "b"}, now=NOW)
+    copy = m.build_copy({"game_id": "b"}, now=NOW)
     assert copy == {
         "id": copy["id"],
-        "book_id": "b",
+        "game_id": "b",
         "shelf_id": None,
         "format": "paperback",
         "condition": None,
@@ -111,13 +111,13 @@ def test_copy_and_loan_shapes() -> None:
         "created_at": NOW,
     }
     loan = m.build_loan(
-        {"direction": "out", "copy_id": "c", "book_id": "b", "party": " Al "},
+        {"direction": "out", "copy_id": "c", "game_id": "b", "party": " Al "},
         today="2026-10-05",
     )
     assert loan == {
         "id": loan["id"],
         "direction": "out",
-        "book_id": "b",
+        "game_id": "b",
         "copy_id": "c",
         "party": "Al",
         "person_id": None,
@@ -137,23 +137,23 @@ def test_copy_and_loan_shapes() -> None:
         {"direction": "out", "copy_id": "c", "party": "x"},
         today="2026-10-05",
     )
-    assert err.placeholders == {"field": "book_id"}
+    assert err.placeholders == {"field": "game_id"}
     err = _raises(
         m.build_loan,
-        {"direction": "out", "copy_id": "c", "book_id": "b", "party": "x", "due": 3},
+        {"direction": "out", "copy_id": "c", "game_id": "b", "party": "x", "due": 3},
         today="2026-10-05",
     )
     assert err.key == "invalid_date" and err.placeholders == {"field": "due"}
     err = _raises(
         m.build_loan,
-        {"direction": "out", "copy_id": "c", "book_id": "b", "party": "x", "note": 5j},
+        {"direction": "out", "copy_id": "c", "game_id": "b", "party": "x", "note": 5j},
         today="2026-10-05",
     )
     assert err.placeholders == {"field": "note"}
     loan = m.build_loan(
         {
             "direction": "in",
-            "book_id": "b",
+            "game_id": "b",
             "party": "x",
             "person_id": "p",
             "copy_id": "c",
@@ -176,16 +176,16 @@ def test_field_names_in_errors() -> None:
         "invalid_field",
         {"field": "area_id"},
     )
-    assert key(m.build_bookcase, {"room_id": "r", "name": "x", "note": []}, order=0)[
-        1
-    ] == {"field": "note"}
-    assert key(m.build_shelf, {"bookcase_id": "k", "name": ""}, order=0)[1] == {
+    assert key(m.build_unit, {"room_id": "r", "name": "x", "note": []}, order=0)[1] == {
+        "field": "note"
+    }
+    assert key(m.build_shelf, {"unit_id": "k", "name": ""}, order=0)[1] == {
         "field": "name"
     }
-    assert key(m.build_copy, {"book_id": "b", "price": -1}, now=NOW)[1]["field"] == (
+    assert key(m.build_copy, {"game_id": "b", "price": -1}, now=NOW)[1]["field"] == (
         "price"
     )
-    assert key(m.build_copy, {"book_id": "b", "value": "x"}, now=NOW)[1] == {
+    assert key(m.build_copy, {"game_id": "b", "value": "x"}, now=NOW)[1] == {
         "field": "value"
     }
     assert key(m.copy_field, "condition", "mint")[1]["field"] == "condition"
@@ -193,14 +193,14 @@ def test_field_names_in_errors() -> None:
     assert key(m.copy_field, "signed", 1)[1] == {"field": "signed"}
     assert key(m.copy_field, "note", [])[1] == {"field": "note"}
     assert key(m.copy_field, "acquired_from", [])[1] == {"field": "acquired_from"}
-    assert key(m.book_field, "barcode", [])[1] == {"field": "barcode"}
-    assert key(m.book_field, "barcode", True)[1] == {"field": "barcode"}
-    assert key(m.book_field, "barcode", "a b#")[1] == {"barcode": "AB#"}
-    assert key(m.book_field, "catalogs", {})[1] == {"field": "catalogs"}
-    assert key(m.book_field, "series", [1])[1] == {"field": "series"}
-    assert key(m.book_field, "language", [])[1] == {"field": "language"}
-    assert key(m.book_field, "needs_details", "yes")[1] == {"field": "needs_details"}
-    assert key(m.book_field, "authors", 3)[1] == {"field": "authors"}
+    assert key(m.game_field, "barcode", [])[1] == {"field": "barcode"}
+    assert key(m.game_field, "barcode", True)[1] == {"field": "barcode"}
+    assert key(m.game_field, "barcode", "a b#")[1] == {"barcode": "AB#"}
+    assert key(m.game_field, "catalogs", {})[1] == {"field": "catalogs"}
+    assert key(m.game_field, "series", [1])[1] == {"field": "series"}
+    assert key(m.game_field, "language", [])[1] == {"field": "language"}
+    assert key(m.game_field, "needs_details", "yes")[1] == {"field": "needs_details"}
+    assert key(m.game_field, "authors", 3)[1] == {"field": "authors"}
     assert key(m.reading_field, "started", "x")[1] == {"field": "started"}
     assert key(m.reading_field, "page", -1)[1]["field"] == "page"
     assert key(m.reading_field, "private_notes", [])[1] == {"field": "private_notes"}
@@ -210,7 +210,7 @@ def test_field_names_in_errors() -> None:
     assert key(m.update_location, "room", {"name": "a"}, {"order": "x"})[1] == {
         "field": "order"
     }
-    assert key(m.update_location, "bookcase", {"name": "a"}, {"note": []})[1] == {
+    assert key(m.update_location, "unit", {"name": "a"}, {"note": []})[1] == {
         "field": "note"
     }
     assert key(m.update_location, "room", {"name": "a"}, {"name": "b" * 101})[1] == {
@@ -231,30 +231,30 @@ def test_field_names_in_errors() -> None:
 
 
 def test_barcode_field() -> None:
-    assert m.book_field("barcode", " 978-0441 478125 ") == "9780441478125"
-    assert m.book_field("barcode", "abc123") == "ABC123"
-    assert m.book_field("barcode", 4006381333931) == "4006381333931"
-    assert m.book_field("barcode", "") is None
-    assert m.book_field("barcode", None) is None
-    assert m.book_field("barcode", "9" * 50) == "9" * 50
-    err = _raises(m.book_field, "barcode", "9" * 51)
+    assert m.game_field("barcode", " 978-0441 478125 ") == "9780441478125"
+    assert m.game_field("barcode", "abc123") == "ABC123"
+    assert m.game_field("barcode", 4006381333931) == "4006381333931"
+    assert m.game_field("barcode", "") is None
+    assert m.game_field("barcode", None) is None
+    assert m.game_field("barcode", "9" * 50) == "9" * 50
+    err = _raises(m.game_field, "barcode", "9" * 51)
     assert (err.key, err.placeholders) == ("invalid_barcode", {"barcode": "9" * 50})
-    err = _raises(m.book_field, "barcode", " - ")
+    err = _raises(m.game_field, "barcode", " - ")
     assert (err.key, err.placeholders) == ("invalid_barcode", {"barcode": ""})
-    assert m.book_field("series", {"name": "D", "number": 2.5}) == {
+    assert m.game_field("series", {"name": "D", "number": 2.5}) == {
         "name": "D",
         "number": "2.5",
     }
 
 
-def _two_books() -> dict:
+def _two_games() -> dict:
     state = m.empty_state()
-    for book_id, title, stamp in (("z", "Apple", "t2"), ("a", "Zed", "t1")):
-        book = m.build_book({"title": title}, now=stamp)
-        book["id"] = book_id
-        state["books"][book_id] = book
+    for game_id, title, stamp in (("z", "Apple", "t2"), ("a", "Zed", "t1")):
+        game = m.build_game({"title": title}, now=stamp)
+        game["id"] = game_id
+        state["games"][game_id] = game
     for copy_id, stamp in (("c2", "t1"), ("c1", "t2")):
-        copy = m.build_copy({"book_id": "a"}, now=stamp)
+        copy = m.build_copy({"game_id": "a"}, now=stamp)
         copy["id"] = copy_id
         state["copies"][copy_id] = copy
     state["reading"]["p"] = {"a": {**m.empty_reading(now=NOW), "status": "read"}}
@@ -262,9 +262,9 @@ def _two_books() -> dict:
 
 
 def test_rows_from_state_order_and_reading() -> None:
-    state = _two_books()
+    state = _two_games()
     rows = cio.rows_from_state(state, "p")
-    assert [(r["book_id"], (r["copy"] or {}).get("id")) for r in rows] == [
+    assert [(r["game_id"], (r["copy"] or {}).get("id")) for r in rows] == [
         ("z", None),
         ("a", "c2"),
         ("a", "c1"),
@@ -294,7 +294,7 @@ def test_cells() -> None:
         published="2001",
     )
     row.update(
-        book_id="b",
+        game_id="b",
         series={"name": "S", "number": "2"},
         copy={
             "id": "c",
@@ -320,7 +320,7 @@ def test_cells() -> None:
         shared_notes="sn",
     )
     assert cio._library_cells(row) == {
-        "book_id": "b",
+        "game_id": "b",
         "title": "T",
         "subtitle": "Sub",
         "authors": "Ann Lee; Bo",
@@ -358,18 +358,18 @@ def test_cells() -> None:
     }
     empty = cio._library_cells(cio.empty_row(1))
     assert empty["signed"] == "" and empty["first_edition"] == ""
-    assert empty["book_id"] == "" and empty["series"] == ""
+    assert empty["game_id"] == "" and empty["series"] == ""
     assert empty["barcode"] == ""
     assert empty["wishlist"] == "false" and empty["format"] == ""
 
 
 def test_project_state_counts_and_order() -> None:
-    state = _two_books()
+    state = _two_games()
     state["rooms"] = {
         "r2": {"id": "r2", "name": "b", "order": 0},
         "r1": {"id": "r1", "name": "a", "order": 0},
     }
-    state["bookcases"] = {
+    state["units"] = {
         "k1": {"id": "k1", "room_id": "r2", "name": "x", "order": 0},
         "k2": {"id": "k2", "room_id": "r1", "name": "y", "order": 5},
         "k3": {"id": "k3", "room_id": "r1", "name": "z", "order": 1},
@@ -384,32 +384,32 @@ def test_project_state_counts_and_order() -> None:
         revision=0,
     )
     assert [r["id"] for r in reply["rooms"]] == ["r1", "r2"]
-    assert [b["id"] for b in reply["bookcases"]] == ["k3", "k2", "k1"]
-    zed = next(b for b in reply["books"] if b["id"] == "a")
+    assert [b["id"] for b in reply["units"]] == ["k3", "k2", "k1"]
+    zed = next(b for b in reply["games"] if b["id"] == "a")
     assert zed["copy_count"] == 2 and zed["owned"] is True
     assert [c["id"] for c in reply["copies"]] == ["c2", "c1"]
     assert reply["me"] == {"person_id": None, "name": None, "is_admin": True}
 
 
-def test_book_matches_joins_fields_with_a_space() -> None:
+def test_game_matches_joins_fields_with_a_space() -> None:
     state = m.empty_state()
-    book = m.build_book({"title": "Dune", "subtitle": "Deluxe"}, now=NOW)
-    state["books"][book["id"]] = book
-    assert pr.book_matches(state, book, {"query": "dune deluxe"})
-    assert not pr.book_matches(state, book, {"query": "dunedeluxe"})
-    book["series"] = {"name": "Chronicles", "number": None}
-    assert pr.book_matches(state, book, {"query": "chronicles"})
+    game = m.build_game({"title": "Dune", "subtitle": "Deluxe"}, now=NOW)
+    state["games"][game["id"]] = game
+    assert pr.game_matches(state, game, {"query": "dune deluxe"})
+    assert not pr.game_matches(state, game, {"query": "dunedeluxe"})
+    game["series"] = {"name": "Chronicles", "number": None}
+    assert pr.game_matches(state, game, {"query": "chronicles"})
 
 
-def test_book_detail_order_and_projection() -> None:
-    state = _two_books()
+def test_game_detail_order_and_projection() -> None:
+    state = _two_games()
     state["loans"] = {
-        "l2": {"id": "l2", "book_id": "a", "started": "2026-02-01", "party": "X"},
-        "l1": {"id": "l1", "book_id": "a", "started": "2026-01-01", "party": "Y"},
-        "l3": {"id": "l3", "book_id": "z", "started": "2026-01-01", "party": "Z"},
+        "l2": {"id": "l2", "game_id": "a", "started": "2026-02-01", "party": "X"},
+        "l1": {"id": "l1", "game_id": "a", "started": "2026-01-01", "party": "Y"},
+        "l3": {"id": "l3", "game_id": "z", "started": "2026-01-01", "party": "Z"},
     }
     state["reading"]["q"] = {"a": {**m.empty_reading(now=NOW), "private_notes": "s"}}
-    detail = pr.book_detail(state, "a", viewer="p", is_admin=False)
+    detail = pr.game_detail(state, "a", viewer="p", is_admin=False)
     assert [c["id"] for c in detail["copies"]] == ["c2", "c1"]
     assert [lo["id"] for lo in detail["loans"]] == ["l1", "l2"]
     assert "private_notes" not in detail["reading"]["q"]
@@ -417,5 +417,5 @@ def test_book_detail_order_and_projection() -> None:
 
 
 def test_cover_url_token() -> None:
-    book = {"id": "b", "cover": {"kind": "custom", "file": "b-12ab34cd.jpg"}}
-    assert pr.cover_url(book) == "/api/home_keeper_games/cover/b?v=12ab34cd"
+    game = {"id": "b", "cover": {"kind": "custom", "file": "b-12ab34cd.jpg"}}
+    assert pr.cover_url(game) == "/api/home_keeper_games/cover/b?v=12ab34cd"

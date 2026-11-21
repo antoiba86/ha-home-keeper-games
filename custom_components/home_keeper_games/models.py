@@ -2,8 +2,8 @@
 
 The store holds one JSON document with these sections, each a map by id::
 
-    rooms, bookcases, shelves, books, copies, loans
-    reading:  {person_id: {book_id: row}}
+    rooms, units, shelves, games, copies, loans
+    reading:  {person_id: {game_id: row}}
     people:   {person_id: settings}
     todo_orphans: [{entity_id, uid}]
 
@@ -28,9 +28,9 @@ from typing import Any
 
 STATE_SECTIONS = (
     "rooms",
-    "bookcases",
+    "units",
     "shelves",
-    "books",
+    "games",
     "copies",
     "reading",
     "loans",
@@ -61,9 +61,9 @@ MAX_READ_COUNT = 1000
 MAX_GOAL = 10_000
 MAX_MONEY = 1_000_000_000
 
-# The book fields that a caller sets. ``wishlist``, ``cover`` and the time stamps
+# The game fields that a caller sets. ``wishlist``, ``cover`` and the time stamps
 # have their own paths.
-BOOK_TEXT_FIELDS = {
+GAME_TEXT_FIELDS = {
     "title": MAX_TITLE,
     "subtitle": MAX_TITLE,
     "publisher": MAX_SHORT,
@@ -71,7 +71,7 @@ BOOK_TEXT_FIELDS = {
     "description": MAX_LONG,
     "shared_notes": MAX_LONG,
 }
-BOOK_FIELDS = (
+GAME_FIELDS = (
     "title",
     "subtitle",
     "authors",
@@ -213,7 +213,7 @@ def merge_changes(
     An import plans its changes on a snapshot (*before*) while other changes
     can go on. This merge writes only the records and the fields that the plan
     changed, so a change made in the meantime stays. A copy or a reading row of
-    the plan whose book was deleted in the meantime is dropped, and a copy on a
+    the plan whose game was deleted in the meantime is dropped, and a copy on a
     deleted shelf goes to no shelf. *current* does not change.
     """
     merged = clone(current)
@@ -224,21 +224,21 @@ def merge_changes(
     rows_written: list[tuple[str, str]] = []
     for person_id in sorted(set(before["reading"]) | set(after["reading"])):
         rows = merged["reading"].setdefault(person_id, {})
-        for book_id in _merge_records(
+        for game_id in _merge_records(
             rows,
             before["reading"].get(person_id, {}),
             after["reading"].get(person_id, {}),
         ):
-            rows_written.append((person_id, book_id))
+            rows_written.append((person_id, game_id))
     for copy_id in written["copies"]:
         copy = merged["copies"][copy_id]
-        if copy.get("book_id") not in merged["books"]:
+        if copy.get("game_id") not in merged["games"]:
             del merged["copies"][copy_id]
         elif copy.get("shelf_id") not in merged["shelves"]:
             copy["shelf_id"] = None
-    for person_id, book_id in rows_written:
-        if book_id not in merged["books"]:
-            del merged["reading"][person_id][book_id]
+    for person_id, game_id in rows_written:
+        if game_id not in merged["games"]:
+            del merged["reading"][person_id][game_id]
     merged["reading"] = {p: r for p, r in merged["reading"].items() if r}
     return merged
 
@@ -380,8 +380,8 @@ def build_room(data: dict[str, Any], *, order: int) -> dict[str, Any]:
     }
 
 
-def build_bookcase(data: dict[str, Any], *, order: int) -> dict[str, Any]:
-    """A new bookcase. The caller checks that ``room_id`` exists."""
+def build_unit(data: dict[str, Any], *, order: int) -> dict[str, Any]:
+    """A new unit. The caller checks that ``room_id`` exists."""
     return {
         "id": new_id(),
         "room_id": text(data.get("room_id"), "room_id", MAX_SHORT, required=True),
@@ -392,12 +392,10 @@ def build_bookcase(data: dict[str, Any], *, order: int) -> dict[str, Any]:
 
 
 def build_shelf(data: dict[str, Any], *, order: int) -> dict[str, Any]:
-    """A new shelf. The caller checks that ``bookcase_id`` exists."""
+    """A new shelf. The caller checks that ``unit_id`` exists."""
     return {
         "id": new_id(),
-        "bookcase_id": text(
-            data.get("bookcase_id"), "bookcase_id", MAX_SHORT, required=True
-        ),
+        "unit_id": text(data.get("unit_id"), "unit_id", MAX_SHORT, required=True),
         "name": text(data.get("name"), "name", MAX_NAME, required=True),
         "order": _order(data.get("order", order)),
     }
@@ -411,20 +409,20 @@ def _order(value: Any) -> int:
 
 _LOCATION_RULES: dict[str, dict[str, Any]] = {
     "room": {"name": ("name",), "area_id": ("area_id",), "order": ("order",)},
-    "bookcase": {
+    "unit": {
         "name": ("name",),
         "note": ("note",),
         "order": ("order",),
         "room_id": ("room_id",),
     },
-    "shelf": {"name": ("name",), "order": ("order",), "bookcase_id": ("bookcase_id",)},
+    "shelf": {"name": ("name",), "order": ("order",), "unit_id": ("unit_id",)},
 }
 
 
 def update_location(
     kind: str, record: dict[str, Any], data: dict[str, Any]
 ) -> tuple[dict[str, Any], list[str]]:
-    """Return ``(updated, changed_fields)`` for a room, a bookcase or a shelf."""
+    """Return ``(updated, changed_fields)`` for a room, a unit or a shelf."""
     updated = dict(record)
     changed: list[str] = []
     for field in _LOCATION_RULES[kind]:
@@ -457,7 +455,7 @@ def next_order(records: dict[str, dict[str, Any]], **match: Any) -> int:
     return max(orders) + 1 if orders else 0
 
 
-# ── Books ────────────────────────────────────────────────────────────────────
+# ── Games ────────────────────────────────────────────────────────────────────
 
 
 def _series(value: Any) -> dict[str, Any] | None:
@@ -497,10 +495,10 @@ def barcode(value: Any, field: str = "barcode") -> str | None:
     return cleaned
 
 
-def book_field(field: str, value: Any) -> Any:
-    """Check one caller-set book field and return its stored value."""
-    if field in BOOK_TEXT_FIELDS:
-        return text(value, field, BOOK_TEXT_FIELDS[field], required=field == "title")
+def game_field(field: str, value: Any) -> Any:
+    """Check one caller-set game field and return its stored value."""
+    if field in GAME_TEXT_FIELDS:
+        return text(value, field, GAME_TEXT_FIELDS[field], required=field == "title")
     if field in ("authors", "subjects", "tags"):
         return str_list(value, field)
     if field == "barcode":
@@ -516,9 +514,9 @@ def book_field(field: str, value: Any) -> Any:
     raise LibraryError("invalid_field", field=field)
 
 
-def build_book(data: dict[str, Any], *, now: str) -> dict[str, Any]:
-    """A new book from caller input."""
-    book: dict[str, Any] = {
+def build_game(data: dict[str, Any], *, now: str) -> dict[str, Any]:
+    """A new game from caller input."""
+    game: dict[str, Any] = {
         "id": new_id(),
         "title": "",
         "subtitle": "",
@@ -539,23 +537,23 @@ def build_book(data: dict[str, Any], *, now: str) -> dict[str, Any]:
         "updated_at": now,
         "wishlist": None,
     }
-    for field in BOOK_FIELDS:
+    for field in GAME_FIELDS:
         if field in data:
-            book[field] = book_field(field, data[field])
-    if not book["title"]:
+            game[field] = game_field(field, data[field])
+    if not game["title"]:
         raise LibraryError("field_required", field="title")
-    return book
+    return game
 
 
-def update_book(
-    book: dict[str, Any], data: dict[str, Any], *, now: str
+def update_game(
+    game: dict[str, Any], data: dict[str, Any], *, now: str
 ) -> tuple[dict[str, Any], list[str]]:
     """Return ``(updated, changed_fields)``. ``updated_at`` moves on a change."""
-    updated = dict(book)
+    updated = dict(game)
     changed: list[str] = []
-    patch = {field: data[field] for field in BOOK_FIELDS if field in data}
+    patch = {field: data[field] for field in GAME_FIELDS if field in data}
     for field, raw in patch.items():
-        value = book_field(field, raw)
+        value = game_field(field, raw)
         if value != updated.get(field):
             updated[field] = value
             changed.append(field)
@@ -567,14 +565,14 @@ def update_book(
 SUMMARY_TEMPLATE = "{title} by {author}"
 
 
-def book_summary(book: dict[str, Any], template: str = SUMMARY_TEMPLATE) -> str:
-    """``Title by Author``, or the title alone if the book has no author.
+def game_summary(game: dict[str, Any], template: str = SUMMARY_TEMPLATE) -> str:
+    """``Title by Author``, or the title alone if the game has no author.
 
     *template* is the ``item.summary`` backend string in the language of Home
     Assistant.
     """
-    authors = book.get("authors") or []
-    title = str(book.get("title") or "")
+    authors = game.get("authors") or []
+    title = str(game.get("title") or "")
     if not authors:
         return title
     return template.replace("{title}", title).replace("{author}", str(authors[0]))
@@ -635,10 +633,10 @@ def copy_field(field: str, value: Any) -> Any:
 
 
 def build_copy(data: dict[str, Any], *, now: str) -> dict[str, Any]:
-    """A new copy. The caller checks that the book and the shelf exist."""
+    """A new copy. The caller checks that the game and the shelf exist."""
     record: dict[str, Any] = {
         "id": new_id(),
-        "book_id": text(data.get("book_id"), "book_id", MAX_SHORT, required=True),
+        "game_id": text(data.get("game_id"), "game_id", MAX_SHORT, required=True),
         "shelf_id": None,
         "format": DEFAULT_FORMAT,
         "condition": None,
@@ -745,7 +743,7 @@ def apply_reading(
 
 
 def build_loan(data: dict[str, Any], *, today: str) -> dict[str, Any]:
-    """A new loan. The caller checks the book, the copy and the person."""
+    """A new loan. The caller checks the game, the copy and the person."""
     direction = choice(data.get("direction"), "direction", DIRECTIONS)
     started = iso_date(data.get("started"), "started") or today
     due = iso_date(data.get("due"), "due")
@@ -763,7 +761,7 @@ def build_loan(data: dict[str, Any], *, today: str) -> dict[str, Any]:
     return {
         "id": new_id(),
         "direction": direction,
-        "book_id": text(data.get("book_id"), "book_id", MAX_SHORT, required=True),
+        "game_id": text(data.get("game_id"), "game_id", MAX_SHORT, required=True),
         "copy_id": copy_id,
         "party": text(data.get("party"), "party", MAX_SHORT, required=True),
         "person_id": person_id,
@@ -859,7 +857,7 @@ def apply_person_settings(
 
 
 def build_wishlist(person_id: str, *, buy: bool, now: str) -> dict[str, Any]:
-    """A new wishlist entry on a book."""
+    """A new wishlist entry on a game."""
     return {
         "person_id": text(person_id, "person_id", MAX_SHORT, required=True),
         "buy": boolean(buy, "buy"),
@@ -873,22 +871,22 @@ def build_wishlist(person_id: str, *, buy: bool, now: str) -> dict[str, Any]:
 # ── Derived reads ────────────────────────────────────────────────────────────
 
 
-def copies_of(state: dict[str, Any], book_id: str) -> list[dict[str, Any]]:
-    """The copies of a book, oldest first."""
-    rows = [c for c in state["copies"].values() if c.get("book_id") == book_id]
+def copies_of(state: dict[str, Any], game_id: str) -> list[dict[str, Any]]:
+    """The copies of a game, oldest first."""
+    rows = [c for c in state["copies"].values() if c.get("game_id") == game_id]
     return sorted(rows, key=lambda c: (str(c.get("created_at", "")), c["id"]))
 
 
-def copy_clears_wishlist(state: dict[str, Any], book_id: str) -> bool:
-    """Whether a new copy of a book takes the book off the wishlist.
+def copy_clears_wishlist(state: dict[str, Any], game_id: str) -> bool:
+    """Whether a new copy of a game takes the game off the wishlist.
 
-    It does when the book has a wishlist entry and no copy yet: the first copy
-    is the book that the person wanted.
+    It does when the game has a wishlist entry and no copy yet: the first copy
+    is the game that the person wanted.
     """
-    book = state["books"].get(book_id)
-    if not book or not book.get("wishlist"):
+    game = state["games"].get(game_id)
+    if not game or not game.get("wishlist"):
         return False
-    return not any(c.get("book_id") == book_id for c in state["copies"].values())
+    return not any(c.get("game_id") == game_id for c in state["copies"].values())
 
 
 def open_loan_of_copy(state: dict[str, Any], copy_id: str) -> dict[str, Any] | None:
@@ -900,21 +898,21 @@ def open_loan_of_copy(state: dict[str, Any], copy_id: str) -> dict[str, Any] | N
 
 
 def location_path(state: dict[str, Any], shelf_id: str | None) -> list[str]:
-    """``[room, bookcase, shelf]`` names for a shelf, or ``[]``."""
+    """``[room, unit, shelf]`` names for a shelf, or ``[]``."""
     shelf = state["shelves"].get(shelf_id) if shelf_id else None
     if shelf is None:
         return []
-    bookcase = state["bookcases"].get(shelf.get("bookcase_id")) or {}
-    room = state["rooms"].get(bookcase.get("room_id")) or {}
+    unit = state["units"].get(shelf.get("unit_id")) or {}
+    room = state["rooms"].get(unit.get("room_id")) or {}
     return [
         str(room.get("name", "")),
-        str(bookcase.get("name", "")),
+        str(unit.get("name", "")),
         str(shelf.get("name", "")),
     ]
 
 
 def find_shelf_by_path(state: dict[str, Any], path: list[str]) -> str | None:
-    """The id of the shelf whose room, bookcase and shelf names fold to *path*."""
+    """The id of the shelf whose room, unit and shelf names fold to *path*."""
     if len(path) != 3:
         return None
     wanted = [fold(part) for part in path]
@@ -924,41 +922,41 @@ def find_shelf_by_path(state: dict[str, Any], path: list[str]) -> str | None:
     return None
 
 
-def find_book_by_barcode(
+def find_game_by_barcode(
     state: dict[str, Any], code: str | None
 ) -> dict[str, Any] | None:
-    """The book with this barcode, or None."""
+    """The game with this barcode, or None."""
     if code:
-        for book in state["books"].values():
-            if book.get("barcode") == code:
-                return book
+        for game in state["games"].values():
+            if game.get("barcode") == code:
+                return game
     return None
 
 
 __all__ = [
-    "BOOK_FIELDS",
     "CONDITIONS",
     "COPY_FIELDS",
     "COVER_KINDS",
     "DIRECTIONS",
     "FORMATS",
+    "GAME_FIELDS",
     "STATUSES",
     "STATUS_NONE",
     "LibraryError",
     "apply_person_settings",
     "apply_reading",
-    "book_summary",
-    "build_book",
-    "build_bookcase",
     "build_copy",
+    "build_game",
     "build_loan",
     "build_room",
     "build_shelf",
+    "build_unit",
     "build_wishlist",
     "empty_state",
+    "game_summary",
     "normalize_state",
-    "update_book",
     "update_copy",
+    "update_game",
     "update_loan",
     "update_location",
 ]

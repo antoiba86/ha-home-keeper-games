@@ -19,7 +19,7 @@ LIB = (
     "\ufefftitle,authors,barcode,publisher,pages,format,status,rating,finished,"
     "read_count,private_notes,tags,wishlist\n"
     f"The Left Hand of Darkness,Ursula K. Le Guin,{LEFT},Ace,304,paperback,read,5,"
-    '2024-03-05,2,"Great\nbook",favorites,false\n'
+    '2024-03-05,2,"Great\ngame",favorites,false\n'
     "Dune,Frank Herbert; Kevin J. Anderson,,,,,reading,,,,,,false\n"
     "Emma,Jane Austen,,,,,,,,,,,true\n"
     "Persuasion,Jane Austen,,,,hardcover,want,,,,,,false\n"
@@ -38,7 +38,7 @@ def test_parse() -> None:
     assert left["status"] == "read" and left["rating"] == 5
     assert left["finished"] == "2024-03-05" and left["read_count"] == 2
     assert left["owned"] == 1 and left["copy"]["format"] == "paperback"
-    assert left["tags"] == ["favorites"] and left["notes"] == "Great\nbook"
+    assert left["tags"] == ["favorites"] and left["notes"] == "Great\ngame"
     assert left["publisher"] == "Ace" and left["pages"] == 304
     dune = rows[1]
     assert dune["authors"] == ["Frank Herbert", "Kevin J. Anderson"]
@@ -97,17 +97,17 @@ def test_parse_library_round_trip() -> None:
 # ── Import ───────────────────────────────────────────────────────────────────
 
 
-BOOK_HEX = "0123456789abcdef0123456789abcdef"
+GAME_HEX = "0123456789abcdef0123456789abcdef"
 
 
 def _library() -> dict:
     state = m.empty_state()
     state["rooms"]["r"] = {"id": "r", "name": "Den", "order": 0}
-    state["bookcases"]["k"] = {"id": "k", "room_id": "r", "name": "Left", "order": 0}
-    state["shelves"]["s"] = {"id": "s", "bookcase_id": "k", "name": "Top", "order": 0}
-    book = m.build_book({"title": "Persuasion", "authors": ["Jane Austen"]}, now=NOW)
-    book["id"] = "persuasion"
-    state["books"]["persuasion"] = book
+    state["units"]["k"] = {"id": "k", "room_id": "r", "name": "Left", "order": 0}
+    state["shelves"]["s"] = {"id": "s", "unit_id": "k", "name": "Top", "order": 0}
+    game = m.build_game({"title": "Persuasion", "authors": ["Jane Austen"]}, now=NOW)
+    game["id"] = "persuasion"
+    state["games"]["persuasion"] = game
     return state
 
 
@@ -123,7 +123,7 @@ def test_apply_import() -> None:
         replace_reading=False,
         now=NOW,
     )
-    assert state["books"].keys() == {"persuasion"}, "the input must not change"
+    assert state["games"].keys() == {"persuasion"}, "the input must not change"
     assert summary == {
         "rows": 6,
         "read": 1,
@@ -147,34 +147,34 @@ def test_apply_import() -> None:
         "new",
         "new",
     ]
-    assert results[3]["book_id"] == "persuasion"
+    assert results[3]["game_id"] == "persuasion"
     assert results[0] == {
         "line": 1,
         "title": "The Left Hand of Darkness",
         "authors": ["Ursula K. Le Guin"],
         "barcode": LEFT,
-        "book_id": results[0]["book_id"],
+        "game_id": results[0]["game_id"],
         "action": "new",
     }
     assert cio.summary_of(summary, 2) == {
         "rows": 6,
-        "books_added": 5,
-        "books_matched": 1,
+        "games_added": 5,
+        "games_matched": 1,
         "copies_added": 2,
         "reading_set": 4,
         "reading_kept": 2,
         "wishlist_added": 1,
         "errors": 0,
     }
-    left = next(b for b in new["books"].values() if b["barcode"] == LEFT)
+    left = next(b for b in new["games"].values() if b["barcode"] == LEFT)
     assert left["needs_details"] is False and left["tags"] == ["favorites"]
-    copies = [c for c in new["copies"].values() if c["book_id"] == left["id"]]
+    copies = [c for c in new["copies"].values() if c["game_id"] == left["id"]]
     assert len(copies) == 1 and copies[0]["shelf_id"] == "s"
     assert copies[0]["format"] == "paperback"
     reading = new["reading"]["p"][left["id"]]
     assert reading["status"] == "read" and reading["read_count"] == 2
-    assert reading["private_notes"] == "Great\nbook"
-    emma = next(b for b in new["books"].values() if b["title"] == "Emma")
+    assert reading["private_notes"] == "Great\ngame"
+    emma = next(b for b in new["games"].values() if b["title"] == "Emma")
     assert emma["wishlist"]["person_id"] == "p" and emma["wishlist"]["buy"] is False
     assert emma["id"] not in new["reading"]["p"]
 
@@ -193,9 +193,9 @@ def test_import_matches_and_keeps_reading() -> None:
         now=NOW,
     )
     assert first["reading"]["p"]["persuasion"]["status"] == "want"
-    left = next(b for b in first["books"].values() if b["barcode"] == LEFT)
+    left = next(b for b in first["games"].values() if b["barcode"] == LEFT)
     assert first["reading"]["p"][left["id"]]["private_notes"] == ""
-    copy = next(c for c in first["copies"].values() if c["book_id"] == left["id"])
+    copy = next(c for c in first["copies"].values() if c["game_id"] == left["id"])
     assert copy["shelf_id"] is None
     _second, summary, _results = cio.apply_import(
         first,
@@ -222,7 +222,7 @@ def test_import_matches_and_keeps_reading() -> None:
     )
     assert summary["read"] + summary["want"] + summary["dnf"] == 3
     assert summary["reading"] == 1 and summary["reading_kept"] == 0
-    assert third["reading"]["p"][left["id"]]["private_notes"] == "Great\nbook"
+    assert third["reading"]["p"][left["id"]]["private_notes"] == "Great\ngame"
 
 
 def test_import_row_error_and_empty_person() -> None:
@@ -245,17 +245,17 @@ def test_import_row_error_and_empty_person() -> None:
 
 def test_import_library_rows_use_ids_and_locations() -> None:
     state = _library()
-    book = state["books"].pop("persuasion")
-    book["id"] = BOOK_HEX
-    state["books"][BOOK_HEX] = book
-    copy = m.build_copy({"book_id": BOOK_HEX, "shelf_id": "s"}, now=NOW)
+    game = state["games"].pop("persuasion")
+    game["id"] = GAME_HEX
+    state["games"][GAME_HEX] = game
+    copy = m.build_copy({"game_id": GAME_HEX, "shelf_id": "s"}, now=NOW)
     state["copies"][copy["id"]] = copy
     text = cio.export(state, None)
     new, summary, _ = cio.apply_import(
         m.empty_state()
         | {
             "shelves": state["shelves"],
-            "bookcases": state["bookcases"],
+            "units": state["units"],
             "rooms": state["rooms"],
         },
         cio.parse(text),
@@ -266,7 +266,7 @@ def test_import_library_rows_use_ids_and_locations() -> None:
         now=NOW,
     )
     assert summary["new"] == 1 and summary["copies"] == 1
-    assert new["books"][BOOK_HEX]["title"] == "Persuasion"
+    assert new["games"][GAME_HEX]["title"] == "Persuasion"
     assert new["copies"][copy["id"]]["shelf_id"] == "s"
     _, again, _ = cio.apply_import(
         new,
@@ -281,23 +281,23 @@ def test_import_library_rows_use_ids_and_locations() -> None:
 
 
 def test_import_library_ids_that_are_not_record_ids_are_dropped() -> None:
-    header = "book_id,copy_id,title,format\n"
+    header = "game_id,copy_id,title,format\n"
     rows = cio.parse(
         header
         + "../../evil,x,Escape,paperback\n"
-        + f"{BOOK_HEX},{BOOK_HEX.upper()},Upper,paperback\n"
-        + f"{BOOK_HEX}0,{BOOK_HEX},Long,paperback\n"
-        + f"{BOOK_HEX},{BOOK_HEX},Good,paperback\n",
+        + f"{GAME_HEX},{GAME_HEX.upper()},Upper,paperback\n"
+        + f"{GAME_HEX}0,{GAME_HEX},Long,paperback\n"
+        + f"{GAME_HEX},{GAME_HEX},Good,paperback\n",
     )
-    assert [(r["book_id"], r["copy"]["id"]) for r in rows] == [
+    assert [(r["game_id"], r["copy"]["id"]) for r in rows] == [
         (None, None),
-        (BOOK_HEX, None),
-        (None, BOOK_HEX),
-        (BOOK_HEX, BOOK_HEX),
+        (GAME_HEX, None),
+        (None, GAME_HEX),
+        (GAME_HEX, GAME_HEX),
     ]
 
 
-def test_import_row_with_a_bad_copy_adds_no_book() -> None:
+def test_import_row_with_a_bad_copy_adds_no_game() -> None:
     rows = cio.parse("title,format,condition\nPersuasion,paperback,mint\n")
     new, summary, results = cio.apply_import(
         m.empty_state(),
@@ -311,13 +311,13 @@ def test_import_row_with_a_bad_copy_adds_no_book() -> None:
     assert results[0]["action"] == "error"
     assert results[0]["error"] == "invalid_choice"
     assert summary["errors"] == 1 and summary["new"] == 0
-    assert new["books"] == {} and new["copies"] == {}
+    assert new["games"] == {} and new["copies"] == {}
 
 
-def test_import_sets_the_reading_of_a_book_once() -> None:
+def test_import_sets_the_reading_of_a_game_once() -> None:
     state = _library()
     for _ in range(2):
-        copy = m.build_copy({"book_id": "persuasion"}, now=NOW)
+        copy = m.build_copy({"game_id": "persuasion"}, now=NOW)
         state["copies"][copy["id"]] = copy
     state["reading"]["p"] = {
         "persuasion": m.empty_reading(now=NOW) | {"status": "read"}
@@ -342,8 +342,8 @@ def test_import_sets_the_reading_of_a_book_once() -> None:
 
 def test_export_header_and_cells() -> None:
     state = _library()
-    state["books"]["persuasion"]["barcode"] = LEFT
-    copy = m.build_copy({"book_id": "persuasion", "format": "audiobook"}, now=NOW)
+    state["games"]["persuasion"]["barcode"] = LEFT
+    copy = m.build_copy({"game_id": "persuasion", "format": "audiobook"}, now=NOW)
     state["copies"][copy["id"]] = copy
     state["reading"]["p"] = {
         "persuasion": {
@@ -369,7 +369,7 @@ def test_export_header_and_cells() -> None:
 
 def test_export_wishlist_of_the_person() -> None:
     state = _library()
-    state["books"]["persuasion"]["wishlist"] = m.build_wishlist("p", buy=True, now=NOW)
+    state["games"]["persuasion"]["wishlist"] = m.build_wishlist("p", buy=True, now=NOW)
     row = next(csv.DictReader(io.StringIO(cio.export(state, "p"))))
     assert (row["wishlist"], row["wishlist_buy"], row["format"]) == ("true", "true", "")
     other = next(csv.DictReader(io.StringIO(cio.export(state, "q"))))
@@ -381,7 +381,7 @@ def test_export_wishlist_of_the_person() -> None:
 def test_export_library_has_a_row_for_each_copy() -> None:
     state = _library()
     for stamp, fmt in (("t1", "hardcover"), ("t2", "ebook")):
-        copy = m.build_copy({"book_id": "persuasion", "format": fmt}, now=stamp)
+        copy = m.build_copy({"game_id": "persuasion", "format": fmt}, now=stamp)
         state["copies"][copy["id"]] = copy
     rows = cio.rows_from_state(state, None)
     assert [r["copy"]["format"] for r in rows] == ["hardcover", "ebook"]
@@ -412,7 +412,7 @@ _TAG = st.text(alphabet=string.ascii_lowercase + "-", min_size=1, max_size=10).f
 def _library_row(draw) -> dict:
     row = cio.empty_row(1)
     row["needs_details"] = False
-    row["book_id"] = draw(st.uuids()).hex
+    row["game_id"] = draw(st.uuids()).hex
     row["title"] = draw(_TEXT.filter(bool))
     for field in ("subtitle", "publisher", "description", "shared_notes"):
         row[field] = draw(_TEXT)
@@ -471,14 +471,14 @@ def test_library_round_trip(rows: list[dict]) -> None:
         max_size=5,
         unique_by=(
             lambda r: m.title_key(r["title"], r["authors"]),
-            lambda r: r["barcode"] or r["book_id"],
+            lambda r: r["barcode"] or r["game_id"],
         ),
     )
 )
 def test_state_export_import_export_is_stable(rows: list[dict]) -> None:
     """Import a library CSV into an empty library, export it, and compare.
 
-    The titles differ, because 2 rows with the same title and author are 1 book.
+    The titles differ, because 2 rows with the same title and author are 1 game.
     """
     for index, row in enumerate(rows, start=1):
         row["line"] = index

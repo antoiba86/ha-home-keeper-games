@@ -21,14 +21,14 @@ DIST = (
 HOME_KEEPER = Path(__file__).resolve().parent / ".home_keeper" / "custom_components"
 SERVICES = (
     "add_room",
-    "add_book",
+    "add_game",
     "scan_barcode",
     "set_reading",
-    "lend_book",
-    "borrow_book",
+    "lend_game",
+    "borrow_game",
     "import_csv",
     "export_csv",
-    "list_books",
+    "list_games",
     "list_people",
 )
 
@@ -86,16 +86,16 @@ def test_no_repair_issue_with_home_keeper(ws):
 
 
 def test_loan_adds_a_home_keeper_task(api):
-    book = api.post(
-        "/api/services/home_keeper_games/add_book?return_response",
-        json={"title": "Integration loan book"},
-    ).json()["service_response"]["book"]
+    game = api.post(
+        "/api/services/home_keeper_games/add_game?return_response",
+        json={"title": "Integration loan game"},
+    ).json()["service_response"]["game"]
     copy = api.post(
         "/api/services/home_keeper_games/add_copy?return_response",
-        json={"book_id": book["id"]},
+        json={"game_id": game["id"]},
     ).json()["service_response"]["copy"]
     loan = api.post(
-        "/api/services/home_keeper_games/lend_book?return_response",
+        "/api/services/home_keeper_games/lend_game?return_response",
         json={"copy_id": copy["id"], "party": "Zed", "due": "2030-01-01"},
     ).json()["service_response"]["loan"]
     try:
@@ -107,13 +107,13 @@ def test_loan_adds_a_home_keeper_task(api):
             "/api/services/home_keeper/list_tasks?return_response", json={}
         ).json()["service_response"]["tasks"]
         task = next(t for t in tasks if t["id"] == loan["hk_task_id"])
-        assert task["name"] == "Get Integration loan book back from Zed"
+        assert task["name"] == "Get Integration loan game back from Zed"
         assert task["source"] == {"home_keeper_games": {"loan_id": loan["id"]}}
         assert task["managed_by"]["integration"] == DOMAIN
     finally:
         api.post(
-            "/api/services/home_keeper_games/delete_book",
-            json={"book_id": book["id"]},
+            "/api/services/home_keeper_games/delete_game",
+            json={"game_id": game["id"]},
         )
 
 

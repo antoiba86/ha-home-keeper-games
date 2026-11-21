@@ -33,8 +33,8 @@ How the surfaces work is in [events-api](../../docs/design/events-api.md). Integ
 - **Name a catalog surface with "catalog", not with the name of the catalog.** A service
   that reads an online catalog is `search_catalog`, not `search_igdb`, so a second
   catalog needs no rename.
-- A service that takes a book takes `book_id`. Titles are not unique. `borrow_book` and
-  `add_to_wishlist` also take `barcode` or `title`, and add the book when none matches.
+- A service that takes a game takes `game_id`. Titles are not unique. `borrow_game` and
+  `add_to_wishlist` also take `barcode` or `title`, and add the game when none matches.
 
 ## Events
 
@@ -43,8 +43,8 @@ How the surfaces work is in [events-api](../../docs/design/events-api.md). Integ
   that ships.
 - **Fire at the `store.py` chokepoint**, after the save, not in a handler. Then a change
   from the tab, a service, a to-do list or a Home Keeper task fires the same event.
-- The book events share the spine `{book_id, title, person_id, origin}`
-  (`events.book_event_data`). A specific event extends it, for example `copy_moved` adds
+- The game events share the spine `{game_id, title, person_id, origin}`
+  (`events.game_event_data`). A specific event extends it, for example `copy_moved` adds
   `previous_shelf_id`. Copy a list into a payload. Never alias the caller's list.
 - An update that changes no field fires no event. A CSV import fires only
   `import_completed`.
@@ -56,7 +56,7 @@ How the surfaces work is in [events-api](../../docs/design/events-api.md). Integ
 - An event needs no new service. It observes a change that a service already makes.
 - **A new event is not done until `docs/EVENTS.md` describes it**: when it fires, its
   payload, and an example automation.
-- Bookkeeping fires no event ([architecture.md](architecture.md#administration-and-usage)).
+- Gamekeeping fires no event ([architecture.md](architecture.md#administration-and-usage)).
 
 ## The declared surface
 

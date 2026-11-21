@@ -8,7 +8,7 @@ implements:
   - custom_components/home_keeper_games/frontend/src/tab.ts
   - custom_components/home_keeper_games/frontend/src/tab-index.ts
   - custom_components/home_keeper_games/frontend/src/tab-types.ts
-  - custom_components/home_keeper_games/frontend/src/tab-books.ts
+  - custom_components/home_keeper_games/frontend/src/tab-games.ts
   - custom_components/home_keeper_games/frontend/src/tab-shelves.ts
   - custom_components/home_keeper_games/frontend/src/tab-lists.ts
   - custom_components/home_keeper_games/frontend/src/tab-dialogs.ts
@@ -25,7 +25,7 @@ implements:
   - custom_components/home_keeper_games/frontend/src/styles.ts
   - custom_components/home_keeper_games/frontend/src/global.d.ts
 related: [home-keeper-dependency, scan-and-barcode, csv-import-export, people-privilege]
-source_hash: fb8f7ee7cad1
+source_hash: 9b365a24039d
 ---
 
 # Tab and card
@@ -88,21 +88,21 @@ The Home Keeper panel sets `hass`, `narrow`, `route` and `host` on
 `home-keeper-games-tab`. `route.path` is the path after `/home-keeper/games`.
 `utils.parseRoute` turns it into a view, an id and the filters, and `utils.buildPath` is
 the inverse. The host gives the tab only the path and drops a `?query`. So the filters
-are `;key=value` parameters on the last segment, as in `/books;q=le%20guin;status=read`.
+are `;key=value` parameters on the last segment, as in `/games;q=le%20guin;status=read`.
 `parseRoute` also reads a `?query`, and a parameter wins over it. The tab moves only with
 `host.navigate` and shows notices with `host.showToast`. A loan links to the URL of
 `host.taskLink`, and a click uses `host.openTask` if the host has it.
 
 | Path | View | Module |
 |---|---|---|
-| `/books`, `/books/<id>` | Book list with filters, book detail | `tab-books.ts` |
+| `/games`, `/games/<id>` | Game list with filters, game detail | `tab-games.ts` |
 | `/shelves`, `/shelves/<room_id>` | Rooms and shelves | `tab-shelves.ts` |
 | `/loans;tab=in\|returned` | Loans | `tab-lists.ts` |
 | `/wishlist`, `/settings` | Wishlist, people settings | `tab-lists.ts` |
 | `/scan`, `/import` | Scan flow, import | `tab-scan.ts`, `tab-import.ts` |
 
-The book filters are `q`, `status`, `room`, `shelf`, `reader`, `subject`, `owned`, `sort` and
-`view`. `utils.filterBooks` and `sortBooks` apply them. Each view is a free function over
+The game filters are `q`, `status`, `room`, `shelf`, `reader`, `subject`, `owned`, `sort` and
+`view`. `utils.filterGames` and `sortGames` apply them. Each view is a free function over
 `ViewCtx` (`tab-types.ts`) that returns HTML. `tab.ts` renders it with
 `dom.renderKeepFocus`. It keeps the focus, the caret, the typed text and the camera video.
 A delegated listener for each event type reads the `data-act`, `data-chg`, `data-input`
@@ -138,7 +138,7 @@ their reading. Each section has a toggle in the visual editor. The card calls `s
 - **1 HTML string for each render** over **a virtual DOM**: no dependency, and the views
   test as pure functions in jsdom. The cost is the focus helper.
 - **Read the whole state** over **query each view**: every view and filter works on local
-  data. The design size of 5000 books is 1 reply of a few MB.
+  data. The design size of 5000 games is 1 reply of a few MB.
 
 ## One-way doors
 

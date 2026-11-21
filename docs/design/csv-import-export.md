@@ -1,11 +1,11 @@
 ---
 title: CSV import and export
-summary: How the integration reads its own CSV format with a dry run first, how it matches rows to books, and how it writes an export.
+summary: How the integration reads its own CSV format with a dry run first, how it matches rows to games, and how it writes an export.
 implements:
   - custom_components/home_keeper_games/csv_io.py
   - custom_components/home_keeper_games/frontend/src/tab-import.ts
 related: [store-models, events-api, import-export]
-source_hash: 7f87d748b480
+source_hash: cbbce532f8cc
 ---
 
 # CSV import and export
@@ -18,7 +18,7 @@ the admin sees the counts before a write.
 
 - **G1. Preview before write.** A dry run is the same pure call as the import, with the
   result thrown away. The preview and the import cannot disagree.
-- **G2. No second book.** A row matches a stored book by id, then barcode, then title
+- **G2. No second game.** A row matches a stored game by id, then barcode, then title
   and first author.
 - **G3. Keep what is there.** A reading row that the person has now stays, unless the
   admin asks to replace it. A copy id that is already stored is not added again.
@@ -49,32 +49,32 @@ the save have no `await` between them, so no other change comes in the middle.
 
 - A change to another field of the same record stays.
 - A record that a user deleted while the plan ran stays deleted.
-- A planned copy or reading row of a deleted book is dropped. A planned copy on a
+- A planned copy or reading row of a deleted game is dropped. A planned copy on a
   deleted shelf goes to no shelf.
 
 ### Columns
 
-The file has every book field, the copy fields, the location as a path of room, bookcase
+The file has every game field, the copy fields, the location as a path of room, unit
 and shelf names, the reading row of the chosen person and the wishlist flags
 (`csv_io.LIBRARY_COLUMNS`). A list cell separates its items with `; `. The barcode cell
 is cleaned as in [scan-and-barcode](scan-and-barcode.md#barcode-rules).
 
 - A row puts its copy on the shelf of its path when that shelf exists, else on the
-  chosen shelf. A row with no copy id adds a copy only to a book with no copy.
-- A `book_id` or `copy_id` that is not 32 lower-case hex characters is dropped.
+  chosen shelf. A row with no copy id adds a copy only to a game with no copy.
+- A `game_id` or `copy_id` that is not 32 lower-case hex characters is dropped.
 - The import checks the copy of a row first, so a row with a bad copy changes no record.
-- A book has 1 row for each copy. The first row of the book sets the reading status.
-- A row with `wishlist` true puts a book with no copy on the wishlist of the person.
+- A game has 1 row for each copy. The first row of the game sets the reading status.
+- A row with `wishlist` true puts a game with no copy on the wishlist of the person.
 
 ### Export
 
-`csv_io.export` writes 1 row for each copy, and 1 row for a book with no copy. With a
-person, the file has the reading status of that person. With no person, it has all books
+`csv_io.export` writes 1 row for each copy, and 1 row for a game with no copy. With a
+person, the file has the reading status of that person. With no person, it has all games
 and no reading status. `csv_io.export_filename` names the file with the date.
 
 ### Tab
 
-`tab-import.ts` is the Import dialog at `/import`: person, shelf for new books, file,
+`tab-import.ts` is the Import dialog at `/import`: person, shelf for new games, file,
 preview table and counts, then **Import**. It reads the file in the browser and sends the
 text to `import_csv`. A new person or shelf starts a new preview, and the tab uses only
 the reply of the latest preview.
@@ -86,7 +86,7 @@ the reply of the latest preview.
 - **Text in a service field** over **a file upload**: an automation can call the import.
   The limit is 5 MB.
 - **Match by title and first author** after the barcode: a row that a user typed often
-  has no barcode. A wrong match is possible for 2 books with the same title by 1 author.
+  has no barcode. A wrong match is possible for 2 games with the same title by 1 author.
 
 ## One-way doors
 

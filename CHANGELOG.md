@@ -5,6 +5,15 @@ Each change that a user can see is in this file. The format is based on
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). `manifest.json` `version`
 is the single source of truth (see `RELEASE.md`).
 
+## [0.5.0b2] - 2026-11-21
+
+### Changed
+
+- **Service and event names.** The services, the events and the stored records use "game"
+  and "unit" in place of "book" and "bookcase", such as `add_game`, `game_id` and
+  `home_keeper_games_game_added`. Update each automation that calls a service or listens
+  for an event.
+
 ## [0.5.0b1] - 2026-11-21
 
 ### Changed

@@ -56,41 +56,37 @@ async def _todo_items(hass, entity: str) -> list[dict]:
 
 
 async def _library(hass, call, todo_list) -> dict:
-    """A library with a room in an area, a shelf, 2 books, a copy, loans and reading."""
+    """A library with a room in an area, a shelf, 2 games, a copy, loans and reading."""
     area = ar.async_get(hass).async_create("Living room")
     room = (await call("add_room", {"name": "Study", "area_id": area.id}))["room"]
-    case = (await call("add_bookcase", {"room_id": room["id"], "name": "Oak"}))[
-        "bookcase"
-    ]
-    shelf = (await call("add_shelf", {"bookcase_id": case["id"], "name": "Top"}))[
-        "shelf"
-    ]
+    case = (await call("add_unit", {"room_id": room["id"], "name": "Oak"}))["unit"]
+    shelf = (await call("add_shelf", {"unit_id": case["id"], "name": "Top"}))["shelf"]
     dune = (
         await call(
-            "add_book",
+            "add_game",
             {"title": "Dune", "authors": ["Frank Herbert"]},
         )
-    )["book"]
-    copy = (await call("add_copy", {"book_id": dune["id"], "shelf_id": shelf["id"]}))[
+    )["game"]
+    copy = (await call("add_copy", {"game_id": dune["id"], "shelf_id": shelf["id"]}))[
         "copy"
     ]
     loan = (
         await call(
-            "lend_book", {"copy_id": copy["id"], "party": "Sam", "due": "2026-12-01"}
+            "lend_game", {"copy_id": copy["id"], "party": "Sam", "due": "2026-12-01"}
         )
     )["loan"]
     await call(
-        "set_reading", {"book_id": dune["id"], "person_id": ALICE, "status": "read"}
+        "set_reading", {"game_id": dune["id"], "person_id": ALICE, "status": "read"}
     )
     await call("set_person_settings", {"person_id": BOB, "wishlist_todo": todo_list})
     emma = (
         await call(
-            "add_book",
+            "add_game",
             {"title": "Emma", "authors": ["Jane Austen"]},
         )
-    )["book"]
+    )["game"]
     await call(
-        "add_to_wishlist", {"book_id": emma["id"], "person_id": BOB, "buy": True}
+        "add_to_wishlist", {"game_id": emma["id"], "person_id": BOB, "buy": True}
     )
     await hass.async_block_till_done(wait_background_tasks=True)
     return {
@@ -136,13 +132,13 @@ async def test_export_data_reply(hass, setup_entry, call, todo_list) -> None:
     loan = data["loans"][0]
     assert loan["id"] == ids["loan"]
     assert "hk_task_id" not in loan
-    emma = next(b for b in data["books"] if b["id"] == ids["emma"])
+    emma = next(b for b in data["games"] if b["id"] == ids["emma"])
     assert emma["wishlist"]["person_name"] == "Bob"
     assert "todo_uid" not in emma["wishlist"]
     # The store keeps the values of this install.
     stored = coordinator(setup_entry).store.state
     assert stored["loans"][ids["loan"]]["hk_task_id"]
-    assert stored["books"][ids["emma"]]["wishlist"]["todo_uid"]
+    assert stored["games"][ids["emma"]]["wishlist"]["todo_uid"]
 
 
 async def test_import_data_into_a_new_install(
@@ -155,24 +151,24 @@ async def test_import_data_into_a_new_install(
     preview = await call("import_data", {"document": exported, "dry_run": True})
     assert preview["ok"] is True and preview["dry_run"] is True
     assert preview["problems"] == []
-    assert preview["counts"]["books"] == {"created": 2, "updated": 0, "skipped": 0}
+    assert preview["counts"]["games"] == {"created": 2, "updated": 0, "skipped": 0}
     assert preview["counts"]["covers"] == {"imported": 0, "skipped": 0}
-    assert coordinator(setup_entry).store.state["books"] == {}
+    assert coordinator(setup_entry).store.state["games"] == {}
 
     imported = async_capture_events(hass, "home_keeper_games_data_imported")
-    added = async_capture_events(hass, "home_keeper_games_book_added")
+    added = async_capture_events(hass, "home_keeper_games_game_added")
     reply = await call("import_data", {"document": exported})
     await hass.async_block_till_done(wait_background_tasks=True)
     assert reply["ok"] is True and reply["dry_run"] is False
     assert reply["counts"]["loans"]["created"] == 1
-    assert {r["section"] for r in reply["records"]} >= {"rooms", "books", "loans"}
+    assert {r["section"] for r in reply["records"]} >= {"rooms", "games", "loans"}
     assert len(imported) == 1
-    assert imported[0].data["counts"]["books"]["created"] == 2
+    assert imported[0].data["counts"]["games"]["created"] == 2
     assert imported[0].data["origin"] is None
     assert added == [], "an import fires only data_imported"
 
     state = coordinator(setup_entry).store.state
-    assert set(state["books"]) == {ids["dune"], ids["emma"]}
+    assert set(state["games"]) == {ids["dune"], ids["emma"]}
     assert state["rooms"][ids["room"]]["area_id"] == ids["area"]
     assert state["reading"][ALICE][ids["dune"]]["status"] == "read"
     # The loan sync made the Home Keeper task again.
@@ -184,7 +180,7 @@ async def test_import_data_into_a_new_install(
     # The wishlist sync made the to-do item again.
     items = await _todo_items(hass, todo_list)
     assert [i["summary"] for i in items] == ["Emma by Jane Austen"]
-    assert state["books"][ids["emma"]]["wishlist"]["todo_uid"] == items[0]["uid"]
+    assert state["games"][ids["emma"]]["wishlist"]["todo_uid"] == items[0]["uid"]
     # The export of the new install is the same document.
     again = (await call("export_data"))["data"]
     assert again == exported
@@ -192,7 +188,7 @@ async def test_import_data_into_a_new_install(
 
 async def test_import_data_reports_problems(hass, setup_entry, call) -> None:
     reply = await call(
-        "import_data", {"document": {"format": 2, "books": [{"title": "X"}]}}
+        "import_data", {"document": {"format": 2, "games": [{"title": "X"}]}}
     )
     assert reply["ok"] is False
     assert reply["problems"] == [
@@ -203,14 +199,14 @@ async def test_import_data_reports_problems(hass, setup_entry, call) -> None:
             "lower.",
         }
     ]
-    assert coordinator(setup_entry).store.state["books"] == {}
+    assert coordinator(setup_entry).store.state["games"] == {}
 
     reply = await call(
         "import_data",
         {
             "document": {
-                "books": [{"title": "A"}, {"title": "B", "pages": 0}],
-                "reading": [{"person_id": "gone", "person_name": "Zed", "books": []}],
+                "games": [{"title": "A"}, {"title": "B", "pages": 0}],
+                "reading": [{"person_id": "gone", "person_name": "Zed", "games": []}],
             }
         },
     )
@@ -218,7 +214,7 @@ async def test_import_data_reports_problems(hass, setup_entry, call) -> None:
     assert reply["problems"] == [
         {
             "level": "error",
-            "path": "books[1].pages",
+            "path": "games[1].pages",
             "message": "pages must be from 1 to 100000.",
         },
         {
@@ -227,7 +223,7 @@ async def test_import_data_reports_problems(hass, setup_entry, call) -> None:
             "message": "No person matches Zed.",
         },
     ]
-    assert coordinator(setup_entry).store.state["books"] == {}, "an error blocks all"
+    assert coordinator(setup_entry).store.state["games"] == {}, "an error blocks all"
 
 
 async def test_services_refuse_a_non_admin_user(hass, setup_entry, call, ws) -> None:
@@ -241,19 +237,19 @@ async def test_services_refuse_a_non_admin_user(hass, setup_entry, call, ws) -> 
     assert reply["success"] is False
     assert reply["error"]["code"] == "unauthorized"
     await client.send_json_auto_id(
-        {"type": "home_keeper_games/import_data", "document": {"books": []}}
+        {"type": "home_keeper_games/import_data", "document": {"games": []}}
     )
     reply = await client.receive_json()
     assert reply["error"]["code"] == "unauthorized"
 
 
 async def test_websocket_twin_for_an_admin(hass, setup_entry, call, ws) -> None:
-    await call("add_book", {"title": "Dune"})
+    await call("add_game", {"title": "Dune"})
     client = await ws("admin")
     await client.send_json_auto_id({"type": "home_keeper_games/export_data"})
     reply = await client.receive_json()
     assert reply["success"] is True
-    assert [b["title"] for b in reply["result"]["data"]["books"]] == ["Dune"]
+    assert [b["title"] for b in reply["result"]["data"]["games"]] == ["Dune"]
     assert reply["result"]["data"]["copies"] == []
 
 
@@ -293,27 +289,27 @@ async def test_symbolic_link_out_of_the_bundles_is_refused(
 async def test_covers_travel_in_a_bundle(hass, setup_entry, call, todo_list) -> None:
     from custom_components.home_keeper_games.covers import covers_dir
 
-    book = (await call("add_book", {"title": "Dune"}))["book"]
-    plain = (await call("add_book", {"title": "Emma"}))["book"]
+    game = (await call("add_game", {"title": "Dune"}))["game"]
+    plain = (await call("add_game", {"title": "Emma"}))["game"]
     directory = covers_dir(hass)
     directory.mkdir(parents=True, exist_ok=True)
-    name = f"{book['id']}-0a1b2c3d.jpg"
+    name = f"{game['id']}-0a1b2c3d.jpg"
     (directory / name).write_bytes(_jpeg())
-    await coordinator(setup_entry).store.set_cover(book["id"], "custom", name)
+    await coordinator(setup_entry).store.set_cover(game["id"], "custom", name)
 
     without = await call("export_data")
     assert without["skipped"] == {"covers": 1}
-    dune = next(b for b in without["data"]["books"] if b["id"] == book["id"])
+    dune = next(b for b in without["data"]["games"] if b["id"] == game["id"])
     assert dune["cover"] is None
 
     bundle = Path(hass.config.path(*BUNDLES, "export-1"))
     reply = await call("export_data", {"files_dir": str(bundle)})
     assert reply["skipped"] == {"covers": 0}
-    dune = next(b for b in reply["data"]["books"] if b["id"] == book["id"])
-    assert dune["cover"] == {"kind": "custom", "file": f"covers/{book['id']}.jpg"}
-    emma = next(b for b in reply["data"]["books"] if b["id"] == plain["id"])
+    dune = next(b for b in reply["data"]["games"] if b["id"] == game["id"])
+    assert dune["cover"] == {"kind": "custom", "file": f"covers/{game['id']}.jpg"}
+    emma = next(b for b in reply["data"]["games"] if b["id"] == plain["id"])
     assert emma["cover"] is None
-    copied = bundle / "covers" / f"{book['id']}.jpg"
+    copied = bundle / "covers" / f"{game['id']}.jpg"
     assert copied.read_bytes() == (directory / name).read_bytes()
 
     await _forget_install(hass, setup_entry, todo_list)
@@ -335,7 +331,7 @@ async def test_covers_travel_in_a_bundle(hass, setup_entry, call, todo_list) -> 
     )
     assert result["ok"] is True
     assert result["counts"]["covers"] == {"imported": 1, "skipped": 0}
-    cover = coordinator(setup_entry).store.state["books"][book["id"]]["cover"]
+    cover = coordinator(setup_entry).store.state["games"][game["id"]]["cover"]
     assert cover["kind"] == "custom"
     assert cover["file"] != name
     stored = directory / cover["file"]
@@ -352,7 +348,7 @@ async def test_bad_cover_file_is_a_warning(hass, setup_entry, call) -> None:
     big = bundle / "covers" / "big.jpg"
     big.write_bytes(b"\xff\xd8\xff" + b"0" * (10 * 1024 * 1024))
     document = {
-        "books": [
+        "games": [
             {"title": "A", "cover": {"kind": "custom", "file": "covers/x.jpg"}},
             {"title": "B", "cover": {"kind": "custom", "file": "covers/none.jpg"}},
             {"title": "C", "cover": {"kind": "custom", "file": "covers/big.jpg"}},
@@ -362,15 +358,15 @@ async def test_bad_cover_file_is_a_warning(hass, setup_entry, call) -> None:
     assert reply["ok"] is True
     assert reply["counts"]["covers"] == {"imported": 0, "skipped": 3}
     assert [p["path"] for p in reply["problems"]] == [
-        "books[0].cover.file",
-        "books[1].cover.file",
-        "books[2].cover.file",
+        "games[0].cover.file",
+        "games[1].cover.file",
+        "games[2].cover.file",
     ]
     assert reply["problems"][0] == {
         "level": "warning",
-        "path": "books[0].cover.file",
+        "path": "games[0].cover.file",
         "message": "The cover file covers/x.jpg is not a valid image.",
     }
-    books = coordinator(setup_entry).store.state["books"].values()
-    assert sorted(b["title"] for b in books) == ["A", "B", "C"]
-    assert all(b["cover"] == {"kind": "none", "file": None} for b in books)
+    games = coordinator(setup_entry).store.state["games"].values()
+    assert sorted(b["title"] for b in games) == ["A", "B", "C"]
+    assert all(b["cover"] == {"kind": "none", "file": None} for b in games)

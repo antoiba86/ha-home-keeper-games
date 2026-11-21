@@ -57,10 +57,10 @@ describe('setLanguage', () => {
 
 describe('t', () => {
   it('fills tokens and keeps unknown tokens', () => {
-    expect(t('book.page_of', { page: 3, pages: 10 })).toBe('Page 3 of 10');
-    expect(t('book.page_of', { page: 0 })).toBe('Page 0 of {pages}');
-    expect(t('book.page_of', { page: null, pages: '' })).toBe('Page {page} of ');
-    expect(t('book.page_of')).toBe('Page {page} of {pages}');
+    expect(t('game.page_of', { page: 3, pages: 10 })).toBe('Page 3 of 10');
+    expect(t('game.page_of', { page: 0 })).toBe('Page 0 of {pages}');
+    expect(t('game.page_of', { page: null, pages: '' })).toBe('Page {page} of ');
+    expect(t('game.page_of')).toBe('Page {page} of {pages}');
   });
   it('falls back to English, then to the key', () => {
     withKeys({ 'tmp.en': 'English only' }, () => {
@@ -73,10 +73,10 @@ describe('t', () => {
 
 describe('tn', () => {
   it('picks the English plural', () => {
-    expect(tn('count.books', 1)).toBe('1 book');
-    expect(tn('count.books', 0)).toBe('0 books');
-    expect(tn('count.books', 7)).toBe('7 books');
-    expect(tn('count.books', 7, { n: 'seven' })).toBe('seven books');
+    expect(tn('count.games', 1)).toBe('1 book');
+    expect(tn('count.games', 0)).toBe('0 books');
+    expect(tn('count.games', 7)).toBe('7 books');
+    expect(tn('count.games', 7, { n: 'seven' })).toBe('seven books');
   });
   it('picks few and many in Polish', () => {
     withKeys({ 'tmp.p.one': '{n} A', 'tmp.p.few': '{n} B', 'tmp.p.many': '{n} C', 'tmp.p.other': '{n} D' }, () => {

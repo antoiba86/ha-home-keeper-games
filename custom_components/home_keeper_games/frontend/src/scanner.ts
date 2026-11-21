@@ -1,6 +1,6 @@
 // The camera scanner: `getUserMedia` and a barcode detector.
 //
-// The native `BarcodeDetector` is used when it supports a book format. Else the
+// The native `BarcodeDetector` is used when it supports a game format. Else the
 // zxing chunk loads (see `zxing-decoder.ts`). The camera API needs a secure
 // origin (HTTPS), so `start` reports "insecure" when `navigator.mediaDevices`
 // is missing.
@@ -39,7 +39,7 @@ export function cameraNeedsHttps(): boolean {
   return globalThis.isSecureContext === false;
 }
 
-const BOOK_FORMATS = ['ean_13', 'ean_8', 'upc_a'];
+const GAME_FORMATS = ['ean_13', 'ean_8', 'upc_a'];
 /** A playing video whose time does not move for this long has a frozen picture. */
 export const FROZEN_MS = 1500;
 
@@ -56,8 +56,8 @@ export async function createDetector(): Promise<Detector & { kind: string }> {
   const Native = (window as unknown as { BarcodeDetector?: NativeDetectorClass }).BarcodeDetector;
   if (Native) {
     try {
-      const supported = (await Native.getSupportedFormats?.()) ?? BOOK_FORMATS;
-      const formats = BOOK_FORMATS.filter((f) => supported.includes(f));
+      const supported = (await Native.getSupportedFormats?.()) ?? GAME_FORMATS;
+      const formats = GAME_FORMATS.filter((f) => supported.includes(f));
       if (formats.length) {
         const native = new Native({ formats });
         return { kind: 'native', detect: async (video) => (await native.detect(video)).map((r) => r.rawValue) };

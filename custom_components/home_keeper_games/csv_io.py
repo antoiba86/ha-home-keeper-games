@@ -8,7 +8,7 @@ Import has 2 steps:
    result for each row. It changes no argument, so a dry run is the same call
    with the result thrown away.
 
-Export writes every book and copy field. ``rows_from_state`` makes the rows, and
+Export writes every game and copy field. ``rows_from_state`` makes the rows, and
 ``write(rows)`` writes them, so ``parse(write(rows))`` gives the rows back (a
 property test checks this).
 
@@ -28,8 +28,8 @@ from .models import (
     FORMATS,
     STATUSES,
     LibraryError,
-    build_book,
     build_copy,
+    build_game,
     build_wishlist,
     clean_barcode,
     clone,
@@ -41,7 +41,7 @@ from .models import (
 )
 
 LIBRARY_COLUMNS = (
-    "book_id",
+    "game_id",
     "title",
     "subtitle",
     "authors",
@@ -99,7 +99,7 @@ def empty_row(line: int) -> dict[str, Any]:
     """An import row with every key."""
     return {
         "line": line,
-        "book_id": None,
+        "game_id": None,
         "title": "",
         "subtitle": "",
         "authors": [],
@@ -212,7 +212,7 @@ def _bool_cell(value: str) -> bool:
 def _record_id(value: str) -> str | None:
     """*value* if it has the form of a record id (:func:`models.new_id`), else None.
 
-    A cover file name starts with the book id, so an id from a file must not
+    A cover file name starts with the game id, so an id from a file must not
     hold a path.
     """
     return value if _RECORD_ID_RE.fullmatch(value) else None
@@ -223,7 +223,7 @@ def parse_library(text: str) -> list[dict[str, Any]]:
     rows = []
     for index, raw in enumerate(_rows(text, "title"), start=1):
         row = empty_row(index)
-        row["book_id"] = _record_id(_cell(raw, "book_id"))
+        row["game_id"] = _record_id(_cell(raw, "game_id"))
         for field in ("title", "subtitle", "publisher", "published", "description"):
             row[field] = _cell(raw, field)
         row["shared_notes"] = _cell(raw, "shared_notes")
@@ -286,35 +286,35 @@ def parse(text: str) -> list[dict[str, Any]]:
 
 
 class _Index:
-    """The match keys of the books: barcode, then title and author."""
+    """The match keys of the games: barcode, then title and author."""
 
-    def __init__(self, books: dict[str, dict[str, Any]]) -> None:
+    def __init__(self, games: dict[str, dict[str, Any]]) -> None:
         self.by_id: set[str] = set()
         self.barcode: dict[str, str] = {}
         self.title: dict[str, str] = {}
-        for book in books.values():
-            self.add(book)
+        for game in games.values():
+            self.add(game)
 
-    def add(self, book: dict[str, Any]) -> None:
-        self.by_id.add(book["id"])
-        if book["barcode"]:
-            self.barcode.setdefault(book["barcode"], book["id"])
-        key = title_key(book["title"], book["authors"])
+    def add(self, game: dict[str, Any]) -> None:
+        self.by_id.add(game["id"])
+        if game["barcode"]:
+            self.barcode.setdefault(game["barcode"], game["id"])
+        key = title_key(game["title"], game["authors"])
         if key.split("|", 1)[0]:
-            self.title.setdefault(key, book["id"])
+            self.title.setdefault(key, game["id"])
 
     def match(self, row: dict[str, Any]) -> tuple[str | None, str]:
-        """``(book_id, action)``: ``existing``, ``title_match`` or ``new``."""
-        if row["book_id"] and row["book_id"] in self.by_id:
-            return str(row["book_id"]), ACTION_EXISTING
+        """``(game_id, action)``: ``existing``, ``title_match`` or ``new``."""
+        if row["game_id"] and row["game_id"] in self.by_id:
+            return str(row["game_id"]), ACTION_EXISTING
         if row["barcode"] and row["barcode"] in self.barcode:
             return self.barcode[row["barcode"]], ACTION_EXISTING
         found = self.title.get(title_key(row["title"], row["authors"]))
         return found, ACTION_TITLE_MATCH if found else ACTION_NEW
 
 
-# The book fields of an import row.
-_ROW_BOOK_FIELDS = (
+# The game fields of an import row.
+_ROW_GAME_FIELDS = (
     "title",
     "subtitle",
     "authors",
@@ -331,17 +331,17 @@ _ROW_BOOK_FIELDS = (
 )
 
 
-def _new_book(row: dict[str, Any], now: str) -> dict[str, Any]:
+def _new_game(row: dict[str, Any], now: str) -> dict[str, Any]:
     data = {
         field: row[field]
-        for field in _ROW_BOOK_FIELDS
+        for field in _ROW_GAME_FIELDS
         if row.get(field) not in (None, "", [])
     }
     data["needs_details"] = bool(row.get("needs_details", True))
-    book = build_book(data, now=now)
-    if row.get("book_id"):
-        book["id"] = str(row["book_id"])
-    return book
+    game = build_game(data, now=now)
+    if row.get("game_id"):
+        game["id"] = str(row["game_id"])
+    return game
 
 
 ACTION_NEW = "new"
@@ -368,8 +368,8 @@ def summary_of(counts: dict[str, int], kept: int) -> dict[str, int]:
     """The summary of the ``import_completed`` event, from the import counts."""
     return {
         "rows": counts["rows"],
-        "books_added": counts["new"],
-        "books_matched": counts["existing"] + counts["title_match"],
+        "games_added": counts["new"],
+        "games_matched": counts["existing"] + counts["title_match"],
         "copies_added": counts["copies"],
         "reading_set": counts["read"]
         + counts["reading"]
@@ -395,15 +395,15 @@ def apply_import(
 
     Return ``(new_state, counts, results)``. ``counts`` has the keys of
     :data:`COUNT_KEYS` and ``reading_kept``. Each result has ``line``, ``title``,
-    ``authors``, ``barcode``, ``book_id`` and ``action`` (``new``, ``existing``,
+    ``authors``, ``barcode``, ``game_id`` and ``action`` (``new``, ``existing``,
     ``title_match`` or ``error``). An error result also has ``error`` (a
     translation key) and ``placeholders``.
     """
     new = clone(state)
-    index = _Index(new["books"])
+    index = _Index(new["games"])
     reading = new["reading"].setdefault(person_id, {})
     copy_ids = set(new["copies"])
-    owned_books = {c.get("book_id") for c in new["copies"].values()}
+    owned_games = {c.get("game_id") for c in new["copies"].values()}
     reading_done: set[str] = set()
     counts = dict.fromkeys(COUNT_KEYS, 0)
     counts["rows"] = len(rows)
@@ -415,7 +415,7 @@ def apply_import(
             "title": row["title"],
             "authors": list(row["authors"]),
             "barcode": row["barcode"],
-            "book_id": None,
+            "game_id": None,
             "action": ACTION_NEW,
         }
         try:
@@ -424,43 +424,43 @@ def apply_import(
             for field in COPY_FIELDS:
                 if copy_data.get(field) is not None:
                     copy_field(field, copy_data[field])
-            book_id, action = index.match(row)
-            if book_id is None:
-                book = _new_book(row, now)
-                new["books"][book["id"]] = book
-                index.add(book)
-                book_id = book["id"]
+            game_id, action = index.match(row)
+            if game_id is None:
+                game = _new_game(row, now)
+                new["games"][game["id"]] = game
+                index.add(game)
+                game_id = game["id"]
                 if row["tags"]:
                     counts["tags"] += 1
             else:
-                book = new["books"][book_id]
-                extra = [t for t in row["tags"] if t not in book["tags"]]
+                game = new["games"][game_id]
+                extra = [t for t in row["tags"] if t not in game["tags"]]
                 if extra:
-                    book["tags"] = [*book["tags"], *extra]
+                    game["tags"] = [*game["tags"], *extra]
                     counts["tags"] += 1
             counts[action] += 1
             result["action"] = action
-            result["book_id"] = book_id
-            if _import_copy(new, row, book_id, shelf_id, copy_ids, owned_books, now):
+            result["game_id"] = game_id
+            if _import_copy(new, row, game_id, shelf_id, copy_ids, owned_games, now):
                 counts["copies"] += 1
-            # A library file has 1 row for each copy. The first row of a book
+            # A library file has 1 row for each copy. The first row of a game
             # sets its reading status.
-            if row["status"] and book_id not in reading_done:
-                reading_done.add(book_id)
-                if book_id in reading and not replace_reading:
+            if row["status"] and game_id not in reading_done:
+                reading_done.add(game_id)
+                if game_id in reading and not replace_reading:
                     counts["reading_kept"] += 1
                 else:
-                    reading[book_id] = _reading_row(row, import_notes, now)
+                    reading[game_id] = _reading_row(row, import_notes, now)
                     counts[row["status"]] += 1
             if (
                 row["wishlist"]
-                and book_id not in owned_books
-                and not new["books"][book_id]["wishlist"]
+                and game_id not in owned_games
+                and not new["games"][game_id]["wishlist"]
             ):
                 entry = build_wishlist(
                     person_id, buy=bool(row["wishlist_buy"]), now=now
                 )
-                new["books"][book_id]["wishlist"] = entry
+                new["games"][game_id]["wishlist"] = entry
                 counts["wishlist"] += 1
         except LibraryError as err:
             result["action"] = ACTION_ERROR
@@ -476,16 +476,16 @@ def apply_import(
 def _import_copy(
     new: dict[str, Any],
     row: dict[str, Any],
-    book_id: str,
+    game_id: str,
     shelf_id: str | None,
     copy_ids: set[str],
-    owned_books: set[Any],
+    owned_games: set[Any],
     now: str,
 ) -> bool:
     """Add the copy of a row, if the row has one and it is not in the library.
 
     A row with a copy id adds its copy unless a copy with that id exists. A row
-    with no copy id adds 1 copy only to a book with no copy. Return whether a
+    with no copy id adds 1 copy only to a game with no copy. Return whether a
     copy was added.
     """
     copy = row.get("copy")
@@ -495,19 +495,19 @@ def _import_copy(
     if copy_id is not None:
         if copy_id in copy_ids:
             return False
-    elif book_id in owned_books:
+    elif game_id in owned_games:
         return False
     location = row.get("location") or []
     target = find_shelf_by_path(new, location) if location else None
     data = {k: v for k, v in copy.items() if k != "id" and v is not None}
-    data["book_id"] = book_id
+    data["game_id"] = game_id
     data["shelf_id"] = target or (shelf_id if shelf_id in new["shelves"] else None)
     record = build_copy(data, now=now)
     if copy_id:
         record["id"] = str(copy_id)
     new["copies"][record["id"]] = record
     copy_ids.add(record["id"])
-    owned_books.add(book_id)
+    owned_games.add(game_id)
     return True
 
 
@@ -533,41 +533,41 @@ def rows_from_state(
 ) -> list[dict[str, Any]]:
     """Import rows that describe the library, for :func:`write`.
 
-    There is 1 row for each copy, and 1 row for a book with no copy. With no
+    There is 1 row for each copy, and 1 row for a game with no copy. With no
     *person_id*, the rows have no reading status.
     """
     copies: dict[str, list[dict[str, Any]]] = {}
     for copy in sorted(
         state["copies"].values(), key=lambda c: (str(c.get("created_at")), c["id"])
     ):
-        copies.setdefault(copy["book_id"], []).append(copy)
+        copies.setdefault(copy["game_id"], []).append(copy)
     reading = state["reading"].get(person_id, {}) if person_id else {}
     rows: list[dict[str, Any]] = []
-    books = sorted(
-        state["books"].values(),
+    games = sorted(
+        state["games"].values(),
         key=lambda b: (b["title"].casefold(), b["id"]),
     )
-    for book in books:
+    for game in games:
         base = empty_row(len(rows) + 1)
-        for field in (*_ROW_BOOK_FIELDS, "needs_details"):
-            base[field] = clone(book[field])
-        base["book_id"] = book["id"]
-        row_reading = reading.get(book["id"])
+        for field in (*_ROW_GAME_FIELDS, "needs_details"):
+            base[field] = clone(game[field])
+        base["game_id"] = game["id"]
+        row_reading = reading.get(game["id"])
         if row_reading:
             for field in ("status", "rating", "page", "started", "finished"):
                 base[field] = row_reading.get(field)
             base["read_count"] = row_reading.get("read_count")
             base["notes"] = row_reading.get("private_notes", "")
-        wish = book["wishlist"]
+        wish = game["wishlist"]
         if wish and (person_id is None or wish.get("person_id") == person_id):
             base["wishlist"] = True
             base["wishlist_buy"] = bool(wish.get("buy"))
-        book_copies = copies.get(book["id"], [])
-        base["owned"] = len(book_copies)
-        if not book_copies:
+        game_copies = copies.get(game["id"], [])
+        base["owned"] = len(game_copies)
+        if not game_copies:
             rows.append(base)
             continue
-        for copy in book_copies:
+        for copy in game_copies:
             row = clone(base)
             row["line"] = len(rows) + 1
             row["copy"] = {
@@ -599,7 +599,7 @@ def _library_cells(row: dict[str, Any]) -> dict[str, str]:
     series = row["series"] or {}
     copy = row["copy"] or {}
     return {
-        "book_id": row["book_id"] or "",
+        "game_id": row["game_id"] or "",
         "title": row["title"],
         "subtitle": row["subtitle"],
         "authors": LIST_SEP.join(row["authors"] or []),

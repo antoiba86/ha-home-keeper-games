@@ -149,13 +149,13 @@ class LoanSync:
             loan = store.state["loans"].get(add.loan_id)
             if loan is None:
                 continue
-            book = store.state["books"].get(loan["book_id"]) or {}
+            game = store.state["games"].get(loan["game_id"]) or {}
             payload = loan_tasks.add_task_payload(
                 loan,
                 name=resolve_string(
                     lang,
                     loan_tasks.task_name_key(loan),
-                    title=book.get("title", ""),
+                    title=game.get("title", ""),
                     party=loan.get("party", ""),
                 ),
                 completion_prompt=resolve_string(lang, "loan_task.completion_prompt"),

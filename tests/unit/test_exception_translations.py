@@ -127,7 +127,7 @@ def test_library_error_keys_exist_in_strings() -> None:
     # ``store._get`` builds ``<kind>_not_found`` for these kinds.
     used |= {
         f"{kind}_not_found"
-        for kind in ("room", "bookcase", "shelf", "book", "copy", "loan")
+        for kind in ("room", "unit", "shelf", "game", "copy", "loan")
     }
     assert "invalid_field" in used and "not_loaded" in used
     assert not used - defined, f"keys missing from strings.json: {used - defined}"

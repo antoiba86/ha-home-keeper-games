@@ -11,40 +11,40 @@ Most services are admin-only. `set_reading`, `set_person_settings` and the read 
 are open to every user, for their own person
 ([People and privacy](../start/people-and-privacy.md)).
 
-Example: set the status Read when an NFC tag on the bookcase is scanned.
+Example: set the status Read when an NFC tag on the unit is scanned.
 
 ```yaml
 automation:
-  - alias: Finished a book
+  - alias: Finished a game
     triggers:
       - trigger: tag
-        tag_id: bedside-book
+        tag_id: bedside-game
     actions:
       - action: home_keeper_games.set_reading
         data:
-          book_id: "5f0c1b2a9d8e4f7a8b6c5d4e3f2a1b0c"
+          game_id: "5f0c1b2a9d8e4f7a8b6c5d4e3f2a1b0c"
           person_id: "alice"
           status: read
 ```
 
-A read service returns a response. Example: find the shelf of a book.
+A read service returns a response. Example: find the shelf of a game.
 
 ```yaml
 actions:
-  - action: home_keeper_games.list_books
+  - action: home_keeper_games.list_games
     data:
       query: dune
     response_variable: found
-  - action: home_keeper_games.get_book
+  - action: home_keeper_games.get_game
     data:
-      book_id: "{{ found.books[0].id }}"
+      game_id: "{{ found.games[0].id }}"
     response_variable: detail
 ```
 
 ## Events
 
 The library fires an event for each change, such as
-`home_keeper_games_book_finished`, `home_keeper_games_loan_started` and
+`home_keeper_games_game_finished`, `home_keeper_games_loan_started` and
 `home_keeper_games_loan_overdue`. Use them with an **Event** trigger.
 
 ```yaml
@@ -63,14 +63,14 @@ automation:
 
 | Entity | State |
 |---|---|
-| **Books** | The books with 1 copy or more |
+| **Games** | The games with 1 copy or more |
 | **Loans out** | The open loans of lent copies |
 | **Loans overdue** | The open loans past their due date |
-| *Person* **books read this year** | The books read this year, with the goal and the pages |
-| *Person* **reading now** | The books with status Reading, with their titles |
-| *Person* **to read** | A to-do list of the books with status Want to read |
+| *Person* **games read this year** | The games read this year, with the goal and the pages |
+| *Person* **reading now** | The games with status Reading, with their titles |
+| *Person* **to read** | A to-do list of the games with status Want to read |
 
-Complete an item of a **to read** list to set the status Read. Add an item to add a book
+Complete an item of a **to read** list to set the status Read. Add an item to add a game
 to the list. The per-person entities follow the privacy rules in
 [People and privacy](../start/people-and-privacy.md#entities).
 

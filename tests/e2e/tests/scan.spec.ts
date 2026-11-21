@@ -1,40 +1,40 @@
 import { library } from '../ha-ws';
 import type { Locator, Page } from '@playwright/test';
 import { resolve } from 'node:path';
-import { adminState, bookByTitle, expect, fakeCamera, openTab, test } from './helpers';
+import { adminState, gameByTitle, expect, fakeCamera, openTab, test } from './helpers';
 
 /**
- * The Scan flow with Enter barcode. A new barcode adds a book that the test deletes after
+ * The Scan flow with Enter barcode. A new barcode adds a game that the test deletes after
  * it runs.
  */
 const NEW_CODE = '9780553418606';
 const SEEDED_CODE = '9780441478125';
 const SEEDED_TITLE = 'The Left Hand of Darkness';
-/** No seeded book has this barcode. */
+/** No seeded game has this barcode. */
 const MISS_CODE = '9781402894626';
 const MISS_TITLE = 'Field Notes on Moss';
 const COVER = resolve(__dirname, '../seed/covers/13be6b0e5c354e1981a89fe2766196e0-552257a9.jpg');
 
-async function shelfId(room: string, bookcase: string, shelf: string): Promise<string> {
+async function shelfId(room: string, unit: string, shelf: string): Promise<string> {
   const state = await adminState();
   const r = state.rooms.find((x: { name: string }) => x.name === room);
-  const c = state.bookcases.find((x: { name: string; room_id: string }) => x.name === bookcase && x.room_id === r.id);
-  return state.shelves.find((x: { name: string; bookcase_id: string }) => x.name === shelf && x.bookcase_id === c.id).id;
+  const c = state.units.find((x: { name: string; room_id: string }) => x.name === unit && x.room_id === r.id);
+  return state.shelves.find((x: { name: string; unit_id: string }) => x.name === shelf && x.unit_id === c.id).id;
 }
 
-async function deleteNewBook(): Promise<void> {
+async function deleteNewGame(): Promise<void> {
   const state = await adminState();
-  for (const book of state.books.filter((b: { barcode: string }) => [NEW_CODE, MISS_CODE].includes(b.barcode))) {
-    await library('delete_book', { book_id: book.id });
+  for (const game of state.games.filter((b: { barcode: string }) => [NEW_CODE, MISS_CODE].includes(b.barcode))) {
+    await library('delete_game', { game_id: game.id });
   }
 }
 
 test.describe('Scan', { tag: '@responsive' }, () => {
-  test.beforeEach(deleteNewBook);
-  test.afterEach(deleteNewBook);
+  test.beforeEach(deleteNewGame);
+  test.afterEach(deleteNewGame);
 
   test('Enter barcode with a new barcode asks for its title before the next scan', async ({ page }) => {
-    const shelf = await shelfId('Office', 'Tall bookcase', 'Shelf 3');
+    const shelf = await shelfId('Office', 'Tall unit', 'Shelf 3');
     const tab = await openTab(page, `/scan;shelf=${shelf}`);
     await tab.locator('[data-k="m-manual"]').check();
     await tab.locator('[data-k="scan-start"]').click();
@@ -64,14 +64,14 @@ test.describe('Scan', { tag: '@responsive' }, () => {
     await expect(tab.locator('.hkl-result').filter({ hasText: MISS_TITLE })).toContainText('No book has this barcode');
 
     const state = await adminState();
-    const book = state.books.find((b: { barcode: string }) => b.barcode === MISS_CODE);
-    expect(book).toMatchObject({ title: MISS_TITLE, authors: ['A. Hollins'], needs_details: true });
-    expect(book.cover.kind).toBe('custom');
-    const copies = state.copies.filter((c: { book_id: string }) => c.book_id === book.id);
+    const game = state.games.find((b: { barcode: string }) => b.barcode === MISS_CODE);
+    expect(game).toMatchObject({ title: MISS_TITLE, authors: ['A. Hollins'], needs_details: true });
+    expect(game.cover.kind).toBe('custom');
+    const copies = state.copies.filter((c: { game_id: string }) => c.game_id === game.id);
     expect(copies.map((c: { shelf_id: string; format: string }) => [c.shelf_id, c.format])).toEqual([[shelf, 'hardcover']]);
   });
 
-  test('Remove this scan deletes the new book', async ({ page }) => {
+  test('Remove this scan deletes the new game', async ({ page }) => {
     const tab = await openTab(page, '/scan');
     await tab.locator('[data-k="m-manual"]').check();
     await tab.locator('[data-k="scan-start"]').click();
@@ -83,14 +83,14 @@ test.describe('Scan', { tag: '@responsive' }, () => {
     await expect(sheet).toHaveCount(0);
     await expect(tab.locator('[data-k^="removed-"]')).toHaveText('Removed');
     const state = await adminState();
-    expect(state.books.filter((b: { barcode: string }) => b.barcode === MISS_CODE)).toEqual([]);
+    expect(state.games.filter((b: { barcode: string }) => b.barcode === MISS_CODE)).toEqual([]);
   });
 
   test('a duplicate shows its actions and Skip changes nothing', async ({ page }) => {
-    const seeded = await bookByTitle(SEEDED_TITLE);
+    const seeded = await gameByTitle(SEEDED_TITLE);
     expect(seeded.barcode).toBe(SEEDED_CODE);
-    const before = (await adminState()).copies.filter((c: { book_id: string }) => c.book_id === seeded.id);
-    const shelf = await shelfId('Office', 'Tall bookcase', 'Shelf 3');
+    const before = (await adminState()).copies.filter((c: { game_id: string }) => c.game_id === seeded.id);
+    const shelf = await shelfId('Office', 'Tall unit', 'Shelf 3');
     const tab = await openTab(page, `/scan;shelf=${shelf};step=camera`);
     await tab.locator('[data-k="m-manual"]').check().catch(() => undefined);
     const input = tab.locator('[data-k="barcode-input"]');
@@ -98,12 +98,12 @@ test.describe('Scan', { tag: '@responsive' }, () => {
     await input.fill(SEEDED_CODE);
     await tab.locator('[data-k="barcode-add"]').click();
     const row = tab.locator('.hkl-result.dup');
-    await expect(row).toContainText('Already in Office › Tall bookcase › Shelf 1, Living room › Bookcase A › Shelf 2');
+    await expect(row).toContainText('Already in Office › Tall unit › Shelf 1, Living room › Unit A › Shelf 2');
     await expect(row.getByRole('button', { name: 'Move here' })).toBeVisible();
     await expect(row.getByRole('button', { name: 'Add 2nd copy' })).toBeVisible();
     await row.getByRole('button', { name: 'Skip' }).click();
     await expect(tab.locator('.hkl-result').filter({ hasText: seeded.title }).locator('.hkl-pill')).toHaveText('Skipped');
-    const after = (await adminState()).copies.filter((c: { book_id: string }) => c.book_id === seeded.id);
+    const after = (await adminState()).copies.filter((c: { game_id: string }) => c.game_id === seeded.id);
     expect(after).toEqual(before);
   });
 });
@@ -121,12 +121,12 @@ function playing(video: Locator): Promise<boolean> {
 }
 
 test.describe('Scan camera', { tag: '@responsive' }, () => {
-  test.beforeEach(deleteNewBook);
-  test.afterEach(deleteNewBook);
+  test.beforeEach(deleteNewGame);
+  test.afterEach(deleteNewGame);
 
   test('the camera keeps its picture after a scan, and stops at the summary', async ({ page }) => {
     await fakeCamera(page);
-    const shelf = await shelfId('Office', 'Tall bookcase', 'Shelf 3');
+    const shelf = await shelfId('Office', 'Tall unit', 'Shelf 3');
     const tab = await openTab(page, `/scan;shelf=${shelf}`);
     await tab.locator('[data-k="scan-start"]').click();
     const video = tab.locator('[data-slot="video"] video');
@@ -157,8 +157,8 @@ test.describe('Scan camera', { tag: '@responsive' }, () => {
 });
 
 test.describe('Scan camera with a new barcode', { tag: '@responsive' }, () => {
-  test.beforeEach(deleteNewBook);
-  test.afterEach(deleteNewBook);
+  test.beforeEach(deleteNewGame);
+  test.afterEach(deleteNewGame);
 
   test('the camera shows Scan paused and reads no code until the title is saved', async ({ page }) => {
     await fakeCamera(page);
@@ -171,7 +171,7 @@ test.describe('Scan camera with a new barcode', { tag: '@responsive' }, () => {
     await expect(sheet).toBeVisible({ timeout: 30_000 });
     await expect(tab.locator('[data-k="cam-paused"]')).toHaveText('Scan paused');
 
-    // A code read now adds no book.
+    // A code read now adds no game.
     await page.evaluate((code) => ((window as unknown as Record<string, unknown>).__hklCode = code), NEW_CODE);
     await expect.poll(() => page.evaluate(() => (window as unknown as Record<string, string>).__hklCode)).toBe('');
     await expect(tab.locator('.hkl-result')).toHaveCount(1);
@@ -182,7 +182,7 @@ test.describe('Scan camera with a new barcode', { tag: '@responsive' }, () => {
     await expect(tab.locator('[data-k="cam-paused"]')).toHaveCount(0);
     expect(await playing(video)).toBe(true);
     const state = await adminState();
-    expect(state.books.filter((b: { barcode: string }) => b.barcode === NEW_CODE)).toEqual([]);
+    expect(state.games.filter((b: { barcode: string }) => b.barcode === NEW_CODE)).toEqual([]);
   });
 });
 

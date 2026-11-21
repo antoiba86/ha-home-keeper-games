@@ -49,7 +49,7 @@ delete_room:
       selector:
         boolean:
 
-add_bookcase:
+add_unit:
   fields:
     room_id:
       required: true
@@ -71,9 +71,9 @@ add_bookcase:
           max: 100000
           mode: "box"
 
-update_bookcase:
+update_unit:
   fields:
-    bookcase_id:
+    unit_id:
       required: true
       selector:
         text:
@@ -95,9 +95,9 @@ update_bookcase:
           max: 100000
           mode: "box"
 
-delete_bookcase:
+delete_unit:
   fields:
-    bookcase_id:
+    unit_id:
       required: true
       selector:
         text:
@@ -107,7 +107,7 @@ delete_bookcase:
 
 add_shelf:
   fields:
-    bookcase_id:
+    unit_id:
       required: true
       selector:
         text:
@@ -129,7 +129,7 @@ update_shelf:
       required: true
       selector:
         text:
-    bookcase_id:
+    unit_id:
       selector:
         text:
     name:
@@ -153,7 +153,7 @@ delete_shelf:
       selector:
         boolean:
 
-add_book:
+add_game:
   fields:
     title:
       example: "The Left Hand of Darkness"
@@ -208,9 +208,9 @@ add_book:
       selector:
         boolean:
 
-update_book:
+update_game:
   fields:
-    book_id:
+    game_id:
       required: true
       selector:
         text:
@@ -267,9 +267,9 @@ update_book:
       selector:
         boolean:
 
-delete_book:
+delete_game:
   fields:
-    book_id:
+    game_id:
       required: true
       selector:
         text:
@@ -304,7 +304,7 @@ scan_barcode:
 
 add_copy:
   fields:
-    book_id:
+    game_id:
       required: true
       selector:
         text:
@@ -437,7 +437,7 @@ delete_copy:
 
 set_cover:
   fields:
-    book_id:
+    game_id:
       required: true
       selector:
         text:
@@ -454,7 +454,7 @@ set_cover:
 
 set_reading:
   fields:
-    book_id:
+    game_id:
       required: true
       selector:
         text:
@@ -499,7 +499,7 @@ set_reading:
         text:
           multiline: true
 
-lend_book:
+lend_game:
   fields:
     copy_id:
       required: true
@@ -525,9 +525,9 @@ lend_book:
       selector:
         boolean:
 
-borrow_book:
+borrow_game:
   fields:
-    book_id:
+    game_id:
       selector:
         text:
     barcode:
@@ -625,7 +625,7 @@ delete_loan:
 
 add_to_wishlist:
   fields:
-    book_id:
+    game_id:
       selector:
         text:
     barcode:
@@ -650,7 +650,7 @@ add_to_wishlist:
 
 update_wishlist:
   fields:
-    book_id:
+    game_id:
       required: true
       selector:
         text:
@@ -663,14 +663,14 @@ update_wishlist:
 
 remove_from_wishlist:
   fields:
-    book_id:
+    game_id:
       required: true
       selector:
         text:
 
-got_wishlist_book:
+got_wishlist_game:
   fields:
-    book_id:
+    game_id:
       required: true
       selector:
         text:
@@ -763,7 +763,7 @@ import_data:
       selector:
         text:
 
-list_books:
+list_games:
   fields:
     query:
       selector:
@@ -795,9 +795,9 @@ list_books:
           max: 100000
           mode: "box"
 
-get_book:
+get_game:
   fields:
-    book_id:
+    game_id:
       required: true
       selector:
         text:

@@ -223,7 +223,7 @@ button { font: inherit; color: inherit; }
 .hkl-case { background: var(--hkl-surface); border: 1px solid var(--hkl-divider); border-radius: var(--hkl-radius); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 .hkl-case-body { display: flex; flex-direction: column; gap: 14px; }
 .hkl-shelf { display: flex; flex-direction: column; }
-.hkl-shelf-books { display: flex; align-items: flex-end; gap: 2px; min-height: 84px; padding: 0 8px; overflow: hidden; }
+.hkl-shelf-games { display: flex; align-items: flex-end; gap: 2px; min-height: 84px; padding: 0 8px; overflow: hidden; }
 .hkl-spine { display: block; flex: 0 0 auto; border-radius: 2px 2px 0 0; box-shadow: inset -2px 0 0 rgba(0,0,0,.18), inset 0 6px 0 rgba(255,255,255,.08); }
 .hkl-spine:hover { transform: translateY(-3px); }
 .hkl-board { height: 8px; border-radius: 2px; background: var(--hkl-wood); }

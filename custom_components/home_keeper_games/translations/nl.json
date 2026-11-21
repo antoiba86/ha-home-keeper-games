@@ -41,7 +41,7 @@
   },
   "entity": {
     "sensor": {
-      "books": {
+      "games": {
         "name": "Boeken"
       },
       "loans_out": {
@@ -50,7 +50,7 @@
       "loans_overdue": {
         "name": "Te late uitleningen"
       },
-      "books_read_this_year": {
+      "games_read_this_year": {
         "name": "{person} boeken gelezen dit jaar"
       },
       "reading_now": {
@@ -132,7 +132,7 @@
         }
       }
     },
-    "add_bookcase": {
+    "add_unit": {
       "name": "Boekenkast toevoegen",
       "description": "Een boekenkast aan een kamer toevoegen.",
       "fields": {
@@ -154,11 +154,11 @@
         }
       }
     },
-    "update_bookcase": {
+    "update_unit": {
       "name": "Boekenkast wijzigen",
       "description": "Een boekenkast wijzigen of naar een andere kamer verplaatsen.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Boekenkast",
           "description": "De ID van de boekenkast."
         },
@@ -180,11 +180,11 @@
         }
       }
     },
-    "delete_bookcase": {
+    "delete_unit": {
       "name": "Boekenkast verwijderen",
       "description": "Een boekenkast verwijderen. Een boekenkast met planken heeft force nodig.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Boekenkast",
           "description": "De ID van de boekenkast."
         },
@@ -198,7 +198,7 @@
       "name": "Plank toevoegen",
       "description": "Een plank aan een boekenkast toevoegen.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Boekenkast",
           "description": "De ID van de boekenkast."
         },
@@ -220,7 +220,7 @@
           "name": "Plank",
           "description": "De ID van de plank. Leeg voor geen plank."
         },
-        "bookcase_id": {
+        "unit_id": {
           "name": "Boekenkast",
           "description": "De ID van de boekenkast."
         },
@@ -248,7 +248,7 @@
         }
       }
     },
-    "add_book": {
+    "add_game": {
       "name": "Boek toevoegen",
       "description": "Een boek toevoegen. Als een boek dezelfde barcode heeft, geeft de dienst dat boek terug.",
       "fields": {
@@ -310,11 +310,11 @@
         }
       }
     },
-    "update_book": {
+    "update_game": {
       "name": "Boek wijzigen",
       "description": "De details van een boek wijzigen.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Boek",
           "description": "De ID van het boek."
         },
@@ -376,11 +376,11 @@
         }
       }
     },
-    "delete_book": {
+    "delete_game": {
       "name": "Boek verwijderen",
       "description": "Een boek verwijderen met de exemplaren, de leesstatus, de uitleningen en de omslag.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Boek",
           "description": "De ID van het boek."
         }
@@ -412,7 +412,7 @@
       "name": "Exemplaar toevoegen",
       "description": "Een exemplaar van een boek toevoegen.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Boek",
           "description": "De ID van het boek."
         },
@@ -536,7 +536,7 @@
       "name": "Omslag instellen",
       "description": "De omslag van een boek instellen.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Boek",
           "description": "De ID van het boek."
         },
@@ -554,7 +554,7 @@
       "name": "Leesstatus instellen",
       "description": "De leesstatus van een boek voor een persoon instellen. Een gebruiker zonder beheerdersrechten kan alleen de eigen status instellen.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Boek",
           "description": "De ID van het boek."
         },
@@ -592,7 +592,7 @@
         }
       }
     },
-    "lend_book": {
+    "lend_game": {
       "name": "Boek uitlenen",
       "description": "Een exemplaar aan een andere persoon uitlenen.",
       "fields": {
@@ -622,11 +622,11 @@
         }
       }
     },
-    "borrow_book": {
+    "borrow_game": {
       "name": "Geleend boek toevoegen",
       "description": "Een boek vastleggen dat een persoon heeft geleend.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Boek",
           "description": "De ID van het boek."
         },
@@ -730,7 +730,7 @@
       "name": "Aan verlanglijst toevoegen",
       "description": "Een boek op de verlanglijst van een persoon zetten.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Boek",
           "description": "De ID van het boek."
         },
@@ -760,7 +760,7 @@
       "name": "Verlanglijst wijzigen",
       "description": "Een item van de verlanglijst wijzigen.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Boek",
           "description": "De ID van het boek."
         },
@@ -778,17 +778,17 @@
       "name": "Van verlanglijst halen",
       "description": "Een boek van de verlanglijst halen.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Boek",
           "description": "De ID van het boek."
         }
       }
     },
-    "got_wishlist_book": {
+    "got_wishlist_game": {
       "name": "Gewenst boek ontvangen",
       "description": "Een exemplaar van een gewenst boek toevoegen en het van de verlanglijst halen.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Boek",
           "description": "De ID van het boek."
         },
@@ -874,7 +874,7 @@
         }
       }
     },
-    "list_books": {
+    "list_games": {
       "name": "Boeken weergeven",
       "description": "De boeken teruggeven die bij de filters passen.",
       "fields": {
@@ -908,11 +908,11 @@
         }
       }
     },
-    "get_book": {
+    "get_game": {
       "name": "Boek ophalen",
       "description": "Een boek met de exemplaren en uitleningen teruggeven.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Boek",
           "description": "De ID van het boek."
         }
@@ -1000,13 +1000,13 @@
     "room_not_found": {
       "message": "Geen kamer heeft de ID {id}."
     },
-    "bookcase_not_found": {
+    "unit_not_found": {
       "message": "Geen boekenkast heeft de ID {id}."
     },
     "shelf_not_found": {
       "message": "Geen plank heeft de ID {id}."
     },
-    "book_not_found": {
+    "game_not_found": {
       "message": "Geen boek heeft de ID {id}."
     },
     "copy_not_found": {
@@ -1024,7 +1024,7 @@
     "room_not_empty": {
       "message": "De kamer heeft {count} boekenkasten. Gebruik force om ze ook te verwijderen."
     },
-    "bookcase_not_empty": {
+    "unit_not_empty": {
       "message": "De boekenkast heeft {count} planken. Gebruik force om ze ook te verwijderen."
     },
     "shelf_not_empty": {

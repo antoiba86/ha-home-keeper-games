@@ -1,16 +1,16 @@
 ---
 title: Loans and Home Keeper tasks
-summary: How the library records lent and borrowed books, and keeps 1 one-off Home Keeper task for each loan with a due date.
+summary: How the library records lent and borrowed games, and keeps 1 one-off Home Keeper task for each loan with a due date.
 implements:
   - custom_components/home_keeper_games/loan_tasks.py
   - custom_components/home_keeper_games/loan_sync.py
 related: [store-models, home-keeper-dependency, events-api]
-source_hash: 0b9a5a539747
+source_hash: 4c4f5850bff7
 ---
 
 # Loans and Home Keeper tasks
 
-A loan is a copy that the household lent out (`direction: out`), or a book that a person
+A loan is a copy that the household lent out (`direction: out`), or a game that a person
 borrowed (`direction: in`). A loan with a due date can have a one-off task in Home
 Keeper, so the return shows in the to-do list, the calendar and the notifications of Home
 Keeper. The contract is sections 1 to 6 of the Home Keeper `docs/INTEGRATING.md`.
@@ -29,16 +29,16 @@ Keeper. The contract is sections 1 to 6 of the Home Keeper `docs/INTEGRATING.md`
 
 - Reminders of the library's own. Home Keeper owns the notifications of a task.
 - Tasks for a loan with no due date.
-- Loans of a book that the library does not hold. A borrowed book is a book with no copy.
+- Loans of a game that the library does not hold. A borrowed game is a game with no copy.
 
 ## Design
 
 ### Loan records
 
-- `lend_book` takes a `copy_id` and a `party`. The copy keeps its shelf and can have only 1
+- `lend_game` takes a `copy_id` and a `party`. The copy keeps its shelf and can have only 1
   open loan.
-- `borrow_book` takes a `book_id`, a barcode or a title, a `party` and a `person_id`. It
-  adds the book when none matches, and adds no copy. The status of the person becomes
+- `borrow_game` takes a `game_id`, a barcode or a title, a `party` and a `person_id`. It
+  adds the game when none matches, and adds no copy. The status of the person becomes
   `reading` if it is `want` or absent.
 - `return_loan` sets `returned`, today by default. A returned loan stays in the history.
 - `update_loan` changes the party, the dates, the format or the note. `delete_loan`
@@ -68,7 +68,7 @@ the name, the type `one-off`, the due date, `source: {"home_keeper_games": {"loa
 `managed_by` with the library name, the icon, the config entry id, the locked fields
 `name` and `recurrence_type`, and the completion prompt. The name comes from
 `backend_strings` in the Home Assistant language: "Get {title} back from {party}" for a
-lent copy, "Return {title} to {party}" for a borrowed book.
+lent copy, "Return {title} to {party}" for a borrowed game.
 
 ### Sync
 

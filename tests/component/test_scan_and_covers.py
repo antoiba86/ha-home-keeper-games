@@ -20,15 +20,15 @@ def _jpeg(size=(1600, 2400), color="red", fmt="JPEG") -> bytes:
     return out.getvalue()
 
 
-async def test_scan_of_a_new_barcode_adds_a_book_that_needs_details(
+async def test_scan_of_a_new_barcode_adds_a_game_that_needs_details(
     hass, setup_entry, call
 ) -> None:
     reply = await call("scan_barcode", {"barcode": " 0711-7195 05012 "})
     assert reply["result"] == "not_found"
-    book = reply["book"]
-    assert book["barcode"] == EAN and book["title"] == EAN
-    assert book["needs_details"] is True and book["owned"] is True
-    assert reply["copy"]["book_id"] == book["id"]
+    game = reply["game"]
+    assert game["barcode"] == EAN and game["title"] == EAN
+    assert game["needs_details"] is True and game["owned"] is True
+    assert reply["copy"]["game_id"] == game["id"]
     assert reply["existing_copies"] == [] and reply["from_wishlist"] is False
 
 
@@ -36,20 +36,18 @@ async def test_scan_of_a_known_barcode_follows_on_duplicate(
     hass, setup_entry, call
 ) -> None:
     first = await call("scan_barcode", {"barcode": EAN})
-    book_id = first["book"]["id"]
+    game_id = first["game"]["id"]
     duplicate = await call("scan_barcode", {"barcode": EAN})
     assert duplicate["result"] == "duplicate" and duplicate["copy"] is None
-    assert duplicate["book"]["id"] == book_id
+    assert duplicate["game"]["id"] == game_id
     assert len(duplicate["existing_copies"]) == 1
     skipped = await call("scan_barcode", {"barcode": EAN, "on_duplicate": "skip"})
     assert skipped["result"] == "skipped" and skipped["copy"] is None
     second = await call("scan_barcode", {"barcode": EAN, "on_duplicate": "add_copy"})
     assert second["result"] == "added" and len(second["existing_copies"]) == 2
     room = (await call("add_room", {"name": "Den"}))["room"]
-    case = (await call("add_bookcase", {"room_id": room["id"], "name": "L"}))[
-        "bookcase"
-    ]
-    shelf = (await call("add_shelf", {"bookcase_id": case["id"], "name": "T"}))["shelf"]
+    case = (await call("add_unit", {"room_id": room["id"], "name": "L"}))["unit"]
+    shelf = (await call("add_shelf", {"unit_id": case["id"], "name": "T"}))["shelf"]
     moved = await call(
         "scan_barcode",
         {"barcode": EAN, "on_duplicate": "move", "shelf_id": shelf["id"]},
@@ -57,15 +55,15 @@ async def test_scan_of_a_known_barcode_follows_on_duplicate(
     assert moved["result"] == "moved" and moved["copy"]["shelf_id"] == shelf["id"]
     locations = [row["location"] for row in moved["existing_copies"]]
     assert ["Den", "L", "T"] in locations
-    books = setup_entry.runtime_data.store.state["books"]
-    assert list(books) == [book_id], "a scan of a known barcode adds no book"
+    games = setup_entry.runtime_data.store.state["games"]
+    assert list(games) == [game_id], "a scan of a known barcode adds no game"
 
 
-async def test_scan_of_a_book_with_no_copy_adds_a_copy(hass, setup_entry, call) -> None:
-    book = (await call("add_book", {"title": "Wanted", "barcode": EAN}))["book"]
+async def test_scan_of_a_game_with_no_copy_adds_a_copy(hass, setup_entry, call) -> None:
+    game = (await call("add_game", {"title": "Wanted", "barcode": EAN}))["game"]
     reply = await call("scan_barcode", {"barcode": EAN})
-    assert reply["result"] == "added" and reply["book"]["id"] == book["id"]
-    assert reply["book"]["title"] == "Wanted"
+    assert reply["result"] == "added" and reply["game"]["id"] == game["id"]
+    assert reply["game"]["title"] == "Wanted"
 
 
 async def test_scan_refuses_a_bad_barcode(hass, setup_entry, call) -> None:
@@ -81,22 +79,22 @@ async def test_scan_refuses_a_bad_barcode(hass, setup_entry, call) -> None:
         await call("scan_barcode", {"barcode": ""})
     assert info.value.translation_key == "field_required"
     assert info.value.translation_placeholders == {"field": "barcode"}
-    assert setup_entry.runtime_data.store.state["books"] == {}
+    assert setup_entry.runtime_data.store.state["games"] == {}
 
 
-async def test_add_book_by_barcode(hass, setup_entry, call) -> None:
-    added = await call("add_book", {"barcode": EAN, "title": "Dune"})
+async def test_add_game_by_barcode(hass, setup_entry, call) -> None:
+    added = await call("add_game", {"barcode": EAN, "title": "Dune"})
     assert added["existing"] is False
-    assert added["book"]["barcode"] == EAN and added["book"]["needs_details"] is False
-    again = await call("add_book", {"barcode": EAN})
-    assert again == {"book": added["book"], "existing": True}
-    bare = (await call("add_book", {"barcode": "4006381333931"}))["book"]
+    assert added["game"]["barcode"] == EAN and added["game"]["needs_details"] is False
+    again = await call("add_game", {"barcode": EAN})
+    assert again == {"game": added["game"], "existing": True}
+    bare = (await call("add_game", {"barcode": "4006381333931"}))["game"]
     assert bare["title"] == "4006381333931" and bare["needs_details"] is True
     with pytest.raises(ServiceValidationError) as info:
-        await call("add_book", {"authors": ["Nobody"]})
+        await call("add_game", {"authors": ["Nobody"]})
     assert info.value.translation_key == "barcode_or_title_required"
     with pytest.raises(ServiceValidationError) as info:
-        await call("update_book", {"book_id": bare["id"], "barcode": EAN})
+        await call("update_game", {"game_id": bare["id"], "barcode": EAN})
     assert info.value.translation_key == "duplicate_barcode"
     assert info.value.translation_placeholders == {"barcode": EAN}
 
@@ -111,32 +109,32 @@ async def _upload(hass_client, data: bytes, name: str = "c.png"):
 async def test_cover_upload_and_custom_cover(
     hass, setup_entry, call, hass_client
 ) -> None:
-    book = (await call("add_book", {"title": "Dune"}))["book"]
+    game = (await call("add_game", {"title": "Dune"}))["game"]
     png = io.BytesIO()
     Image.new("RGBA", (100, 150), (0, 0, 255, 128)).save(png, "PNG")
     response = await _upload(hass_client, png.getvalue())
     assert response.status == HTTPStatus.OK
     file_id = (await response.json())["file_id"]
     reply = await call(
-        "set_cover", {"book_id": book["id"], "kind": "custom", "file_id": file_id}
+        "set_cover", {"game_id": game["id"], "kind": "custom", "file_id": file_id}
     )
-    assert reply["book"]["cover"]["kind"] == "custom"
-    url = reply["book"]["cover_url"]
+    assert reply["game"]["cover"]["kind"] == "custom"
+    url = reply["game"]["cover_url"]
     client = await hass_client()
     assert (await client.get(url)).status == HTTPStatus.OK
     with pytest.raises(ServiceValidationError) as info:
         await call(
-            "set_cover", {"book_id": book["id"], "kind": "custom", "file_id": file_id}
+            "set_cover", {"game_id": game["id"], "kind": "custom", "file_id": file_id}
         )
     assert info.value.translation_key == "upload_not_found"
     with pytest.raises(ServiceValidationError) as info:
-        await call("set_cover", {"book_id": book["id"], "kind": "custom"})
+        await call("set_cover", {"game_id": game["id"], "kind": "custom"})
     assert info.value.translation_key == "field_required"
-    reply = await call("get_book", {"book_id": book["id"]})
-    assert reply["book"]["cover"]["kind"] == "custom", "a failed call keeps the cover"
+    reply = await call("get_game", {"game_id": game["id"]})
+    assert reply["game"]["cover"]["kind"] == "custom", "a failed call keeps the cover"
     assert (await client.get(url)).status == HTTPStatus.OK
-    reply = await call("set_cover", {"book_id": book["id"], "kind": "none"})
-    assert reply["book"]["cover_url"] is None
+    reply = await call("set_cover", {"game_id": game["id"], "kind": "none"})
+    assert reply["game"]["cover_url"] is None
     assert (await client.get(url)).status == HTTPStatus.NOT_FOUND
     assert (await client.get("/api/home_keeper_games/cover/nope")).status == 404
 
@@ -201,14 +199,14 @@ async def test_signed_cover_url_needs_no_token(
     hass, setup_entry, call, hass_client, hass_client_no_auth, hass_ws_client
 ) -> None:
     """The tab and the card sign a cover path, because an <img> sends no token."""
-    book = (await call("add_book", {"title": "Dune"}))["book"]
+    game = (await call("add_game", {"title": "Dune"}))["game"]
     response = await _upload(hass_client, _jpeg((60, 90)))
     file_id = (await response.json())["file_id"]
     url = (
         await call(
-            "set_cover", {"book_id": book["id"], "kind": "custom", "file_id": file_id}
+            "set_cover", {"game_id": game["id"], "kind": "custom", "file_id": file_id}
         )
-    )["book"]["cover_url"]
+    )["game"]["cover_url"]
     anon = await hass_client_no_auth()
     assert (await anon.get(url)).status == HTTPStatus.UNAUTHORIZED
     ws = await hass_ws_client(hass)

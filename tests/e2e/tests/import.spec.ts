@@ -22,8 +22,8 @@ test.describe('Import', { tag: '@responsive' }, () => {
     await dialog.locator('.hkl-details summary').click();
     await expect(dialog.locator('.hkl-details tr').filter({ hasText: 'Piranesi' })).toContainText('In the library');
     const after = await adminState();
-    expect(after.books.length).toBe(before.books.length);
+    expect(after.games.length).toBe(before.games.length);
     await dialog.locator('[data-k="import-cancel"]').click();
-    await expect(page).toHaveURL(/\/home-keeper\/games\/books$/);
+    await expect(page).toHaveURL(/\/home-keeper\/games\/games$/);
   });
 });

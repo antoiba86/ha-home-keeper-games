@@ -1,7 +1,7 @@
 """Pure planner for the wishlist to-do sync.
 
 Each person can have a ``wishlist_todo``: an existing ``todo.*`` entity that an
-admin selects. A wishlist book with ``buy: true`` and not ``bought`` puts 1 item
+admin selects. A wishlist game with ``buy: true`` and not ``bought`` puts 1 item
 ``Title by Author`` on the list of its person. ``wishlist_sync.py`` reads the
 lists with ``todo.get_items``, calls :func:`plan_sync`, and applies the plan with
 ``todo.add_item`` and ``todo.remove_item`` and through the store.
@@ -9,14 +9,14 @@ lists with ``todo.get_items``, calls :func:`plan_sync`, and applies the plan wit
 The rules follow the shopping sync of Home Keeper (``shopping.py``):
 
 * **The list holds what the wishlist wants bought now.** An item goes away when
-  its book leaves the wishlist, when ``buy`` turns off, or when the person gets
+  its game leaves the wishlist, when ``buy`` turns off, or when the person gets
   another list.
-* **A completed item is never touched.** A completed item marks the book
-  ``bought``. After that the sync leaves the item and the book alone.
+* **A completed item is never touched.** A completed item marks the game
+  ``bought``. After that the sync leaves the item and the game alone.
 * **An unreadable list is not an empty list.** The plan has no step for a list
   that the caller could not read.
 * ``todo.add_item`` returns no uid, so an added item is bound on the next read:
-  an open item with the same summary that no other book holds.
+  an open item with the same summary that no other game holds.
 * If a bound item is deleted from the list, ``buy`` turns off. The sync does not
   add the item again against the choice of the person who deleted it.
 
@@ -28,7 +28,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from .models import SUMMARY_TEMPLATE, book_summary, person_settings
+from .models import SUMMARY_TEMPLATE, game_summary, person_settings
 
 STATUS_COMPLETED = "completed"
 
@@ -37,16 +37,16 @@ STATUS_COMPLETED = "completed"
 class AddOp:
     """Add an item to a list."""
 
-    book_id: str
+    game_id: str
     entity_id: str
     summary: str
 
 
 @dataclass(frozen=True)
 class BindOp:
-    """Record the uid of the item that holds a book."""
+    """Record the uid of the item that holds a game."""
 
-    book_id: str
+    game_id: str
     entity_id: str
     uid: str
 
@@ -61,16 +61,16 @@ class RemoveOp:
 
 @dataclass(frozen=True)
 class BoughtOp:
-    """The item of a book is completed: mark the book bought."""
+    """The item of a game is completed: mark the game bought."""
 
-    book_id: str
+    game_id: str
 
 
 @dataclass(frozen=True)
 class UnbindOp:
-    """Forget the item of a book. ``buy_off`` also turns ``buy`` off."""
+    """Forget the item of a game. ``buy_off`` also turns ``buy`` off."""
 
-    book_id: str
+    game_id: str
     buy_off: bool = False
 
 
@@ -104,9 +104,9 @@ class SyncPlan:
         return not (self.adds or self.removes or self.store_changes)
 
 
-def target_list(state: dict[str, Any], book: dict[str, Any]) -> str | None:
-    """The list that the item of a wishlist book belongs on, or None."""
-    entry = book.get("wishlist")
+def target_list(state: dict[str, Any], game: dict[str, Any]) -> str | None:
+    """The list that the item of a wishlist game belongs on, or None."""
+    entry = game.get("wishlist")
     if not entry or not entry.get("buy") or entry.get("bought"):
         return None
     target = person_settings(state["people"], entry["person_id"])["wishlist_todo"]
@@ -116,10 +116,10 @@ def target_list(state: dict[str, Any], book: dict[str, Any]) -> str | None:
 def lists_to_read(state: dict[str, Any]) -> list[str]:
     """Every list that a sync pass reads, sorted."""
     wanted: set[str] = set()
-    for book in state["books"].values():
-        if target := target_list(state, book):
+    for game in state["games"].values():
+        if target := target_list(state, game):
             wanted.add(target)
-        entry = book.get("wishlist") or {}
+        entry = game.get("wishlist") or {}
         if entry.get("todo_entity"):
             wanted.add(entry["todo_entity"])
     for orphan in state.get("todo_orphans", []):
@@ -150,16 +150,16 @@ def plan_sync(
     """
     plan = SyncPlan()
     claimed: set[tuple[str, str]] = set()
-    # The uids that a book holds now. A summary match never takes one of them.
-    for book in state["books"].values():
-        entry = book.get("wishlist") or {}
+    # The uids that a game holds now. A summary match never takes one of them.
+    for game in state["games"].values():
+        entry = game.get("wishlist") or {}
         if entry.get("todo_uid") and entry.get("todo_entity"):
             claimed.add((entry["todo_entity"], entry["todo_uid"]))
 
-    for book_id in sorted(state["books"]):
-        book = state["books"][book_id]
-        entry = book.get("wishlist") or {}
-        target = target_list(state, book)
+    for game_id in sorted(state["games"]):
+        game = state["games"][game_id]
+        entry = game.get("wishlist") or {}
+        target = target_list(state, game)
         bound_entity = entry.get("todo_entity")
         bound_uid = entry.get("todo_uid")
 
@@ -170,14 +170,14 @@ def plan_sync(
             item = _find(items, bound_uid)
             if target == bound_entity:
                 if item is None:
-                    plan.unbinds.append(UnbindOp(book_id, buy_off=True))
+                    plan.unbinds.append(UnbindOp(game_id, buy_off=True))
                 elif not _is_open(item):
-                    plan.bought.append(BoughtOp(book_id))
+                    plan.bought.append(BoughtOp(game_id))
                 continue
-            # The book does not want this item now.
+            # The game does not want this item now.
             if item is not None and _is_open(item):
                 plan.removes.append(RemoveOp(bound_entity, bound_uid))
-            plan.unbinds.append(UnbindOp(book_id))
+            plan.unbinds.append(UnbindOp(game_id))
             continue
 
         if target is None:
@@ -185,7 +185,7 @@ def plan_sync(
         items = lists.get(target)
         if items is None:
             continue
-        summary = book_summary(book, template)
+        summary = game_summary(game, template)
         match = next(
             (
                 item
@@ -199,9 +199,9 @@ def plan_sync(
         )
         if match is not None:
             claimed.add((target, match["uid"]))
-            plan.binds.append(BindOp(book_id, target, match["uid"]))
+            plan.binds.append(BindOp(game_id, target, match["uid"]))
         else:
-            plan.adds.append(AddOp(book_id, target, summary))
+            plan.adds.append(AddOp(game_id, target, summary))
 
     for orphan in state.get("todo_orphans", []):
         items = lists.get(orphan["entity_id"])

@@ -41,7 +41,7 @@
   },
   "entity": {
     "sensor": {
-      "books": {
+      "games": {
         "name": "Книги"
       },
       "loans_out": {
@@ -50,7 +50,7 @@
       "loans_overdue": {
         "name": "Просроченные выдачи"
       },
-      "books_read_this_year": {
+      "games_read_this_year": {
         "name": "{person} прочитано книг в этом году"
       },
       "reading_now": {
@@ -132,7 +132,7 @@
         }
       }
     },
-    "add_bookcase": {
+    "add_unit": {
       "name": "Добавить книжный шкаф",
       "description": "Добавить книжный шкаф в комнату.",
       "fields": {
@@ -154,11 +154,11 @@
         }
       }
     },
-    "update_bookcase": {
+    "update_unit": {
       "name": "Изменить книжный шкаф",
       "description": "Изменить книжный шкаф или переместить его в другую комнату.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Книжный шкаф",
           "description": "ID книжного шкафа."
         },
@@ -180,11 +180,11 @@
         }
       }
     },
-    "delete_bookcase": {
+    "delete_unit": {
       "name": "Удалить книжный шкаф",
       "description": "Удалить книжный шкаф. Для шкафа с полками нужен force.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Книжный шкаф",
           "description": "ID книжного шкафа."
         },
@@ -198,7 +198,7 @@
       "name": "Добавить полку",
       "description": "Добавить полку в книжный шкаф.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Книжный шкаф",
           "description": "ID книжного шкафа."
         },
@@ -220,7 +220,7 @@
           "name": "Полка",
           "description": "ID полки. Пусто, если полки нет."
         },
-        "bookcase_id": {
+        "unit_id": {
           "name": "Книжный шкаф",
           "description": "ID книжного шкафа."
         },
@@ -248,7 +248,7 @@
         }
       }
     },
-    "add_book": {
+    "add_game": {
       "name": "Добавить книгу",
       "description": "Добавить книгу. Если у книги тот же штрихкод, служба возвращает эту книгу.",
       "fields": {
@@ -310,11 +310,11 @@
         }
       }
     },
-    "update_book": {
+    "update_game": {
       "name": "Изменить книгу",
       "description": "Изменить сведения о книге.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Книга",
           "description": "ID книги."
         },
@@ -376,11 +376,11 @@
         }
       }
     },
-    "delete_book": {
+    "delete_game": {
       "name": "Удалить книгу",
       "description": "Удалить книгу с её экземплярами, статусом чтения, выдачами и обложкой.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Книга",
           "description": "ID книги."
         }
@@ -412,7 +412,7 @@
       "name": "Добавить экземпляр",
       "description": "Добавить экземпляр книги.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Книга",
           "description": "ID книги."
         },
@@ -536,7 +536,7 @@
       "name": "Задать обложку",
       "description": "Задать обложку книги.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Книга",
           "description": "ID книги."
         },
@@ -554,7 +554,7 @@
       "name": "Задать статус чтения",
       "description": "Задать статус чтения книги для человека. Пользователь без прав администратора может задать только свой статус.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Книга",
           "description": "ID книги."
         },
@@ -592,7 +592,7 @@
         }
       }
     },
-    "lend_book": {
+    "lend_game": {
       "name": "Выдать книгу",
       "description": "Выдать экземпляр другому человеку.",
       "fields": {
@@ -622,11 +622,11 @@
         }
       }
     },
-    "borrow_book": {
+    "borrow_game": {
       "name": "Добавить взятую книгу",
       "description": "Записать книгу, которую человек взял.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Книга",
           "description": "ID книги."
         },
@@ -730,7 +730,7 @@
       "name": "Добавить в желания",
       "description": "Поставить книгу в список желаний человека.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Книга",
           "description": "ID книги."
         },
@@ -760,7 +760,7 @@
       "name": "Изменить желание",
       "description": "Изменить запись в списке желаний.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Книга",
           "description": "ID книги."
         },
@@ -778,17 +778,17 @@
       "name": "Убрать из желаний",
       "description": "Убрать книгу из списка желаний.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Книга",
           "description": "ID книги."
         }
       }
     },
-    "got_wishlist_book": {
+    "got_wishlist_game": {
       "name": "Желанная книга получена",
       "description": "Добавить экземпляр желанной книги и убрать её из списка желаний.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Книга",
           "description": "ID книги."
         },
@@ -874,7 +874,7 @@
         }
       }
     },
-    "list_books": {
+    "list_games": {
       "name": "Список книг",
       "description": "Вернуть книги, которые подходят под фильтры.",
       "fields": {
@@ -908,11 +908,11 @@
         }
       }
     },
-    "get_book": {
+    "get_game": {
       "name": "Получить книгу",
       "description": "Вернуть книгу с её экземплярами и выдачами.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Книга",
           "description": "ID книги."
         }
@@ -1000,13 +1000,13 @@
     "room_not_found": {
       "message": "Нет комнаты с ID {id}."
     },
-    "bookcase_not_found": {
+    "unit_not_found": {
       "message": "Нет книжного шкафа с ID {id}."
     },
     "shelf_not_found": {
       "message": "Нет полки с ID {id}."
     },
-    "book_not_found": {
+    "game_not_found": {
       "message": "Нет книги с ID {id}."
     },
     "copy_not_found": {
@@ -1024,7 +1024,7 @@
     "room_not_empty": {
       "message": "В комнате есть книжные шкафы: {count}. Используйте force, чтобы удалить и их."
     },
-    "bookcase_not_empty": {
+    "unit_not_empty": {
       "message": "В книжном шкафу есть полки: {count}. Используйте force, чтобы удалить и их."
     },
     "shelf_not_empty": {
