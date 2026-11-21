@@ -40,12 +40,11 @@ no user, as Home Assistant does. An automation makes that kind of call.
 | `add_room`, `update_room`, `delete_room` | Admin |
 | `add_bookcase`, `update_bookcase`, `delete_bookcase` | Admin |
 | `add_shelf`, `update_shelf`, `delete_shelf` | Admin |
-| `lookup_isbn`, `add_book`, `update_book`, `delete_book`, `refresh_book` | Admin |
-| `scan_isbn`, `add_copy`, `update_copy`, `move_copy`, `delete_copy`, `set_cover` | Admin |
+| `add_book`, `update_book`, `delete_book` | Admin |
+| `scan_barcode`, `add_copy`, `update_copy`, `move_copy`, `delete_copy`, `set_cover` | Admin |
 | `lend_book`, `borrow_book`, `return_loan`, `update_loan`, `delete_loan` | Admin |
 | `add_to_wishlist`, `update_wishlist`, `remove_from_wishlist`, `got_wishlist_book` | Admin |
 | `set_settings`, `import_csv`, `export_csv` | Admin |
-| `search_catalog`, `send_to_catalog`, `link_catalog`, `skip_catalog`, `disconnect_catalog` | Admin |
 | `export_data`, `import_data` | Admin |
 | `set_reading` | Open, for the caller's own person. An admin can name any person. |
 | `set_person_settings` | Open, for the caller's own person, with no `wishlist_todo`. An admin can set each field of any person. |
@@ -53,24 +52,6 @@ no user, as Home Assistant does. An automation makes that kind of call.
 
 `wishlist_todo` is admin-only because it sends book titles to a to-do list. Import and
 export are admin-only because they read or write the whole library.
-`send_to_catalog` is admin-only because it sends book details to a public website
-as the household account.
-
-## Open Library account
-
-An admin can connect an Open Library account to send books
-([open-library-contribute](design/open-library-contribute.md)).
-
-- The 2 Archive.org S3 keys come in only through the `openlibrary` step of the options
-  flow. Home Assistant lets only an admin run an options flow. The keys are not a
-  service field, so no `call_service` event or recorder row holds them.
-- The keys stay in the config entry data. No reply, event or diagnostics file shows
-  them. `get_state` gives an admin only `catalog_accounts`: for each catalog, if an
-  account is connected, and its user name. A non-admin user gets no `catalog_accounts`.
-- The library signs in for each send and keeps the session cookie only for that send.
-- A send goes only to the Open Library base URL, with the same limit of 1 request a
-  second as the lookups. It sends the title, the first author and the fields that the
-  admin selects. It never sends notes, prices, values, loans, shelves or reading status.
 
 ## Websocket commands
 
@@ -113,8 +94,7 @@ projection:
 
 The book records, the shared notes and the covers are open to every user. Only an admin
 can download the diagnostics. The download redacts the loan
-parties, the notes and `acquired_from`. It has no Open Library key, only a mark that
-shows if an account is connected.
+parties, the notes and `acquired_from`.
 
 ## Entities
 

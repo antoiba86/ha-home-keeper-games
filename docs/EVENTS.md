@@ -90,15 +90,14 @@ The other keys of each event are in the generated API reference and in
 - The wishlist events add `buy` and `bought`.
 - The room, bookcase and shelf events have their own ids and `name` in place of
   the book spine.
-- `import_completed` has `person_id`, `source` and the counts of the import.
+- `import_completed` has `person_id`, `source` (always `csv`) and the counts of the import.
 - `data_imported` has `counts` and `origin`. `counts` has `created`, `updated` and
   `skipped` for each section, such as `books`.
 - `person_settings_updated` has `person_id`, `changed_fields` and `origin`, and
   no setting values.
 - `settings_updated` has `changed_fields`, `currency` and `origin`. The
-  `set_settings` service, the `disconnect_catalog` service and the options flow
-  fire it. `changed_fields` names `currency` or `catalog_accounts`. The payload has
-  no Open Library key and no user name.
+  `set_settings` service and the options flow fire it. `changed_fields` names
+  `currency`.
 
 ## Rules
 
@@ -107,9 +106,6 @@ The other keys of each event are in the generated API reference and in
 - A CSV import fires only `import_completed`. It fires no event for each row.
 - A Home Keeper import fires only `data_imported`. It fires no event for each record.
 - `book_finished` fires with `reading_changed`, in that order.
-- A book that Open Library does not have fires `book_updated` with
-  `catalog_status` in `changed_fields`. A link to Open Library, a skip and a send
-  fire it too, with `catalogs` or `catalog_status`. A send fires no event of its own.
 - The first copy of a book on the wishlist takes the book off the wishlist. The
   scan, `add_copy` and `got_wishlist_book` fire `copy_added` and then
   `wishlist_removed`.
@@ -117,8 +113,8 @@ The other keys of each event are in the generated API reference and in
   event for each child and a `copy_moved` event for each copy that moves to no
   shelf.
 - An update that changes no field fires no event.
-- The library fires no event for its own bookkeeping: the count of Open Library
-  lookups of a book and the Home Keeper task id of a loan.
+- The library fires no event for its own bookkeeping: the Home Keeper task id of a
+  loan.
 
 ## Events that the library listens for
 

@@ -5,18 +5,16 @@ import type { Index, TabRoute } from './utils';
 
 export interface ScanEntry {
   key: number;
-  isbn: string;
+  barcode: string;
   pending: boolean;
   res: ScanResult | null;
   error?: string;
   /** What the user picked for a duplicate. */
   choice?: 'move' | 'add_copy' | 'skip';
-  /** The user gave the title of a book with no match in Open Library. */
+  /** The user gave the title of the new book of a scan. */
   named?: boolean;
-  /** The user removed the book of a scan with no match. */
+  /** The user removed the new book of a scan. */
   removed?: boolean;
-  /** The user linked the book of a scan with no match to its Open Library work. */
-  matched?: boolean;
 }
 
 export interface ScanSession {
@@ -36,7 +34,6 @@ export interface ScanSession {
 }
 
 export interface ImportState {
-  source: 'goodreads' | 'storygraph' | 'library';
   personId: string | null;
   shelfId: string;
   fileName: string;
@@ -58,13 +55,7 @@ export interface UiState {
   scan: ScanSession;
   import: ImportState;
   todoEntities: Array<{ entity_id: string; name?: string }>;
-  exportFormat: 'goodreads' | 'library';
   exportPerson: string;
-  /** The Open Library connect form: busy while the flow runs, and its error. */
-  olBusy: boolean;
-  olError: string;
-  /** The typed access key, so a failed connect keeps it. The secret key is not kept. */
-  olAccess: string;
 }
 
 export interface ViewCtx {

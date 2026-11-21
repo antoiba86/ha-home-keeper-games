@@ -5,11 +5,9 @@
  *   bash ci/capture-video.sh        # writes docs/videos/walkthrough.{webm,mp4,gif}
  *
  * The tour: open the Library tab in Home Keeper, browse the grid, search, open a
- * book, set the reading status, scan a book by ISBN into a shelf, give the title of a
- * scanned book that Open Library does not have, confirm the Open Library work of
- * another scanned title, lend a book with
- * a Home Keeper task, see the loan, connect Open Library and send a book that it
- * does not have, and open the card on a dashboard. `BEAT` pauses
+ * book, set the reading status, scan a stored barcode and a new barcode into a shelf,
+ * give the title of the new book, lend a book with a Home Keeper task, see the loan, and
+ * open the card on a dashboard. `BEAT` pauses
  * let each step read in the video. The tour puts the seed back at the end.
  *
  * The recording needs its own context: `recordVideo` is set when a context is made.
@@ -22,19 +20,14 @@ import { DESKTOP } from './viewports';
 
 const OUT = process.env.VIDEO_DIR || '/tmp/home-keeper-games-video';
 const BEAT = 900;
-const NEW_ISBN = '9780553418606';
-// A scanned book that the fixture Open Library does not have. The scan asks for its title.
-const MISS_ISBN = '9781402894626';
+// A seeded book with copies: the scan shows the duplicate choices.
+const SEEDED_CODE = '9780441478125';
+// No book has this barcode. The scan asks for its title.
+const MISS_CODE = '9781402894626';
 const MISS_TITLE = 'Field Notes on Moss';
-// The fixture Open Library has no edition with this ISBN, but has a work with the title.
-const MATCH_ISBN = '9781935788225';
-const MATCH_TITLE = 'The Hollow Orchard';
 const LEND_TITLE = 'Station Eleven';
 const PARTY = 'Robin';
 const STATUS_TITLE = 'The Lathe of Heaven';
-// A book that the fixture Open Library does not have. The tour adds it and sends it.
-const OL_TITLE = 'Walkthrough Field Notes';
-const OL_ISBN = '9780000000996';
 
 async function beat(page: Page, n = 1): Promise<void> {
   await page.waitForTimeout(BEAT * n);
@@ -42,14 +35,13 @@ async function beat(page: Page, n = 1): Promise<void> {
 
 async function cleanUp(): Promise<void> {
   const state = await adminState();
-  for (const book of state.books.filter((b: { isbn13: string }) => [NEW_ISBN, MISS_ISBN, MATCH_ISBN, OL_ISBN].includes(b.isbn13))) {
+  for (const book of state.books.filter((b: { barcode: string }) => b.barcode === MISS_CODE)) {
     await library('delete_book', { book_id: book.id });
   }
   const lent = state.books.find((b: { title: string }) => b.title === LEND_TITLE);
   for (const loan of state.loans.filter((l: { book_id: string; party: string }) => l.book_id === lent.id && l.party === PARTY)) {
     await library('delete_loan', { loan_id: loan.id });
   }
-  await library('disconnect_catalog');
 }
 
 test('record the Library walkthrough', async ({ browser }) => {
@@ -87,7 +79,7 @@ test('record the Library walkthrough', async ({ browser }) => {
     await expect(tab.locator('.hkl-star.on')).toHaveCount(4);
     await beat(page);
 
-    // 4. Scan a book by ISBN into a shelf.
+    // 4. Scan barcodes into a shelf.
     const state = await adminState();
     const office = state.rooms.find((r: { name: string }) => r.name === 'Office');
     const tall = state.bookcases.find((c: { room_id: string }) => c.room_id === office.id);
@@ -100,15 +92,20 @@ test('record the Library walkthrough', async ({ browser }) => {
     await expect(tab.locator('[data-k="m-manual"]')).toBeChecked();
     await beat(page);
     await tab.locator('[data-k="scan-start"]').click();
-    await expect(tab.locator('[data-k="isbn-input"]')).toBeVisible();
+    await expect(tab.locator('[data-k="barcode-input"]')).toBeVisible();
     await beat(page);
-    await tab.locator('[data-k="isbn-input"]').pressSequentially(NEW_ISBN, { delay: 60 });
-    await tab.locator('[data-k="isbn-add"]').click();
-    await expect(tab.locator('.hkl-result .hkl-pill.ok')).toHaveText('Added', { timeout: 30_000 });
+    // A stored book: the scan offers Move here, Add 2nd copy or Skip.
+    await tab.locator('[data-k="barcode-input"]').pressSequentially(SEEDED_CODE, { delay: 60 });
+    await tab.locator('[data-k="barcode-add"]').click();
+    const dup = tab.locator('.hkl-result.dup');
+    await expect(dup).toBeVisible({ timeout: 30_000 });
     await beat(page, 2);
-    // A book that Open Library does not have: the scan stops and asks for the title.
-    await tab.locator('[data-k="isbn-input"]').pressSequentially(MISS_ISBN, { delay: 60 });
-    await tab.locator('[data-k="isbn-add"]').click();
+    await dup.getByRole('button', { name: 'Skip' }).click();
+    await expect(dup).toHaveCount(0);
+    await beat(page);
+    // A new barcode: the scan stops and asks for the title.
+    await tab.locator('[data-k="barcode-input"]').pressSequentially(MISS_CODE, { delay: 60 });
+    await tab.locator('[data-k="barcode-add"]').click();
     const sheet = tab.locator('.hkl-dialog.sheet');
     await expect(sheet).toBeVisible({ timeout: 30_000 });
     await beat(page, 2);
@@ -118,18 +115,6 @@ test('record the Library walkthrough', async ({ browser }) => {
     await expect(sheet).toHaveCount(0);
     await expect(tab.locator('.hkl-result').filter({ hasText: MISS_TITLE })).toBeVisible();
     await beat(page, 2);
-    // Open Library has a work with the title of the next miss: the user confirms it.
-    await tab.locator('[data-k="isbn-input"]').pressSequentially(MATCH_ISBN, { delay: 60 });
-    await tab.locator('[data-k="isbn-add"]').click();
-    await expect(sheet).toBeVisible({ timeout: 30_000 });
-    await sheet.locator('[name="title"]').pressSequentially(MATCH_TITLE, { delay: 60 });
-    await sheet.locator('[data-k="d-submit"]').click();
-    const match = tab.locator('.hkl-dialog');
-    await expect(match.locator('h2')).toHaveText('Found on Open Library', { timeout: 30_000 });
-    await beat(page, 3);
-    await match.locator('[data-k="d-submit"]').click();
-    await expect(match).toHaveCount(0);
-    await beat(page);
     await tab.locator('[data-k="scan-done"]').click();
     await expect(tab.locator('.hkl-scan-head')).toContainText('Scan summary');
     await beat(page, 2);
@@ -167,31 +152,7 @@ test('record the Library walkthrough', async ({ browser }) => {
     await expect(page.locator('home-keeper-panel')).toContainText(`Get ${LEND_TITLE} back from ${PARTY}`, { timeout: 30_000 });
     await beat(page, 2);
 
-    // 7. Connect Open Library, then send a book that it does not have.
-    const olBook = await library<{ book: { id: string } }>('add_book', { title: OL_TITLE, authors: ['Ada Fixture'], publisher: 'Fixture Press', isbn: OL_ISBN });
-    await library('add_copy', { book_id: olBook.book.id });
-    await openTab(page, '/settings');
-    const olCard = tab.locator('[data-k="ol-card"]');
-    await olCard.scrollIntoViewIfNeeded();
-    await beat(page);
-    await olCard.locator('[data-k="ol-access"]').pressSequentially('E2E-ACCESS', { delay: 50 });
-    await olCard.locator('[data-k="ol-secret"]').fill('E2E-SECRET');
-    await olCard.locator('[data-k="ol-connect-save"]').click();
-    await expect(olCard.locator('[data-k="ol-connected"]')).toBeVisible();
-    await beat(page, 2);
-    await openTab(page, '/books;status=not_on_ol');
-    await expect(tab.locator('.hkl-olrow').filter({ hasText: OL_TITLE })).toBeVisible({ timeout: 30_000 });
-    await beat(page, 2);
-    await tab.locator('.hkl-olrow').filter({ hasText: OL_TITLE }).locator('[data-act="send-ol"]').click();
-    await beat(page, 2);
-    await dialog.locator('[data-k="d-submit"]').click();
-    await expect(dialog.locator('[data-k="d-ol-added"]')).toBeVisible();
-    await beat(page, 3);
-    await dialog.locator('[data-k="d-submit"]').click();
-    await expect(tab.locator('.hkl-olrow').filter({ hasText: OL_TITLE })).toHaveCount(0);
-    await beat(page);
-
-    // 8. The card on a dashboard.
+    // 7. The card on a dashboard.
     await openCard(page);
     await beat(page, 3);
   } finally {

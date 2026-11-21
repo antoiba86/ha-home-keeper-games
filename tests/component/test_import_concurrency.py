@@ -2,32 +2,24 @@
 
 from __future__ import annotations
 
-import json
 import threading
-from pathlib import Path
 
 from custom_components.home_keeper_games import csv_io
 
 BOB = "p_bob"
-OL = "https://openlibrary.org"
-FIX = Path(__file__).resolve().parents[1] / "fixtures" / "openlibrary"
 
 
 async def test_import_keeps_changes_made_while_it_runs(
-    hass, setup_entry, call, aioclient_mock, monkeypatch
+    hass, setup_entry, call, monkeypatch
 ) -> None:
-    aioclient_mock.get(
-        f"{OL}/search.json?title=Emma&limit=5&author=Jane+Austen",
-        json=json.loads((FIX / "search_empty.json").read_text(encoding="utf-8")),
-    )
     store = setup_entry.runtime_data.store
     dune = (
         await call(
             "add_book",
-            {"title": "Dune", "authors": ["Frank Herbert"], "lookup": False},
+            {"title": "Dune", "authors": ["Frank Herbert"]},
         )
     )["book"]
-    hyperion = (await call("add_book", {"title": "Hyperion", "lookup": False}))["book"]
+    hyperion = (await call("add_book", {"title": "Hyperion"}))["book"]
     # The import plan waits in the executor until the test lets it go on.
     started, release = threading.Event(), threading.Event()
     real = csv_io.apply_import
@@ -39,14 +31,14 @@ async def test_import_keeps_changes_made_while_it_runs(
 
     monkeypatch.setattr(csv_io, "apply_import", slow_plan)
     csv_text = (
-        "Title,Author,ISBN13,My Rating,Exclusive Shelf,Owned Copies,Bookshelves\n"
-        'Dune,Frank Herbert,,4,read,0,"read, classics"\n'
-        "Emma,Jane Austen,,0,currently-reading,0,\n"
+        "title,authors,rating,status,tags\n"
+        "Dune,Frank Herbert,4,read,classics\n"
+        "Emma,Jane Austen,,reading,\n"
     )
     task = hass.async_create_task(
         call(
             "import_csv",
-            {"content": csv_text, "source": "goodreads", "person_id": BOB},
+            {"content": csv_text, "person_id": BOB},
         )
     )
     assert await hass.async_add_executor_job(started.wait, 10)

@@ -17,14 +17,10 @@ import { PHONE } from './viewports';
 
 const SHOT_DIR = resolve(__dirname, process.env.SHOT_DIR || '../../docs/images');
 const DESKTOP_SHOT = { width: 1280, height: 900 };
-const SCAN_ISBNS = ['9780553418606', '9780441478125', '9781250313188'];
-/** The scanned books that are not in the seed. The 2nd ISBN is a seeded book. */
-const NEW_ISBNS = [SCAN_ISBNS[0], SCAN_ISBNS[2]];
-/** The fixture Open Library does not have the 3rd ISBN, so the scan asks for this title. */
+/** The 1st barcode is a seeded book. No book has the 2nd, so the scan asks for its title. */
+const SCAN_CODES = ['9780441478125', '9781250313188'];
+const NEW_CODES = [SCAN_CODES[1]];
 const MISS_TITLE = 'Field Notes on Moss';
-/** The fixture Open Library has no edition with this ISBN, but has a work with this title. */
-const MATCH_ISBN = '9781935788225';
-const MATCH_TITLE = 'The Hollow Orchard';
 
 async function shot(page: Page, name: string): Promise<void> {
   // Let the covers and the fonts settle, and move the pointer out of the way.
@@ -64,15 +60,14 @@ async function coversLoaded(page: Page): Promise<void> {
 async function deleteScanned(): Promise<void> {
   const state = await adminState();
   for (const book of state.books) {
-    if ([...NEW_ISBNS, MATCH_ISBN].includes(book.isbn13)) {
+    if (NEW_CODES.includes(book.barcode)) {
       await library('delete_book', { book_id: book.id });
     }
   }
 }
 
 /**
- * Scan the 3 ISBNs into Shelf 3. Open Library does not have the 3rd one, so the
- * title sheet opens: shoot it as *missShot*, and with its details open as
+ * Scan the 2 barcodes into Shelf 3. No book has the 2nd one, so the title sheet opens: shoot it as *missShot*, and with its details open as
  * *detailsShot*. Then give the title, so the scan goes on.
  */
 async function scanSession(page: Page, missShot: string, detailsShot?: string): Promise<void> {
@@ -84,11 +79,10 @@ async function scanSession(page: Page, missShot: string, detailsShot?: string): 
   await tab.locator('[data-k="m-manual"]').check();
   await expect(tab.locator('[data-k="m-manual"]')).toBeChecked();
   await tab.locator('[data-k="scan-start"]').click();
-  for (const isbn of SCAN_ISBNS) {
-    await tab.locator('[data-k="isbn-input"]').fill(isbn);
-    await tab.locator('[data-k="isbn-add"]').click();
-    // Each lookup reads Open Library 1 request a second, so wait for it to end.
-    await expect(tab.locator('.hkl-result').filter({ hasText: 'Searching Open Library' })).toHaveCount(0, { timeout: 30_000 });
+  for (const code of SCAN_CODES) {
+    await tab.locator('[data-k="barcode-input"]').fill(code);
+    await tab.locator('[data-k="barcode-add"]').click();
+    await expect(tab.locator('.hkl-result').filter({ hasText: 'Checking the barcode' })).toHaveCount(0, { timeout: 30_000 });
   }
   const sheet = tab.locator('.hkl-dialog.sheet');
   await expect(sheet).toBeVisible();
@@ -103,27 +97,8 @@ async function scanSession(page: Page, missShot: string, detailsShot?: string): 
   }
   await sheet.locator('[data-k="d-submit"]').click();
   await expect(sheet).toHaveCount(0);
-  await expect(tab.locator('.hkl-result')).toHaveCount(3);
+  await expect(tab.locator('.hkl-result')).toHaveCount(2);
   await expect(tab.locator('.hkl-result').filter({ hasText: MISS_TITLE })).toBeVisible();
-}
-
-/** Scan a book with no edition on Open Library, give its title, and shoot the match as *name*. */
-async function matchSession(page: Page, name: string): Promise<void> {
-  const tab = await openTab(page, '/scan');
-  await tab.locator('[data-k="m-manual"]').check();
-  await tab.locator('[data-k="scan-start"]').click();
-  await tab.locator('[data-k="isbn-input"]').fill(MATCH_ISBN);
-  await tab.locator('[data-k="isbn-add"]').click();
-  const sheet = tab.locator('.hkl-dialog.sheet');
-  await expect(sheet).toBeVisible({ timeout: 30_000 });
-  await sheet.locator('[name="title"]').fill(MATCH_TITLE);
-  await sheet.locator('[data-k="d-submit"]').click();
-  const match = tab.locator('.hkl-dialog');
-  await expect(match.locator('h2')).toHaveText('Found on Open Library', { timeout: 30_000 });
-  await expect(match.locator('[data-k="d-match-by"]')).toContainText('June Calder');
-  await shot(page, name);
-  await match.locator('[data-k="d-cancel"]').click();
-  await expect(match).toHaveCount(0);
 }
 
 /** Open the Lend dialog of a book with a copy to lend, type a note, and submit with no borrower. */
@@ -139,37 +114,6 @@ async function openLendError(page: Page): Promise<void> {
   await dialog.locator('[name="note"]').fill('Back by the trip');
   await dialog.locator('[data-k="d-submit"]').click();
   await expect(dialog.locator('.hkl-error')).toBeVisible();
-}
-
-/** The Open Library account card in Settings, scrolled into view. */
-async function openLibraryCard(page: Page): Promise<Locator> {
-  const tab = await openTab(page, '/settings');
-  const card = tab.locator('[data-k="ol-card"]');
-  await card.scrollIntoViewIfNeeded();
-  return card;
-}
-
-/** Connect the fixture account of tests/e2e/seed/openlibrary/server.py. */
-async function connectOpenLibrary(page: Page): Promise<void> {
-  const card = await openLibraryCard(page);
-  if (await card.locator('[data-k="ol-connected"]').count()) return;
-  await card.locator('[data-k="ol-access"]').fill('E2E-ACCESS');
-  await card.locator('[data-k="ol-secret"]').fill('E2E-SECRET');
-  await card.locator('[data-k="ol-connect-save"]').click();
-  await expect(card.locator('[data-k="ol-connected"]')).toBeVisible();
-}
-
-/** Open the send dialog of a book that Open Library does not have. Shoot the banner first. */
-async function openSendDialog(page: Page, bannerShot: string): Promise<void> {
-  const rice = await bookByTitle('Every Grain of Rice');
-  const tab = await openTab(page, `/books/${rice.id}`);
-  await coversLoaded(page);
-  const banner = tab.locator('[data-k="ol-banner"]');
-  await expect(banner).toBeVisible();
-  await banner.scrollIntoViewIfNeeded();
-  await shot(page, bannerShot);
-  await tab.locator('[data-k="ol-banner-send"]').click();
-  await expect(tab.locator('.hkl-dialog [data-k="d-send-isbn"]')).toBeChecked();
 }
 
 test.describe.configure({ mode: 'serial' });
@@ -215,9 +159,9 @@ test('capture the Library screenshots', async ({ page, browser }) => {
   await coversLoaded(page);
   await shot(page, 'wishlist-desktop');
 
-  // Import, after the dry run of the sample Goodreads file.
+  // Import, after the dry run of the sample CSV file.
   tab = await openTab(page, '/import');
-  await tab.locator('[data-k="im-file"]').setInputFiles(resolve(__dirname, 'seed/goodreads_sample.csv'));
+  await tab.locator('[data-k="im-file"]').setInputFiles(resolve(__dirname, 'seed/games_sample.csv'));
   await expect(tab.locator('.hkl-dialog .hkl-chips')).toContainText('New books', { timeout: 30_000 });
   await tab.locator('.hkl-details summary').click();
   await shot(page, 'import-desktop');
@@ -227,23 +171,8 @@ test('capture the Library screenshots', async ({ page, browser }) => {
   await expect(tab.locator('[data-k="currency"]')).toHaveValue('EUR');
   await shot(page, 'settings-desktop');
 
-  // Open Library: the account card, the list of books that it does not have,
-  // and the send dialog of 1 of them.
-  await library('disconnect_catalog');
-  await openLibraryCard(page);
-  await shot(page, 'settings-openlibrary-desktop');
-  tab = await openTab(page, '/books;status=not_on_ol');
-  await expect(tab.locator('.hkl-olrow')).toHaveCount(4);
-  await coversLoaded(page);
-  await shot(page, 'openlibrary-list-desktop');
-  await connectOpenLibrary(page);
-  await openSendDialog(page, 'openlibrary-banner-desktop');
-  await shot(page, 'openlibrary-send-desktop');
-
-  // A scanned book that Open Library does not have: the title sheet as a dialog.
+  // A scan of a new barcode: the title sheet as a dialog.
   await scanSession(page, 'scan-miss-desktop');
-  await deleteScanned();
-  await matchSession(page, 'scan-match-desktop');
   await deleteScanned();
 
   // The card on a dashboard, as Alex. The window is tall enough for the whole card.
@@ -268,16 +197,6 @@ test('capture the Library screenshots', async ({ page, browser }) => {
   await openTab(page, '/shelves');
   await shot(page, 'shelves-mobile');
 
-  await openSendDialog(page, 'openlibrary-banner-mobile');
-  await shot(page, 'openlibrary-send-mobile');
-  tab = await openTab(page, '/books;status=not_on_ol');
-  await expect(tab.locator('.hkl-olrow')).toHaveCount(4);
-  await coversLoaded(page);
-  await shot(page, 'openlibrary-list-mobile');
-  await library('disconnect_catalog');
-  await openLibraryCard(page);
-  await shot(page, 'settings-openlibrary-mobile');
-
   tab = await openTab(page, '/loans');
   await expect(tab.locator('a.hkl-task').first()).toBeVisible({ timeout: 30_000 });
   await shot(page, 'loans-mobile');
@@ -290,8 +209,6 @@ test('capture the Library screenshots', async ({ page, browser }) => {
   await libraryTab(page).locator('[data-k="scan-done"]').click();
   await expect(libraryTab(page).locator('.hkl-scan-head')).toContainText('Scan summary');
   await shot(page, 'scan-summary-mobile');
-  await deleteScanned();
-  await matchSession(page, 'scan-match-mobile');
   await deleteScanned();
 
   // The setup step on a page that is not HTTPS: the camera is blocked.

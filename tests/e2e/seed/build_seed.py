@@ -71,7 +71,7 @@ def _load_pure() -> tuple[types.ModuleType, types.ModuleType]:
             module.__path__ = [str(path)]
             sys.modules[name] = module
     loaded = []
-    for mod in ("const", "isbn", "models", "projections"):
+    for mod in ("const", "models", "projections"):
         full = f"{pkg}.{mod}"
         if full not in sys.modules:
             spec = importlib.util.spec_from_file_location(full, COMPONENT / f"{mod}.py")
@@ -80,7 +80,7 @@ def _load_pure() -> tuple[types.ModuleType, types.ModuleType]:
             sys.modules[full] = module
             spec.loader.exec_module(module)
         loaded.append(sys.modules[full])
-    return loaded[2], loaded[3]
+    return loaded[1], loaded[2]
 
 
 def seed_id(kind: str, key: str) -> str:
@@ -90,8 +90,8 @@ def seed_id(kind: str, key: str) -> str:
     return uuid.UUID(bytes=digest[:16], version=4).hex
 
 
-def isbn13(first12: str) -> str:
-    """An ISBN-13 with a correct check digit for the first 12 digits."""
+def ean13(first12: str) -> str:
+    """An EAN-13 barcode with a correct check digit for the first 12 digits."""
     total = sum(int(d) * (3 if i % 2 else 1) for i, d in enumerate(first12))
     return first12 + str((10 - total % 10) % 10)
 
@@ -118,9 +118,9 @@ SHELVES = [
 ]
 
 # ── Books ────────────────────────────────────────────────────────────────────
-# key: (title, authors, ISBN first 12 digits, publisher, published, pages,
+# key: (title, authors, barcode first 12 digits, publisher, published, pages,
 #       subjects, series, tags, cover)
-# cover: None, "ol" (an Open Library cover file) or "custom".
+# cover: None or "custom". Each cover is a file in tests/e2e/seed/covers.
 LE_GUIN = ["Ursula K. Le Guin"]
 SF = ["Science fiction"]
 FANTASY = ["Fantasy"]
@@ -128,13 +128,13 @@ BOOKS: dict[str, tuple[Any, ...]] = {
     "left_hand": ("The Left Hand of Darkness", LE_GUIN, "978044147812", "Ace Books",
                   "1969", 304, [*SF, "Gender"], ("Hainish Cycle", 4), ["Hugo winner"], "custom"),
     "earthsea": ("A Wizard of Earthsea", LE_GUIN, "978054777374", "Clarion Books",
-                 "1968", 183, FANTASY, ("Earthsea", 1), [], "ol"),
+                 "1968", 183, FANTASY, ("Earthsea", 1), [], "custom"),
     "dispossessed": ("The Dispossessed", LE_GUIN, "978006105488", "Harper Voyager",
-                     "1974", 387, [*SF, "Utopias"], ("Hainish Cycle", 6), ["Hugo winner"], "ol"),
+                     "1974", 387, [*SF, "Utopias"], ("Hainish Cycle", 6), ["Hugo winner"], "custom"),
     "lathe": ("The Lathe of Heaven", LE_GUIN, "978141655696", "Scribner",
               "1971", 184, SF, None, [], None),
     "atuan": ("The Tombs of Atuan", LE_GUIN, "978141650960", "Atheneum",
-              "1970", 180, FANTASY, ("Earthsea", 2), [], "ol"),
+              "1970", 180, FANTASY, ("Earthsea", 2), [], "custom"),
     "farthest": ("The Farthest Shore", LE_GUIN, "978141650963", "Atheneum",
                  "1972", 223, FANTASY, ("Earthsea", 3), [], None),
     "tehanu": ("Tehanu", LE_GUIN, "978068931595", "Atheneum",
@@ -146,18 +146,18 @@ BOOKS: dict[str, tuple[Any, ...]] = {
     "lavinia": ("Lavinia", LE_GUIN, "978015603368", "Mariner Books",
                 "2008", 279, ["Historical fiction"], None, [], None),
     "piranesi": ("Piranesi", ["Susanna Clarke"], "978163557563", "Bloomsbury",
-                 "2020", 272, FANTASY, None, ["Book club"], "ol"),
+                 "2020", 272, FANTASY, None, ["Book club"], "custom"),
     "hail_mary": ("Project Hail Mary", ["Andy Weir"], "978059313520", "Ballantine Books",
-                  "2021", 476, SF, None, [], "ol"),
+                  "2021", 476, SF, None, [], "custom"),
     "fifth_season": ("The Fifth Season", ["N. K. Jemisin"], "978031622929", "Orbit",
                      "2015", 468, [*FANTASY, "Science fiction"], ("The Broken Earth", 1),
-                     ["Hugo winner"], "ol"),
+                     ["Hugo winner"], "custom"),
     "dune": ("Dune", ["Frank Herbert"], "978044101359", "Ace Books",
-             "1965", 688, SF, ("Dune", 1), [], "ol"),
+             "1965", 688, SF, ("Dune", 1), [], "custom"),
     "name_wind": ("The Name of the Wind", ["Patrick Rothfuss"], "978075640474", "DAW Books",
                   "2007", 662, FANTASY, ("The Kingkiller Chronicle", 1), [], None),
     "klara": ("Klara and the Sun", ["Kazuo Ishiguro"], "978059331817", "Knopf",
-              "2021", 303, SF, None, [], "ol"),
+              "2021", 303, SF, None, [], "custom"),
     "grain_rice": ("Every Grain of Rice", ["Fuchsia Dunlop"], "978039308928", "W. W. Norton",
                    "2012", 352, ["Cooking", "Chinese cooking"], None, ["Kitchen"], None),
     "salt_fat": ("Salt, Fat, Acid, Heat", ["Samin Nosrat"], "978147675383", "Simon & Schuster",
@@ -173,7 +173,7 @@ BOOKS: dict[str, tuple[Any, ...]] = {
     "sweetgrass": ("Braiding Sweetgrass", ["Robin Wall Kimmerer"], "978157131356",
                    "Milkweed Editions", "2013", 391, ["Nature", "Botany"], None, [], None),
     "hobbit": ("The Hobbit", ["J. R. R. Tolkien"], "978054792822", "Mariner Books",
-               "1937", 310, FANTASY, None, ["Family"], "ol"),
+               "1937", 310, FANTASY, None, ["Family"], "custom"),
     "wild_things": ("Where the Wild Things Are", ["Maurice Sendak"], "978006025492",
                     "HarperCollins", "1963", 48, ["Picture books"], None, ["Family"], None),
     "chinese_1": ("Integrated Chinese 1", ["Yuehua Liu", "Tao-chung Yao"], "978162291135",
@@ -195,7 +195,7 @@ BOOKS: dict[str, tuple[Any, ...]] = {
     "unreal": ("The Unreal and the Real", LE_GUIN, "978161873079", "Saga Press",
                "2012", 320, ["Short stories"], None, [], None),
     "untitled": ("Untitled paperback", [], "978098012345", "", "", None, [], None, [], None),
-    "isbn_only": ("9780980123468", [], "978098012346", "", "", None, [], None, [], None),
+    "code_only": ("9780980123468", [], "978098012346", "", "", None, [], None, [], None),
     "steering": ("Steering the Craft", LE_GUIN, "978054461161", "Mariner Books",
                  "1998", 176, ["Writing"], None, [], None),
     "ministry": ("The Ministry for the Future", ["Kim Stanley Robinson"], "978031630013",
@@ -217,9 +217,7 @@ BOOKS: dict[str, tuple[Any, ...]] = {
                   "Cheng & Tsui", "2018", 412, ["Chinese language"], ("Integrated Chinese", 2),
                   [], None),
 }
-NEEDS_DETAILS = {"untitled", "isbn_only"}
-# Books that the lookup did not find on Open Library: the "Not on Open Library" list.
-NOT_ON_OPENLIBRARY = {"grain_rice", "steering", "untitled", "isbn_only"}
+NEEDS_DETAILS = {"untitled", "code_only"}
 SHARED_NOTES = {
     "left_hand": "Book club pick, **Oct 2026**. Sam has the map of Gethen bookmarked on page 6.",
     "food_lab": "The *pancake* recipe is on page 102.\n\n- Sticky notes from Jo\n- Do not lend",
@@ -283,7 +281,7 @@ COPIES = [
      False, False, ""),
     ("unreal", "a4", "hardcover", "fine", "2013-01-01", "", 30, None, False, False, ""),
     ("untitled", "a3", "paperback", None, None, "", None, None, False, False, ""),
-    ("isbn_only", None, "paperback", None, None, "", None, None, False, False, ""),
+    ("code_only", None, "paperback", None, None, "", None, None, False, False, ""),
     ("steering", None, "paperback", "good", "2024-05-05", "", 16, None, False, False, ""),
     ("ministry", "a4", "hardcover", "fine", "2020-10-06", "", 28, None, False, False, ""),
     ("tomorrow", "a4", "hardcover", "fine", "2022-07-05", "", 28, None, False, False, ""),
@@ -371,19 +369,6 @@ PEOPLE = {
     JO: {"share_reading": True, "wishlist_todo": None, "yearly_goal": None},
 }
 
-# The Open Library cover ids of the books with an "ol" cover.
-OL_COVER_IDS = {
-    "earthsea": 12623421,
-    "dispossessed": 8231862,
-    "atuan": 12623433,
-    "piranesi": 10307413,
-    "hail_mary": 11200092,
-    "fifth_season": 8296560,
-    "dune": 11481354,
-    "klara": 10958358,
-    "hobbit": 12003830,
-}
-
 # fmt: on
 
 
@@ -418,7 +403,7 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
         (
             title,
             authors,
-            isbn,
+            code,
             publisher,
             published,
             pages,
@@ -431,7 +416,7 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
         data: dict[str, Any] = {
             "title": title,
             "authors": authors,
-            "isbn13": isbn13(isbn),
+            "barcode": ean13(code),
             "publisher": publisher,
             "published": published,
             "pages": pages,
@@ -445,23 +430,8 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
         book["id"] = seed_id("book", key)
         book["updated_at"] = created
         book["needs_details"] = key in NEEDS_DETAILS
-        if key in NOT_ON_OPENLIBRARY:
-            book["catalog_status"] = {"openlibrary": "missing"}
-            book["lookup_tries"] = 3  # const.LOOKUP_MAX_TRIES
         if cov:
-            book["cover"] = {
-                "kind": "custom" if cov == "custom" else "openlibrary",
-                "file": cover_file(key),
-            }
-        if key in OL_COVER_IDS:
-            work = int(seed_id("work", key)[:6], 16)
-            book["catalogs"] = {
-                "openlibrary": {
-                    "edition_key": f"OL{work}M",
-                    "work_key": f"/works/OL{work}W",
-                    "cover_id": OL_COVER_IDS[key],
-                }
-            }
+            book["cover"] = {"kind": "custom", "file": cover_file(key)}
         state["books"][book["id"]] = book
     copy_ids: dict[str, list[str]] = {}
     for row in COPIES:

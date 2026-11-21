@@ -27,42 +27,16 @@
     "step": {
       "init": {
         "title": "Bibliotekalternativer",
-        "menu_options": {
-          "currency": "Valuta",
-          "openlibrary": "Open Library-konto"
-        },
         "data": {
           "currency": "Valuta"
         },
         "data_description": {
           "currency": "En kode på 3 bokstaver, for eksempel EUR eller USD."
-        }
-      },
-      "currency": {
-        "title": "Valuta",
-        "data": {
-          "currency": "Valuta"
-        },
-        "data_description": {
-          "currency": "En kode på 3 bokstaver, for eksempel EUR eller USD."
-        }
-      },
-      "openlibrary": {
-        "title": "Open Library-konto",
-        "description": "Lim inn tilgangsnøkkelen og den hemmelige nøkkelen fra siden med S3-nøkler på Archive.org-kontoen din. Biblioteket bruker dem bare når du sender en bok til Open Library.",
-        "data": {
-          "access_key": "Tilgangsnøkkel",
-          "secret_key": "Hemmelig nøkkel"
         }
       }
     },
     "error": {
-      "invalid_currency": "Skriv inn en valutakode på 3 bokstaver.",
-      "invalid_auth": "Open Library godtok ikke disse nøklene.",
-      "cannot_connect": "Open Library er ikke tilgjengelig. Prøv igjen senere."
-    },
-    "abort": {
-      "not_loaded": "Home Keeper Games er ikke lastet. Prøv igjen når den har startet."
+      "invalid_currency": "Skriv inn en valutakode på 3 bokstaver."
     }
   },
   "entity": {
@@ -274,33 +248,9 @@
         }
       }
     },
-    "lookup_isbn": {
-      "name": "Slå opp ISBN",
-      "description": "Les detaljene for et ISBN fra Open Library. Biblioteket forblir uendret.",
-      "fields": {
-        "isbn": {
-          "name": "ISBN",
-          "description": "Et ISBN-10 eller et ISBN-13."
-        }
-      }
-    },
-    "search_catalog": {
-      "name": "Søk i katalogen",
-      "description": "Finn det beste verket i Open Library for en tittel og en forfatter. Biblioteket endres ikke.",
-      "fields": {
-        "title": {
-          "name": "Tittel",
-          "description": "Tittelen på boken."
-        },
-        "authors": {
-          "name": "Forfattere",
-          "description": "Forfatterne. Bare den første forfatteren brukes."
-        }
-      }
-    },
     "add_book": {
       "name": "Legg til bok",
-      "description": "Legg til en bok. Hvis en bok har samme ISBN, returnerer tjenesten den boken.",
+      "description": "Legg til en bok. Hvis en bok har samme strekkode, returnerer tjenesten den boken.",
       "fields": {
         "title": {
           "name": "Tittel",
@@ -314,17 +264,9 @@
           "name": "Forfattere",
           "description": "Forfatterne, i rekkefølge."
         },
-        "isbn": {
-          "name": "ISBN",
-          "description": "Et ISBN-10 eller et ISBN-13."
-        },
-        "isbn13": {
-          "name": "ISBN-13",
-          "description": "ISBN med 13 sifre."
-        },
-        "isbn10": {
-          "name": "ISBN-10",
-          "description": "ISBN med 10 sifre."
+        "barcode": {
+          "name": "Strekkode",
+          "description": "Nummeret til strekkoden, for eksempel en EAN-13."
         },
         "publisher": {
           "name": "Forlag",
@@ -365,10 +307,6 @@
         "needs_details": {
           "name": "Detaljer mangler",
           "description": "Merk boken som ufullstendig."
-        },
-        "lookup": {
-          "name": "Slå opp",
-          "description": "Les detaljene fra Open Library."
         }
       }
     },
@@ -392,17 +330,9 @@
           "name": "Forfattere",
           "description": "Forfatterne, i rekkefølge."
         },
-        "isbn": {
-          "name": "ISBN",
-          "description": "Et ISBN-10 eller et ISBN-13."
-        },
-        "isbn13": {
-          "name": "ISBN-13",
-          "description": "ISBN med 13 sifre."
-        },
-        "isbn10": {
-          "name": "ISBN-10",
-          "description": "ISBN med 10 sifre."
+        "barcode": {
+          "name": "Strekkode",
+          "description": "Nummeret til strekkoden, for eksempel en EAN-13."
         },
         "publisher": {
           "name": "Forlag",
@@ -456,73 +386,13 @@
         }
       }
     },
-    "refresh_book": {
-      "name": "Oppdater fra Open Library",
-      "description": "Fyll ut de tomme feltene for en bok fra Open Library.",
-      "fields": {
-        "book_id": {
-          "name": "Bok",
-          "description": "ID-en til boken."
-        }
-      }
-    },
-    "send_to_catalog": {
-      "name": "Send til Open Library",
-      "description": "Legg til en bok som Open Library ikke har, med den tilkoblede Open Library-kontoen, og koble deretter boken.",
-      "fields": {
-        "book_id": {
-          "name": "Bok",
-          "description": "ID-en til boken."
-        },
-        "fields": {
-          "name": "Felt",
-          "description": "De valgfrie feltene som sendes: publisher, published og isbn. Tittelen og den første forfatteren sendes alltid."
-        },
-        "include_cover": {
-          "name": "Send omslag",
-          "description": "Send også det egne omslaget til boken."
-        }
-      }
-    },
-    "link_catalog": {
-      "name": "Koble til Open Library",
-      "description": "Knytt en bok til en utgave eller et verk i Open Library, og fyll ut de tomme feltene.",
-      "fields": {
-        "book_id": {
-          "name": "Bok",
-          "description": "ID-en til boken."
-        },
-        "record": {
-          "name": "Utgave eller verk",
-          "description": "En utgavenøkkel som OL123M, en verknøkkel som OL45W eller URL-en til siden."
-        }
-      }
-    },
-    "skip_catalog": {
-      "name": "Hopp over Open Library",
-      "description": "Fjern en bok fra listen over bøker som ikke er på Open Library, eller legg den tilbake.",
-      "fields": {
-        "book_id": {
-          "name": "Bok",
-          "description": "ID-en til boken."
-        },
-        "skip": {
-          "name": "Hopp over",
-          "description": "Slå av for å legge boken tilbake i listen."
-        }
-      }
-    },
-    "disconnect_catalog": {
-      "name": "Koble fra Open Library",
-      "description": "Fjern nøklene til Open Library-kontoen."
-    },
-    "scan_isbn": {
-      "name": "Skann ISBN",
+    "scan_barcode": {
+      "name": "Skann strekkode",
       "description": "Legg til en skannet bok på en hylle.",
       "fields": {
-        "isbn": {
-          "name": "ISBN",
-          "description": "Et ISBN-10 eller et ISBN-13."
+        "barcode": {
+          "name": "Strekkode",
+          "description": "Nummeret til strekkoden, for eksempel en EAN-13."
         },
         "shelf_id": {
           "name": "Hylle",
@@ -760,9 +630,9 @@
           "name": "Bok",
           "description": "ID-en til boken."
         },
-        "isbn": {
-          "name": "ISBN",
-          "description": "Et ISBN-10 eller et ISBN-13."
+        "barcode": {
+          "name": "Strekkode",
+          "description": "Nummeret til strekkoden, for eksempel en EAN-13."
         },
         "title": {
           "name": "Tittel",
@@ -864,9 +734,9 @@
           "name": "Bok",
           "description": "ID-en til boken."
         },
-        "isbn": {
-          "name": "ISBN",
-          "description": "Et ISBN-10 eller et ISBN-13."
+        "barcode": {
+          "name": "Strekkode",
+          "description": "Nummeret til strekkoden, for eksempel en EAN-13."
         },
         "title": {
           "name": "Tittel",
@@ -966,15 +836,11 @@
     },
     "import_csv": {
       "name": "Importer CSV",
-      "description": "Importer bøker fra Goodreads, StoryGraph eller en bibliotekeksport.",
+      "description": "Importer bøker fra en CSV-eksport av Home Keeper Games.",
       "fields": {
         "content": {
           "name": "CSV-innhold",
           "description": "CSV-teksten. Høyst 5 MB."
-        },
-        "source": {
-          "name": "Kilde",
-          "description": "Appen som laget CSV-filen."
         },
         "person_id": {
           "name": "Person",
@@ -1005,10 +871,6 @@
         "person_id": {
           "name": "Person",
           "description": "ID-en til personen i Home Assistant."
-        },
-        "format": {
-          "name": "Filformat",
-          "description": "goodreads eller library."
         }
       }
     },
@@ -1018,7 +880,7 @@
       "fields": {
         "query": {
           "name": "Søk",
-          "description": "Tekst i tittelen, forfatterne, ISBN eller merkene."
+          "description": "Tekst i tittelen, forfatterne, strekkoden eller merkene."
         },
         "room_id": {
           "name": "Rom",
@@ -1132,8 +994,8 @@
     "invalid_choice": {
       "message": "{field} må være en av: {options}."
     },
-    "invalid_isbn": {
-      "message": "{isbn} er ikke et gyldig ISBN."
+    "invalid_barcode": {
+      "message": "{barcode} er ikke en gyldig strekkode."
     },
     "room_not_found": {
       "message": "Ingen rom har ID {id}."
@@ -1168,8 +1030,8 @@
     "shelf_not_empty": {
       "message": "Hyllen har {count} eksemplarer. Bruk force for å flytte dem til ingen hylle."
     },
-    "duplicate_isbn": {
-      "message": "En annen bok har ISBN {isbn}."
+    "duplicate_barcode": {
+      "message": "En annen bok har strekkoden {barcode}."
     },
     "copy_on_loan": {
       "message": "Eksemplaret er utlånt. Lever først tilbake utlånet."
@@ -1186,14 +1048,8 @@
     "upload_not_found": {
       "message": "Ingen opplastet omslag har ID {file_id}."
     },
-    "isbn_or_title_required": {
-      "message": "Oppgi en bok-ID, et ISBN eller en tittel."
-    },
-    "lookup_unavailable": {
-      "message": "Open Library er ikke tilgjengelig. Prøv igjen senere."
-    },
-    "no_openlibrary_cover": {
-      "message": "Open Library har ikke noe omslag for denne boken."
+    "barcode_or_title_required": {
+      "message": "Oppgi en bok-ID, en strekkode eller en tittel."
     },
     "todo_entity_not_found": {
       "message": "{entity_id} er ikke en gjøremålsliste."
@@ -1227,27 +1083,6 @@
     },
     "todo_not_allowed": {
       "message": "Bare {person} eller en administrator kan endre denne gjøremålslisten."
-    },
-    "openlibrary_not_connected": {
-      "message": "Koble først til en Open Library-konto i bibliotekinnstillingene."
-    },
-    "openlibrary_already_linked": {
-      "message": "Denne boken er allerede koblet til Open Library."
-    },
-    "openlibrary_needs_author": {
-      "message": "Legg til en forfatter i boken før du sender den."
-    },
-    "openlibrary_ambiguous": {
-      "message": "Open Library fant mer enn 1 verk som kan være denne boken. Legg til boken på nettstedet til Open Library."
-    },
-    "openlibrary_login_failed": {
-      "message": "Open Library godtok ikke kontonøklene. Koble til kontoen på nytt."
-    },
-    "openlibrary_not_found": {
-      "message": "Open Library har ingen post {edition}."
-    },
-    "invalid_openlibrary_edition": {
-      "message": "{edition} er ikke en nøkkel eller URL fra Open Library."
     },
     "files_dir_invalid": {
       "message": "Filmappen må ligge under .storage/home_keeper_import_export."

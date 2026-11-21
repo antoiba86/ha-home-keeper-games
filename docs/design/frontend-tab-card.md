@@ -24,8 +24,8 @@ implements:
   - custom_components/home_keeper_games/frontend/src/dom.ts
   - custom_components/home_keeper_games/frontend/src/styles.ts
   - custom_components/home_keeper_games/frontend/src/global.d.ts
-related: [home-keeper-dependency, scan-and-isbn, csv-import-export, people-privilege]
-source_hash: 7e464a0894f6
+related: [home-keeper-dependency, scan-and-barcode, csv-import-export, people-privilege]
+source_hash: fb8f7ee7cad1
 ---
 
 # Tab and card
@@ -102,13 +102,13 @@ are `;key=value` parameters on the last segment, as in `/books;q=le%20guin;statu
 | `/scan`, `/import` | Scan flow, import | `tab-scan.ts`, `tab-import.ts` |
 
 The book filters are `q`, `status`, `room`, `shelf`, `reader`, `subject`, `owned`, `sort` and
-`view`. `utils.filterBooks` and `sortBooks` apply them. An admin gets `status=not_on_ol`, the books
-to [send](open-library-contribute.md). Each view is a free function over `ViewCtx` (`tab-types.ts`)
-that returns HTML. `tab.ts` renders it with `dom.renderKeepFocus`. It keeps the focus, the caret,
-the typed text and the camera video. A delegated listener for each event type reads the `data-act`,
-`data-chg`, `data-input` and `data-form` attributes. The dialogs of `tab-dialogs.ts` are a separate
-layer, so a data push does not clear a form. An error keeps the typed input. A failed command shows
-the stored values. A [sheet](scan-and-isbn.md#title-sheet) has no close button.
+`view`. `utils.filterBooks` and `sortBooks` apply them. Each view is a free function over
+`ViewCtx` (`tab-types.ts`) that returns HTML. `tab.ts` renders it with
+`dom.renderKeepFocus`. It keeps the focus, the caret, the typed text and the camera video.
+A delegated listener for each event type reads the `data-act`, `data-chg`, `data-input`
+and `data-form` attributes. The dialogs of `tab-dialogs.ts` are a separate layer, so a
+data push does not clear a form. An error keeps the typed input. A failed command shows
+the stored values. A [sheet](scan-and-barcode.md#title-sheet) has no close button.
 
 ### The card
 

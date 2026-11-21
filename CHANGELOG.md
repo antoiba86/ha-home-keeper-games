@@ -5,15 +5,31 @@ Each change that a user can see is in this file. The format is based on
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). `manifest.json` `version`
 is the single source of truth (see `RELEASE.md`).
 
+## [0.5.0b1] - 2026-11-21
+
+### Changed
+
+- **[Retail barcode scanning](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/work-in-progress).**
+  A scan reads any EAN-13, EAN-8 or UPC-A barcode, and a new barcode asks for the title.
+  A book has 1 barcode field in place of its 2 ISBN fields, and `scan_isbn` is now
+  `scan_barcode`.
+
+### Removed
+
+- **Open Library.** The library no longer reads details or covers from Open Library, and
+  no longer sends books to it. Upload a photo to give a book a cover.
+- **Goodreads and StoryGraph files.** The CSV import and export use only the format of
+  Home Keeper Games.
+
 ## [0.4.0] - 2026-10-25
 
 ### Added
 
-- **[Open Library title match](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/scan-books).**
+- **Open Library title match.**
   When a scanned ISBN has no match, the library looks for the title that you type on Open
   Library and asks if it is your book. If you confirm, the book gets the description,
   subjects and cover from Open Library, and keeps your ISBN.
-- **[SBN numbers](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/scan-books).**
+- **SBN numbers.**
   You can type the 9-digit SBN of an old UK book where the library asks for an ISBN. The
   library finds and stores the book with the matching ISBN.
 
@@ -26,15 +42,15 @@ is the single source of truth (see `RELEASE.md`).
 
 ### Added
 
-- **[Send books to Open Library](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/open-library).**
+- **Send books to Open Library.**
   An admin can connect an Open Library account and send a book that Open Library does not
   have, and the library links the new record. The **Not on Open Library** filter lists
   these books.
-- **[Title for unmatched scans](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/scan-books).**
+- **Title for unmatched scans.**
   If Open Library has no match for a scanned book, the scan stops and asks for its title,
   so you can find the book again later. You can also add the other details and a photo of
   the cover, or remove the scan.
-- **[Library in Home Keeper export](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/import-export).**
+- **Library in Home Keeper export.**
   The Home Keeper export file now holds your whole library: books, shelves, reading
   status, loans and wishlists. Its import brings them back or applies your edits, and a
   bundle export also holds the covers.
@@ -76,21 +92,21 @@ is the single source of truth (see `RELEASE.md`).
 
 ### Added
 
-- **[ISBN barcode scan](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/scan-books).** Scan the ISBN barcode of each book with a
+- **ISBN barcode scan.** Scan the ISBN barcode of each book with a
   phone. The book goes on the selected shelf with its details and cover from Open
   Library. Enter the ISBN by hand for a book with no barcode.
-- **[Rooms and shelves](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/rooms-and-shelves).** Record the rooms, bookcases and
+- **Rooms and shelves.** Record the rooms, bookcases and
   shelves of the home. Each copy shows its shelf.
-- **[Book search and filters](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/books).** Find a book by its title, author, ISBN,
+- **Book search and filters.** Find a book by its title, author, ISBN,
   series or notes. Filter the library by room, shelf, reader, subject and reading status.
-- **[Reading status and notes](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/book-detail).** Each person keeps a reading status, a
+- **Reading status and notes.** Each person keeps a reading status, a
   rating, the page, the dates and private notes for each book. Each copy keeps its
   format, condition, price and value.
-- **[Lent and borrowed books](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/loans).** Record the books that are lent out or
+- **Lent and borrowed books.** Record the books that are lent out or
   borrowed. Each due date gets a Home Keeper task, and the completed task returns the book.
-- **[Per-person wishlist](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/wishlist).** Each person has a wishlist. The books to buy go
+- **Per-person wishlist.** Each person has a wishlist. The books to buy go
   to a to-do list of that person.
-- **[Goodreads and StoryGraph import](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/import-export).** Bring a reading history in
+- **Goodreads and StoryGraph import.** Bring a reading history in
   from a Goodreads or StoryGraph CSV file, with a preview first. Export the library to a
   CSV file that both read.
 - **[Dashboard card](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/dashboard-card).** Each user gets a dashboard card with their

@@ -376,11 +376,11 @@ class LibraryStore:
     ) -> tuple[dict[str, Any], bool]:
         """Add a book. Return ``(book, existing)``.
 
-        If the ISBN-13 of the new book matches a stored book, the store adds no
+        If the barcode of the new book matches a stored book, the store adds no
         book and returns the stored one with ``existing`` True.
         """
         book = models.build_book(data, now=now())
-        if found := models.find_book_by_isbn(self.state, book["isbn13"]):
+        if found := models.find_book_by_barcode(self.state, book["barcode"]):
             return dict(found), True
         self.state["books"][book["id"]] = book
         await self._commit([(EVENT_BOOK_ADDED, events.book_event_data(book, origin))])
@@ -391,55 +391,11 @@ class LibraryStore:
     ) -> dict[str, Any]:
         """Change the fields of a book."""
         updated, changed = models.update_book(self.book(book_id), data, now=now())
-        if "isbn13" in changed and updated["isbn13"]:
-            other = models.find_book_by_isbn(self.state, updated["isbn13"])
+        if "barcode" in changed and updated["barcode"]:
+            other = models.find_book_by_barcode(self.state, updated["barcode"])
             if other is not None and other["id"] != book_id:
-                raise LibraryError("duplicate_isbn", isbn=updated["isbn13"])
+                raise LibraryError("duplicate_barcode", barcode=updated["barcode"])
         return await self._replace_book(updated, changed, origin)
-
-    async def fill_book(
-        self, book_id: str, draft: dict[str, Any], *, origin: str | None = None
-    ) -> dict[str, Any]:
-        """Fill the empty fields of a book from an Open Library draft."""
-        book = self.book(book_id)
-        updated, changed = models.fill_from_draft(book, draft, now=now())
-        if "isbn13" in changed:
-            other = models.find_book_by_isbn(self.state, updated["isbn13"])
-            if other is not None and other["id"] != book_id:
-                # Keep the ISBNs of the book. Only the ISBN-13 was empty.
-                updated["isbn13"] = book.get("isbn13")
-                updated["isbn10"] = book.get("isbn10")
-                changed = [f for f in changed if f not in ("isbn13", "isbn10")]
-        return await self._replace_book(updated, changed, origin)
-
-    async def set_catalog_status(
-        self,
-        book_id: str,
-        status: str | None,
-        *,
-        catalog: str = models.OPENLIBRARY,
-        origin: str | None = None,
-    ) -> dict[str, Any]:
-        """Set the ``catalog_status`` of a book for 1 catalog: None, missing or skipped.
-
-        A book with a record in the catalog keeps no status. A change fires
-        ``book_updated``, because the "Not on Open Library" list shows it.
-        """
-        book = self.book(book_id)
-        value = models.catalog_status_value(status)
-        if models.catalog_record(book, catalog):
-            value = None
-        if models.catalog_status(book, catalog) == value:
-            return book
-        statuses = {
-            name: kept
-            for name, kept in (book.get("catalog_status") or {}).items()
-            if name != catalog
-        }
-        if value is not None:
-            statuses[catalog] = value
-        updated = {**book, "catalog_status": statuses, "updated_at": now()}
-        return await self._replace_book(updated, ["catalog_status"], origin)
 
     async def _replace_book(
         self, updated: dict[str, Any], changed: list[str], origin: str | None
@@ -737,19 +693,6 @@ class LibraryStore:
     def _book_or_stub(self, book_id: str) -> dict[str, Any]:
         """The book, or a record with only its id, for an event payload."""
         return self.state["books"].get(book_id) or {"id": book_id}
-
-    async def set_lookup_tries(self, book_id: str, tries: int) -> None:
-        """Record the count of Open Library lookups of a book that gave no details.
-
-        The lookup queue keeps the count here, so the retry limit holds across
-        a restart. The count is bookkeeping of the queue that no user sees, so
-        it fires no event, as ``set_loan_task`` does.
-        """
-        book = self.state["books"].get(book_id)
-        if book is None or book.get("lookup_tries") == tries:
-            return
-        book["lookup_tries"] = tries
-        await self._commit([])
 
     async def set_loan_task(self, loan_id: str, task_id: str | None) -> None:
         """Record the Home Keeper task id of a loan."""

@@ -38,7 +38,7 @@ bought. The sync follows the design of the shopping sync of Home Keeper.
 ### Records
 
 A book on a wishlist has `wishlist: {person_id, buy, added_at, todo_uid, todo_entity,
-bought}`. `add_to_wishlist` takes a `book_id`, an ISBN or a title, and adds the book when
+bought}`. `add_to_wishlist` takes a `book_id`, a barcode or a title, and adds the book when
 none matches. `update_wishlist` changes `buy` or the person. `remove_from_wishlist`
 removes the entry. `got_wishlist_book` adds a copy and removes the entry in 1 change. A
 person's list is `wishlist_todo` in the `people` section.

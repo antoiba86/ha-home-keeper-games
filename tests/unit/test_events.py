@@ -90,11 +90,11 @@ def test_loan_and_wishlist_payloads() -> None:
 
 def test_import_payload() -> None:
     data = ev.import_completed_event_data(
-        {"rows": 3, "books_added": 2, "errors": 1}, "p", "goodreads", None
+        {"rows": 3, "books_added": 2, "errors": 1}, "p", "csv", None
     )
     assert data == {
         "person_id": "p",
-        "source": "goodreads",
+        "source": "csv",
         "rows": 3,
         "books_added": 2,
         "books_matched": 0,

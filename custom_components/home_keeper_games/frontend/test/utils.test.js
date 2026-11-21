@@ -7,8 +7,7 @@ const book = (id, extra = {}) => ({
   title: `Title ${id}`,
   subtitle: '',
   authors: [],
-  isbn13: null,
-  isbn10: null,
+  barcode: null,
   publisher: '',
   published: '',
   pages: null,
@@ -18,7 +17,6 @@ const book = (id, extra = {}) => ({
   description: '',
   tags: [],
   shared_notes: '',
-  catalogs: {},
   cover: { kind: 'none', file: null },
   needs_details: false,
   created_at: '2026-01-01T00:00:00+00:00',
@@ -362,8 +360,7 @@ describe('reading helpers and search', () => {
     title: 'The Left Hand',
     subtitle: 'A novel',
     authors: ['Ursula K. Le Guin'],
-    isbn13: '9780441478125',
-    isbn10: '0441478123',
+    barcode: '9780441478125',
     series: { name: 'Hainish', number: 4 },
     shared_notes: 'Book club',
     tags: ['hugo'],
@@ -380,7 +377,7 @@ describe('reading helpers and search', () => {
   });
 
   it('searches each field', () => {
-    for (const q of ['left hand', 'NOVEL', 'guin', '9780441478125', '978-0-441-47812-5', '0441478123', 'hainish', 'club', 'hugo', 'secret']) {
+    for (const q of ['left hand', 'NOVEL', 'guin', '9780441478125', '978-0-441-47812-5', '0441478125', 'hainish', 'club', 'hugo', 'secret']) {
       expect(u.matchesSearch(b, q, 'me'), q).toBe(true);
     }
   });
@@ -393,8 +390,9 @@ describe('reading helpers and search', () => {
     expect(u.matchesSearch(b, '', null)).toBe(true);
   });
 
-  it('matches a hyphenated ISBN only as digits', () => {
-    expect(u.matchesSearch(b, '0-441-47812-3', 'me')).toBe(true);
+  it('matches a hyphenated barcode only as digits', () => {
+    expect(u.matchesSearch(b, '0-441-47812-5', 'me')).toBe(true);
+    expect(u.matchesSearch(b, '0441478125x', 'me')).toBe(false);
     expect(u.matchesSearch(b, '978-0-441-9', 'me')).toBe(false);
     expect(u.matchesSearch(book('n', { title: 'a-b' }), 'ab', null)).toBe(false);
   });
@@ -409,76 +407,6 @@ describe('reading helpers and search', () => {
   });
 });
 
-describe('Open Library helpers', () => {
-  it('lists a book that Open Library does not have and no admin skipped', () => {
-    const missing = { catalog_status: { openlibrary: 'missing' } };
-    expect(u.notOnOpenLibrary(book('a', missing))).toBe(true);
-    expect(u.notOnOpenLibrary(book('a', { catalog_status: { openlibrary: 'skipped' } }))).toBe(false);
-    expect(u.notOnOpenLibrary(book('a', { catalog_status: {} }))).toBe(false);
-    expect(u.notOnOpenLibrary(book('a'))).toBe(false);
-    const linked = { edition_key: 'OL1M', work_key: null, cover_id: null };
-    expect(u.notOnOpenLibrary(book('a', { ...missing, catalogs: { openlibrary: linked } }))).toBe(false);
-  });
-
-  it('reads the Open Library record and status of a book', () => {
-    const linked = { edition_key: 'OL1M', work_key: null, cover_id: null };
-    expect(u.olRecord(book('a', { catalogs: { openlibrary: linked } }))).toEqual(linked);
-    expect(u.olRecord(book('a'))).toBeNull();
-    expect(u.olRecord(book('a', { catalogs: undefined }))).toBeNull();
-    expect(u.olStatus(book('a', { catalog_status: { openlibrary: 'skipped' } }))).toBe('skipped');
-    expect(u.olStatus(book('a', { catalog_status: {} }))).toBeNull();
-    expect(u.olStatus(book('a'))).toBeNull();
-  });
-
-  it.each([
-    ['OL5M', 'OL5M'],
-    ['OL12345M', 'OL12345M'],
-    [' OL5M ', 'OL5M'],
-    ['/books/OL12345M/x', 'OL12345M'],
-    ['/books/OL5M', 'OL5M'],
-    ['https://openlibrary.org/books/OL5M/Ferns_of_the_Rain_City', 'OL5M'],
-    ['https://openlibrary.org/books/OL5M.json', 'OL5M'],
-    ['https://openlibrary.org/books/OL5M?x=1', 'OL5M'],
-    ['https://openlibrary.org/books/OL5M#top', 'OL5M'],
-    ['https://openlibrary.org/works/OL5W', null],
-    ['https://example.org/OL5M', null],
-    ['OL5W', null],
-    ['OL5MX', null],
-    ['xOL5M', null],
-    ['', null],
-    [null, null],
-    [undefined, null],
-  ])('reads the edition key of %s', (text, key) => {
-    expect(u.editionKey(text)).toBe(key);
-  });
-
-  it('shows the Not on Open Library filter to admins only', () => {
-    expect(u.ADMIN_STATUS_FILTERS).toEqual(['not_on_ol']);
-    expect(u.STATUS_FILTERS).toContain('not_on_ol');
-  });
-
-  it('builds the edition page and the edit page', () => {
-    expect(u.openLibraryUrl('OL5M')).toBe('https://openlibrary.org/books/OL5M');
-    expect(u.openLibraryUrl('OL5M', true)).toBe('https://openlibrary.org/books/OL5M/edit');
-    expect(u.openLibraryUrl('a b')).toBe('https://openlibrary.org/books/a%20b');
-    expect(u.openLibraryUrl('OL45W')).toBe('https://openlibrary.org/works/OL45W');
-    expect(u.openLibraryUrl('/works/OL45W')).toBe('https://openlibrary.org/works/OL45W');
-    expect(u.openLibraryUrl('/books/OL5M', true)).toBe('https://openlibrary.org/books/OL5M/edit');
-    expect(u.openLibraryUrl('OL45WX')).toBe('https://openlibrary.org/books/OL45WX');
-    // Only a leading path is cut, and only a whole work key opens the works page.
-    expect(u.openLibraryUrl('x/works/OL45W')).toBe('https://openlibrary.org/books/x%2Fworks%2FOL45W');
-    expect(u.openLibraryUrl('xOL45W')).toBe('https://openlibrary.org/books/xOL45W');
-  });
-
-  it('reads the account of get_state', () => {
-    expect(u.normalizeState({}).openlibrary).toBeNull();
-    expect(u.normalizeState({ catalog_accounts: {} }).openlibrary).toBeNull();
-    const account = (value) => u.normalizeState({ catalog_accounts: { openlibrary: value } }).openlibrary;
-    expect(account({ connected: true, username: 'alex' })).toEqual({ connected: true, username: 'alex' });
-    expect(account({ connected: 'yes' })).toEqual({ connected: false, username: null });
-  });
-});
-
 describe('filterBooks, statusCounts and sortBooks', () => {
   let l;
   let ctx;
@@ -486,9 +414,9 @@ describe('filterBooks, statusCounts and sortBooks', () => {
     l = lib({
       books: {
         a: book('a', { title: 'Alpha', authors: ['Zed Last'], subjects: ['SF'], reading: { me: row('read', { rating: 3 }), p2: row('read') }, created_at: '2026-01-03', published: '1999' }),
-        b: book('b', { title: 'Beta', authors: ['Amy Bee'], reading: { me: row('reading') }, needs_details: true, catalog_status: { openlibrary: 'missing' }, created_at: '2026-01-02', published: 'May 1970' }),
+        b: book('b', { title: 'Beta', authors: ['Amy Bee'], reading: { me: row('reading') }, needs_details: true, created_at: '2026-01-02', published: 'May 1970' }),
         c: book('c', { title: 'Gamma', authors: ['Amy Bee'], owned: false, reading: { me: row('want', { rating: 5 }) }, created_at: '2026-01-01' }),
-        d: book('d', { title: 'Delta', authors: [], subjects: ['SF', 'Art'], catalog_status: { openlibrary: 'skipped' }, created_at: '2026-01-04', published: '2001' }),
+        d: book('d', { title: 'Delta', authors: [], subjects: ['SF', 'Art'], created_at: '2026-01-04', published: '2001' }),
       },
       copies: { k1: copy('k1', 'a', 's1'), k2: copy('k2', 'b', 's3'), k3: copy('k3', 'd', null) },
     });
@@ -507,7 +435,8 @@ describe('filterBooks, statusCounts and sortBooks', () => {
     expect(ids({ status: 'reading' })).toEqual(['b']);
     expect(ids({ status: 'unread' })).toEqual(['b', 'd']);
     expect(ids({ status: 'needs' })).toEqual(['b']);
-    expect(ids({ status: 'not_on_ol' })).toEqual(['b']);
+    expect(ids({ status: 'not_on_ol' })).toEqual(['b', 'a', 'd']);
+    expect(u.STATUS_FILTERS).toEqual(['all', 'unread', 'reading', 'read', 'needs']);
   });
 
   it('filters by place', () => {
@@ -529,9 +458,9 @@ describe('filterBooks, statusCounts and sortBooks', () => {
   });
 
   it('counts each status with the other filters on', () => {
-    expect(u.statusCounts(l.books, u.readFilters({}), ctx)).toEqual({ all: 3, unread: 2, reading: 1, read: 1, needs: 1, not_on_ol: 1 });
-    expect(u.statusCounts(l.books, u.readFilters({ status: 'read', owned: 'all' }), ctx)).toEqual({ all: 4, unread: 3, reading: 1, read: 1, needs: 1, not_on_ol: 1 });
-    expect(u.statusCounts(l.books, u.readFilters({ room: 'r1' }), ctx)).toEqual({ all: 1, unread: 0, reading: 0, read: 1, needs: 0, not_on_ol: 0 });
+    expect(u.statusCounts(l.books, u.readFilters({}), ctx)).toEqual({ all: 3, unread: 2, reading: 1, read: 1, needs: 1 });
+    expect(u.statusCounts(l.books, u.readFilters({ status: 'read', owned: 'all' }), ctx)).toEqual({ all: 4, unread: 3, reading: 1, read: 1, needs: 1 });
+    expect(u.statusCounts(l.books, u.readFilters({ room: 'r1' }), ctx)).toEqual({ all: 1, unread: 0, reading: 0, read: 1, needs: 0 });
   });
 
   it('sorts by each key with the title as the tiebreak', () => {
@@ -577,52 +506,41 @@ describe('authorKey and yearOf', () => {
   });
 });
 
-describe('ISBN', () => {
-  it('cleans an ISBN', () => {
-    expect(u.cleanIsbn(' 0-441-47812-x ')).toBe('044147812X');
-    expect(u.cleanIsbn(null)).toBe('');
+describe('barcodes', () => {
+  it('cleans a barcode', () => {
+    expect(u.cleanBarcode(' 0711-7195 05012 ')).toBe('0711719505012');
+    expect(u.cleanBarcode('ab\t12')).toBe('AB12');
+    expect(u.cleanBarcode(null)).toBe('');
   });
-  it('checks ISBN-10', () => {
-    expect(u.isValidIsbn10('0441478123')).toBe(true);
-    expect(u.isValidIsbn10('080442957X')).toBe(true);
-    expect(u.isValidIsbn10('0441478124')).toBe(false);
-    expect(u.isValidIsbn10('044147812')).toBe(false);
-    expect(u.isValidIsbn10('X441478123')).toBe(false);
-    expect(u.isValidIsbn10('04414781234')).toBe(false);
+  it('accepts a typed or scanned barcode with letters and digits only', () => {
+    expect(u.normalizeBarcode('0711-7195-05012')).toBe('0711719505012');
+    expect(u.normalizeBarcode('code 128')).toBe('CODE128');
+    expect(u.normalizeBarcode('9'.repeat(50))).toBe('9'.repeat(50));
+    expect(u.normalizeBarcode('9'.repeat(51))).toBeNull();
+    expect(u.normalizeBarcode(' - ')).toBeNull();
+    expect(u.normalizeBarcode('12#3')).toBeNull();
+    expect(u.normalizeBarcode('é1')).toBeNull();
+    expect(u.MAX_BARCODE).toBe(50);
   });
-  it('checks ISBN-13', () => {
-    expect(u.ean13Check('978044147812')).toBe(5);
-    expect(u.ean13Check('978000000000')).toBe(2);
-    expect(u.ean13Check('979100000000')).toBe(8);
-    expect(u.isValidIsbn13('9780441478125')).toBe(true);
-    expect(u.isValidIsbn13('9791000000008')).toBe(true);
-    expect(u.isValidIsbn13('9780441478126')).toBe(false);
-    expect(u.isValidIsbn13('4006381333931')).toBe(false);
-    expect(u.isValidIsbn13('97804414781255')).toBe(false);
-    expect(u.isValidIsbn13('978044147812')).toBe(false);
+  it('checks the check digit of EAN and UPC codes', () => {
+    expect(u.hasRetailCheckDigit('4006381333931')).toBe(true);
+    expect(u.hasRetailCheckDigit('4006381333932')).toBe(false);
+    expect(u.hasRetailCheckDigit('9780441478125')).toBe(true);
+    expect(u.hasRetailCheckDigit('036000291452')).toBe(true);
+    expect(u.hasRetailCheckDigit('036000291453')).toBe(false);
+    expect(u.hasRetailCheckDigit('96385074')).toBe(true);
+    expect(u.hasRetailCheckDigit('96385075')).toBe(false);
   });
-  it('converts ISBN-10 to ISBN-13', () => {
-    expect(u.isbn10to13('0441478123')).toBe('9780441478125');
-    expect(u.isbn10to13('080442957X')).toBe('9780804429573');
-  });
-  it('reads a book EAN and rejects other codes', () => {
-    expect(u.isbnFromEan('9780441478125')).toBe('9780441478125');
-    expect(u.isbnFromEan(' 9780441478125 ')).toBe('9780441478125');
-    expect(u.isbnFromEan('4006381333931')).toBeNull();
-    expect(u.isbnFromEan('96385074')).toBeNull();
-    expect(u.isbnFromEan(null)).toBeNull();
-  });
-  it('normalizes a typed ISBN to ISBN-13', () => {
-    expect(u.normalizeIsbn('978-0-441-47812-5')).toBe('9780441478125');
-    expect(u.normalizeIsbn('0-441-47812-3')).toBe('9780441478125');
-    expect(u.normalizeIsbn('0441478124')).toBeNull();
-    expect(u.normalizeIsbn('9780441478126')).toBeNull();
-    expect(u.normalizeIsbn('12345')).toBeNull();
-    // An SBN is the ISBN-10 with no leading 0.
-    expect(u.normalizeIsbn('340 01381 8')).toBe('9780340013816');
-    expect(u.normalizeIsbn('10000007X')).toBe('9780100000070');
-    expect(u.normalizeIsbn('340013817')).toBeNull();
-    expect(u.normalizeIsbn('40013818')).toBeNull();
+  it('reads a retail barcode in a title field, and leaves a title alone', () => {
+    expect(u.retailBarcode('400-6381-333931')).toBe('4006381333931');
+    expect(u.retailBarcode('036000291452')).toBe('036000291452');
+    expect(u.retailBarcode('96385074')).toBe('96385074');
+    expect(u.retailBarcode('4006381333932')).toBeNull();
+    expect(u.retailBarcode('1984')).toBeNull();
+    expect(u.retailBarcode('Dune')).toBeNull();
+    expect(u.retailBarcode('40063813339310')).toBeNull();
+    expect(u.retailBarcode('0360002914521')).toBeNull();
+    expect(u.retailBarcode('ABCDEFGH')).toBeNull();
   });
 });
 

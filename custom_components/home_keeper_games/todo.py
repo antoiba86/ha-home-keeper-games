@@ -5,8 +5,7 @@ The items are the books with status ``want`` for the person. The summary is
 
 * Completing an item sets the status to ``read``, with ``finished`` today.
 * Adding an item by name gives a ``want`` row to the book with that title. If no
-  book has that title, a new book with ``needs_details: true`` is added, and the
-  lookup queue reads Open Library for it.
+  book has that title, a new book with ``needs_details: true`` is added.
 * Deleting an item removes the ``want`` row.
 
 Home Assistant lets each user call the ``todo`` services on each list. So a
@@ -127,7 +126,6 @@ class ToReadList(PersonEntity, TodoListEntity):
                 match, _ = await store.add_book(
                     {"title": summary, "needs_details": True}
                 )
-                self.coordinator.lookup.async_enqueue(match["id"])
             await store.set_reading(match["id"], self.person_id, {"status": "want"})
         except LibraryError as err:
             raise service_error(err) from err

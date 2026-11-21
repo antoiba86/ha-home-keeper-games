@@ -21,13 +21,13 @@ Run the cheapest tier first.
 | Mutation | the changed code | see [ci-and-ha-versions.md](ci-and-ha-versions.md#mutation-testing) |
 
 - The unit tier needs only `pip install pytest PyYAML hypothesis`. It tests the pure core,
-  the CI scripts, the docs tool, the backend strings and translation parity. The ISBN and
-  CSV tests are property-based round trips.
+  the CI scripts, the docs tool, the backend strings and translation parity. The CSV
+  tests are property-based round trips.
 - The component tier runs a real Home Assistant through
   `pytest-homeassistant-custom-component`, with real registries and config entries and
   mocked I/O. It covers the config flow, setup and unload, every service with an admin
   and a non-admin user, the projections, the websocket commands, the entities, the cover
-  views, the Open Library client (`aioclient_mock`) and the loan tasks. It also needs
+  views, the barcode scan and the loan tasks. It also needs
   `home-assistant-frontend`, because the `frontend` dependency imports `hass_frontend` at
   setup. Its runner sets `asyncio_mode=auto`.
 - `ci/setup-ci-deps.sh` installs everything into `.venv`. Run `source .venv/bin/activate`
@@ -57,8 +57,8 @@ Run the cheapest tier first.
   loop. It ignores Home Assistant's own blocking work. A blocking function goes through
   `hass.async_add_executor_job`. The unit tier has no event loop, so it has no such check.
 - **`tests/integration/test_surfaces.py` touches each surface once**: diagnostics, every
-  config and options flow step and every service. A new service needs a call there, or an
-  entry in `VALIDATION_ONLY`. The test sends no request to Open Library.
+  config and options flow step and every service. A new service needs a call there. The
+  test sends no request to the network.
 - **The container runs in Python dev mode** (`docker-compose.yml`). The last step of each
   `integration.yml` lane runs `python ci/check-ha-log.py --domain home_keeper_games` on the
   saved log. Read the grouped report. Fix a real finding. For a message that a test causes
@@ -121,7 +121,7 @@ Run the cheapest tier first.
   upgrade tier yet ([IDEAS.md](../../IDEAS.md#upgrade-test-tier)).
 - **Assert disappearance too.** Test a transition from both ends: present before, gone
   after.
-- Never commit a real `.storage` dump or a real Open Library reply with personal data.
+- Never commit a real `.storage` dump or a real catalog reply with personal data.
   Build fixtures from synthetic data, and use each fixture in a test.
 
 ## The seeded fixture
@@ -140,7 +140,7 @@ Run the cheapest tier first.
 - Auth and onboarding are in `tests/e2e/global-setup.ts`. Specs share its saved state.
 - **A spec owns what it creates.** Delete created records after the test, and give
   fixtures stable names, never a `Date.now()` suffix.
-- Mock Open Library with route interception, so a browser test needs no network.
+- Mock an online catalog with route interception, so a browser test needs no network.
 - The card can load after the dashboard renders, so `openCard` in
   `tests/e2e/tests/helpers.ts` retries with a reload. Keep the retry
   ([frontend.md](frontend.md#bundles-and-the-card)).

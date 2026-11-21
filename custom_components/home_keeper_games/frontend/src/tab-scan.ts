@@ -92,7 +92,7 @@ function resultRow(ctx: ViewCtx, e: ScanEntry): string {
   const scanned = e.res?.book ?? null;
   const book = (scanned && ctx.idx.book.get(scanned.id)) || scanned;
   const thumb = book ? cover(book, 'thumb') : '<span class="hkl-cover hkl-cover-thumb blank" aria-hidden="true"></span>';
-  const title = book?.title ?? e.isbn;
+  const title = book?.title ?? e.barcode;
   const by = book ? [book.authors.join(', '), book.published].filter(Boolean).join(' · ') : '';
   const k = `data-key="${e.key}"`;
   let sub = escapeHTML(by);
@@ -113,13 +113,12 @@ function resultRow(ctx: ViewCtx, e: ScanEntry): string {
     sub = escapeHTML(t('scan.already_in', { place: where }));
     right = `<div class="hkl-dup">${button(escapeHTML(t('scan.move_here')), 'scan-dup', 'tonal', `${k} data-value="move" data-k="dup-m-${e.key}"`)}${button(escapeHTML(t('scan.add_copy')), 'scan-dup', 'tonal', `${k} data-value="add_copy" data-k="dup-a-${e.key}"`)}${button(escapeHTML(t('scan.skip')), 'scan-dup', 'text', `${k} data-value="skip" data-k="dup-s-${e.key}"`)}</div>`;
     cls = 'dup';
-  } else if (e.res?.result === 'not_found' && !e.matched) {
+  } else if (e.res?.result === 'not_found') {
     sub = escapeHTML(t('scan.no_match'));
     right = book ? button(escapeHTML(t('action.add_details')), 'scan-details', 'tonal', `data-id="${escapeHTML(book.id)}" data-k="det-${e.key}"`) : '';
     cls = 'warn';
   } else {
-    // A matched scan has no edition on Open Library, but its book has the details of the work.
-    const label = e.matched ? t('match.title') : e.res?.result ? t(`scan.result_${e.res.result}`) : t('scan.result_added');
+    const label = e.res?.result ? t(`scan.result_${e.res.result}`) : t('scan.result_added');
     const wish = e.res?.from_wishlist === true ? `<span class="hkl-pill st-want" data-k="from-wish-${e.key}">${escapeHTML(t('scan.from_wishlist'))}</span>` : '';
     right = `<span class="hkl-pills">${wish}<span class="hkl-pill ok">${escapeHTML(label)}</span></span>`;
   }
@@ -135,7 +134,7 @@ function cameraStep(ctx: ViewCtx): string {
   const stalled = s.stalled
     ? `<button class="hkl-cam-restart" data-act="scan-camera" data-k="cam-restart">${escapeHTML(t('scan.camera_paused'))}</button>`
     : '';
-  // A book with no match waits for its title, and the camera reads no code.
+  // A new book waits for its title, and the camera reads no code.
   const paused = nextMiss(s.results) ? `<span class="hkl-cam-paused" data-k="cam-paused">${escapeHTML(t('scan.paused'))}</span>` : '';
   // The debug view (`;debug=1`) shows the camera state. The tab writes its text.
   const debug = ctx.route.query.debug === '1' ? '<pre class="hkl-cam-debug" data-k="cam-debug"></pre>' : '';
@@ -144,7 +143,7 @@ function cameraStep(ctx: ViewCtx): string {
     : '';
   const added = s.results.filter((r) => r.res?.result === 'added' || r.res?.result === 'moved' || (isBorrowedMode(ctx) && r.res)).length;
   const manual = s.manualOpen || !camera
-    ? `<form class="hkl-isbn" data-form="isbn"><input name="isbn" inputmode="numeric" autocomplete="off" data-k="isbn-input" aria-label="${escapeHTML(t('scan.isbn'))}" placeholder="${escapeHTML(t('scan.isbn_placeholder'))}" /><button class="hkl-btn primary" type="submit" data-k="isbn-add">${escapeHTML(t('action.add'))}</button></form>`
+    ? `<form class="hkl-code" data-form="barcode"><input name="barcode" autocomplete="off" autocapitalize="characters" spellcheck="false" data-k="barcode-input" aria-label="${escapeHTML(t('scan.barcode'))}" placeholder="${escapeHTML(t('scan.barcode_placeholder'))}" /><button class="hkl-btn primary" type="submit" data-k="barcode-add">${escapeHTML(t('action.add'))}</button></form>`
     : '';
   const shelfId = routeShelf(ctx);
   const next = !isBorrowedMode(ctx) && shelfId ? nextShelf(ctx.lib, shelfId) : null;
@@ -154,7 +153,7 @@ function cameraStep(ctx: ViewCtx): string {
     ${head(where, 'scan-setup')}
     ${cam}${msg}${debug}
     <div class="hkl-tray">
-      <div class="hkl-tray-head"><span>${escapeHTML(counter)}</span>${camera ? button(escapeHTML(t('scan.enter_isbn')), 'scan-manual', 'outline', 'data-k="scan-manual"') : ''}</div>
+      <div class="hkl-tray-head"><span>${escapeHTML(counter)}</span>${camera ? button(escapeHTML(t('scan.enter_barcode')), 'scan-manual', 'outline', 'data-k="scan-manual"') : ''}</div>
       ${manual}
       <div class="hkl-results" aria-live="polite">${[...s.results].reverse().map((r) => resultRow(ctx, r)).join('')}</div>
       <div class="hkl-tray-foot">${next ? button(escapeHTML(t('scan.next_shelf', { shelf: next.name })), 'scan-next', 'outline', `data-id="${escapeHTML(next.id)}" data-k="scan-next"`) : ''}${button(escapeHTML(t('action.done')), 'scan-done', 'primary', 'data-k="scan-done"')}</div>
@@ -165,9 +164,8 @@ function cameraStep(ctx: ViewCtx): string {
 function summaryStep(ctx: ViewCtx): string {
   const s = ctx.ui.scan;
   const kept = s.results.filter((r) => r.res && !r.removed);
-  // A matched scan added its copy and has its details, so it counts as added.
-  const resultOf = (r: (typeof kept)[number]) => (r.matched ? 'added' : r.res!.result);
-  const tally = scanTally(kept.map((r) => ({ result: resultOf(r), book: r.matched ? null : r.res!.book })));
+  const resultOf = (r: (typeof kept)[number]) => r.res!.result;
+  const tally = scanTally(kept.map((r) => ({ result: resultOf(r), book: r.res!.book })));
   const shelfId = routeShelf(ctx);
   const where = isBorrowedMode(ctx) ? t('scan.title_borrowed') : shelfId ? locationLabel(ctx.idx, shelfId) : t('common.no_shelf');
   const tiles = [
@@ -187,7 +185,7 @@ function summaryStep(ctx: ViewCtx): string {
         if (from) label = t('scan.moved_from', { place: from });
       }
       if (res === 'not_found') label = t('action.add_details');
-      return `<div class="hkl-result">${book ? cover(book, 'thumb') : '<span class="hkl-cover hkl-cover-thumb blank"></span>'}<span class="hkl-row-main"><b>${escapeHTML(book?.title ?? r.isbn)}</b><span class="hkl-row-sub">${escapeHTML(book && res !== 'not_found' ? book.authors.join(', ') : t('scan.no_match'))}</span></span><span class="hkl-pill ${res === 'not_found' ? 'warn' : 'ok'}">${escapeHTML(label)}</span></div>`;
+      return `<div class="hkl-result">${book ? cover(book, 'thumb') : '<span class="hkl-cover hkl-cover-thumb blank"></span>'}<span class="hkl-row-main"><b>${escapeHTML(book?.title ?? r.barcode)}</b><span class="hkl-row-sub">${escapeHTML(book && res !== 'not_found' ? book.authors.join(', ') : t('scan.no_match'))}</span></span><span class="hkl-pill ${res === 'not_found' ? 'warn' : 'ok'}">${escapeHTML(label)}</span></div>`;
     })
     .join('');
   const next = !isBorrowedMode(ctx) && shelfId ? nextShelf(ctx.lib, shelfId) : null;

@@ -9,10 +9,10 @@ import {DEV_DOCS, DOC_ROUTES} from '../../website/scripts/doc-map.mjs';
 describe('pagesForChanges', () => {
   it('maps changed guide files to their User Guide routes in sidebar order', () => {
     const pages = pagesForChanges({
-      changedFiles: ['docs/guide/automation/services.md', 'docs/guide/library/scan-books.md'],
+      changedFiles: ['docs/guide/automation/services.md', 'docs/guide/start/work-in-progress.md'],
     });
     expect(pages).toEqual([
-      {title: 'Scan books', route: '/docs/guide/scan-books'},
+      {title: 'Work in progress', route: '/docs/guide/work-in-progress'},
       {title: 'Services and events', route: '/docs/guide/services'},
     ]);
   });

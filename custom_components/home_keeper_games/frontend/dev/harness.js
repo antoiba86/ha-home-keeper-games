@@ -36,25 +36,21 @@ function handle(msg) {
       byId(state.loans, msg.loan_id).returned = today;
       push();
       return { loan: byId(state.loans, msg.loan_id) };
-    case 'scan_isbn': {
-      const found = state.books.find((b) => b.isbn13 === msg.isbn);
+    case 'scan_barcode': {
+      const found = state.books.find((b) => b.barcode === msg.barcode);
       if (found) {
         const existing = state.copies.filter((c) => c.book_id === found.id);
         if (existing.length && (!msg.on_duplicate || msg.on_duplicate === 'ask')) return { result: 'duplicate', book: found, copy: null, existing_copies: existing };
         return { result: msg.on_duplicate === 'skip' ? 'skipped' : msg.on_duplicate === 'move' ? 'moved' : 'added', book: found, copy: existing[0] ?? null, existing_copies: existing };
       }
-      if (msg.isbn.startsWith('9781')) {
-        const book = { id: 'b-new', title: 'The Library at Mount Char', authors: ['Scott Hawkins'], published: '2015', needs_details: false, reading: {}, cover: { kind: 'none' }, cover_url: null };
-        return { result: 'added', book, copy: { id: 'k-new', book_id: 'b-new', shelf_id: msg.shelf_id }, existing_copies: [] };
-      }
-      return { result: 'not_found', book: { id: 'new', title: msg.isbn, authors: [], needs_details: true, reading: {}, cover: { kind: 'none' } }, copy: null, existing_copies: [] };
+      return { result: 'not_found', book: { id: 'new', title: msg.barcode, barcode: msg.barcode, authors: [], needs_details: true, reading: {}, cover: { kind: 'none' } }, copy: null, existing_copies: [] };
     }
     case 'import_csv':
       return {
         dry_run: Boolean(msg.dry_run),
         truncated: false,
         counts: { rows: 318, read: 201, reading: 2, want: 41, wishlist: 74, tags: 9, copies: 57, existing: 187, new: 57, title_match: 12 },
-        rows: [{ line: 2, title: 'Piranesi', authors: ['Susanna Clarke'], isbn: '9781635575637', book_id: null, action: 'existing', message: '' }],
+        rows: [{ line: 2, title: 'Piranesi', authors: ['Susanna Clarke'], barcode: '9781635575637', book_id: null, action: 'existing', message: '' }],
       };
     default:
       return {};

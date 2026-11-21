@@ -307,7 +307,7 @@ describe('book detail', () => {
     $('[data-k="edit-book"]').click();
     const dlg = el.shadowRoot.getElementById('dlg');
     dlg.querySelector('[name="authors"]').value = 'Frank Herbert, Someone Else';
-    dlg.querySelector('[name="isbn"]').value = '0-441-47812-3';
+    dlg.querySelector('[name="barcode"]').value = 'ab-12';
     dlg.querySelector('[name="series_name"]').value = 'Dune';
     dlg.querySelector('[name="series_number"]').value = '1';
     dlg.querySelector('[data-k="d-submit"]').click();
@@ -316,7 +316,7 @@ describe('book detail', () => {
       book_id: id,
       title: 'Dune',
       authors: ['Frank Herbert', 'Someone Else'],
-      isbn13: '9780441478125',
+      barcode: 'AB12',
       series: { name: 'Dune', number: 1 },
       pages: 688,
     });
@@ -425,7 +425,7 @@ describe('shelves, loans, wishlist and settings', () => {
     expect(fake.calls('lend_book')[0]).toMatchObject({ party: 'Priya', due: '2026-11-04', add_task: true, copy_id: expect.any(String) });
   });
 
-  it('adds a borrowed book by ISBN', async () => {
+  it('adds a borrowed book by barcode', async () => {
     const fake = await mount('/loans');
     $('[data-k="add-borrowed"]').click();
     const dlg = el.shadowRoot.getElementById('dlg');
@@ -433,7 +433,7 @@ describe('shelves, loans, wishlist and settings', () => {
     dlg.querySelector('[name="party"]').value = 'Library';
     dlg.querySelector('[data-k="d-submit"]').click();
     await flush();
-    expect(fake.calls('borrow_book')[0]).toMatchObject({ isbn: '9780441478125', party: 'Library', person_id: ALEX });
+    expect(fake.calls('borrow_book')[0]).toMatchObject({ barcode: '9780441478125', party: 'Library', person_id: ALEX });
     expect(fake.calls('borrow_book')[0].title).toBeUndefined();
   });
 
@@ -487,7 +487,7 @@ describe('scan', () => {
     Object.defineProperty(window, 'isSecureContext', { value: false, configurable: true });
   });
 
-  it('blocks the camera on a page that is not HTTPS, and Enter ISBN still starts', async () => {
+  it('blocks the camera on a page that is not HTTPS, and Enter barcode still starts', async () => {
     const state = fixture();
     const shelf = Object.values(state.shelves)[0].id;
     await mount(`/scan;shelf=${shelf}`);
@@ -506,7 +506,7 @@ describe('scan', () => {
     $('[data-k="scan-start"]').click();
     expect(host.navigate).toHaveBeenLastCalledWith(`/scan;shelf=${shelf};step=camera`, { replace: false });
     await flush();
-    expect($('[data-k="isbn-input"]')).not.toBeNull();
+    expect($('[data-k="barcode-input"]')).not.toBeNull();
   });
 
   it('shows the HTTPS message on the camera step of a page that is not HTTPS', async () => {
@@ -514,7 +514,7 @@ describe('scan', () => {
     await mount(`/scan;shelf=${Object.values(state.shelves)[0].id};step=camera`);
     await flush();
     expect(text()).toContain('The camera needs HTTPS.');
-    expect($('[data-k="isbn-input"]')).not.toBeNull();
+    expect($('[data-k="barcode-input"]')).not.toBeNull();
   });
 
   it('lets the camera start on an HTTPS page', async () => {
@@ -525,31 +525,31 @@ describe('scan', () => {
     expect($('[data-k="scan-start"]').disabled).toBe(false);
   });
 
-  it('scans an ISBN and resolves a duplicate', async () => {
+  it('scans a barcode and resolves a duplicate', async () => {
     const state = fixture();
     const shelf = Object.values(state.shelves)[0].id;
     const dune = Object.values(state.books).find((b) => b.title === 'Dune');
     const copies = Object.values(state.copies).filter((c) => c.book_id === dune.id);
     const fake = await mount(`/scan;shelf=${shelf};step=camera`, {
       replies: {
-        scan_isbn: (m) =>
+        scan_barcode: (m) =>
           m.on_duplicate === 'ask'
             ? { result: 'duplicate', book: dune, copy: null, existing_copies: copies }
             : { result: 'moved', book: dune, copy: copies[0], existing_copies: copies },
       },
     });
-    const input = $('[data-k="isbn-input"]');
-    input.value = 'bad';
-    $('[data-k="isbn-add"]').click();
-    expect(host.showToast).toHaveBeenCalledWith('This is not a valid ISBN.');
-    $('[data-k="isbn-input"]').value = dune.isbn13;
-    $('[data-k="isbn-add"]').click();
+    const input = $('[data-k="barcode-input"]');
+    input.value = 'b#d';
+    $('[data-k="barcode-add"]').click();
+    expect(host.showToast).toHaveBeenCalledWith('This is not a valid barcode.');
+    $('[data-k="barcode-input"]').value = dune.barcode;
+    $('[data-k="barcode-add"]').click();
     await flush();
-    expect(fake.calls('scan_isbn')[0]).toMatchObject({ isbn: dune.isbn13, shelf_id: shelf, on_duplicate: 'ask' });
+    expect(fake.calls('scan_barcode')[0]).toMatchObject({ barcode: dune.barcode, shelf_id: shelf, on_duplicate: 'ask' });
     expect(text()).toContain('Already in Living room › Bookcase A › Shelf 1');
     $('[data-value="move"]').click();
     await flush();
-    expect(fake.calls('scan_isbn')[1]).toMatchObject({ on_duplicate: 'move' });
+    expect(fake.calls('scan_barcode')[1]).toMatchObject({ on_duplicate: 'move' });
     expect(text()).toContain('Moved here');
     expect(text()).toContain('Added to this shelf: 1');
     $('[data-k="scan-done"]').click();
@@ -557,15 +557,15 @@ describe('scan', () => {
     expect($$('.hkl-stat b').map((b) => b.textContent)).toEqual(['0', '1', '0']);
   });
 
-  it('keeps a typed ISBN when a store change renders the view', async () => {
+  it('keeps a typed barcode when a store change renders the view', async () => {
     const state = fixture();
     const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`);
-    const input = $('[data-k="isbn-input"]');
+    const input = $('[data-k="barcode-input"]');
     input.focus();
     input.value = '978044';
     fake.push();
     await flush();
-    const now = $('[data-k="isbn-input"]');
+    const now = $('[data-k="barcode-input"]');
     expect(now).not.toBe(input);
     expect(now.value).toBe('978044');
     expect(el.shadowRoot.activeElement).toBe(now);
@@ -578,16 +578,16 @@ describe('scan', () => {
     const dune = state.books.find((b) => b.title === 'Dune');
     const fake = await mount(`/scan;shelf=${shelf};step=camera`, {
       replies: {
-        scan_isbn: (m) =>
-          m.isbn === wished.isbn13
+        scan_barcode: (m) =>
+          m.barcode === wished.barcode
             ? { result: 'added', book: wished, copy: null, existing_copies: [], from_wishlist: true }
             : { result: 'added', book: dune, copy: null, existing_copies: [] },
       },
     });
     void fake;
-    for (const isbn of [wished.isbn13, dune.isbn13]) {
-      $('[data-k="isbn-input"]').value = isbn;
-      $('[data-k="isbn-add"]').click();
+    for (const code of [wished.barcode, dune.barcode]) {
+      $('[data-k="barcode-input"]').value = code;
+      $('[data-k="barcode-add"]').click();
       await flush();
     }
     const rows = $$('.hkl-result');
@@ -603,10 +603,10 @@ describe('scan', () => {
     const shelf = Object.values(state.shelves)[0].id;
     const dune = Object.values(state.books).find((b) => b.title === 'Dune');
     const fake = await mount(`/scan;shelf=${shelf};step=camera`, {
-      replies: { scan_isbn: { result: 'added', book: dune, copy: null, existing_copies: [] } },
+      replies: { scan_barcode: { result: 'added', book: dune, copy: null, existing_copies: [] } },
     });
-    $('[data-k="isbn-input"]').value = dune.isbn13;
-    $('[data-k="isbn-add"]').click();
+    $('[data-k="barcode-input"]').value = dune.barcode;
+    $('[data-k="barcode-add"]').click();
     await flush();
     $('[data-k="scan-done"]').click();
     change($('[data-k="markread"]'), true);
@@ -621,19 +621,19 @@ describe('scan with no match', () => {
     Object.defineProperty(window, 'isSecureContext', { value: false, configurable: true });
   });
 
-  /** A book that a scan saved with no match: its ISBN is its title. */
-  function missing(state, isbn, id) {
+  /** A book that a scan of a new barcode saved: its barcode is its title. */
+  function missing(state, code, id) {
     const shelf = state.shelves[0].id;
-    const book = { ...state.books[0], id, title: isbn, subtitle: '', authors: [], isbn13: isbn, isbn10: null, publisher: '', published: '', pages: null, needs_details: true, cover: null };
+    const book = { ...state.books[0], id, title: code, subtitle: '', authors: [], barcode: code, publisher: '', published: '', pages: null, needs_details: true, cover: null };
     const copy = { ...state.copies[0], id: `c-${id}`, book_id: id, shelf_id: shelf, format: 'paperback' };
     state.books.push(book);
     state.copies.push(copy);
     return { book, copy, reply: { result: 'not_found', book, copy, existing_copies: [] } };
   }
 
-  async function scan(isbn) {
-    $('[data-k="isbn-input"]').value = isbn;
-    $('[data-k="isbn-add"]').click();
+  async function scan(code) {
+    $('[data-k="barcode-input"]').value = code;
+    $('[data-k="barcode-add"]').click();
   }
 
   const sheet = () => $('.hkl-dialog.sheet');
@@ -650,18 +650,18 @@ describe('scan with no match', () => {
     const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, {
       state,
       replies: {
-        scan_isbn: miss.reply,
+        scan_barcode: miss.reply,
         update_book: (m) => {
           miss.book.title = m.title;
           return { book: miss.book };
         },
       },
     });
-    await scan(miss.book.isbn13);
+    await scan(miss.book.barcode);
     await flush();
     expect(sheet()).not.toBeNull();
-    expect(sheet().querySelector('h2').textContent).toBe('No match in Open Library');
-    expect(sheet().querySelector('[data-k="d-isbn"]').textContent).toBe('ISBN 9781402894626');
+    expect(sheet().querySelector('h2').textContent).toBe('No book has this barcode');
+    expect(sheet().querySelector('[data-k="d-barcode"]').textContent).toBe('Barcode 9781402894626');
     expect(sheet().querySelector('[data-k="d-x"]')).toBeNull();
     expect(sheet().querySelector('[data-k="d-cancel"]')).toBeNull();
     expect(sheet().querySelector('[data-k="d-more"]').open).toBe(false);
@@ -676,7 +676,7 @@ describe('scan with no match', () => {
     await scan('9780441478125');
     await flush();
     expect(sheet()).not.toBeNull();
-    expect(fake.calls('scan_isbn')).toHaveLength(1);
+    expect(fake.calls('scan_barcode')).toHaveLength(1);
 
     typeTitle('  ');
     expect(submit.disabled).toBe(true);
@@ -690,21 +690,21 @@ describe('scan with no match', () => {
     expect(fake.calls('update_copy')).toHaveLength(0);
     expect(fake.calls('set_cover')).toHaveLength(0);
     expect(sheet()).toBeNull();
-    expect(el.shadowRoot.activeElement).toBe($('[data-k="isbn-input"]'));
+    expect(el.shadowRoot.activeElement).toBe($('[data-k="barcode-input"]'));
     const row = $$('.hkl-result').find((r) => r.textContent.includes('Field Notes on Moss'));
-    expect(row.textContent).toContain('No match in Open Library');
+    expect(row.textContent).toContain('No book has this barcode');
 
     // The scan goes on.
     await scan('9780441478125');
     await flush();
-    expect(fake.calls('scan_isbn')).toHaveLength(2);
+    expect(fake.calls('scan_barcode')).toHaveLength(2);
   });
 
   it('shows the error of an empty title and keeps the sheet open', async () => {
     const state = fixture();
     const miss = missing(state, '9781402894626', 'new');
-    const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, { state, replies: { scan_isbn: miss.reply } });
-    await scan(miss.book.isbn13);
+    const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, { state, replies: { scan_barcode: miss.reply } });
+    await scan(miss.book.barcode);
     await flush();
     sheet().dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     await flush();
@@ -718,13 +718,13 @@ describe('scan with no match', () => {
     const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, {
       state,
       replies: {
-        scan_isbn: miss.reply,
+        scan_barcode: miss.reply,
         update_copy: () => {
           throw { code: 'home_assistant_error', message: 'Copy save failed' };
         },
       },
     });
-    await scan(miss.book.isbn13);
+    await scan(miss.book.barcode);
     await flush();
     typeTitle('Field Notes on Moss');
     sheet().querySelector('[name="format"]').value = 'hardcover';
@@ -737,14 +737,14 @@ describe('scan with no match', () => {
     // The scan stays paused.
     await scan('9780441478125');
     await flush();
-    expect(fake.calls('scan_isbn')).toHaveLength(1);
+    expect(fake.calls('scan_barcode')).toHaveLength(1);
   });
 
   it('saves the details that the user adds', async () => {
     const state = fixture();
     const miss = missing(state, '9781402894626', 'new');
-    const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, { state, replies: { scan_isbn: miss.reply } });
-    await scan(miss.book.isbn13);
+    const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, { state, replies: { scan_barcode: miss.reply } });
+    await scan(miss.book.barcode);
     await flush();
     sheet().querySelector('[data-k="d-more-toggle"]').click();
     expect(sheet().querySelector('[data-k="d-more"]').open).toBe(true);
@@ -775,20 +775,20 @@ describe('scan with no match', () => {
     const second = missing(state, '9780306406157', 'two');
     const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, {
       state,
-      replies: { scan_isbn: (m) => (m.isbn === first.book.isbn13 ? first.reply : second.reply) },
+      replies: { scan_barcode: (m) => (m.barcode === first.book.barcode ? first.reply : second.reply) },
     });
     // The 2nd scan starts while the lookup of the 1st one runs.
-    void scan(first.book.isbn13);
-    void scan(second.book.isbn13);
+    void scan(first.book.barcode);
+    void scan(second.book.barcode);
     await flush();
-    expect(fake.calls('scan_isbn')).toHaveLength(2);
-    expect(sheet().querySelector('[data-k="d-isbn"]').textContent).toBe('ISBN 9781402894626');
+    expect(fake.calls('scan_barcode')).toHaveLength(2);
+    expect(sheet().querySelector('[data-k="d-barcode"]').textContent).toBe('Barcode 9781402894626');
     const remove = sheet().querySelector('[data-k="d-remove"]');
     expect(remove.textContent).toBe('Remove this scan');
     remove.click();
     await flush();
     expect(fake.calls('delete_book')).toEqual([{ type: 'home_keeper_games/delete_book', book_id: 'one' }]);
-    expect(sheet().querySelector('[data-k="d-isbn"]').textContent).toBe('ISBN 9780306406157');
+    expect(sheet().querySelector('[data-k="d-barcode"]').textContent).toBe('Barcode 9780306406157');
     expect($$('[data-k^="removed-"]').map((p) => p.textContent)).toEqual(['Removed']);
 
     typeTitle('Second book');
@@ -799,109 +799,29 @@ describe('scan with no match', () => {
     expect($$('.hkl-stat b').map((b) => b.textContent)).toEqual(['0', '0', '1']);
   });
 
-  const MATCH = { title: 'Field Notes on Moss', authors: ['A. Hollins'], first_published: '1999', work_key: 'OL45W' };
-
-  it('shows the Open Library work for the title, and links it on a confirm', async () => {
+  it('goes on with the scan after the title, with no catalog call', async () => {
     const state = fixture();
     const miss = missing(state, '9781402894626', 'new');
     const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, {
       state,
-      replies: { scan_isbn: miss.reply, search_catalog: { status: 'found', match: MATCH } },
+      replies: { scan_barcode: miss.reply },
     });
-    await scan(miss.book.isbn13);
-    await flush();
-    typeTitle('Field notes on moss');
-    sheet().querySelector('[data-k="d-more-toggle"]').click();
-    sheet().querySelector('[name="authors"]').value = 'Hollins';
-    sheet().querySelector('[data-k="d-submit"]').click();
-    await flush();
-    expect(fake.calls('search_catalog')).toEqual([
-      { type: 'home_keeper_games/search_catalog', title: 'Field notes on moss', authors: ['Hollins'] },
-    ]);
-    // The title sheet becomes the match dialog. It is not a sheet.
-    expect(sheet()).toBeNull();
-    const dlg = $('.hkl-dialog');
-    expect(dlg.querySelector('h2').textContent).toBe('Found on Open Library');
-    expect(dlg.querySelector('[data-k="d-match-title"]').textContent).toBe('Field Notes on Moss');
-    expect(dlg.querySelector('[data-k="d-match-by"]').textContent).toBe('A. Hollins · first published 1999');
-    expect(dlg.querySelector('[data-k="d-match-hint"]').textContent).toContain('The ISBN stays the same.');
-    expect(dlg.querySelector('[data-k="d-match-view"]').getAttribute('href')).toBe('https://openlibrary.org/works/OL45W');
-    expect(dlg.querySelector('[data-k="d-cancel"]').textContent).toBe('Not this book');
-    expect(dlg.querySelector('[data-k="d-submit"]').textContent).toBe('Use these details');
-    expect(dlg.querySelector('[data-k="d-submit"]').disabled).toBe(false);
-    // The scan stays paused while the match shows.
-    await scan('9780441478125');
-    await flush();
-    expect(fake.calls('scan_isbn')).toHaveLength(1);
-
-    dlg.querySelector('[data-k="d-submit"]').click();
-    await flush();
-    expect(fake.calls('link_catalog')).toEqual([{ type: 'home_keeper_games/link_catalog', book_id: 'new', record: 'OL45W' }]);
-    expect($('.hkl-dialog')).toBeNull();
-    expect(host.showToast).toHaveBeenCalledWith('Details added from Open Library.');
-    // The row and the summary show the match, not a book that needs details.
-    // The fake keeps the ISBN as the title of the book.
-    const row = $$('.hkl-result').find((r) => r.textContent.includes('9781402894626'));
-    expect(row.textContent).toContain('Found on Open Library');
-    expect(row.textContent).not.toContain('No match in Open Library');
-    expect(row.querySelector('[data-k^="det-"]')).toBeNull();
-    $('[data-k="scan-done"]').click();
-    expect($$('.hkl-stat b').map((b) => b.textContent)).toEqual(['1', '0', '0']);
-  });
-
-  it('closes the match with no link on Not this book', async () => {
-    const state = fixture();
-    const miss = missing(state, '9781402894626', 'new');
-    const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, {
-      state,
-      replies: { scan_isbn: miss.reply, search_catalog: { status: 'found', match: MATCH } },
-    });
-    await scan(miss.book.isbn13);
+    await scan(miss.book.barcode);
     await flush();
     typeTitle('Field Notes on Moss');
     sheet().querySelector('[data-k="d-submit"]').click();
     await flush();
-    expect(fake.calls('search_catalog')[0].authors).toEqual([]);
-    $('.hkl-dialog [data-k="d-cancel"]').click();
-    await flush();
+    expect(fake.calls('search_catalog')).toEqual([]);
+    expect(fake.calls('link_catalog')).toEqual([]);
     expect($('.hkl-dialog')).toBeNull();
-    expect(fake.calls('link_catalog')).toHaveLength(0);
-    const row = $$('.hkl-result').find((r) => r.textContent.includes('9781402894626'));
-    expect(row.textContent).toContain('No match in Open Library');
-    await scan('9780441478125');
-    await flush();
-    expect(fake.calls('scan_isbn')).toHaveLength(2);
-  });
-
-  it.each([
-    ['no match', { status: 'not_found', match: null }],
-    ['Open Library is down', { status: 'unavailable', match: null }],
-    ['a match with no work key', { status: 'found', match: { ...MATCH, work_key: '' } }],
-    ['a failed call', () => {
-      throw { code: 'home_assistant_error', message: 'Search failed' };
-    }],
-  ])('goes on with the scan after %s', async (_name, reply) => {
-    const state = fixture();
-    const miss = missing(state, '9781402894626', 'new');
-    const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, {
-      state,
-      replies: { scan_isbn: miss.reply, search_catalog: reply },
-    });
-    await scan(miss.book.isbn13);
-    await flush();
-    typeTitle('Field Notes on Moss');
-    sheet().querySelector('[data-k="d-submit"]').click();
-    await flush();
-    expect(fake.calls('search_catalog')).toHaveLength(1);
-    expect($('.hkl-dialog')).toBeNull();
-    expect(el.shadowRoot.activeElement).toBe($('[data-k="isbn-input"]'));
+    expect(el.shadowRoot.activeElement).toBe($('[data-k="barcode-input"]'));
   });
 
   it('closes the sheet when the user leaves the scan', async () => {
     const state = fixture();
     const miss = missing(state, '9781402894626', 'new');
-    await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, { state, replies: { scan_isbn: miss.reply } });
-    await scan(miss.book.isbn13);
+    await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, { state, replies: { scan_barcode: miss.reply } });
+    await scan(miss.book.barcode);
     await flush();
     expect(sheet()).not.toBeNull();
     el.route = { path: '/books' };
@@ -973,14 +893,14 @@ describe('scan camera', () => {
     const state = fixture();
     const dune = state.books.find((b) => b.title === 'Dune');
     const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, {
-      replies: { scan_isbn: { result: 'added', book: dune, copy: null, existing_copies: [] } },
+      replies: { scan_barcode: { result: 'added', book: dune, copy: null, existing_copies: [] } },
     });
     const v = video();
     const slot = v.parentNode;
     expect(v.paused).toBe(false);
     $('[data-k="scan-manual"]').click();
-    $('[data-k="isbn-input"]').value = dune.isbn13;
-    $('[data-k="isbn-add"]').click();
+    $('[data-k="barcode-input"]').value = dune.barcode;
+    $('[data-k="barcode-add"]').click();
     fake.push();
     await flush();
     expect(text()).toContain('Added to this shelf: 1');
@@ -1077,14 +997,14 @@ describe('import', () => {
       dry_run: true,
       counts: { rows: 900, read: 3, existing: 1, new: 1, title_match: 1, errors: 1 },
       rows: [
-        { line: 2, title: 'Piranesi', authors: ['Susanna Clarke'], isbn: '9781635575637', book_id: 'b1', action: 'existing', message: '' },
-        { line: 3, title: 'Dune', authors: ['Frank Herbert'], isbn: null, book_id: 'b2', action: 'title_match', message: '' },
-        { line: 4, title: '', authors: [], isbn: null, book_id: null, action: 'error', message: 'The row has no title.' },
+        { line: 2, title: 'Piranesi', authors: ['Susanna Clarke'], barcode: '9781635575637', book_id: 'b1', action: 'existing', message: '' },
+        { line: 3, title: 'Dune', authors: ['Frank Herbert'], barcode: null, book_id: 'b2', action: 'title_match', message: '' },
+        { line: 4, title: '', authors: [], barcode: null, book_id: null, action: 'error', message: 'The row has no title.' },
       ],
       truncated: true,
     };
     await mount('/import', { replies: { import_csv: summary } });
-    pick('goodreads_library_export.csv', 'Title\nA\n');
+    pick('games-export.csv', 'title\nA\n');
     await flush(10);
     const cells = $$('.hkl-details tr').map((r) => r.lastElementChild.textContent);
     expect(cells).toEqual(['In the library', 'Title match', 'The row has no title.']);
@@ -1096,11 +1016,11 @@ describe('import', () => {
     const summary = { dry_run: true, counts: { rows: 1 }, rows: [], truncated: false };
     const callApi = vi.fn(async () => ({ changed_states: [], service_response: summary }));
     const fake = await mount('/import', { callApi });
-    const big = `Title\n${'x'.repeat(3 * 1024 * 1024)}\n`;
+    const big = `title\n${'x'.repeat(3 * 1024 * 1024)}\n`;
     pick('library.csv', big);
     await flush(10);
     expect(fake.calls('import_csv')).toEqual([]);
-    expect(callApi).toHaveBeenCalledWith('POST', 'services/home_keeper_games/import_csv?return_response', expect.objectContaining({ dry_run: true, source: 'goodreads', person_id: ALEX }));
+    expect(callApi).toHaveBeenCalledWith('POST', 'services/home_keeper_games/import_csv?return_response', expect.objectContaining({ dry_run: true, person_id: ALEX }));
     expect(callApi.mock.calls[0][2].content).toBe(big);
     expect(text()).toContain('Import 1 row');
   });
@@ -1110,12 +1030,12 @@ describe('import', () => {
     const fake = await mount('/import', { replies: { import_csv: summary } });
     expect($('#hkl-import-title').textContent).toBe('Import books');
     const input = $('[data-k="im-file"]');
-    const file = new File(['Title,Author\nA,B\nC,D\nE,F\n'], 'goodreads_library_export.csv', { type: 'text/csv' });
+    const file = new File(['title,authors\nA,B\nC,D\nE,F\n'], 'games-export.csv', { type: 'text/csv' });
     Object.defineProperty(input, 'files', { value: [file] });
     input.dispatchEvent(new Event('change', { bubbles: true }));
     await flush(10);
-    expect(fake.calls('import_csv')[0]).toMatchObject({ content: 'Title,Author\nA,B\nC,D\nE,F\n', source: 'goodreads', person_id: ALEX, dry_run: true, import_notes: true, replace_reading: false, shelf_id: null });
-    expect(text()).toContain('goodreads_library_export.csv · 3 rows');
+    expect(fake.calls('import_csv')[0]).toMatchObject({ content: 'title,authors\nA,B\nC,D\nE,F\n', person_id: ALEX, dry_run: true, import_notes: true, replace_reading: false, shelf_id: null });
+    expect(text()).toContain('games-export.csv · 3 rows');
     expect(text()).toContain('Already in the library: 1');
     $('[data-k="import-run"]').click();
     await flush();
@@ -1124,219 +1044,23 @@ describe('import', () => {
   });
 });
 
-describe('Open Library', () => {
-  const RICE = 'Every Grain of Rice';
-
-  function olState({ connected = true, title = RICE, status = 'missing', extra = {} } = {}) {
+describe('no Open Library', () => {
+  it('shows no Open Library control in the books, the book and the settings views', async () => {
     const state = fixture();
-    const book = Object.values(state.books).find((b) => b.title === title);
-    Object.assign(book, { catalogs: {}, catalog_status: status ? { openlibrary: status } : {}, ...extra });
-    state.catalog_accounts = { openlibrary: { connected, username: connected ? 'alex_reads' : null } };
-    return { state, id: book.id };
-  }
-
-  it('shows the banner on a book that Open Library does not have, and Not now skips it', async () => {
-    const { state, id } = olState();
-    const fake = await mount(`/books/${id}`, { state });
-    expect($('[data-k="ol-banner"]').textContent).toContain('Open Library does not have this book');
-    $('[data-k="ol-not-now"]').click();
-    await flush();
-    expect(fake.calls('skip_catalog')).toEqual([{ type: 'home_keeper_games/skip_catalog', book_id: id }]);
-    expect(host.showToast).toHaveBeenCalledWith('The book is no longer in the Not on Open Library list.');
-  });
-
-  it('shows no banner to a non-admin user, on a linked book or on a skipped book', async () => {
-    const user = olState();
-    user.state.me.is_admin = false;
-    delete user.state.catalog_accounts;
-    await mount(`/books/${user.id}`, { state: user.state });
-    expect($('[data-k="ol-banner"]')).toBeNull();
-    el.remove();
-    const skipped = olState({ status: 'skipped' });
-    await mount(`/books/${skipped.id}`, { state: skipped.state });
-    expect($('[data-k="ol-banner"]')).toBeNull();
-    expect($('[data-k="ol-send-later"]').textContent).toBe('Send to Open Library');
-    el.remove();
-    const dune = fixture();
-    await mount(`/books/${bookId(dune, 'Dune')}`, { state: dune });
-    expect($('[data-k="ol-banner"]')).toBeNull();
-    expect($('[data-k="ol-send-later"]')).toBeNull();
-  });
-
-  it('links to Settings when no account is connected', async () => {
-    const { state, id } = olState({ connected: false });
-    await mount(`/books/${id}`, { state });
-    const go = $('[data-k="ol-banner-send"]');
-    expect(go.textContent).toBe('Connect Open Library');
-    go.click();
-    expect(host.navigate).toHaveBeenCalledWith('/settings', expect.anything());
-  });
-
-  it('sends the selected fields and shows the new edition', async () => {
-    const { state, id } = olState({ extra: { publisher: 'Bloomsbury', published: '2013', isbn13: '9781408802526', cover: { kind: 'custom', file: 'x.jpg' } } });
-    const reply = { result: 'added', record: 'OL5M', cover: 'failed', book: {} };
-    const fake = await mount(`/books/${id}`, { state, replies: { send_to_catalog: reply } });
-    $('[data-k="ol-banner-send"]').click();
-    const dlg = el.shadowRoot.getElementById('dlg');
-    expect(dlg.textContent).toContain('You send as alex_reads.');
-    expect(dlg.querySelector('[data-k="d-send-publisher"]').checked).toBe(true);
-    expect(dlg.querySelector('[data-k="d-send-cover"]').checked).toBe(false);
-    dlg.querySelector('[data-k="d-send-published"]').checked = false;
-    dlg.querySelector('[data-k="d-send-cover"]').checked = true;
-    dlg.querySelector('[data-k="d-submit"]').click();
-    await flush();
-    expect(fake.calls('send_to_catalog')).toEqual([
-      { type: 'home_keeper_games/send_to_catalog', book_id: id, fields: ['publisher', 'isbn'], include_cover: true },
-    ]);
-    expect(dlg.querySelector('[data-k="d-ol-added"]').textContent).toContain('OL5M');
-    expect(dlg.querySelector('[data-k="d-ol-cover-failed"]')).not.toBeNull();
-    expect(dlg.querySelector('[data-k="d-ol-edit"]').getAttribute('href')).toBe('https://openlibrary.org/books/OL5M/edit');
-    expect(dlg.querySelector('[data-k="d-cancel"]')).toBeNull();
-    dlg.querySelector('[data-k="d-submit"]').click();
-    await flush();
-    expect(dlg.innerHTML).toBe('');
-  });
-
-  it('disables an empty field and hides the cover choice without a custom cover', async () => {
-    const { state, id } = olState({ extra: { publisher: '', isbn13: null, isbn10: null } });
-    await mount(`/books/${id}`, { state });
-    $('[data-k="ol-banner-send"]').click();
-    const dlg = el.shadowRoot.getElementById('dlg');
-    expect(dlg.querySelector('[data-k="d-send-publisher"]').disabled).toBe(true);
-    expect(dlg.querySelector('[data-k="d-send-isbn"]').disabled).toBe(true);
-    expect(dlg.querySelector('[data-k="d-send-cover"]')).toBeNull();
-  });
-
-  it('offers to link an edition that Open Library already has', async () => {
-    const { state, id } = olState();
-    const reply = { result: 'existing', record: 'OL9M', cover: 'skipped', book: {} };
-    const fake = await mount(`/books/${id}`, { state, replies: { send_to_catalog: reply } });
-    $('[data-k="ol-banner-send"]').click();
-    const dlg = el.shadowRoot.getElementById('dlg');
-    dlg.querySelector('[data-k="d-submit"]').click();
-    await flush();
-    expect(dlg.querySelector('[data-k="d-ol-existing"]').textContent).toContain('OL9M');
-    expect(dlg.querySelector('[data-k="d-submit"]').textContent).toBe('Link to OL9M');
-    dlg.querySelector('[data-k="d-submit"]').click();
-    await flush();
-    expect(fake.calls('link_catalog')).toEqual([{ type: 'home_keeper_games/link_catalog', book_id: id, record: 'OL9M' }]);
-    expect(host.showToast).toHaveBeenCalledWith('Book linked to Open Library.');
-    expect(dlg.innerHTML).toBe('');
-  });
-
-  it('shows a send error in the dialog and hides the busy line', async () => {
-    const { state, id } = olState();
-    await mount(`/books/${id}`, { state, replies: { send_to_catalog: () => Promise.reject({ message: 'Refused' }) } });
-    $('[data-k="ol-banner-send"]').click();
-    const dlg = el.shadowRoot.getElementById('dlg');
-    dlg.querySelector('[data-k="d-submit"]').click();
-    await flush();
-    expect(dlg.querySelector('.hkl-error').textContent).toBe('Refused');
-    expect(dlg.querySelector('[data-k="d-sending"]').hidden).toBe(true);
-    expect(dlg.querySelector('[data-k="d-submit"]').disabled).toBe(false);
-  });
-
-  it('lists the books that are not on Open Library with an action on each row', async () => {
-    const { state, id } = olState();
-    const fake = await mount('/books?status=not_on_ol', { state });
-    expect($('[data-k="st-not_on_ol"]').textContent).toContain('Not on Open Library');
-    expect($('[data-k="ol-list-hint"]').textContent).toContain('(4)');
-    expect($$('.hkl-olrow').map((r) => r.querySelector('.hkl-row-title').textContent)).toEqual(['Every Grain of Rice', 'Steering the Craft', '9780980123468', 'Untitled paperback']);
-    // A book with no author asks for one and has no Send button.
-    const untitled = $$('.hkl-olrow')[3];
-    expect(untitled.querySelector('.hkl-row-hint').textContent).toBe('Add an author before you send');
-    expect(untitled.querySelector('[data-act="send-ol"]')).toBeNull();
-    $(`[data-k="ol-skip-${id}"]`).click();
-    await flush();
-    expect(fake.calls('skip_catalog')[0]).toMatchObject({ book_id: id });
-    $(`[data-k="ol-send-${id}"]`).click();
-    expect(el.shadowRoot.getElementById('dlg').textContent).toContain('Send to Open Library');
-  });
-
-  it('hides the chip with no book in it, and from a non-admin user', async () => {
-    const none = fixture();
-    for (const b of Object.values(none.books)) b.catalog_status = {};
-    await mount('/books', { state: none });
+    const id = bookId(state, 'Dune');
+    await mount('/books');
     expect($('[data-k="st-not_on_ol"]')).toBeNull();
-    el.remove();
-    const { state } = olState();
-    state.me.is_admin = false;
-    await mount('/books?status=not_on_ol', { state });
-    expect($('[data-k="st-not_on_ol"]')).toBeNull();
-    expect($$('.hkl-olrow')).toHaveLength(0);
-  });
-
-  it('tells the user after a manual add that Open Library does not have the book', async () => {
-    const reply = { book: { id: 'new' }, existing: false, lookup: 'not_found' };
-    await mount('/books', { replies: { add_book: reply } });
-    $('[data-k="add-book"]').click();
-    const dlg = el.shadowRoot.getElementById('dlg');
-    dlg.querySelector('[name="query"]').value = '9780000000002';
-    dlg.querySelector('[data-k="d-submit"]').click();
+    expect(text()).not.toContain('Open Library');
+    el.route = { path: `/books/${id}` };
     await flush();
-    expect(host.showToast).toHaveBeenCalledWith('Book added. Open Library does not have it.');
-  });
-});
-
-describe('settings Open Library', () => {
-  function flowApi(result) {
-    return vi.fn(async (method, path, body) => {
-      if (method === 'DELETE') return {};
-      if (path === 'config/config_entries/options/flow') return { flow_id: 'f1', type: 'menu' };
-      if (body?.next_step_id) return { flow_id: 'f1', type: 'form' };
-      return result;
-    });
-  }
-
-  it('connects an account through the options flow, never through a service', async () => {
-    const callApi = flowApi({ flow_id: 'f1', type: 'create_entry' });
-    const fake = await mount('/settings', { callApi, replies: { 'config_entries/get': [{ entry_id: 'e1' }] } });
-    $('[data-k="ol-access"]').value = ' ACC ';
-    $('[data-k="ol-secret"]').value = 'SEC';
-    $('[data-k="ol-connect-save"]').click();
+    expect($('[data-k="ol-banner"]')).toBeNull();
+    expect($('[data-k="refresh"]')).toBeNull();
+    expect($('[data-k="use-ol"]')).toBeNull();
+    expect(text()).not.toContain('Open Library');
+    el.route = { path: '/settings' };
     await flush();
-    expect(callApi.mock.calls).toEqual([
-      ['POST', 'config/config_entries/options/flow', { handler: 'e1' }],
-      ['POST', 'config/config_entries/options/flow/f1', { next_step_id: 'openlibrary' }],
-      ['POST', 'config/config_entries/options/flow/f1', { access_key: 'ACC', secret_key: 'SEC' }],
-    ]);
-    expect(host.showToast).toHaveBeenCalledWith('Open Library account connected.');
-    const sent = JSON.stringify(fake.send.mock.calls);
-    expect(sent).not.toContain('SEC');
-  });
-
-  it('shows the flow error, keeps the access key and closes the flow', async () => {
-    const callApi = flowApi({ flow_id: 'f1', type: 'form', errors: { base: 'invalid_auth' } });
-    await mount('/settings', { callApi, replies: { 'config_entries/get': [{ entry_id: 'e1' }] } });
-    $('[data-k="ol-access"]').value = 'ACC';
-    $('[data-k="ol-secret"]').value = 'BAD';
-    $('[data-k="ol-connect-save"]').click();
-    await flush();
-    expect($('[data-k="ol-error"]').textContent).toBe('Open Library did not accept these keys.');
-    expect($('[data-k="ol-access"]').value).toBe('ACC');
-    expect($('[data-k="ol-secret"]').value).toBe('');
-    expect(callApi.mock.calls.at(-1)).toEqual(['DELETE', 'config/config_entries/options/flow/f1']);
-  });
-
-  it('asks for both keys before it starts the flow', async () => {
-    const callApi = flowApi({});
-    await mount('/settings', { callApi });
-    $('[data-k="ol-access"]').value = 'ACC';
-    $('[data-k="ol-connect-save"]').click();
-    await flush();
-    expect($('[data-k="ol-error"]').textContent).toBe('Enter the access key and the secret key.');
-    expect(callApi).not.toHaveBeenCalled();
-  });
-
-  it('shows the account and disconnects it after a confirm', async () => {
-    const state = fixture();
-    state.catalog_accounts = { openlibrary: { connected: true, username: 'alex_reads' } };
-    const fake = await mount('/settings', { state });
-    expect($('[data-k="ol-connected"]').textContent).toBe('Connected as alex_reads');
-    expect($('[data-k="ol-access"]')).toBeNull();
-    $('[data-k="ol-disconnect"]').click();
-    el.shadowRoot.getElementById('dlg').querySelector('[data-k="d-submit"]').click();
-    await flush();
-    expect(fake.calls('disconnect_catalog')).toHaveLength(1);
+    expect($('[data-k="ol-card"]')).toBeNull();
+    expect($('[data-k="ex-format"]')).toBeNull();
+    expect(text()).not.toContain('Open Library');
   });
 });

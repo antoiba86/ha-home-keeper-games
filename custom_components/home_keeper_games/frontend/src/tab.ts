@@ -21,7 +21,7 @@ import { renderLoans, renderSettings, renderWishlist } from './tab-lists';
 import { cameraBlocked, isBorrowedMode, renderScan, routeShelf } from './tab-scan';
 import { renderShelves } from './tab-shelves';
 import type { ImportState, ScanEntry, UiState, ViewCtx } from './tab-types';
-import type { Book, HomeAssistant, ImportSummary, Lib, RawState, ReadingStatus, ScanResult, SearchResult, SendResult, TabHost } from './types';
+import type { Book, HomeAssistant, ImportSummary, Lib, RawState, ReadingStatus, ScanResult, TabHost } from './types';
 import {
   buildIndex,
   buildPath,
@@ -29,15 +29,15 @@ import {
   debounce,
   escapeHTML,
   intOrNull,
-  isbnFromEan,
   makeCodeGate,
   nextMiss,
-  normalizeIsbn,
+  normalizeBarcode,
   normalizeState,
   numberOrNull,
   parseRoute,
   readFilters,
   readingOf,
+  retailBarcode,
   shelfPath,
   splitList,
   todayISO,
@@ -55,7 +55,6 @@ let tabCount = 0;
 
 function freshImport(personId: string | null): ImportState {
   return {
-    source: 'goodreads',
     personId,
     shelfId: '',
     fileName: '',
@@ -92,11 +91,7 @@ function freshUi(): UiState {
     },
     import: freshImport(null),
     todoEntities: [],
-    exportFormat: 'goodreads',
     exportPerson: '',
-    olBusy: false,
-    olError: '',
-    olAccess: '',
   };
 }
 
@@ -197,7 +192,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
       if (this._route.view === 'import' && prev.view !== 'import') this._ui.import = freshImport(this._lib?.me.person_id ?? null);
     }
     if (prev.view === 'book' && prev.id !== this._route.id) this._ui.readingPerson = null;
-    // The title sheet belongs to the scan. If the user leaves, the book keeps its ISBN as the title.
+    // The title sheet belongs to the scan. If the user leaves, the book keeps its barcode as the title.
     if (this._route.view !== 'scan' && this._sheetOpen()) this._closeDialog();
     this._syncScanner();
     if (this._route.view === 'settings') void this._loadTodo();
@@ -469,8 +464,8 @@ export class HomeKeeperGamesTab extends HTMLElement {
     this._dialog = null;
     this._renderDialog();
     this._askMiss();
-    // After the last title sheet, the ISBN field gets the focus, if it shows.
-    if (sheet && !this._dialog) this._main.querySelector<HTMLElement>('[data-k="isbn-input"]')?.focus();
+    // After the last title sheet, the barcode field gets the focus, if it shows.
+    if (sheet && !this._dialog) this._main.querySelector<HTMLElement>('[data-k="barcode-input"]')?.focus();
   }
 
   /** True when the open dialog is a sheet that only a submit or a remove can close. */
@@ -556,9 +551,6 @@ export class HomeKeeperGamesTab extends HTMLElement {
         await this._run('set_person_settings', fields, t('settings.saved'));
         return;
       }
-      case 'export-format':
-        this._ui.exportFormat = value === 'library' ? 'library' : 'goodreads';
-        return;
       case 'export-person':
         this._ui.exportPerson = String(value);
         return;
@@ -595,20 +587,19 @@ export class HomeKeeperGamesTab extends HTMLElement {
     if (kind === 'dialog') void this._submitDialog(form);
     if (kind === 'notes') void this._saveNotes(form);
     if (kind === 'currency') void this._saveCurrency(form);
-    if (kind === 'ol-connect') void this._connectOpenLibrary(form);
-    if (kind === 'isbn') {
+    if (kind === 'barcode') {
       if (this._scanPaused()) {
         this._askMiss();
         return;
       }
-      const input = form.elements.namedItem('isbn') as HTMLInputElement;
-      const isbn = normalizeIsbn(input.value);
-      if (!isbn) {
-        this._toast(t('scan.bad_isbn'));
+      const input = form.elements.namedItem('barcode') as HTMLInputElement;
+      const code = normalizeBarcode(input.value);
+      if (!code) {
+        this._toast(t('scan.bad_barcode'));
         return;
       }
       input.value = '';
-      void this._scanIsbn(isbn);
+      void this._scanCode(code);
     }
   }
 
@@ -702,23 +693,8 @@ export class HomeKeeperGamesTab extends HTMLElement {
           this._openDialog({ kind: 'confirm', title: t('dialog.delete_book'), text: t('dialog.delete_book_text', { title: book.title }), label: t('action.delete'), command: 'delete_book', fields: { book_id: book.id }, after: this._booksPath });
         }
         return;
-      case 'ol-disconnect':
-        this._openDialog({ kind: 'confirm', title: t('ol.disconnect_title'), text: t('ol.disconnect_text'), label: t('ol.disconnect'), command: 'disconnect_catalog', fields: {} });
-        return;
-      case 'send-ol':
-        this._openDialog({ kind: 'send-ol', bookId: id || book?.id || '', phase: 'review' });
-        return;
-      case 'skip-ol':
-        await this._run('skip_catalog', { book_id: id }, t('ol.skipped'));
-        return;
-      case 'refresh-book':
-        if (book) await this._run('refresh_book', { book_id: book.id }, t('book.refreshed'));
-        return;
       case 'change-cover':
         this._main.querySelector<HTMLInputElement>('[data-k="cover-file"]')?.click();
-        return;
-      case 'use-ol-cover':
-        if (book) await this._run('set_cover', { book_id: book.id, kind: 'openlibrary' });
         return;
       case 'lend':
         this._openDialog({ kind: 'lend', bookId: el.dataset.book ?? null });
@@ -839,40 +815,6 @@ export class HomeKeeperGamesTab extends HTMLElement {
     this._render();
   }
 
-  private async _connectOpenLibrary(form: HTMLFormElement): Promise<void> {
-    if (this._ui.olBusy) return;
-    const value = (name: string) => ((form.elements.namedItem(name) as HTMLInputElement | null)?.value ?? '').trim();
-    const access = value('access_key');
-    const secret = value('secret_key');
-    if (!access || !secret) {
-      this._ui.olAccess = access;
-      this._ui.olError = t('ol.need_keys');
-      this._render();
-      return;
-    }
-    this._ui.olBusy = true;
-    this._ui.olError = '';
-    this._ui.olAccess = access;
-    this._render();
-    let code: string | null;
-    try {
-      code = await this._api!.connectOpenLibrary(access, secret);
-    } catch (err) {
-      code = 'unknown';
-      console.warn('Open Library connect failed', err);
-    }
-    this._ui.olBusy = false;
-    if (code === null) {
-      this._ui.olAccess = '';
-      this._toast(t('ol.connected_toast'));
-      await this._refresh();
-    } else {
-      this._ui.olError =
-        code === 'invalid_auth' ? t('ol.error_invalid_auth') : code === 'cannot_connect' ? t('ol.error_cannot_connect') : t('ol.error_unknown');
-      this._render();
-    }
-  }
-
   private async _saveCurrency(form: HTMLFormElement): Promise<void> {
     const input = form.elements.namedItem('currency') as HTMLInputElement;
     const currency = input.value.trim().toUpperCase();
@@ -916,27 +858,23 @@ export class HomeKeeperGamesTab extends HTMLElement {
     try {
       const api = this._api!;
       let after: string | undefined;
-      let next: Dialog | null = null;
       switch (d.kind) {
         case 'add-book': {
           const query = str('query');
           if (!query) throw new Error(t('dialog.need_title'));
-          const isbn = normalizeIsbn(query);
+          const code = retailBarcode(query);
           const res = await api.call<Record<string, unknown>>('add_book', {
-            ...(isbn ? { isbn } : { title: query }),
+            ...(code ? { barcode: code } : { title: query }),
             authors: splitList(str('authors')),
-            lookup: on('lookup'),
           });
           const bookId = replyId(res, 'book');
           const existing = Boolean(res?.existing ?? (res?.book as Record<string, unknown> | undefined)?.existing);
           if (existing) this._toast(t('dialog.existing'));
-          else if (res?.lookup === 'not_found') this._toast(t('ol.added_not_found'));
           else if (bookId && on('own')) await api.call('add_copy', { book_id: bookId, shelf_id: str('shelf_id') || null, format: str('format') });
           if (bookId) after = `/books/${encodeURIComponent(bookId)}`;
           break;
         }
         case 'edit-book': {
-          const isbn = str('isbn');
           const series = str('series_name');
           const fields: Fields = {
             book_id: d.bookId,
@@ -951,14 +889,12 @@ export class HomeKeeperGamesTab extends HTMLElement {
             subjects: splitList(str('subjects')),
             tags: splitList(str('tags')),
             description: str('description'),
+            barcode: null,
           };
-          if (isbn) {
-            const norm = normalizeIsbn(isbn);
-            if (!norm) throw new Error(t('scan.bad_isbn'));
-            fields.isbn13 = norm;
-          } else {
-            fields.isbn13 = null;
-            fields.isbn10 = null;
+          if (str('barcode')) {
+            const code = normalizeBarcode(str('barcode'));
+            if (!code) throw new Error(t('scan.bad_barcode'));
+            fields.barcode = code;
           }
           if (on('details_done')) fields.needs_details = false;
           await api.call('update_book', fields);
@@ -987,14 +923,8 @@ export class HomeKeeperGamesTab extends HTMLElement {
             await api.call('set_cover', { book_id: d.bookId, kind: 'custom', file_id: fileId });
           }
           this._markMiss(d.key, 'named');
-          next = await this._findMatch(d.key, d.bookId, title, authors);
           break;
         }
-        case 'scan-match':
-          await api.call('link_catalog', { book_id: d.bookId, record: d.match.work_key });
-          this._markMiss(d.key, 'matched');
-          this._toast(t('match.linked'));
-          break;
         case 'copy': {
           const fields: Fields = {
             format: str('format'),
@@ -1039,9 +969,9 @@ export class HomeKeeperGamesTab extends HTMLElement {
         case 'borrow': {
           const query = str('query');
           if (!query || !str('party')) throw new Error(t('dialog.need_party'));
-          const isbn = normalizeIsbn(query);
+          const code = retailBarcode(query);
           await api.call('borrow_book', {
-            ...(isbn ? { isbn } : { title: query }),
+            ...(code ? { barcode: code } : { title: query }),
             party: str('party'),
             person_id: str('person_id'),
             format: str('format'),
@@ -1054,10 +984,10 @@ export class HomeKeeperGamesTab extends HTMLElement {
         }
         case 'wish-add': {
           const query = str('query');
-          const isbn = query ? normalizeIsbn(query) : null;
+          const code = query ? retailBarcode(query) : null;
           if (!d.bookId && !query) throw new Error(t('dialog.need_title'));
           await api.call('add_to_wishlist', {
-            ...(d.bookId ? { book_id: d.bookId } : isbn ? { isbn } : { title: query }),
+            ...(d.bookId ? { book_id: d.bookId } : code ? { barcode: code } : { title: query }),
             person_id: str('person_id'),
             buy: on('buy'),
           });
@@ -1106,32 +1036,6 @@ export class HomeKeeperGamesTab extends HTMLElement {
           await api.call(d.command, d.fields);
           after = d.after;
           break;
-        case 'send-ol':
-          if (d.phase === 'existing') {
-            await api.call('link_catalog', { book_id: d.bookId, record: d.editionKey });
-            this._toast(t('ol.linked'));
-          }
-          break;
-      }
-      if (d.kind === 'send-ol' && d.phase === 'review') {
-        // The dialog stays open and shows the reply of Open Library.
-        if (this._dialog === state) {
-          state.busy = false;
-          state.dialog = await this._sendToOpenLibrary(d.bookId, on);
-          this._renderDialog();
-        }
-        void this._refresh();
-        return;
-      }
-      if (next) {
-        // The title sheet becomes the match dialog. The scan stays paused.
-        if (this._dialog === state) {
-          state.busy = false;
-          state.dialog = next;
-          this._renderDialog();
-        }
-        void this._refresh();
-        return;
       }
       // The user can close this dialog and open a new one during the call.
       if (this._dialog === state) this._closeDialog();
@@ -1143,37 +1047,6 @@ export class HomeKeeperGamesTab extends HTMLElement {
       this._dlg.querySelector<HTMLElement>('[data-k="d-sending"]')?.setAttribute('hidden', '');
       if (this._dialog === state) this._showDialogStatus();
     }
-  }
-
-  /**
-   * The match dialog for a title that Open Library has, or null. A failed search
-   * gives null: the scan goes on, and the book stays "Not on Open Library".
-   */
-  private async _findMatch(key: number, bookId: string, title: string, authors: string[]): Promise<Dialog | null> {
-    try {
-      const res = await this._api!.call<SearchResult>('search_catalog', { title, authors });
-      return res?.status === 'found' && res.match?.work_key ? { kind: 'scan-match', key, bookId, match: res.match } : null;
-    } catch {
-      return null;
-    }
-  }
-
-  /** Send a book to Open Library. Return the dialog that shows the reply. */
-  private async _sendToOpenLibrary(bookId: string, on: (name: string) => boolean): Promise<Dialog> {
-    this._dlg.querySelector<HTMLElement>('[data-k="d-sending"]')?.removeAttribute('hidden');
-    const fields = ['publisher', 'published', 'isbn'].filter((name) => on(`send_${name}`));
-    const res = await this._api!.call<SendResult>('send_to_catalog', {
-      book_id: bookId,
-      fields,
-      include_cover: on('include_cover'),
-    });
-    return {
-      kind: 'send-ol',
-      bookId,
-      phase: res.result === 'added' ? 'added' : 'existing',
-      editionKey: res.record,
-      coverFailed: res.cover === 'failed',
-    };
   }
 
   // ── Import and export ──────────────────────────────────────────────────────
@@ -1194,7 +1067,6 @@ export class HomeKeeperGamesTab extends HTMLElement {
     s.summary = null;
     s.done = false;
     s.error = '';
-    if (/storygraph/i.test(file.name)) s.source = 'storygraph';
     await this._dryRun();
   }
 
@@ -1202,7 +1074,6 @@ export class HomeKeeperGamesTab extends HTMLElement {
     const s = this._ui.import;
     return {
       content: s.content,
-      source: s.source,
       person_id: s.personId ?? this._lib?.me.person_id ?? undefined,
       shelf_id: s.shelfId || null,
       import_notes: s.importNotes,
@@ -1252,12 +1123,12 @@ export class HomeKeeperGamesTab extends HTMLElement {
 
   private async _export(): Promise<void> {
     try {
-      const res = await this._api!.exportCsv({ format: this._ui.exportFormat, person_id: this._ui.exportPerson || undefined });
+      const res = await this._api!.exportCsv({ person_id: this._ui.exportPerson || undefined });
       const blob = new Blob([res.content], { type: 'text/csv;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = res.filename || 'library.csv';
+      a.download = res.filename || 'games.csv';
       this._root.appendChild(a);
       a.click();
       a.remove();
@@ -1342,25 +1213,21 @@ export class HomeKeeperGamesTab extends HTMLElement {
       this._askMiss();
       return;
     }
-    const isbn = isbnFromEan(code);
-    if (!this._gate(isbn ?? code, Date.now())) return;
-    if (!isbn) {
-      this._toast(t('scan.not_isbn'));
-      return;
-    }
+    const barcode = normalizeBarcode(code);
+    if (!barcode || !this._gate(barcode, Date.now())) return;
     navigator.vibrate?.(40);
-    void this._scanIsbn(isbn);
+    void this._scanCode(barcode);
   }
 
-  private async _scanIsbn(isbn: string): Promise<void> {
+  private async _scanCode(barcode: string): Promise<void> {
     const s = this._ui.scan;
-    const entry: ScanEntry = { key: ++this._scanKey, isbn, pending: true, res: null };
+    const entry: ScanEntry = { key: ++this._scanKey, barcode, pending: true, res: null };
     s.results.push(entry);
     this._render();
     try {
       if (this._route.query.mode === 'borrowed') {
         const res = await this._api!.call<Record<string, unknown>>('borrow_book', {
-          isbn,
+          barcode,
           party: s.party || t('loan.unknown_party'),
           person_id: s.personId ?? this._lib?.me.person_id ?? undefined,
           due: s.due || undefined,
@@ -1370,7 +1237,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
         const book = (res?.book as Book | undefined) ?? null;
         entry.res = { result: 'added', book, copy: null, existing_copies: [] };
       } else {
-        entry.res = await this._api!.scanIsbn({ isbn, shelf_id: routeShelf(this._ctx()!), on_duplicate: 'ask' });
+        entry.res = await this._api!.scanBarcode({ barcode, shelf_id: routeShelf(this._ctx()!), on_duplicate: 'ask' });
       }
     } catch (err) {
       entry.error = errorText(err);
@@ -1381,22 +1248,22 @@ export class HomeKeeperGamesTab extends HTMLElement {
     void this._refresh();
   }
 
-  /** True when the scan takes no code: a dialog is open, or a book with no match has no title yet. */
+  /** True when the scan takes no code: a dialog is open, or a new book has no title yet. */
   private _scanPaused(): boolean {
     return Boolean(this._dialog || nextMiss(this._ui.scan.results));
   }
 
-  /** Open the title sheet for the next scan with no match, if no dialog is open. */
+  /** Open the title sheet for the next scan of a new book, if no dialog is open. */
   private _askMiss(): void {
     if (this._dialog || this._route.view !== 'scan') return;
     const miss = nextMiss(this._ui.scan.results);
     const book = miss?.res?.book;
     if (!miss || !book) return;
-    this._openDialog({ kind: 'scan-title', key: miss.key, bookId: book.id, copyId: miss.res?.copy?.id ?? null, isbn: miss.isbn });
+    this._openDialog({ kind: 'scan-title', key: miss.key, bookId: book.id, copyId: miss.res?.copy?.id ?? null, barcode: miss.barcode });
     this._render();
   }
 
-  private _markMiss(key: number, flag: 'named' | 'removed' | 'matched'): void {
+  private _markMiss(key: number, flag: 'named' | 'removed'): void {
     const entry = this._ui.scan.results.find((r) => r.key === key);
     if (entry) entry[flag] = true;
   }
@@ -1427,7 +1294,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
     entry.pending = true;
     this._render();
     try {
-      entry.res = await this._api!.scanIsbn({ isbn: entry.isbn, shelf_id: routeShelf(this._ctx()!), on_duplicate: choice });
+      entry.res = await this._api!.scanBarcode({ barcode: entry.barcode, shelf_id: routeShelf(this._ctx()!), on_duplicate: choice });
     } catch (err) {
       entry.error = errorText(err);
     }
@@ -1473,7 +1340,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
       case 'scan-manual':
         s.manualOpen = !s.manualOpen;
         this._render();
-        this._main.querySelector<HTMLElement>('[data-k="isbn-input"]')?.focus();
+        this._main.querySelector<HTMLElement>('[data-k="barcode-input"]')?.focus();
         return;
       case 'scan-dup': {
         const entry = s.results.find((r) => String(r.key) === el.dataset.key);

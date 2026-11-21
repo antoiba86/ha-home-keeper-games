@@ -29,17 +29,11 @@ Nothing here is committed scope. When an item ships, remove it. The design docs 
 - **Insurance value report.** The total value and price of the copies for each room,
   with a CSV or PDF download for an insurance claim. Admin-only.
 - **Phone walkthrough tour.** A second walkthrough capture at phone width: scan a shelf
-  with **Enter ISBN**, read the summary, set a status in the card.
-- **More details in a send to Open Library.** The send posts only the 5 fields of the
-  "Add a book" form. The edit form of Open Library takes the subtitle, the pages and the
-  language, but it replaces the whole record and can ask for a captcha.
-- **Send the edition of a work match.** A scan that the user links to an Open Library
-  work leaves the "Not on Open Library" list, but Open Library still has no edition with
-  its ISBN. Let the admin send that edition under the linked work.
-- **Title match for other books.** Offer the title match of a scan on the book page of
-  each book that is not on Open Library, and in the CSV import.
-- **Event for a send to Open Library.** A `home_keeper_games_book_contributed` event
-  with the edition key, if an integrator needs more than `book_updated`.
+  with **Enter barcode**, read the summary, set a status in the card.
+- **Game details from IGDB.** Read the title, the cover and the genres of a game from
+  IGDB, with a title search for a scan of a new barcode.
+- **Barcode lookup.** Turn the EAN of a game case into a title with a product lookup
+  service, then search the catalog.
 
 ### Shelf photo
 
@@ -62,7 +56,7 @@ Boot a frozen older Home Assistant and Home Keeper on a seeded config dir, then 
 current ones on the same dir, and check that the library, the tab and the loan tasks
 load. Add a job in `ha-beta.yml` for it.
 
-- **Browser test of the scan with a camera.** The e2e tier uses **Enter ISBN**. A fake
+- **Browser test of the scan with a camera.** The e2e tier uses **Enter barcode**. A fake
   video stream with a barcode would cover the decoder chunk.
 
 ## Docs and quality

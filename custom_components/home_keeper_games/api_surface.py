@@ -162,17 +162,10 @@ SERVICES: tuple[ServiceSpec, ...] = (
     ServiceSpec("add_shelf", response="optional", **_ADMIN),
     ServiceSpec("update_shelf", response="optional", **_ADMIN),
     ServiceSpec("delete_shelf", response="optional", **_ADMIN),
-    ServiceSpec("lookup_isbn", response="only", **_ADMIN),
-    ServiceSpec("search_catalog", response="only", **_ADMIN),
     ServiceSpec("add_book", response="optional", **_ADMIN),
     ServiceSpec("update_book", response="optional", **_ADMIN),
     ServiceSpec("delete_book", response="optional", **_ADMIN),
-    ServiceSpec("refresh_book", response="optional", **_ADMIN),
-    ServiceSpec("send_to_catalog", response="optional", **_ADMIN),
-    ServiceSpec("link_catalog", response="optional", **_ADMIN),
-    ServiceSpec("skip_catalog", response="optional", **_ADMIN),
-    ServiceSpec("disconnect_catalog", response="optional", **_ADMIN),
-    ServiceSpec("scan_isbn", response="optional", **_ADMIN),
+    ServiceSpec("scan_barcode", response="optional", **_ADMIN),
     ServiceSpec("add_copy", response="optional", **_ADMIN),
     ServiceSpec("update_copy", response="optional", **_ADMIN),
     ServiceSpec("move_copy", response="optional", **_ADMIN),
@@ -248,7 +241,7 @@ PAYLOAD_SPINES: dict[str, tuple[Field, ...]] = {
     ),
     "import": (
         Field("person_id", "str | None"),
-        Field("source", "str", "goodreads, storygraph or library."),
+        Field("source", "str", "Always csv."),
         Field("rows", "int"),
         Field("books_added", "int"),
         Field("books_matched", "int"),
@@ -534,15 +527,13 @@ SURFACE_KINDS: tuple[SurfaceKind, ...] = (
     SurfaceKind(
         "Config entry options",
         "published",
-        "The currency of the prices and values of the copies. The Open Library "
-        "account is in the entry data, not in the options.",
+        "The currency of the prices and values of the copies.",
     ),
     SurfaceKind(
         "Config flow",
         "published",
-        "A single-instance setup flow with a currency field. The options flow has "
-        "a menu: the currency, and the Archive.org S3 keys of an Open Library "
-        "account.",
+        "A single-instance setup flow with a currency field. The options flow "
+        "changes the currency.",
     ),
     SurfaceKind(
         "Websocket commands",
@@ -562,8 +553,7 @@ SURFACE_KINDS: tuple[SurfaceKind, ...] = (
     SurfaceKind(
         "Reauth / reconfigure flows",
         "not_applicable",
-        "The storage is local. The admin sets the Open Library keys again in the "
-        "options flow, and a send with refused keys says so.",
+        "The storage is local, and the integration has no account to sign in to.",
     ),
     SurfaceKind(
         "Repairs / issue registry",

@@ -22,7 +22,7 @@ def _calls(hass, name: str) -> list[dict]:
 
 
 async def _copy(call) -> dict:
-    book = (await call("add_book", {"title": "Dune", "lookup": False}))["book"]
+    book = (await call("add_book", {"title": "Dune"}))["book"]
     return (await call("add_copy", {"book_id": book["id"]}))["copy"]
 
 

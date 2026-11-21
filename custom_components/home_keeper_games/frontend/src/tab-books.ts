@@ -18,7 +18,6 @@ import {
 import type { ViewCtx } from './tab-types';
 import type { Book, Copy, Loan, ReadingStatus } from './types';
 import {
-  ADMIN_STATUS_FILTERS,
   allSubjects,
   buildPath,
   dueState,
@@ -26,10 +25,6 @@ import {
   filterBooks,
   hasFilters,
   locationLabel,
-  notOnOpenLibrary,
-  olRecord,
-  olStatus,
-  openLibraryUrl,
   progress,
   readFilters,
   readingOf,
@@ -101,33 +96,6 @@ function row(ctx: ViewCtx, book: Book): string {
   </a>`;
 }
 
-// A row of the "Not on Open Library" list. It is not 1 link, so the buttons are
-// valid HTML: the book part opens the book, and the buttons act on it.
-function olRow(ctx: ViewCtx, book: Book): string {
-  const path = `/books/${encodeURIComponent(book.id)}`;
-  const id = escapeHTML(book.id);
-  const sub = [book.authors.join(', '), book.published].filter(Boolean).join(' · ');
-  const hint = book.authors.length ? '' : `<span class="hkl-row-hint">${escapeHTML(t('ol.needs_author'))}</span>`;
-  const send = ctx.lib.openlibrary?.connected && book.authors.length
-    ? button(escapeHTML(t('ol.send')), 'send-ol', 'tonal', `data-id="${id}" data-k="ol-send-${id}"`)
-    : '';
-  return `<div class="hkl-olrow" data-k="ol-${id}">
-    <a class="hkl-olrow-book" href="${escapeHTML(href(path))}" data-act="nav" data-path="${escapeHTML(path)}">
-      ${cover(book, 'thumb')}
-      <span class="hkl-row-main"><span class="hkl-row-title">${escapeHTML(book.title)}</span><span class="hkl-row-sub">${escapeHTML(sub)}</span>${hint}</span>
-    </a>
-    <span class="hkl-olrow-acts">${send}${button(escapeHTML(t('ol.skip')), 'skip-ol', 'text', `data-id="${id}" data-k="ol-skip-${id}"`)}</span>
-  </div>`;
-}
-
-function olListHead(ctx: ViewCtx, count: number): string {
-  if (!count) return '';
-  const connect = ctx.lib.openlibrary?.connected
-    ? ''
-    : button(escapeHTML(t('ol.connect')), 'nav', 'text', 'data-path="/settings" data-k="ol-connect"');
-  return `<div class="hkl-banner info" data-k="ol-list-hint">${escapeHTML(t('ol.list_hint', { n: count }))}${connect}</div>`;
-}
-
 function summaryLine(ctx: ViewCtx, f: BookFilters, count: number): string {
   const parts: string[] = [];
   if (f.room) parts.push(ctx.idx.room.get(f.room)?.name ?? '');
@@ -148,11 +116,7 @@ export function renderBooks(ctx: ViewCtx): string {
   const fctx = { idx: ctx.idx, me: ctx.me };
   const books = filterBooks(ctx.lib.books, f, fctx);
   const counts = statusCounts(ctx.lib.books, f, fctx);
-  const admin = ctx.lib.me.is_admin;
-  const visible = STATUS_FILTERS.filter(
-    (s) => !ADMIN_STATUS_FILTERS.includes(s) || (admin && (counts[s] > 0 || f.status === s)),
-  );
-  const chips = visible.map((s) => {
+  const chips = STATUS_FILTERS.map((s) => {
     const on = f.status === s;
     return `<button class="hkl-seg${on ? ' on' : ''}" data-act="status" data-value="${s}" data-k="st-${s}" aria-pressed="${on}">${escapeHTML(t(`filter.${s}`))} <span class="hkl-seg-n">${counts[s]}</span></button>`;
   }).join('');
@@ -172,12 +136,9 @@ export function renderBooks(ctx: ViewCtx): string {
     ['no', t('filter.owned_no')],
   ];
   const shown = books.slice(0, ctx.ui.limit);
-  const olList = f.status === 'not_on_ol' && admin;
-  const list = olList
-    ? `${olListHead(ctx, books.length)}<div class="hkl-rows">${shown.map((b) => olRow(ctx, b)).join('')}</div>`
-    : f.view === 'rows'
-      ? `<div class="hkl-rows">${shown.map((b) => row(ctx, b)).join('')}</div>`
-      : `<div class="hkl-grid">${shown.map((b) => tile(ctx, b)).join('')}</div>`;
+  const list = f.view === 'rows'
+    ? `<div class="hkl-rows">${shown.map((b) => row(ctx, b)).join('')}</div>`
+    : `<div class="hkl-grid">${shown.map((b) => tile(ctx, b)).join('')}</div>`;
   const more = books.length > shown.length
     ? `<div class="hkl-more">${button(escapeHTML(t('books.show_more', { n: books.length - shown.length })), 'more', 'outline', 'data-k="more"')}</div>`
     : '';
@@ -352,12 +313,8 @@ export function renderBook(ctx: ViewCtx, book: Book | undefined): string {
     book.published,
     book.publisher,
     book.pages ? tn('book.pages', book.pages) : '',
-    book.isbn13 ? `ISBN ${book.isbn13}` : book.isbn10 ? `ISBN ${book.isbn10}` : '',
+    book.barcode ? t('book.barcode', { code: book.barcode }) : '',
   ].filter(Boolean).map((x) => escapeHTML(x));
-  const olKey = olRecord(book)?.edition_key || olRecord(book)?.work_key;
-  if (olKey) {
-    meta.push(`<a href="${escapeHTML(openLibraryUrl(olKey))}" target="_blank" rel="noreferrer noopener">Open Library</a>`);
-  }
   const tags = [...book.subjects.slice(0, 6), ...book.tags]
     .map((x) => `<span class="hkl-chip">${escapeHTML(x)}</span>`)
     .join('');
@@ -367,25 +324,10 @@ export function renderBook(ctx: ViewCtx, book: Book | undefined): string {
   const needs = book.needs_details
     ? `<div class="hkl-banner warn">${escapeHTML(t('book.needs_details'))}${button(escapeHTML(t('action.add_details')), 'edit-book', 'tonal', 'data-k="needs-edit"')}</div>`
     : '';
-  const admin = ctx.lib.me.is_admin;
-  const connected = Boolean(ctx.lib.openlibrary?.connected);
-  const id = escapeHTML(book.id);
-  const sendButton = (weight: 'primary' | 'text', key: string): string => connected
-    ? button(escapeHTML(t('ol.send')), 'send-ol', weight, `data-id="${id}" data-k="${key}"`)
-    : button(escapeHTML(t('ol.connect')), 'nav', weight, `data-path="/settings" data-k="${key}"`);
-  const missingOl = admin && notOnOpenLibrary(book)
-    ? `<div class="hkl-banner ol" data-k="ol-banner"><span class="hkl-banner-text"><strong>${escapeHTML(t('ol.banner_title'))}</strong><span>${escapeHTML(t('ol.banner_text'))}</span></span><span class="hkl-banner-acts">${sendButton('primary', 'ol-banner-send')}${button(escapeHTML(t('ol.not_now')), 'skip-ol', 'text', `data-id="${id}" data-k="ol-not-now"`)}</span></div>`
-    : '';
-  const sendLater = admin && !olRecord(book) && olStatus(book) === 'skipped' ? sendButton('text', 'ol-send-later') : '';
   const badge = book.cover?.kind === 'custom' ? `<span class="hkl-cover-badge">${escapeHTML(t('book.custom_cover'))}</span>` : '';
-  const useOl = olRecord(book)?.cover_id && book.cover?.kind !== 'openlibrary'
-    ? button(escapeHTML(t('action.use_ol_cover')), 'use-ol-cover', 'text', 'data-k="use-ol"')
-    : '';
   const actions = [
     button(escapeHTML(t('action.edit')), 'edit-book', 'tonal', 'data-k="edit-book"'),
     copies.some((c) => !ctx.idx.loanByCopy.has(c.id)) ? button(escapeHTML(t('action.lend')), 'lend', 'tonal', `data-book="${escapeHTML(book.id)}" data-k="lend"`) : '',
-    button(escapeHTML(t('action.refresh')), 'refresh-book', 'tonal', 'data-k="refresh"'),
-    sendLater,
     book.wishlist ? '' : button(escapeHTML(t('action.add_to_wishlist')), 'wish-this', 'text', 'data-k="wish-this"'),
     button(escapeHTML(t('action.delete')), 'delete-book', 'danger', 'data-k="delete-book"'),
   ].join('');
@@ -394,7 +336,7 @@ export function renderBook(ctx: ViewCtx, book: Book | undefined): string {
   <div class="hkl-detail">
     <div class="hkl-detail-cover">
       ${cover(book, 'large', badge)}
-      <div class="hkl-cover-actions">${button(escapeHTML(t('action.change_cover')), 'change-cover', 'tonal', 'data-k="change-cover"')}${useOl}</div>
+      <div class="hkl-cover-actions">${button(escapeHTML(t('action.change_cover')), 'change-cover', 'tonal', 'data-k="change-cover"')}</div>
       <input type="file" accept="image/jpeg,image/png,image/webp" data-chg="cover-file" data-k="cover-file" hidden />
     </div>
     <div class="hkl-detail-info">
@@ -403,7 +345,7 @@ export function renderBook(ctx: ViewCtx, book: Book | undefined): string {
       <span class="hkl-byline">${authors}${series}</span>
       <span class="hkl-muted">${meta.join(' · ')}</span>
       ${tags ? `<div class="hkl-chips">${tags}</div>` : ''}
-      ${missingOl}${needs}${wish}
+      ${needs}${wish}
       <div class="hkl-boxes">${copies.map((c, i) => copyBox(ctx, c, i, copies.length)).join('')}${loans.map((l) => loanBox(ctx, l)).join('')}</div>
       ${book.description ? `<p class="hkl-desc">${escapeHTML(book.description)}</p>` : ''}
     </div>

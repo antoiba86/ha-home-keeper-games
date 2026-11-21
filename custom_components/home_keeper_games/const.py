@@ -42,7 +42,7 @@ PLATFORMS = ["sensor", "todo"]
 
 # PANEL_VERSION is the same string as the manifest version. release.yml checks it,
 # and rollup.config.mjs reads it.
-PANEL_VERSION = "0.4.0"
+PANEL_VERSION = "0.5.0b1"
 
 # The built bundles are in frontend/dist/ and Home Assistant serves them here.
 STATIC_URL = "/home_keeper_games_static"
@@ -73,13 +73,6 @@ STORAGE_MINOR_VERSION = 1
 # The config entry option.
 CONF_CURRENCY = "currency"
 DEFAULT_CURRENCY = "EUR"
-# The Open Library account, in the config entry data. The options flow step
-# ``openlibrary`` sets the 2 Archive.org S3 keys. They are secrets: no reply, event
-# or diagnostics file shows them.
-CONF_OPENLIBRARY_ACCESS = "openlibrary_access"
-CONF_OPENLIBRARY_SECRET = "openlibrary_secret"
-CONF_OPENLIBRARY_USERNAME = "openlibrary_username"
-OPENLIBRARY_SECRET_KEYS = (CONF_OPENLIBRARY_ACCESS, CONF_OPENLIBRARY_SECRET)
 
 # The Home Keeper capability of a companion that joins the export and import.
 HOME_KEEPER_CAPABILITY_IMPORT_EXPORT = "import_export"
@@ -87,20 +80,6 @@ HOME_KEEPER_CAPABILITY_IMPORT_EXPORT = "import_export"
 # The CSV import limits.
 MAX_CSV_BYTES = 5 * 1024 * 1024
 MAX_IMPORT_ROW_RESULTS = 200
-
-# The Open Library client.
-OPENLIBRARY_URL = "https://openlibrary.org"
-OPENLIBRARY_COVERS_URL = "https://covers.openlibrary.org"
-# Environment variables that replace the 2 Open Library base URLs. Only the
-# browser test setup sets them, to point at a fixture server, because Open
-# Library is not reachable from the test container.
-OPENLIBRARY_URL_ENV = "HOME_KEEPER_GAMES_OPENLIBRARY_URL"
-OPENLIBRARY_COVERS_URL_ENV = "HOME_KEEPER_GAMES_OPENLIBRARY_COVERS_URL"
-OPENLIBRARY_TIMEOUT_S = 10
-OPENLIBRARY_MIN_INTERVAL_S = 1.0
-OPENLIBRARY_MISS_TTL_S = 24 * 60 * 60
-LOOKUP_MAX_TRIES = 3
-LOOKUP_BACKOFF_S = (60, 300, 1800)
 
 # The overdue loan check interval.
 OVERDUE_CHECK_INTERVAL_S = 60 * 60

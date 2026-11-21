@@ -14,7 +14,7 @@ EVENT = "home_keeper_games_{}".format
 
 
 async def _book(call) -> dict:
-    return (await call("add_book", {"title": "Dune", "lookup": False}))["book"]
+    return (await call("add_book", {"title": "Dune"}))["book"]
 
 
 async def test_copy_updated(hass, setup_entry, call) -> None:
@@ -126,9 +126,6 @@ async def test_settings_updated(hass, setup_entry, call) -> None:
     assert len(updated) == 1
     # The options flow fires it too.
     result = await hass.config_entries.options.async_init(setup_entry.entry_id)
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"], {"next_step_id": "currency"}
-    )
     await hass.config_entries.options.async_configure(
         result["flow_id"], {"currency": "GBP"}
     )

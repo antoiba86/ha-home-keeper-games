@@ -17,7 +17,7 @@ async def _send(client, **msg):
 
 
 async def _book(call, **data):
-    return (await call("add_book", {"title": "Dune", "lookup": False, **data}))["book"]
+    return (await call("add_book", {"title": "Dune", **data}))["book"]
 
 
 async def test_get_state_shape_and_projection(hass, setup_entry, call, ws) -> None:
@@ -44,10 +44,6 @@ async def test_get_state_shape_and_projection(hass, setup_entry, call, ws) -> No
         "me",
         "currency",
         "home_keeper",
-        "catalog_accounts",
-    }
-    assert result["catalog_accounts"] == {
-        "openlibrary": {"connected": False, "username": None}
     }
     assert result["me"] == {"person_id": ALICE, "name": "Alice", "is_admin": True}
     assert result["currency"] == "EUR" and result["home_keeper"] == {"tab": True}
@@ -60,7 +56,6 @@ async def test_get_state_shape_and_projection(hass, setup_entry, call, ws) -> No
     assert result["me"]["person_id"] == BOB and result["me"]["is_admin"] is False
     assert "price" not in result["copies"][0] and "party" not in result["loans"][0]
     assert "private_notes" not in result["books"][0]["reading"][CAROL]
-    assert "catalog_accounts" not in result
 
 
 async def test_subscribe_pushes_changes(hass, setup_entry, call, ws) -> None:
@@ -98,7 +93,7 @@ async def test_twin_commands_share_the_gate(hass, setup_entry, ws) -> None:
     user = await ws("user")
     reply = await _send(user, type=WS + "add_room", name="Den")
     assert reply["error"]["code"] == "unauthorized"
-    book = await _send(admin, type=WS + "add_book", title="Dune", lookup=False)
+    book = await _send(admin, type=WS + "add_book", title="Dune")
     book_id = book["result"]["book"]["id"]
     reply = await _send(user, type=WS + "set_reading", book_id=book_id, status="read")
     assert reply["success"] and reply["result"]["person_id"] == BOB
@@ -258,22 +253,22 @@ async def _todo_items(hass, entity: str) -> list[dict]:
 
 
 async def test_first_copy_of_a_wishlist_book_clears_the_wishlist(
-    hass, setup_entry, call, todo_list, aioclient_mock
+    hass, setup_entry, call, todo_list
 ) -> None:
     from pytest_homeassistant_custom_component.common import async_capture_events
-
-    aioclient_mock.get("https://openlibrary.org/isbn/9780441478125.json", status=404)
 
     removed = async_capture_events(hass, "home_keeper_games_wishlist_removed")
     added = async_capture_events(hass, "home_keeper_games_copy_added")
     await call("set_person_settings", {"person_id": BOB, "wishlist_todo": todo_list})
-    book = await _book(call, title="Emma", authors=["Jane Austen"], isbn="0441478123")
+    book = await _book(
+        call, title="Emma", authors=["Jane Austen"], barcode="9780441478125"
+    )
     await call(
         "add_to_wishlist", {"book_id": book["id"], "person_id": BOB, "buy": True}
     )
     await hass.async_block_till_done(wait_background_tasks=True)
     assert len(await _todo_items(hass, todo_list)) == 1
-    reply = await call("scan_isbn", {"isbn": "0441478123"})
+    reply = await call("scan_barcode", {"barcode": "9780441478125"})
     assert reply["result"] == "added" and reply["from_wishlist"] is True
     await hass.async_block_till_done(wait_background_tasks=True)
     store = setup_entry.runtime_data.store
@@ -283,9 +278,13 @@ async def test_first_copy_of_a_wishlist_book_clears_the_wishlist(
     assert removed[0].data["book_id"] == book["id"]
     assert [e.data["copy_id"] for e in added] == [reply["copy"]["id"]]
     # A second copy is not from the wishlist.
-    again = await call("scan_isbn", {"isbn": "0441478123", "on_duplicate": "add_copy"})
+    again = await call(
+        "scan_barcode", {"barcode": "9780441478125", "on_duplicate": "add_copy"}
+    )
     assert again["result"] == "added" and again["from_wishlist"] is False
-    skipped = await call("scan_isbn", {"isbn": "0441478123", "on_duplicate": "skip"})
+    skipped = await call(
+        "scan_barcode", {"barcode": "9780441478125", "on_duplicate": "skip"}
+    )
     assert skipped["from_wishlist"] is False
     # add_copy clears the wishlist too.
     other = await _book(call, title="Persuasion", authors=["Jane Austen"])

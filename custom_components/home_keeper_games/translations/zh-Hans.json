@@ -27,42 +27,16 @@
     "step": {
       "init": {
         "title": "藏书选项",
-        "menu_options": {
-          "currency": "货币",
-          "openlibrary": "Open Library 账户"
-        },
         "data": {
           "currency": "货币"
         },
         "data_description": {
           "currency": "3 个字母的代码，例如 EUR 或 USD。"
-        }
-      },
-      "currency": {
-        "title": "货币",
-        "data": {
-          "currency": "货币"
-        },
-        "data_description": {
-          "currency": "3 个字母的代码，例如 EUR 或 USD。"
-        }
-      },
-      "openlibrary": {
-        "title": "Open Library 账户",
-        "description": "粘贴 Archive.org 账户 S3 密钥页面上的访问密钥和私密密钥。只有在您将图书发送到 Open Library 时，藏书才会使用它们。",
-        "data": {
-          "access_key": "访问密钥",
-          "secret_key": "私密密钥"
         }
       }
     },
     "error": {
-      "invalid_currency": "请输入 3 个字母的货币代码。",
-      "invalid_auth": "Open Library 未接受这些密钥。",
-      "cannot_connect": "Open Library 不可用。请稍后重试。"
-    },
-    "abort": {
-      "not_loaded": "Home Keeper Games 尚未加载。请在其启动后重试。"
+      "invalid_currency": "请输入 3 个字母的货币代码。"
     }
   },
   "entity": {
@@ -274,33 +248,9 @@
         }
       }
     },
-    "lookup_isbn": {
-      "name": "查询 ISBN",
-      "description": "从 Open Library 读取 ISBN 的详情。藏书不变。",
-      "fields": {
-        "isbn": {
-          "name": "ISBN 编号",
-          "description": "ISBN-10 或 ISBN-13。"
-        }
-      }
-    },
-    "search_catalog": {
-      "name": "搜索目录",
-      "description": "按书名和作者查找 Open Library 中最匹配的作品。藏书不变。",
-      "fields": {
-        "title": {
-          "name": "书名",
-          "description": "图书的书名。"
-        },
-        "authors": {
-          "name": "作者",
-          "description": "作者。只使用第一位作者。"
-        }
-      }
-    },
     "add_book": {
       "name": "添加图书",
-      "description": "添加一本图书。如果已有相同 ISBN 的图书，服务返回那本书。",
+      "description": "添加一本图书。如果已有相同条形码的图书，服务返回那本书。",
       "fields": {
         "title": {
           "name": "书名",
@@ -314,17 +264,9 @@
           "name": "作者",
           "description": "按顺序列出的作者。"
         },
-        "isbn": {
-          "name": "ISBN 编号",
-          "description": "ISBN-10 或 ISBN-13。"
-        },
-        "isbn13": {
-          "name": "ISBN-13 编号",
-          "description": "13 位 ISBN。"
-        },
-        "isbn10": {
-          "name": "ISBN-10 编号",
-          "description": "10 位 ISBN。"
+        "barcode": {
+          "name": "条形码",
+          "description": "条形码编号，例如 EAN-13。"
         },
         "publisher": {
           "name": "出版社",
@@ -365,10 +307,6 @@
         "needs_details": {
           "name": "缺少详情",
           "description": "将图书标记为信息不完整。"
-        },
-        "lookup": {
-          "name": "查询",
-          "description": "从 Open Library 读取详情。"
         }
       }
     },
@@ -392,17 +330,9 @@
           "name": "作者",
           "description": "按顺序列出的作者。"
         },
-        "isbn": {
-          "name": "ISBN 编号",
-          "description": "ISBN-10 或 ISBN-13。"
-        },
-        "isbn13": {
-          "name": "ISBN-13 编号",
-          "description": "13 位 ISBN。"
-        },
-        "isbn10": {
-          "name": "ISBN-10 编号",
-          "description": "10 位 ISBN。"
+        "barcode": {
+          "name": "条形码",
+          "description": "条形码编号，例如 EAN-13。"
         },
         "publisher": {
           "name": "出版社",
@@ -456,73 +386,13 @@
         }
       }
     },
-    "refresh_book": {
-      "name": "从 Open Library 更新",
-      "description": "用 Open Library 的信息填写图书的空字段。",
-      "fields": {
-        "book_id": {
-          "name": "图书",
-          "description": "图书的 ID。"
-        }
-      }
-    },
-    "send_to_catalog": {
-      "name": "发送到 Open Library",
-      "description": "使用已连接的 Open Library 账户添加 Open Library 没有的图书，然后关联该图书。",
-      "fields": {
-        "book_id": {
-          "name": "图书",
-          "description": "图书的 ID。"
-        },
-        "fields": {
-          "name": "字段",
-          "description": "要发送的可选字段：publisher、published 和 isbn。书名和第一作者总会发送。"
-        },
-        "include_cover": {
-          "name": "发送封面",
-          "description": "同时发送图书的自定义封面。"
-        }
-      }
-    },
-    "link_catalog": {
-      "name": "关联到 Open Library",
-      "description": "将图书关联到 Open Library 的某个版本或作品，并填写其空字段。",
-      "fields": {
-        "book_id": {
-          "name": "图书",
-          "description": "图书的 ID。"
-        },
-        "record": {
-          "name": "版本或作品",
-          "description": "版本键（例如 OL123M）、作品键（例如 OL45W）或页面的 URL。"
-        }
-      }
-    },
-    "skip_catalog": {
-      "name": "跳过 Open Library",
-      "description": "将图书从不在 Open Library 上的图书列表中移除，或放回列表。",
-      "fields": {
-        "book_id": {
-          "name": "图书",
-          "description": "图书的 ID。"
-        },
-        "skip": {
-          "name": "跳过",
-          "description": "关闭后图书会回到列表中。"
-        }
-      }
-    },
-    "disconnect_catalog": {
-      "name": "断开 Open Library",
-      "description": "移除 Open Library 账户的密钥。"
-    },
-    "scan_isbn": {
-      "name": "扫描 ISBN",
+    "scan_barcode": {
+      "name": "扫描条形码",
       "description": "将扫描的图书添加到书架层。",
       "fields": {
-        "isbn": {
-          "name": "ISBN 编号",
-          "description": "ISBN-10 或 ISBN-13。"
+        "barcode": {
+          "name": "条形码",
+          "description": "条形码编号，例如 EAN-13。"
         },
         "shelf_id": {
           "name": "书架层",
@@ -760,9 +630,9 @@
           "name": "图书",
           "description": "图书的 ID。"
         },
-        "isbn": {
-          "name": "ISBN 编号",
-          "description": "ISBN-10 或 ISBN-13。"
+        "barcode": {
+          "name": "条形码",
+          "description": "条形码编号，例如 EAN-13。"
         },
         "title": {
           "name": "书名",
@@ -864,9 +734,9 @@
           "name": "图书",
           "description": "图书的 ID。"
         },
-        "isbn": {
-          "name": "ISBN 编号",
-          "description": "ISBN-10 或 ISBN-13。"
+        "barcode": {
+          "name": "条形码",
+          "description": "条形码编号，例如 EAN-13。"
         },
         "title": {
           "name": "书名",
@@ -966,15 +836,11 @@
     },
     "import_csv": {
       "name": "导入 CSV",
-      "description": "从 Goodreads、StoryGraph 或藏书导出文件导入图书。",
+      "description": "从 Home Keeper Games 的 CSV 导出文件导入图书。",
       "fields": {
         "content": {
           "name": "CSV 内容",
           "description": "CSV 文本。最大 5 MB。"
-        },
-        "source": {
-          "name": "来源",
-          "description": "生成 CSV 文件的应用。"
         },
         "person_id": {
           "name": "人员",
@@ -1005,10 +871,6 @@
         "person_id": {
           "name": "人员",
           "description": "Home Assistant 人员的 ID。"
-        },
-        "format": {
-          "name": "文件格式",
-          "description": "goodreads 或 library。"
         }
       }
     },
@@ -1018,7 +880,7 @@
       "fields": {
         "query": {
           "name": "搜索",
-          "description": "书名、作者、ISBN 或标签中的文字。"
+          "description": "书名、作者、条形码 或标签中的文字。"
         },
         "room_id": {
           "name": "房间",
@@ -1132,8 +994,8 @@
     "invalid_choice": {
       "message": "{field} 必须是以下之一：{options}。"
     },
-    "invalid_isbn": {
-      "message": "{isbn} 不是有效的 ISBN。"
+    "invalid_barcode": {
+      "message": "{barcode} 不是有效的条形码。"
     },
     "room_not_found": {
       "message": "没有 ID 为 {id} 的房间。"
@@ -1168,8 +1030,8 @@
     "shelf_not_empty": {
       "message": "该书架层有 {count} 个藏本。使用 force 可将它们移出书架层。"
     },
-    "duplicate_isbn": {
-      "message": "另一本图书的 ISBN 是 {isbn}。"
+    "duplicate_barcode": {
+      "message": "另一本图书的条形码是 {barcode}。"
     },
     "copy_on_loan": {
       "message": "该藏本已借出。请先归还借阅。"
@@ -1186,14 +1048,8 @@
     "upload_not_found": {
       "message": "没有 ID 为 {file_id} 的已上传封面。"
     },
-    "isbn_or_title_required": {
-      "message": "请提供图书 ID、ISBN 或书名。"
-    },
-    "lookup_unavailable": {
-      "message": "Open Library 不可用。请稍后重试。"
-    },
-    "no_openlibrary_cover": {
-      "message": "Open Library 没有这本书的封面。"
+    "barcode_or_title_required": {
+      "message": "请提供图书 ID、条形码或书名。"
     },
     "todo_entity_not_found": {
       "message": "{entity_id} 不是待办清单。"
@@ -1227,27 +1083,6 @@
     },
     "todo_not_allowed": {
       "message": "只有 {person} 或管理员用户才能更改此待办事项列表。"
-    },
-    "openlibrary_not_connected": {
-      "message": "请先在藏书设置中连接 Open Library 账户。"
-    },
-    "openlibrary_already_linked": {
-      "message": "这本书已关联到 Open Library。"
-    },
-    "openlibrary_needs_author": {
-      "message": "发送前请为图书添加作者。"
-    },
-    "openlibrary_ambiguous": {
-      "message": "Open Library 找到了不止 1 部可能是这本书的作品。请在 Open Library 网站上添加这本书。"
-    },
-    "openlibrary_login_failed": {
-      "message": "Open Library 未接受账户密钥。请重新连接账户。"
-    },
-    "openlibrary_not_found": {
-      "message": "Open Library 没有记录 {edition}。"
-    },
-    "invalid_openlibrary_edition": {
-      "message": "{edition} 不是 Open Library 的键或 URL。"
     },
     "files_dir_invalid": {
       "message": "文件目录必须位于 .storage/home_keeper_import_export 之下。"

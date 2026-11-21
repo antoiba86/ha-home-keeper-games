@@ -34,7 +34,7 @@ def _state() -> dict:
         now=NOW,
     )
     dune["id"] = "dune"
-    dune["isbn13"] = "9780441013593"
+    dune["barcode"] = "9780441013593"
     emma = m.build_book({"title": "Emma", "series": "Austen"}, now=NOW)
     emma["id"] = "emma"
     emma["cover"] = {"kind": "custom", "file": "emma-0a1b2c3d.jpg"}
@@ -75,9 +75,7 @@ def test_cover_url() -> None:
         None
     )
     assert (
-        pr.cover_url(
-            {"id": "b", "cover": {"kind": "openlibrary", "file": "b-ab12.jpg"}}
-        )
+        pr.cover_url({"id": "b", "cover": {"kind": "custom", "file": "b-ab12.jpg"}})
         == "/api/home_keeper_games/cover/b?v=ab12"
     )
 
@@ -110,37 +108,7 @@ def test_admin_reads_everything() -> None:
     assert list(reply["people"]) == ["alice", "bob", "carol"]
     carol = reply["people"]["carol"]
     assert carol["share_reading"] is False and "wishlist_todo" in carol
-    assert reply["catalog_accounts"] == {
-        "openlibrary": {"connected": False, "username": None}
-    }
-
-
-@pytest.mark.parametrize(
-    ("account", "expected"),
-    [
-        (
-            {"connected": True, "username": "alex_reads"},
-            {"connected": True, "username": "alex_reads"},
-        ),
-        (
-            {"connected": False, "username": "alex_reads"},
-            {"connected": False, "username": None},
-        ),
-        ({"connected": True}, {"connected": True, "username": None}),
-    ],
-)
-def test_catalog_accounts_are_for_admins_only(account, expected) -> None:
-    common = {
-        "persons": PERSONS,
-        "currency": "EUR",
-        "tab": True,
-        "revision": 1,
-        "catalog_accounts": {"openlibrary": account, "other": account},
-    }
-    admin = pr.project_state(_state(), viewer="alice", is_admin=True, **common)
-    assert admin["catalog_accounts"] == {"openlibrary": expected}
-    user = pr.project_state(_state(), viewer="bob", is_admin=False, **common)
-    assert "catalog_accounts" not in user
+    assert "catalog_accounts" not in reply
 
 
 def test_non_admin_projection_never_leaks() -> None:

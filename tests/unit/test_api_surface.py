@@ -281,7 +281,7 @@ def _built() -> dict[str, dict[str, Any]]:
         const.EVENT_WISHLIST_ADDED: events.wishlist_event_data(_BOOK, entry, None),
         const.EVENT_WISHLIST_REMOVED: events.wishlist_event_data(_BOOK, entry, None),
         const.EVENT_IMPORT_COMPLETED: events.import_completed_event_data(
-            {}, "p1", "goodreads", None
+            {}, "p1", "csv", None
         ),
         const.EVENT_DATA_IMPORTED: events.data_imported_event_data({}, None),
     }
@@ -389,7 +389,7 @@ def test_frontend_command_names_stay_the_same() -> None:
         "subscribe",
         "list_todo_entities",
         "add_room",
-        "scan_isbn",
+        "scan_barcode",
         "set_reading",
         "lend_book",
         "borrow_book",
@@ -397,7 +397,6 @@ def test_frontend_command_names_stay_the_same() -> None:
         "add_to_wishlist",
         "import_csv",
         "export_csv",
-        "lookup_isbn",
         "set_cover",
         "set_person_settings",
     ):
