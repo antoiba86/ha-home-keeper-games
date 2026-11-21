@@ -27,42 +27,16 @@
     "step": {
       "init": {
         "title": "Opcions de la biblioteca",
-        "menu_options": {
-          "currency": "Moneda",
-          "openlibrary": "Compte d'Open Library"
-        },
         "data": {
           "currency": "Moneda"
         },
         "data_description": {
           "currency": "Un codi de 3 lletres, per exemple EUR o USD."
-        }
-      },
-      "currency": {
-        "title": "Moneda",
-        "data": {
-          "currency": "Moneda"
-        },
-        "data_description": {
-          "currency": "Un codi de 3 lletres, per exemple EUR o USD."
-        }
-      },
-      "openlibrary": {
-        "title": "Compte d'Open Library",
-        "description": "Enganxeu la clau d'accés i la clau secreta de la pàgina de claus S3 del vostre compte d'Archive.org. La biblioteca només les fa servir quan envieu un llibre a Open Library.",
-        "data": {
-          "access_key": "Clau d'accés",
-          "secret_key": "Clau secreta"
         }
       }
     },
     "error": {
-      "invalid_currency": "Introdueix un codi de moneda de 3 lletres.",
-      "invalid_auth": "Open Library no ha acceptat aquestes claus.",
-      "cannot_connect": "Open Library no està disponible. Torna-ho a provar més tard."
-    },
-    "abort": {
-      "not_loaded": "Home Keeper Games no s'ha carregat. Torneu-ho a provar quan s'iniciï."
+      "invalid_currency": "Introdueix un codi de moneda de 3 lletres."
     }
   },
   "entity": {
@@ -274,33 +248,9 @@
         }
       }
     },
-    "lookup_isbn": {
-      "name": "Cerca un ISBN",
-      "description": "Llegeix els detalls d'un ISBN d'Open Library. La biblioteca no canvia.",
-      "fields": {
-        "isbn": {
-          "name": "ISBN",
-          "description": "Un ISBN-10 o un ISBN-13."
-        }
-      }
-    },
-    "search_catalog": {
-      "name": "Cerca al catàleg",
-      "description": "Troba la millor obra d'Open Library per a un títol i un autor. La biblioteca no canvia.",
-      "fields": {
-        "title": {
-          "name": "Títol",
-          "description": "El títol del llibre."
-        },
-        "authors": {
-          "name": "Autors",
-          "description": "Els autors. Només es fa servir el primer autor."
-        }
-      }
-    },
     "add_book": {
       "name": "Afegeix un llibre",
-      "description": "Afegeix un llibre. Si un llibre té el mateix ISBN, el servei retorna aquest llibre.",
+      "description": "Afegeix un llibre. Si un llibre té el mateix codi de barres, el servei retorna aquest llibre.",
       "fields": {
         "title": {
           "name": "Títol",
@@ -314,17 +264,9 @@
           "name": "Autors",
           "description": "Els autors, en ordre."
         },
-        "isbn": {
-          "name": "ISBN",
-          "description": "Un ISBN-10 o un ISBN-13."
-        },
-        "isbn13": {
-          "name": "ISBN-13",
-          "description": "L'ISBN de 13 xifres."
-        },
-        "isbn10": {
-          "name": "ISBN-10",
-          "description": "L'ISBN de 10 xifres."
+        "barcode": {
+          "name": "Codi de barres",
+          "description": "El número del codi de barres, com un EAN-13."
         },
         "publisher": {
           "name": "Editorial",
@@ -365,10 +307,6 @@
         "needs_details": {
           "name": "Falten detalls",
           "description": "Marca el llibre com a incomplet."
-        },
-        "lookup": {
-          "name": "Cerca",
-          "description": "Llegeix els detalls d'Open Library."
         }
       }
     },
@@ -392,17 +330,9 @@
           "name": "Autors",
           "description": "Els autors, en ordre."
         },
-        "isbn": {
-          "name": "ISBN",
-          "description": "Un ISBN-10 o un ISBN-13."
-        },
-        "isbn13": {
-          "name": "ISBN-13",
-          "description": "L'ISBN de 13 xifres."
-        },
-        "isbn10": {
-          "name": "ISBN-10",
-          "description": "L'ISBN de 10 xifres."
+        "barcode": {
+          "name": "Codi de barres",
+          "description": "El número del codi de barres, com un EAN-13."
         },
         "publisher": {
           "name": "Editorial",
@@ -456,73 +386,13 @@
         }
       }
     },
-    "refresh_book": {
-      "name": "Actualitza des d'Open Library",
-      "description": "Omple els camps buits d'un llibre des d'Open Library.",
-      "fields": {
-        "book_id": {
-          "name": "Llibre",
-          "description": "L'ID del llibre."
-        }
-      }
-    },
-    "send_to_catalog": {
-      "name": "Envia a Open Library",
-      "description": "Afegeix un llibre que Open Library no té, amb el compte d'Open Library connectat, i després enllaça el llibre.",
-      "fields": {
-        "book_id": {
-          "name": "Llibre",
-          "description": "L'ID del llibre."
-        },
-        "fields": {
-          "name": "Camps",
-          "description": "Els camps opcionals que s'envien: publisher, published i isbn. El títol i el primer autor sempre s'envien."
-        },
-        "include_cover": {
-          "name": "Envia la coberta",
-          "description": "Envia també la coberta personalitzada del llibre."
-        }
-      }
-    },
-    "link_catalog": {
-      "name": "Enllaça amb Open Library",
-      "description": "Enllaça un llibre amb una edició o una obra d'Open Library i omple els camps buits.",
-      "fields": {
-        "book_id": {
-          "name": "Llibre",
-          "description": "L'ID del llibre."
-        },
-        "record": {
-          "name": "Edició o obra",
-          "description": "Una clau d'edició, com OL123M, una clau d'obra, com OL45W, o l'URL de la pàgina."
-        }
-      }
-    },
-    "skip_catalog": {
-      "name": "Omet Open Library",
-      "description": "Treu un llibre de la llista de llibres que no són a Open Library, o torna'l a posar.",
-      "fields": {
-        "book_id": {
-          "name": "Llibre",
-          "description": "L'ID del llibre."
-        },
-        "skip": {
-          "name": "Omet",
-          "description": "Desactiveu-ho per tornar a posar el llibre a la llista."
-        }
-      }
-    },
-    "disconnect_catalog": {
-      "name": "Desconnecta Open Library",
-      "description": "Elimina les claus del compte d'Open Library."
-    },
-    "scan_isbn": {
-      "name": "Escaneja un ISBN",
+    "scan_barcode": {
+      "name": "Escaneja un codi de barres",
       "description": "Afegeix un llibre escanejat a un prestatge.",
       "fields": {
-        "isbn": {
-          "name": "ISBN",
-          "description": "Un ISBN-10 o un ISBN-13."
+        "barcode": {
+          "name": "Codi de barres",
+          "description": "El número del codi de barres, com un EAN-13."
         },
         "shelf_id": {
           "name": "Prestatge",
@@ -760,9 +630,9 @@
           "name": "Llibre",
           "description": "L'ID del llibre."
         },
-        "isbn": {
-          "name": "ISBN",
-          "description": "Un ISBN-10 o un ISBN-13."
+        "barcode": {
+          "name": "Codi de barres",
+          "description": "El número del codi de barres, com un EAN-13."
         },
         "title": {
           "name": "Títol",
@@ -864,9 +734,9 @@
           "name": "Llibre",
           "description": "L'ID del llibre."
         },
-        "isbn": {
-          "name": "ISBN",
-          "description": "Un ISBN-10 o un ISBN-13."
+        "barcode": {
+          "name": "Codi de barres",
+          "description": "El número del codi de barres, com un EAN-13."
         },
         "title": {
           "name": "Títol",
@@ -966,15 +836,11 @@
     },
     "import_csv": {
       "name": "Importa un CSV",
-      "description": "Importa llibres de Goodreads, StoryGraph o una exportació de la biblioteca.",
+      "description": "Importa llibres d'una exportació CSV de Home Keeper Games.",
       "fields": {
         "content": {
           "name": "Contingut CSV",
           "description": "El text CSV. Com a màxim 5 MB."
-        },
-        "source": {
-          "name": "Origen",
-          "description": "L'aplicació que va crear el fitxer CSV."
         },
         "person_id": {
           "name": "Persona",
@@ -1005,10 +871,6 @@
         "person_id": {
           "name": "Persona",
           "description": "L'ID de la persona de Home Assistant."
-        },
-        "format": {
-          "name": "Format del fitxer",
-          "description": "goodreads o library."
         }
       }
     },
@@ -1018,7 +880,7 @@
       "fields": {
         "query": {
           "name": "Cerca de text",
-          "description": "Text al títol, als autors, a l'ISBN o a les etiquetes."
+          "description": "Text al títol, als autors, al codi de barres o a les etiquetes."
         },
         "room_id": {
           "name": "Habitació",
@@ -1132,8 +994,8 @@
     "invalid_choice": {
       "message": "{field} ha de ser un d'aquests valors: {options}."
     },
-    "invalid_isbn": {
-      "message": "{isbn} no és un ISBN vàlid."
+    "invalid_barcode": {
+      "message": "{barcode} no és un codi de barres vàlid."
     },
     "room_not_found": {
       "message": "Cap habitació té l'ID {id}."
@@ -1168,8 +1030,8 @@
     "shelf_not_empty": {
       "message": "El prestatge té {count} exemplars. Fes servir force per deixar-los sense prestatge."
     },
-    "duplicate_isbn": {
-      "message": "Un altre llibre té l'ISBN {isbn}."
+    "duplicate_barcode": {
+      "message": "Un altre llibre té el codi de barres {barcode}."
     },
     "copy_on_loan": {
       "message": "L'exemplar està prestat. Retorna primer el préstec."
@@ -1186,14 +1048,8 @@
     "upload_not_found": {
       "message": "Cap coberta pujada té l'ID {file_id}."
     },
-    "isbn_or_title_required": {
-      "message": "Indica un ID de llibre, un ISBN o un títol."
-    },
-    "lookup_unavailable": {
-      "message": "Open Library no està disponible. Torna-ho a provar més tard."
-    },
-    "no_openlibrary_cover": {
-      "message": "Open Library no té coberta per a aquest llibre."
+    "barcode_or_title_required": {
+      "message": "Indica un ID de llibre, un codi de barres o un títol."
     },
     "todo_entity_not_found": {
       "message": "{entity_id} no és una llista de tasques."
@@ -1227,27 +1083,6 @@
     },
     "todo_not_allowed": {
       "message": "Només {person} o un usuari administrador pot canviar aquesta llista de tasques."
-    },
-    "openlibrary_not_connected": {
-      "message": "Primer connecteu un compte d'Open Library a la configuració de la biblioteca."
-    },
-    "openlibrary_already_linked": {
-      "message": "Aquest llibre ja està enllaçat amb Open Library."
-    },
-    "openlibrary_needs_author": {
-      "message": "Afegiu un autor al llibre abans d'enviar-lo."
-    },
-    "openlibrary_ambiguous": {
-      "message": "Open Library ha trobat més d'1 obra que pot ser aquest llibre. Afegiu el llibre al lloc web d'Open Library."
-    },
-    "openlibrary_login_failed": {
-      "message": "Open Library no ha acceptat les claus del compte. Torneu a connectar el compte."
-    },
-    "openlibrary_not_found": {
-      "message": "Open Library no té el registre {edition}."
-    },
-    "invalid_openlibrary_edition": {
-      "message": "{edition} no és una clau ni un URL d'Open Library."
     },
     "files_dir_invalid": {
       "message": "El directori de fitxers ha d'estar dins de .storage/home_keeper_import_export."

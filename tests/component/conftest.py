@@ -92,7 +92,6 @@ async def setup_entry(hass, persons, hk_entry):
     entry.add_to_hass(hass)
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
-    entry.runtime_data.client._min_interval = 0
     return entry
 
 

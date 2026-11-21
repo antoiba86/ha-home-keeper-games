@@ -153,27 +153,6 @@ delete_shelf:
       selector:
         boolean:
 
-lookup_isbn:
-  fields:
-    isbn:
-      required: true
-      example: "9780441478125"
-      selector:
-        text:
-
-search_catalog:
-  fields:
-    title:
-      required: true
-      example: "The Hobbit"
-      selector:
-        text:
-    authors:
-      example: "J. R. R. Tolkien"
-      selector:
-        text:
-          multiple: true
-
 add_book:
   fields:
     title:
@@ -187,14 +166,8 @@ add_book:
       selector:
         text:
           multiple: true
-    isbn:
-      example: "9780441478125"
-      selector:
-        text:
-    isbn13:
-      selector:
-        text:
-    isbn10:
+    barcode:
+      example: "0711719505012"
       selector:
         text:
     publisher:
@@ -234,9 +207,6 @@ add_book:
     needs_details:
       selector:
         boolean:
-    lookup:
-      selector:
-        boolean:
 
 update_book:
   fields:
@@ -255,14 +225,8 @@ update_book:
       selector:
         text:
           multiple: true
-    isbn:
-      example: "9780441478125"
-      selector:
-        text:
-    isbn13:
-      selector:
-        text:
-    isbn10:
+    barcode:
+      example: "0711719505012"
       selector:
         text:
     publisher:
@@ -310,63 +274,11 @@ delete_book:
       selector:
         text:
 
-refresh_book:
+scan_barcode:
   fields:
-    book_id:
+    barcode:
       required: true
-      selector:
-        text:
-
-send_to_catalog:
-  fields:
-    book_id:
-      required: true
-      selector:
-        text:
-    fields:
-      example: '["publisher", "published", "isbn"]'
-      selector:
-        select:
-          multiple: true
-          options:
-            - "publisher"
-            - "published"
-            - "isbn"
-    include_cover:
-      default: false
-      selector:
-        boolean:
-
-link_catalog:
-  fields:
-    book_id:
-      required: true
-      selector:
-        text:
-    record:
-      required: true
-      example: "OL123M"
-      selector:
-        text:
-
-skip_catalog:
-  fields:
-    book_id:
-      required: true
-      selector:
-        text:
-    skip:
-      default: true
-      selector:
-        boolean:
-
-disconnect_catalog:
-
-scan_isbn:
-  fields:
-    isbn:
-      required: true
-      example: "9780441478125"
+      example: "0711719505012"
       selector:
         text:
     shelf_id:
@@ -534,7 +446,6 @@ set_cover:
       selector:
         select:
           options:
-            - openlibrary
             - custom
             - none
     file_id:
@@ -619,8 +530,8 @@ borrow_book:
     book_id:
       selector:
         text:
-    isbn:
-      example: "9780441478125"
+    barcode:
+      example: "0711719505012"
       selector:
         text:
     title:
@@ -717,8 +628,8 @@ add_to_wishlist:
     book_id:
       selector:
         text:
-    isbn:
-      example: "9780441478125"
+    barcode:
+      example: "0711719505012"
       selector:
         text:
     title:
@@ -810,14 +721,6 @@ import_csv:
       selector:
         text:
           multiline: true
-    source:
-      required: true
-      selector:
-        select:
-          options:
-            - goodreads
-            - storygraph
-            - library
     person_id:
       required: true
       selector:
@@ -840,12 +743,6 @@ export_csv:
     person_id:
       selector:
         text:
-    format:
-      selector:
-        select:
-          options:
-            - goodreads
-            - library
 
 export_data:
   fields:

@@ -32,25 +32,22 @@ _COGNATE_IDENTICAL: dict[str, set[str]] = {
         "services.*.fields.format.name",
         "services.*.fields.note.name",
         "services.*.fields.person_id.name",
-        "services.scan_isbn.name",
     },
     "de": {
+        "services.*.fields.barcode.name",
         "services.*.fields.format.name",
         "services.*.fields.name.name",
         "services.*.fields.person_id.name",
     },
     "fr": {"services.*.fields.note.name"},
     "it": {"services.*.fields.area_id.name"},
+    "nl": {"services.*.fields.barcode.name"},
     "nb": {"services.*.fields.format.name", "services.*.fields.person_id.name"},
     "sv": {"services.*.fields.format.name", "services.*.fields.person_id.name"},
 }
-# Values that are the same in each language: the product name, and the ISBN
-# field labels, which are a standard code name.
+# Values that are the same in each language: the product name.
 _INTENTIONALLY_IDENTICAL: set[str] = {
     "config.step.user.title",
-    "services.*.fields.isbn.name",
-    "services.*.fields.isbn10.name",
-    "services.*.fields.isbn13.name",
 }
 
 

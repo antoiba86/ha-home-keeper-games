@@ -1,4 +1,4 @@
-"""Book covers: the files, the upload view and the cover view.
+"""Covers: the files, the upload view and the cover view.
 
 The cover files are in ``.storage/home_keeper_games_covers/``. The store file is
 ``.storage/home_keeper_games``, so the directory has a name of its own. A file name is
@@ -6,8 +6,7 @@ The cover files are in ``.storage/home_keeper_games_covers/``. The store file is
 ``cover_url`` of a book carries it as ``?v=<token>``, so a browser cache never
 shows an old cover.
 
-* An Open Library cover is the large image, downloaded once.
-* A custom cover comes through the upload view: a POST of a multipart body with
+* A cover comes through the upload view: a POST of a multipart body with
   1 file, from an admin user. The view accepts JPEG, PNG and WebP up to 10 MB. It
   reads the type from the first bytes of the file, never from the header of the
   request. Pillow writes a new JPEG of at most 1200 px in an executor job, so
@@ -47,7 +46,6 @@ from .const import (
     DOMAIN,
     SNIFF_BYTES,
 )
-from .models import catalog_record
 
 if TYPE_CHECKING:
     from .coordinator import LibraryCoordinator
@@ -170,49 +168,6 @@ def release_cover(hass: HomeAssistant, file: str) -> None:
     """Delete a cover file that no book uses now."""
     if (path := cover_path(hass, file)) is not None:
         hass.async_add_executor_job(_unlink, path)
-
-
-async def async_store_openlibrary_cover(
-    hass: HomeAssistant,
-    coordinator: LibraryCoordinator,
-    book_id: str,
-    *,
-    replace_custom: bool = False,
-) -> bool:
-    """Download the Open Library cover of a book and put it on the book.
-
-    A book with a custom cover keeps it, unless *replace_custom* is true. Return
-    whether the book got a cover. Raise ``OpenLibraryError`` if Open Library
-    cannot be read.
-    """
-
-    def keeps_its_cover() -> bool:
-        book = coordinator.store.state["books"].get(book_id)
-        if book is None:
-            return True
-        return not replace_custom and (book.get("cover") or {}).get("kind") == "custom"
-
-    if keeps_its_cover():
-        return False
-    book = coordinator.store.state["books"][book_id]
-    cover_id = catalog_record(book).get("cover_id")
-    if not cover_id:
-        return False
-    data = await coordinator.client.async_cover(int(cover_id))
-    if data is None or sniff_image(data[:SNIFF_BYTES]) is None:
-        return False
-    name = new_cover_name(book_id)
-    try:
-        await hass.async_add_executor_job(reencode, data, covers_dir(hass) / name)
-    except CoverError:
-        return False
-    # The book can change during the download: a user can delete it or upload
-    # a custom cover.
-    if keeps_its_cover():
-        await hass.async_add_executor_job(_unlink, covers_dir(hass) / name)
-        return False
-    await coordinator.store.set_cover(book_id, "openlibrary", name)
-    return True
 
 
 def _take_pending(src: Path, dst: Path) -> bool:

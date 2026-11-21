@@ -68,7 +68,7 @@ async def _library(hass, call, todo_list) -> dict:
     dune = (
         await call(
             "add_book",
-            {"title": "Dune", "authors": ["Frank Herbert"], "lookup": False},
+            {"title": "Dune", "authors": ["Frank Herbert"]},
         )
     )["book"]
     copy = (await call("add_copy", {"book_id": dune["id"], "shelf_id": shelf["id"]}))[
@@ -86,7 +86,7 @@ async def _library(hass, call, todo_list) -> dict:
     emma = (
         await call(
             "add_book",
-            {"title": "Emma", "authors": ["Jane Austen"], "lookup": False},
+            {"title": "Emma", "authors": ["Jane Austen"]},
         )
     )["book"]
     await call(
@@ -248,7 +248,7 @@ async def test_services_refuse_a_non_admin_user(hass, setup_entry, call, ws) -> 
 
 
 async def test_websocket_twin_for_an_admin(hass, setup_entry, call, ws) -> None:
-    await call("add_book", {"title": "Dune", "lookup": False})
+    await call("add_book", {"title": "Dune"})
     client = await ws("admin")
     await client.send_json_auto_id({"type": "home_keeper_games/export_data"})
     reply = await client.receive_json()
@@ -293,8 +293,8 @@ async def test_symbolic_link_out_of_the_bundles_is_refused(
 async def test_covers_travel_in_a_bundle(hass, setup_entry, call, todo_list) -> None:
     from custom_components.home_keeper_games.covers import covers_dir
 
-    book = (await call("add_book", {"title": "Dune", "lookup": False}))["book"]
-    plain = (await call("add_book", {"title": "Emma", "lookup": False}))["book"]
+    book = (await call("add_book", {"title": "Dune"}))["book"]
+    plain = (await call("add_book", {"title": "Emma"}))["book"]
     directory = covers_dir(hass)
     directory.mkdir(parents=True, exist_ok=True)
     name = f"{book['id']}-0a1b2c3d.jpg"

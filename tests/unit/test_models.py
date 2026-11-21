@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import copy
 from datetime import date
 
 import ex.models as m
@@ -33,7 +32,7 @@ def test_normalize_state_fills_and_filters() -> None:
     raw = {
         "books": {
             "b": {"id": "b"},
-            "t": {"id": "t", "lookup_tries": 2},
+            "t": {"id": "t", "barcode": "1"},
             "x": "not a book",
         },
         "rooms": [],
@@ -46,46 +45,13 @@ def test_normalize_state_fills_and_filters() -> None:
     }
     state = m.normalize_state(raw)
     assert state["books"] == {
-        "b": {"id": "b", "lookup_tries": 0, "catalogs": {}, "catalog_status": {}},
-        "t": {"id": "t", "lookup_tries": 2, "catalogs": {}, "catalog_status": {}},
+        "b": {"id": "b"},
+        "t": {"id": "t", "barcode": "1"},
         "x": "not a book",
     }
     assert state["rooms"] == {}
     assert state["todo_orphans"] == [{"entity_id": "todo.a", "uid": "1"}]
     assert m.normalize_state({"todo_orphans": "x"})["todo_orphans"] == []
-
-
-@pytest.mark.parametrize(
-    ("value", "tries"),
-    [(None, 0), (0, 0), (1, 1), (3, 3), (-1, 0), (True, 0), ("2", 0), (2.0, 0)],
-)
-def test_lookup_tries(value, tries) -> None:
-    assert m.lookup_tries(value) == tries
-
-
-OL = {"edition_key": "OL1M", "work_key": None, "cover_id": None}
-MISSING = {"openlibrary": "missing"}
-SKIPPED = {"openlibrary": "skipped"}
-
-
-def test_books_to_look_up() -> None:
-    state = m.empty_state()
-    base = {"needs_details": True, "isbn13": "9780441478125", "catalogs": {}}
-    state["books"] = {
-        "b_late": {**base, "id": "b_late", "created_at": "2", "lookup_tries": 2},
-        "c_early": {**base, "id": "c_early", "created_at": "1"},
-        "a_ten": {**base, "id": "a_ten", "isbn13": None, "isbn10": "0441478123"},
-        "done": {**base, "id": "done", "lookup_tries": 3},
-        "known": {**base, "id": "known", "catalogs": {"openlibrary": OL}},
-        "noisbn": {**base, "id": "noisbn", "isbn13": None},
-        "full": {**base, "id": "full", "needs_details": False},
-    }
-    state["books"]["a_ten"]["created_at"] = "3"
-    assert m.books_to_look_up(state, 3) == ["c_early", "b_late", "a_ten"]
-    assert m.books_to_look_up(state, 2) == ["c_early", "a_ten"]
-    assert m.books_to_look_up(state, 4) == ["done", "c_early", "b_late", "a_ten"]
-    state["books"]["b_late"]["created_at"] = "1"
-    assert m.books_to_look_up(state, 3) == ["b_late", "c_early", "a_ten"]
 
 
 def _merge_state(**sections):
@@ -358,31 +324,23 @@ def test_build_book_defaults() -> None:
     assert book["title"] == "Dune"
     assert book["cover"] == {"kind": "none", "file": None}
     assert book["created_at"] == book["updated_at"] == NOW
-    assert book["needs_details"] is False and book["lookup_tries"] == 0
-    assert m.build_book({"title": "Dune", "isbn": ""}, now=NOW)["isbn13"] is None
-    assert book["wishlist"] is None and book["isbn13"] is None
+    assert book["needs_details"] is False
+    assert m.build_book({"title": "Dune", "barcode": ""}, now=NOW)["barcode"] is None
+    assert book["wishlist"] is None and book["barcode"] is None
     assert _err(m.build_book, {}, now=NOW).key == "field_required"
 
 
-def test_build_book_isbn_forms() -> None:
-    book = m.build_book({"title": "x", "isbn": "0441478123"}, now=NOW)
-    assert (book["isbn13"], book["isbn10"]) == ("9780441478125", "0441478123")
-    book = m.build_book({"title": "x", "isbn13": "9780441478125"}, now=NOW)
-    assert book["isbn10"] == "0441478123"
-    book = m.build_book({"title": "x", "isbn10": "0441478123"}, now=NOW)
-    assert book["isbn13"] == "9780441478125"
-    book = m.build_book({"title": "x", "isbn13": "9791032305690"}, now=NOW)
-    assert book["isbn10"] is None
-    assert _err(m.build_book, {"title": "x", "isbn": "123"}, now=NOW).key == (
-        "invalid_isbn"
-    )
-    err = _err(m.build_book, {"title": "x", "isbn10": "0441478124"}, now=NOW)
-    assert err.key == "invalid_isbn" and err.placeholders == {"isbn": "0441478124"}
+def test_build_book_barcode() -> None:
+    book = m.build_book({"title": "x", "barcode": "0711 7195-05012"}, now=NOW)
+    assert book["barcode"] == "0711719505012"
+    err = _err(m.build_book, {"title": "x", "barcode": "12/3"}, now=NOW)
+    assert err.key == "invalid_barcode" and err.placeholders == {"barcode": "12/3"}
+    old = m.build_book({"title": "x", "isbn": "0441478123"}, now=NOW)
+    assert "isbn" not in old and old["barcode"] is None
 
 
 def test_book_fields() -> None:
-    assert m.book_field("isbn13", "") is None
-    assert m.book_field("isbn10", None) is None
+    assert m.book_field("barcode", "") is None
     assert m.book_field("pages", 300) == 300
     assert _err(m.book_field, "pages", 0).key == "out_of_range"
     assert m.book_field("language", " en ") == "en"
@@ -401,17 +359,9 @@ def test_book_fields() -> None:
     assert _err(m.book_field, "series", {"name": "D", "number": [1]}).key == (
         "invalid_field"
     )
-    assert m.book_field("catalogs", None) == {}
-    assert m.book_field("catalogs", {}) == {}
-    assert m.book_field("catalogs", {"openlibrary": {}}) == {}
-    assert m.book_field("catalogs", {"openlibrary": None}) == {}
-    record = {"work_key": "OL1W", "cover_id": 5}
-    assert m.book_field("catalogs", {"openlibrary": record}) == {
-        "openlibrary": {"edition_key": None, "work_key": "OL1W", "cover_id": 5}
-    }
-    for bad in ("x", ["openlibrary"], {"other": record}, {"openlibrary": "x"}):
-        err = _err(m.book_field, "catalogs", bad)
-        assert (err.key, err.placeholders) == ("invalid_field", {"field": "catalogs"})
+    for gone in ("catalogs", "isbn13", "isbn10"):
+        err = _err(m.book_field, gone, None)
+        assert (err.key, err.placeholders) == ("invalid_field", {"field": gone})
     assert m.book_field("needs_details", True) is True
     assert m.book_field("tags", ["a", "a"]) == ["a"]
     assert _err(m.book_field, "nope", 1).key == "invalid_field"
@@ -429,193 +379,18 @@ def test_update_book() -> None:
     )
     assert changed == ["subtitle", "pages"]
     assert updated["updated_at"] == "t1" and updated["id"] == book["id"]
-    updated, changed = m.update_book(book, {"isbn": "0441478123"}, now="t1")
-    assert sorted(changed) == ["isbn10", "isbn13"]
-    # A new ISBN-13 sets the ISBN-10 from it. An empty one clears both.
-    other, changed = m.update_book(updated, {"isbn13": "9780306406157"}, now="t2")
-    assert (other["isbn13"], other["isbn10"]) == ("9780306406157", "0306406152")
-    assert sorted(changed) == ["isbn10", "isbn13"]
-    other, changed = m.update_book(updated, {"isbn13": "0306406152"}, now="t2")
-    assert (other["isbn13"], other["isbn10"]) == ("9780306406157", "0306406152")
-    other, _ = m.update_book(updated, {"isbn13": "9791032305690"}, now="t2")
-    assert (other["isbn13"], other["isbn10"]) == ("9791032305690", None)
-    other, _ = m.update_book(updated, {"isbn13": None}, now="t2")
-    assert (other["isbn13"], other["isbn10"]) == (None, None)
-    other, _ = m.update_book(
-        updated, {"isbn13": "9780306406157", "isbn10": "0441478123"}, now="t2"
-    )
-    assert (other["isbn13"], other["isbn10"]) == ("9780306406157", "0441478123")
-    assert _err(m.update_book, updated, {"isbn13": "123"}, now="t2").key == (
-        "invalid_isbn"
-    )
-
-
-def test_fill_from_draft_keeps_user_edits() -> None:
-    book = m.build_book({"title": "Mine", "pages": 5, "needs_details": True}, now="t0")
-    draft = {
-        "title": "Theirs",
-        "authors": ["A"],
-        "pages": 300,
-        "publisher": "",
-        "subjects": [],
-        "language": "en",
-        "isbn13": "bad",
-        "catalogs": {"openlibrary": {"work_key": "OL1W"}},
-    }
-    filled, changed = m.fill_from_draft(book, draft, now="t1")
-    assert filled["title"] == "Mine" and filled["pages"] == 5
-    assert filled["authors"] == ["A"] and filled["language"] == "en"
-    assert filled["isbn13"] is None
-    assert filled["catalogs"] == {
-        "openlibrary": {"edition_key": None, "work_key": "OL1W", "cover_id": None}
-    }
-    assert filled["needs_details"] is False
-    assert changed == ["authors", "language", "catalogs", "needs_details"]
-    assert filled["updated_at"] == "t1"
-    again, changed = m.fill_from_draft(filled, draft, now="t2")
-    assert changed == [] and again["updated_at"] == "t1"
-
-
-def test_fill_from_draft_clears_the_catalog_status() -> None:
-    book = m.build_book({"title": "Mine"}, now="t0")
-    book["catalog_status"] = {"openlibrary": "missing"}
-    filled, changed = m.fill_from_draft(book, {"authors": ["A"]}, now="t1")
-    assert filled["catalog_status"] == {"openlibrary": "missing"}
-    assert changed == ["authors"]
-    draft = {"catalogs": {"openlibrary": {"edition_key": "OL5M"}}}
-    filled, changed = m.fill_from_draft(book, draft, now="t1")
-    assert filled["catalog_status"] == {}
-    assert filled["catalogs"]["openlibrary"]["edition_key"] == "OL5M"
-    assert changed == ["catalogs", "catalog_status"]
-    _, changed = m.fill_from_draft(filled, draft, now="t2")
+    updated, changed = m.update_book(book, {"barcode": "ab-12"}, now="t1")
+    assert changed == ["barcode"] and updated["barcode"] == "AB12"
+    same, changed = m.update_book(updated, {"barcode": "AB 12"}, now="t2")
+    assert changed == [] and same["updated_at"] == "t1"
+    cleared, changed = m.update_book(updated, {"barcode": None}, now="t2")
+    assert changed == ["barcode"] and cleared["barcode"] is None
+    # The old ISBN keys are not book fields now, so an update ignores them.
+    _, changed = m.update_book(book, {"isbn": "0441478123"}, now="t1")
     assert changed == []
-    # A record from a new draft replaces the old record.
-    draft = {"catalogs": {"openlibrary": {"edition_key": "OL6M"}}}
-    again, changed = m.fill_from_draft(filled, draft, now="t3")
-    assert again["catalogs"]["openlibrary"]["edition_key"] == "OL6M"
-    assert changed == ["catalogs"]
-    # A book with no catalog keys at all gets none from a draft with no record.
-    bare = {"id": "x", "title": "T"}
-    same, changed = m.fill_from_draft(bare, {"catalogs": {}}, now="t4")
-    assert changed == [] and "catalogs" not in same
-
-
-@pytest.mark.parametrize(
-    ("book", "catalogs", "status"),
-    [
-        # Version 0.3.0b1: the status is in openlibrary_status.
-        ({"openlibrary_status": "missing"}, {}, {"openlibrary": "missing"}),
-        ({"openlibrary_status": "skipped"}, {}, {"openlibrary": "skipped"}),
-        ({"openlibrary_status": "other"}, {}, {}),
-        (
-            {"openlibrary_status": None, "needs_details": True, "lookup_tries": 3},
-            {},
-            {},
-        ),
-        (
-            {"openlibrary_status": "skipped", "openlibrary": OL},
-            {"openlibrary": OL},
-            {},
-        ),
-        # Version 0.2.0: no status, and the record is in openlibrary.
-        ({"openlibrary": OL}, {"openlibrary": OL}, {}),
-        ({"openlibrary": None}, {}, {}),
-        ({"needs_details": True, "lookup_tries": 3}, {}, {"openlibrary": "missing"}),
-        ({"needs_details": True, "lookup_tries": 4}, {}, {"openlibrary": "missing"}),
-        ({"needs_details": True, "lookup_tries": 2}, {}, {}),
-        ({"needs_details": False, "lookup_tries": 3}, {}, {}),
-        (
-            {"needs_details": True, "lookup_tries": 3, "openlibrary": OL},
-            {"openlibrary": OL},
-            {},
-        ),
-        ({}, {}, {}),
-        # The current shape stays as it is.
-        ({"catalogs": {"openlibrary": OL}}, {"openlibrary": OL}, {}),
-        ({"catalog_status": SKIPPED}, {}, SKIPPED),
-        (
-            {"catalog_status": {}, "needs_details": True, "lookup_tries": 3},
-            {},
-            {},
-        ),
-        # A bad or unknown value is dropped.
-        (
-            {"catalogs": {"other": OL, "openlibrary": "x"}, "catalog_status": []},
-            {},
-            {},
-        ),
-        ({"catalogs": [], "catalog_status": {"openlibrary": "sent"}}, {}, {}),
-        ({"catalogs": {"openlibrary": {}}}, {}, {}),
-        (
-            {"catalogs": {"openlibrary": OL}, "catalog_status": MISSING},
-            {"openlibrary": OL},
-            {},
-        ),
-        # A record or a status in the current shape wins over an old key.
-        (
-            {"openlibrary": {"work_key": "W"}, "catalogs": {"openlibrary": OL}},
-            {"openlibrary": OL},
-            {},
-        ),
-        (
-            {"openlibrary_status": "missing", "catalog_status": SKIPPED},
-            {},
-            SKIPPED,
-        ),
-    ],
-)
-def test_normalize_catalogs(book, catalogs, status) -> None:
-    # The function changes its argument, so work on a copy of the shared case.
-    book = copy.deepcopy(book)
-    m.normalize_catalogs(book)
-    assert book.get("catalogs") == catalogs
-    assert book.get("catalog_status") == status
-    assert "openlibrary" not in book and "openlibrary_status" not in book
-    # A second load changes nothing.
-    again = dict(book)
-    m.normalize_catalogs(again)
-    assert again == book
-
-
-def test_normalize_state_moves_the_openlibrary_keys() -> None:
-    raw = {
-        "books": {
-            "old": {"id": "old", "needs_details": True, "lookup_tries": 3},
-            "linked": {"id": "linked", "openlibrary": OL, "openlibrary_status": None},
-        }
-    }
-    books = m.normalize_state(raw)["books"]
-    assert books["old"]["catalog_status"] == {"openlibrary": "missing"}
-    assert books["linked"] == {
-        "id": "linked",
-        "lookup_tries": 0,
-        "catalogs": {"openlibrary": OL},
-        "catalog_status": {},
-    }
-
-
-def test_catalog_record_and_status() -> None:
-    book = {"catalogs": {"openlibrary": OL}, "catalog_status": SKIPPED}
-    assert m.catalog_record(book) == OL
-    assert m.catalog_record(book, "other") == {}
-    assert m.catalog_status(book) == "skipped"
-    assert m.catalog_status(book, "other") is None
-    for bad in ({}, {"catalogs": [], "catalog_status": []}):
-        assert m.catalog_record(bad) == {} and m.catalog_status(bad) is None
-    assert m.catalog_record({"catalogs": {"openlibrary": "x"}}) == {}
-    assert m.catalog_status({"catalog_status": {"openlibrary": "sent"}}) is None
-
-
-def test_catalog_status_validator() -> None:
-    assert m.catalog_status_value(None) is None
-    assert m.catalog_status_value("missing") == "missing"
-    assert m.catalog_status_value("skipped") == "skipped"
-    err = _err(m.catalog_status_value, "sent")
-    assert err.key == "invalid_choice"
-    assert err.placeholders == {
-        "field": "catalog_status",
-        "options": "missing, skipped",
-    }
+    assert _err(m.update_book, updated, {"barcode": "#"}, now="t2").key == (
+        "invalid_barcode"
+    )
 
 
 def test_book_summary_and_keys() -> None:
@@ -666,28 +441,6 @@ def test_build_and_update_copy() -> None:
     assert changed == ["shelf_id", "condition"] and updated["condition"] is None
     assert _err(m.copy_field, "format", "scroll").key == "invalid_choice"
     assert _err(m.copy_field, "nope", 1).key == "invalid_field"
-
-
-@pytest.mark.parametrize(
-    ("binding", "fmt"),
-    [
-        ("Hardcover", "hardcover"),
-        ("Hardback", "hardcover"),
-        ("Paperback", "paperback"),
-        ("Mass Market Paperback", "paperback"),
-        ("Kindle Edition", "ebook"),
-        ("ebook", "ebook"),
-        ("digital", "ebook"),
-        ("Audible Audio", "audiobook"),
-        ("Audiobook", "audiobook"),
-        ("audio", "audiobook"),
-        ("Board book", "other"),
-        ("", "other"),
-        (None, "other"),
-    ],
-)
-def test_format_from_binding(binding: str | None, fmt: str) -> None:
-    assert m.format_from_binding(binding) == fmt
 
 
 # ── Reading ──────────────────────────────────────────────────────────────────
@@ -860,8 +613,8 @@ def _state():
     state["rooms"]["r"] = {"id": "r", "name": "Den"}
     state["bookcases"]["k"] = {"id": "k", "room_id": "r", "name": "Left"}
     state["shelves"]["s"] = {"id": "s", "bookcase_id": "k", "name": "Top"}
-    state["books"]["b"] = {"id": "b", "isbn13": "9780441478125", "isbn10": None}
-    state["books"]["c"] = {"id": "c", "isbn13": None, "isbn10": "080442957X"}
+    state["books"]["b"] = {"id": "b", "barcode": "9780441478125"}
+    state["books"]["c"] = {"id": "c", "barcode": None}
     state["copies"]["x2"] = {"id": "x2", "book_id": "b", "created_at": "2"}
     state["copies"]["x1"] = {"id": "x1", "book_id": "b", "created_at": "1"}
     state["copies"]["y"] = {"id": "y", "book_id": "c", "created_at": "0"}
@@ -881,6 +634,7 @@ def test_derived_reads() -> None:
     assert m.find_shelf_by_path(state, ["den", "LEFT", "top"]) == "s"
     assert m.find_shelf_by_path(state, ["Den", "Left"]) is None
     assert m.find_shelf_by_path(state, ["Den", "Left", "Low"]) is None
-    assert m.find_book_by_isbn(state, "9780441478125")["id"] == "b"
-    assert m.find_book_by_isbn(state, None, "080442957X")["id"] == "c"
-    assert m.find_book_by_isbn(state, "9780000000002", "0000000000") is None
+    assert m.find_book_by_barcode(state, "9780441478125")["id"] == "b"
+    assert m.find_book_by_barcode(state, "9780000000002") is None
+    assert m.find_book_by_barcode(state, None) is None
+    assert m.find_book_by_barcode(state, "") is None

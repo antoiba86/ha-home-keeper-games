@@ -14,7 +14,6 @@ from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.core import HomeAssistant
 
 from . import LibraryConfigEntry
-from .const import OPENLIBRARY_SECRET_KEYS
 
 TO_REDACT = {
     "party",
@@ -35,9 +34,8 @@ async def async_get_config_entry_diagnostics(
         "entry": {
             "title": entry.title,
             "version": entry.version,
-            "options": async_redact_data(dict(entry.options), OPENLIBRARY_SECRET_KEYS),
+            "options": dict(entry.options),
         },
-        "openlibrary_connected": coordinator.openlibrary_account["connected"],
         "tab_registered": coordinator.tab_registered,
         "revision": coordinator.store.revision,
         "counts": {

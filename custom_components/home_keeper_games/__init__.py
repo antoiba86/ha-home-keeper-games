@@ -1,18 +1,17 @@
-"""Home Keeper Games: the books of a household, as a companion of Home Keeper.
+"""Home Keeper Games: the games of a household, as a companion of Home Keeper.
 
 Setup order:
 
 1. Load the string tables and the store.
-2. Make the coordinator, the Open Library client and the syncs.
+2. Make the coordinator and the syncs.
 3. Register the frontend, the websocket commands and the cover views.
 4. Set up the entity platforms and register the services.
-5. Start the lookup queue, the to-do and loan syncs and the overdue check.
+5. Start the to-do and loan syncs and the overdue check.
 6. Link to Home Keeper: the tab, the companion, the loan tasks or a repair.
 """
 
 from __future__ import annotations
 
-import os
 from datetime import timedelta
 from functools import partial
 from typing import Any
@@ -26,11 +25,9 @@ from homeassistant.helpers.typing import ConfigType
 
 from . import backend_i18n, card, covers, frontend_assets, home_keeper, websocket_api
 from .api_surface import SERVICE_NAMES
-from .book_lookup import BookLookup
 from .const import DOMAIN, OVERDUE_CHECK_INTERVAL_S, PLATFORMS, SIGNAL_STORE_CHANGED
 from .coordinator import LibraryCoordinator
 from .loan_sync import LoanSync
-from .openlibrary_client import OpenLibraryClient, openlibrary_urls
 from .services import async_register_services
 from .store import LibraryStore, today
 from .wishlist_sync import WishlistSync
@@ -54,8 +51,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: LibraryConfigEntry) -> b
     store.on_cover_released = partial(covers.release_cover, hass)
 
     coordinator = LibraryCoordinator(hass, entry, store)
-    coordinator.client = OpenLibraryClient(hass, **openlibrary_urls(os.environ))
-    coordinator.lookup = BookLookup(hass, coordinator)
     coordinator.wishlist_sync = WishlistSync(hass, coordinator)
     coordinator.loan_sync = LoanSync(hass, coordinator)
     await coordinator.async_config_entry_first_refresh()
@@ -81,10 +76,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: LibraryConfigEntry) -> b
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     async_register_services(hass)
 
-    coordinator.lookup.async_start()
-    # The queue is in memory. Queue again the books that a restart left.
-    coordinator.lookup.async_enqueue_pending()
-    entry.async_on_unload(coordinator.lookup.async_stop)
     coordinator.wishlist_sync.async_start()
     entry.async_on_unload(coordinator.wishlist_sync.async_stop)
     coordinator.loan_sync.async_start()

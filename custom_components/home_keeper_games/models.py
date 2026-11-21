@@ -26,9 +26,6 @@ import uuid
 from datetime import date
 from typing import Any
 
-from . import isbn as isbn_mod
-from .const import LOOKUP_MAX_TRIES
-
 STATE_SECTIONS = (
     "rooms",
     "bookcases",
@@ -47,7 +44,10 @@ STATUSES = ("want", "reading", "read", "dnf")
 # The ``status`` value of ``set_reading`` that removes the reading row.
 STATUS_NONE = "none"
 DIRECTIONS = ("out", "in")
-COVER_KINDS = ("openlibrary", "custom", "none")
+COVER_KINDS = ("custom", "none")
+# A barcode: letters and digits, with no spaces or hyphens.
+MAX_BARCODE = 50
+_BARCODE_RE = re.compile(rf"[0-9A-Z]{{1,{MAX_BARCODE}}}")
 
 MAX_NAME = 100
 MAX_TITLE = 500
@@ -75,8 +75,7 @@ BOOK_FIELDS = (
     "title",
     "subtitle",
     "authors",
-    "isbn13",
-    "isbn10",
+    "barcode",
     "publisher",
     "published",
     "pages",
@@ -86,23 +85,7 @@ BOOK_FIELDS = (
     "description",
     "tags",
     "shared_notes",
-    "catalogs",
     "needs_details",
-)
-# The fields that ``fill_from_draft`` can write. A user edit of a field is kept.
-DRAFT_FIELDS = (
-    "title",
-    "subtitle",
-    "authors",
-    "isbn13",
-    "isbn10",
-    "publisher",
-    "published",
-    "pages",
-    "language",
-    "subjects",
-    "series",
-    "description",
 )
 COPY_FIELDS = (
     "shelf_id",
@@ -167,10 +150,6 @@ def normalize_state(raw: Any) -> dict[str, Any]:
         value = raw.get(name)
         if isinstance(value, dict):
             state[name] = value
-    for book in state["books"].values():
-        if isinstance(book, dict):
-            book["lookup_tries"] = lookup_tries(book.get("lookup_tries"))
-            normalize_catalogs(book)
     orphans = raw.get("todo_orphans")
     if isinstance(orphans, list):
         state["todo_orphans"] = [
@@ -181,86 +160,6 @@ def normalize_state(raw: Any) -> dict[str, Any]:
             and isinstance(entry.get("uid"), str)
         ]
     return state
-
-
-# The catalogs of books that the library reads and sends books to. A book keeps
-# its record in each catalog in ``catalogs``, and its send status in
-# ``catalog_status``. Both are objects with the catalog name as the key.
-OPENLIBRARY = "openlibrary"
-CATALOGS = (OPENLIBRARY,)
-# The values of a ``catalog_status`` entry. ``missing``: a lookup found no book in
-# the catalog. ``skipped``: an admin does not want to send the book.
-CATALOG_STATUSES = ("missing", "skipped")
-
-
-def catalog_record(book: dict[str, Any], catalog: str = OPENLIBRARY) -> dict[str, Any]:
-    """The record of *book* in *catalog*, or an empty dict."""
-    records = book.get("catalogs")
-    record = records.get(catalog) if isinstance(records, dict) else None
-    return record if isinstance(record, dict) else {}
-
-
-def catalog_status(book: dict[str, Any], catalog: str = OPENLIBRARY) -> str | None:
-    """The send status of *book* for *catalog*: None, missing or skipped."""
-    statuses = book.get("catalog_status")
-    value = statuses.get(catalog) if isinstance(statuses, dict) else None
-    return str(value) if value in CATALOG_STATUSES else None
-
-
-def normalize_catalogs(book: dict[str, Any]) -> None:
-    """Set ``catalogs`` and ``catalog_status`` of a stored book, in place.
-
-    Version 0.3.0b1 and older kept the Open Library data in the keys
-    ``openlibrary`` and ``openlibrary_status``. This moves them. A book from
-    before the status had no status: if its lookups gave no details and it has
-    no Open Library data, it is ``missing``. A book with a record in a catalog
-    has no status for that catalog.
-    """
-    had_status = "openlibrary_status" in book or "catalog_status" in book
-    old_record = book.pop("openlibrary", None)
-    old_status = book.pop("openlibrary_status", None)
-    records = book.get("catalogs")
-    records = dict(records) if isinstance(records, dict) else {}
-    if old_record:
-        records.setdefault(OPENLIBRARY, old_record)
-    statuses = book.get("catalog_status")
-    statuses = dict(statuses) if isinstance(statuses, dict) else {}
-    if old_status is not None:
-        statuses.setdefault(OPENLIBRARY, old_status)
-    book["catalogs"] = {
-        name: records[name]
-        for name in CATALOGS
-        if isinstance(records.get(name), dict) and records[name]
-    }
-    book["catalog_status"] = {
-        name: statuses[name]
-        for name in CATALOGS
-        if name not in book["catalogs"] and statuses.get(name) in CATALOG_STATUSES
-    }
-    if (
-        not had_status
-        and OPENLIBRARY not in book["catalogs"]
-        and book.get("needs_details")
-        and lookup_tries(book.get("lookup_tries")) >= LOOKUP_MAX_TRIES
-    ):
-        book["catalog_status"][OPENLIBRARY] = "missing"
-
-
-def catalog_status_value(value: Any) -> str | None:
-    """A caller-set catalog status: None or 1 of ``CATALOG_STATUSES``."""
-    if value is None:
-        return None
-    return choice(value, "catalog_status", CATALOG_STATUSES)
-
-
-def lookup_tries(value: Any) -> int:
-    """The stored count of Open Library lookups that gave no details.
-
-    A book from before the count, or a bad value, has 0.
-    """
-    if isinstance(value, bool) or not isinstance(value, int):
-        return 0
-    return max(value, 0)
 
 
 def clone(value: Any) -> Any:
@@ -581,30 +480,21 @@ def _series(value: Any) -> dict[str, Any] | None:
     return {"name": name, "number": number}
 
 
-def _openlibrary(value: Any) -> dict[str, Any] | None:
-    if value is None:
+def clean_barcode(value: Any) -> str:
+    """A barcode without spaces and hyphens, in capital letters."""
+    return re.sub(r"[\s-]", "", str(value)).upper()
+
+
+def barcode(value: Any, field: str = "barcode") -> str | None:
+    """A checked barcode, or None for an empty value."""
+    if value is None or value == "":
         return None
-    if not isinstance(value, dict):
-        raise LibraryError("invalid_field", field="catalogs")
-    cover_id = value.get("cover_id")
-    if cover_id is not None:
-        cover_id = integer(cover_id, "catalogs", low=1, high=2**53)
-    out = {
-        "edition_key": optional_text(value.get("edition_key"), "catalogs", 50),
-        "work_key": optional_text(value.get("work_key"), "catalogs", 50),
-        "cover_id": cover_id,
-    }
-    return out if any(v is not None for v in out.values()) else None
-
-
-def _catalogs(value: Any) -> dict[str, Any]:
-    """The checked ``catalogs`` object. A record with no value is dropped."""
-    if value is None:
-        return {}
-    if not isinstance(value, dict) or any(name not in CATALOGS for name in value):
-        raise LibraryError("invalid_field", field="catalogs")
-    records = {name: _openlibrary(record) for name, record in value.items()}
-    return {name: record for name, record in records.items() if record is not None}
+    if not isinstance(value, str | int) or isinstance(value, bool):
+        raise LibraryError("invalid_field", field=field)
+    cleaned = clean_barcode(value)
+    if not _BARCODE_RE.fullmatch(cleaned):
+        raise LibraryError("invalid_barcode", barcode=cleaned[:MAX_BARCODE])
+    return cleaned
 
 
 def book_field(field: str, value: Any) -> Any:
@@ -613,51 +503,27 @@ def book_field(field: str, value: Any) -> Any:
         return text(value, field, BOOK_TEXT_FIELDS[field], required=field == "title")
     if field in ("authors", "subjects", "tags"):
         return str_list(value, field)
-    if field == "isbn13":
-        if value in (None, ""):
-            return None
-        isbn13, _ = _isbn(value)
-        return isbn13
-    if field == "isbn10":
-        if value in (None, ""):
-            return None
-        value = isbn_mod.clean(value)
-        if not isbn_mod.is_valid_isbn10(value):
-            raise LibraryError("invalid_isbn", isbn=value)
-        return value
+    if field == "barcode":
+        return barcode(value)
     if field == "pages":
         return integer(value, field, low=1, high=MAX_PAGES)
     if field == "language":
         return optional_text(value, field, 20)
     if field == "series":
         return _series(value)
-    if field == "catalogs":
-        return _catalogs(value)
     if field == "needs_details":
         return boolean(value, field)
     raise LibraryError("invalid_field", field=field)
 
 
-def _isbn(value: Any) -> tuple[str, str | None]:
-    try:
-        return isbn_mod.normalize(value)
-    except isbn_mod.IsbnError as err:
-        raise LibraryError("invalid_isbn", isbn=isbn_mod.clean(value)) from err
-
-
 def build_book(data: dict[str, Any], *, now: str) -> dict[str, Any]:
-    """A new book from caller input.
-
-    ``isbn`` is a convenience field: an ISBN-10 or an ISBN-13 that fills both
-    ``isbn13`` and ``isbn10``.
-    """
+    """A new book from caller input."""
     book: dict[str, Any] = {
         "id": new_id(),
         "title": "",
         "subtitle": "",
         "authors": [],
-        "isbn13": None,
-        "isbn10": None,
+        "barcode": None,
         "publisher": "",
         "published": "",
         "pages": None,
@@ -667,11 +533,8 @@ def build_book(data: dict[str, Any], *, now: str) -> dict[str, Any]:
         "description": "",
         "tags": [],
         "shared_notes": "",
-        "catalogs": {},
         "cover": {"kind": "none", "file": None},
         "needs_details": False,
-        "lookup_tries": 0,
-        "catalog_status": {},
         "created_at": now,
         "updated_at": now,
         "wishlist": None,
@@ -679,12 +542,6 @@ def build_book(data: dict[str, Any], *, now: str) -> dict[str, Any]:
     for field in BOOK_FIELDS:
         if field in data:
             book[field] = book_field(field, data[field])
-    if data.get("isbn") not in (None, ""):
-        book["isbn13"], book["isbn10"] = _isbn(data["isbn"])
-    elif book["isbn13"] and not book["isbn10"]:
-        book["isbn10"] = isbn_mod.to_isbn10(book["isbn13"])
-    elif book["isbn10"] and not book["isbn13"]:
-        book["isbn13"] = isbn_mod.to_isbn13(book["isbn10"])
     if not book["title"]:
         raise LibraryError("field_required", field="title")
     return book
@@ -697,66 +554,11 @@ def update_book(
     updated = dict(book)
     changed: list[str] = []
     patch = {field: data[field] for field in BOOK_FIELDS if field in data}
-    if data.get("isbn") not in (None, ""):
-        patch["isbn13"], patch["isbn10"] = _isbn(data["isbn"])
-    elif "isbn13" in patch and "isbn10" not in patch:
-        # The ISBN-13 and the ISBN-10 name 1 edition. A new ISBN-13 sets the
-        # ISBN-10 from it, and an empty ISBN-13 clears the ISBN-10.
-        if patch["isbn13"] in (None, ""):
-            patch["isbn10"] = None
-        else:
-            patch["isbn13"], patch["isbn10"] = _isbn(patch["isbn13"])
     for field, raw in patch.items():
         value = book_field(field, raw)
         if value != updated.get(field):
             updated[field] = value
             changed.append(field)
-    if changed:
-        updated["updated_at"] = now
-    return updated, changed
-
-
-def _is_empty(value: Any) -> bool:
-    return value in (None, "", [], {})
-
-
-def fill_from_draft(
-    book: dict[str, Any], draft: dict[str, Any], *, now: str
-) -> tuple[dict[str, Any], list[str]]:
-    """Fill the empty fields of *book* from an Open Library *draft*.
-
-    A field that has a value is a user edit and stays. The records in the
-    ``catalogs`` of the draft always replace the records of those catalogs, and
-    ``needs_details`` turns off. A book with a record in a catalog has no
-    ``catalog_status`` for that catalog.
-    """
-    updated = dict(book)
-    changed: list[str] = []
-    for field in DRAFT_FIELDS:
-        if field not in draft or _is_empty(draft[field]):
-            continue
-        if not _is_empty(updated.get(field)):
-            continue
-        try:
-            value = book_field(field, draft[field])
-        except LibraryError:
-            continue
-        updated[field] = value
-        changed.append(field)
-    records = updated.get("catalogs") or {}
-    drafted = _catalogs(draft.get("catalogs"))
-    if drafted and {**records, **drafted} != records:
-        records = {**records, **drafted}
-        updated["catalogs"] = records
-        changed.append("catalogs")
-    statuses = updated.get("catalog_status") or {}
-    kept = {name: value for name, value in statuses.items() if name not in records}
-    if kept != statuses:
-        updated["catalog_status"] = kept
-        changed.append("catalog_status")
-    if updated.get("needs_details"):
-        updated["needs_details"] = False
-        changed.append("needs_details")
     if changed:
         updated["updated_at"] = now
     return updated, changed
@@ -869,22 +671,6 @@ def update_copy(
             updated[field] = value
             changed.append(field)
     return updated, changed
-
-
-def format_from_binding(binding: Any) -> str:
-    """The copy format for a Goodreads ``Binding`` or a StoryGraph ``Format``."""
-    value = fold(binding)
-    if not value:
-        return "other"
-    if "audio" in value or "audible" in value:
-        return "audiobook"
-    if "kindle" in value or "ebook" in value or "digital" in value:
-        return "ebook"
-    if "hardcover" in value or "hardback" in value:
-        return "hardcover"
-    if "paperback" in value or "paper back" in value:
-        return "paperback"
-    return "other"
 
 
 # ── Reading ──────────────────────────────────────────────────────────────────
@@ -1093,25 +879,6 @@ def copies_of(state: dict[str, Any], book_id: str) -> list[dict[str, Any]]:
     return sorted(rows, key=lambda c: (str(c.get("created_at", "")), c["id"]))
 
 
-def books_to_look_up(state: dict[str, Any], max_tries: int) -> list[str]:
-    """The ids of the books that the lookup queue takes again at setup.
-
-    A book goes in the queue when it needs details, has an ISBN, has no Open
-    Library data and has had fewer than *max_tries* lookups with no details.
-    The oldest book is first.
-    """
-    books = [
-        book
-        for book in state["books"].values()
-        if book.get("needs_details")
-        and (book.get("isbn13") or book.get("isbn10"))
-        and not catalog_record(book)
-        and lookup_tries(book.get("lookup_tries")) < max_tries
-    ]
-    books.sort(key=lambda b: (str(b.get("created_at", "")), b["id"]))
-    return [book["id"] for book in books]
-
-
 def copy_clears_wishlist(state: dict[str, Any], book_id: str) -> bool:
     """Whether a new copy of a book takes the book off the wishlist.
 
@@ -1157,17 +924,13 @@ def find_shelf_by_path(state: dict[str, Any], path: list[str]) -> str | None:
     return None
 
 
-def find_book_by_isbn(
-    state: dict[str, Any], isbn13: str | None, isbn10: str | None = None
+def find_book_by_barcode(
+    state: dict[str, Any], code: str | None
 ) -> dict[str, Any] | None:
-    """The book with this ISBN-13, then the book with this ISBN-10."""
-    if isbn13:
+    """The book with this barcode, or None."""
+    if code:
         for book in state["books"].values():
-            if book.get("isbn13") == isbn13:
-                return book
-    if isbn10:
-        for book in state["books"].values():
-            if book.get("isbn10") == isbn10:
+            if book.get("barcode") == code:
                 return book
     return None
 
@@ -1193,7 +956,6 @@ __all__ = [
     "build_shelf",
     "build_wishlist",
     "empty_state",
-    "fill_from_draft",
     "normalize_state",
     "update_book",
     "update_copy",

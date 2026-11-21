@@ -39,12 +39,9 @@ _COMPONENT_DIR = _CUSTOM_COMPONENTS_DIR / "home_keeper_games"
 _PKG = "custom_components.home_keeper_games"
 _PURE_MODULES = (
     "const",
-    "isbn",
     "models",
     "events",
     "projections",
-    "openlibrary",
-    "openlibrary_contribute",
     "csv_io",
     "import_export",
     "wishlist",

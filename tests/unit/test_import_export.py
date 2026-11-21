@@ -50,12 +50,11 @@ def _state() -> dict:
         "order": 0,
     }
     dune = m.build_book(
-        {"title": "Dune", "authors": ["Frank Herbert"], "isbn": "9780441013593"},
+        {"title": "Dune", "authors": ["Frank Herbert"], "barcode": "9780441013593"},
         now=NOW,
     )
     dune["id"] = DUNE
     dune["cover"] = {"kind": "custom", "file": f"{DUNE}-0a1b2c3d.jpg"}
-    dune["lookup_tries"] = 2
     emma = m.build_book({"title": "Emma", "authors": ["Jane Austen"]}, now=NOW)
     emma["id"] = EMMA
     emma["wishlist"] = {
@@ -183,7 +182,6 @@ def test_export_shape_and_names() -> None:
 def test_export_drops_each_install_only_value() -> None:
     data, _ = _export(_state())
     assert "todo_orphans" not in data
-    assert all("lookup_tries" not in book for book in data["books"])
     assert all("hk_task_id" not in loan for loan in data["loans"])
     wish = data["books"][1]["wishlist"]
     assert "todo_uid" not in wish
@@ -251,7 +249,6 @@ def test_round_trip_into_an_empty_library() -> None:
     # The syncs make the install-only values again.
     assert plan.state["loans"][LOAN_OUT]["hk_task_id"] is None
     assert plan.state["books"][EMMA]["wishlist"]["todo_uid"] is None
-    assert plan.state["books"][DUNE]["lookup_tries"] == 0
     assert plan.state["todo_orphans"] == []
 
 
@@ -303,54 +300,42 @@ def test_records_report_names_and_matches() -> None:
 # ── Matching ─────────────────────────────────────────────────────────────────
 
 
-def test_books_match_by_isbn_then_title() -> None:
+def test_books_match_by_barcode_then_title() -> None:
     state = m.empty_state()
-    stored = m.build_book({"title": "Dune", "isbn": "9780441013593"}, now=NOW)
+    stored = m.build_book({"title": "Dune", "barcode": "9780441013593"}, now=NOW)
     other = m.build_book({"title": "Emma", "authors": ["Jane Austen"]}, now=NOW)
-    old10 = m.build_book({"title": "Old", "isbn10": "0441478123"}, now=NOW)
-    old10["isbn13"] = None
-    state["books"] = {b["id"]: b for b in (stored, other, old10)}
+    state["books"] = {b["id"]: b for b in (stored, other)}
     document = {
         "books": [
-            {"id": "x" * 32, "title": "Dune Messiah", "isbn13": "9780441013593"},
+            {"id": "x" * 32, "title": "Dune Messiah", "barcode": "9780441013593"},
             {"title": "Emma: A Novel", "authors": ["Austen"]},
-            {"title": "Old again", "isbn10": "0441478123", "isbn13": None},
-            {"title": "Dune", "isbn13": "9780441013593"},
+            {"title": "Dune", "barcode": "978-0441013593"},
         ]
     }
     plan = _plan(state, document)
     assert plan.ok, plan.problems
     matched = [(r["id"], r["matched_by"]) for r in plan.records]
     assert matched == [
-        (stored["id"], "isbn13"),
+        (stored["id"], "barcode"),
         (other["id"], "title"),
-        (old10["id"], "isbn10"),
-        (stored["id"], "isbn13"),
+        (stored["id"], "barcode"),
     ]
-    assert len(plan.state["books"]) == 3
+    assert len(plan.state["books"]) == 2
     assert plan.state["books"][stored["id"]]["title"] == "Dune"
     assert plan.state["books"][stored["id"]]["updated_at"] == LATER
 
 
-def test_two_books_with_one_isbn_in_the_document_make_one_book() -> None:
+def test_two_books_with_one_barcode_in_the_document_make_one_book() -> None:
     document = {
         "books": [
-            {"title": "Dune", "isbn13": "9780441013593"},
-            {"title": "Dune (2nd)", "isbn13": "9780441013593"},
+            {"title": "Dune", "barcode": "9780441013593"},
+            {"title": "Dune (2nd)", "barcode": "9780441013593"},
         ]
     }
     plan = _plan(m.empty_state(), document)
     assert len(plan.state["books"]) == 1
     assert [r["action"] for r in plan.records] == ["create", "update"]
     assert plan.counts["books"] == {"created": 1, "updated": 1, "skipped": 0}
-
-
-def test_new_book_needs_details_goes_to_lookup() -> None:
-    document = {
-        "books": [{"title": "X", "isbn13": "9780441013593", "needs_details": True}]
-    }
-    plan = _plan(m.empty_state(), document)
-    assert plan.lookup_ids == list(plan.state["books"])
 
 
 def test_locations_match_by_name_within_the_parent() -> None:
@@ -623,7 +608,7 @@ def test_field_errors_name_the_path_and_block_the_import() -> None:
         "rooms": [{"name": ""}],
         "books": [
             {"title": "Ok"},
-            {"title": "Bad", "isbn13": "123", "pages": -1},
+            {"title": "Bad", "barcode": "1#3", "pages": -1},
             {"title": ""},
         ],
         "copies": [{"book_id": "nope", "format": "scroll"}],
@@ -637,7 +622,7 @@ def test_field_errors_name_the_path_and_block_the_import() -> None:
     assert not plan.ok
     assert _problems(plan) == [
         ("error", "rooms[0].name", "field_required"),
-        ("error", "books[1].isbn13", "invalid_isbn"),
+        ("error", "books[1].barcode", "invalid_barcode"),
         ("error", "books[1].pages", "out_of_range"),
         ("error", "books[2].title", "field_required"),
         ("error", "copies[0].book_id", "import_reference_missing"),
@@ -671,7 +656,8 @@ def test_cover_with_a_bad_path_is_a_warning() -> None:
     document = {
         "books": [
             {"title": "A", "cover": {"kind": "custom", "file": "../../secrets.yaml"}},
-            {"title": "B", "cover": {"kind": "openlibrary", "file": "covers/b.jpg"}},
+            {"title": "B", "cover": {"kind": "custom", "file": "covers/b.jpg"}},
+            {"title": "E", "cover": {"kind": "openlibrary", "file": "covers/e.jpg"}},
             {"title": "C", "cover": {"kind": "none", "file": "covers/c.jpg"}},
             {"title": "D", "cover": {"kind": "custom", "file": None}},
         ]
@@ -682,7 +668,7 @@ def test_cover_with_a_bad_path_is_a_warning() -> None:
         ("warning", "books[0].cover.file", "import_cover_unreadable")
     ]
     assert [(c.kind, c.file, c.path) for c in plan.covers] == [
-        ("openlibrary", "covers/b.jpg", "books[1].cover.file")
+        ("custom", "covers/b.jpg", "books[1].cover.file")
     ]
     assert plan.covers[0].book_id in plan.state["books"]
 
@@ -776,7 +762,7 @@ def test_export_orders_locations_by_order_then_name() -> None:
 
 def test_export_skips_no_cover_without_a_file() -> None:
     state = _state()
-    state["books"][DUNE]["cover"] = {"kind": "openlibrary", "file": None}
+    state["books"][DUNE]["cover"] = {"kind": "custom", "file": None}
     _, skipped = _export(state)
     assert skipped == {"covers": 0}
     assert iex.covers_to_copy(state) == []

@@ -27,42 +27,16 @@
     "step": {
       "init": {
         "title": "Opcje biblioteki",
-        "menu_options": {
-          "currency": "Waluta",
-          "openlibrary": "Konto Open Library"
-        },
         "data": {
           "currency": "Waluta"
         },
         "data_description": {
           "currency": "Kod z 3 liter, na przykład EUR lub USD."
-        }
-      },
-      "currency": {
-        "title": "Waluta",
-        "data": {
-          "currency": "Waluta"
-        },
-        "data_description": {
-          "currency": "Kod z 3 liter, na przykład EUR lub USD."
-        }
-      },
-      "openlibrary": {
-        "title": "Konto Open Library",
-        "description": "Wklej klucz dostępu i klucz tajny ze strony kluczy S3 swojego konta Archive.org. Biblioteka używa ich tylko wtedy, gdy wysyłasz książkę do Open Library.",
-        "data": {
-          "access_key": "Klucz dostępu",
-          "secret_key": "Klucz tajny"
         }
       }
     },
     "error": {
-      "invalid_currency": "Wpisz kod waluty z 3 liter.",
-      "invalid_auth": "Open Library nie zaakceptowała tych kluczy.",
-      "cannot_connect": "Open Library jest niedostępna. Spróbuj ponownie później."
-    },
-    "abort": {
-      "not_loaded": "Home Keeper Games nie jest załadowana. Spróbuj ponownie po jej uruchomieniu."
+      "invalid_currency": "Wpisz kod waluty z 3 liter."
     }
   },
   "entity": {
@@ -274,33 +248,9 @@
         }
       }
     },
-    "lookup_isbn": {
-      "name": "Wyszukaj ISBN",
-      "description": "Odczytaj szczegóły ISBN z Open Library. Biblioteka się nie zmienia.",
-      "fields": {
-        "isbn": {
-          "name": "Numer ISBN",
-          "description": "ISBN-10 lub ISBN-13."
-        }
-      }
-    },
-    "search_catalog": {
-      "name": "Szukaj w katalogu",
-      "description": "Znajduje najlepsze dzieło w Open Library dla tytułu i autora. Biblioteka się nie zmienia.",
-      "fields": {
-        "title": {
-          "name": "Tytuł",
-          "description": "Tytuł książki."
-        },
-        "authors": {
-          "name": "Autorzy",
-          "description": "Autorzy. Używany jest tylko pierwszy autor."
-        }
-      }
-    },
     "add_book": {
       "name": "Dodaj książkę",
-      "description": "Dodaj książkę. Gdy książka ma ten sam ISBN, usługa zwraca tę książkę.",
+      "description": "Dodaj książkę. Gdy książka ma ten sam kod kreskowy, usługa zwraca tę książkę.",
       "fields": {
         "title": {
           "name": "Tytuł",
@@ -314,17 +264,9 @@
           "name": "Autorzy",
           "description": "Autorzy, w kolejności."
         },
-        "isbn": {
-          "name": "Numer ISBN",
-          "description": "ISBN-10 lub ISBN-13."
-        },
-        "isbn13": {
-          "name": "Numer ISBN-13",
-          "description": "13-cyfrowy ISBN."
-        },
-        "isbn10": {
-          "name": "Numer ISBN-10",
-          "description": "10-cyfrowy ISBN."
+        "barcode": {
+          "name": "Kod kreskowy",
+          "description": "Numer kodu kreskowego, na przykład EAN-13."
         },
         "publisher": {
           "name": "Wydawca",
@@ -365,10 +307,6 @@
         "needs_details": {
           "name": "Brak szczegółów",
           "description": "Oznacz książkę jako niekompletną."
-        },
-        "lookup": {
-          "name": "Wyszukaj",
-          "description": "Odczytaj szczegóły z Open Library."
         }
       }
     },
@@ -392,17 +330,9 @@
           "name": "Autorzy",
           "description": "Autorzy, w kolejności."
         },
-        "isbn": {
-          "name": "Numer ISBN",
-          "description": "ISBN-10 lub ISBN-13."
-        },
-        "isbn13": {
-          "name": "Numer ISBN-13",
-          "description": "13-cyfrowy ISBN."
-        },
-        "isbn10": {
-          "name": "Numer ISBN-10",
-          "description": "10-cyfrowy ISBN."
+        "barcode": {
+          "name": "Kod kreskowy",
+          "description": "Numer kodu kreskowego, na przykład EAN-13."
         },
         "publisher": {
           "name": "Wydawca",
@@ -456,73 +386,13 @@
         }
       }
     },
-    "refresh_book": {
-      "name": "Aktualizuj z Open Library",
-      "description": "Wypełnij puste pola książki z Open Library.",
-      "fields": {
-        "book_id": {
-          "name": "Książka",
-          "description": "ID książki."
-        }
-      }
-    },
-    "send_to_catalog": {
-      "name": "Wyślij do Open Library",
-      "description": "Dodaje książkę, której nie ma w Open Library, za pomocą połączonego konta Open Library, a następnie łączy książkę.",
-      "fields": {
-        "book_id": {
-          "name": "Książka",
-          "description": "ID książki."
-        },
-        "fields": {
-          "name": "Pola",
-          "description": "Opcjonalne pola do wysłania: publisher, published i isbn. Tytuł i pierwszy autor są wysyłane zawsze."
-        },
-        "include_cover": {
-          "name": "Wyślij okładkę",
-          "description": "Wyślij też własną okładkę książki."
-        }
-      }
-    },
-    "link_catalog": {
-      "name": "Połącz z Open Library",
-      "description": "Łączy książkę z wydaniem lub dziełem w Open Library i wypełnia jej puste pola.",
-      "fields": {
-        "book_id": {
-          "name": "Książka",
-          "description": "ID książki."
-        },
-        "record": {
-          "name": "Wydanie lub dzieło",
-          "description": "Klucz wydania, np. OL123M, klucz dzieła, np. OL45W, lub URL strony."
-        }
-      }
-    },
-    "skip_catalog": {
-      "name": "Pomiń Open Library",
-      "description": "Usuwa książkę z listy książek, których nie ma w Open Library, lub ją przywraca.",
-      "fields": {
-        "book_id": {
-          "name": "Książka",
-          "description": "ID książki."
-        },
-        "skip": {
-          "name": "Pomiń",
-          "description": "Wyłącz, aby przywrócić książkę na listę."
-        }
-      }
-    },
-    "disconnect_catalog": {
-      "name": "Odłącz Open Library",
-      "description": "Usuwa klucze konta Open Library."
-    },
-    "scan_isbn": {
-      "name": "Skanuj ISBN",
+    "scan_barcode": {
+      "name": "Skanuj kod kreskowy",
       "description": "Dodaj zeskanowaną książkę na półkę.",
       "fields": {
-        "isbn": {
-          "name": "Numer ISBN",
-          "description": "ISBN-10 lub ISBN-13."
+        "barcode": {
+          "name": "Kod kreskowy",
+          "description": "Numer kodu kreskowego, na przykład EAN-13."
         },
         "shelf_id": {
           "name": "Półka",
@@ -760,9 +630,9 @@
           "name": "Książka",
           "description": "ID książki."
         },
-        "isbn": {
-          "name": "Numer ISBN",
-          "description": "ISBN-10 lub ISBN-13."
+        "barcode": {
+          "name": "Kod kreskowy",
+          "description": "Numer kodu kreskowego, na przykład EAN-13."
         },
         "title": {
           "name": "Tytuł",
@@ -864,9 +734,9 @@
           "name": "Książka",
           "description": "ID książki."
         },
-        "isbn": {
-          "name": "Numer ISBN",
-          "description": "ISBN-10 lub ISBN-13."
+        "barcode": {
+          "name": "Kod kreskowy",
+          "description": "Numer kodu kreskowego, na przykład EAN-13."
         },
         "title": {
           "name": "Tytuł",
@@ -966,15 +836,11 @@
     },
     "import_csv": {
       "name": "Importuj CSV",
-      "description": "Importuj książki z Goodreads, StoryGraph lub eksportu biblioteki.",
+      "description": "Importuj książki z eksportu CSV Home Keeper Games.",
       "fields": {
         "content": {
           "name": "Zawartość CSV",
           "description": "Tekst CSV. Najwyżej 5 MB."
-        },
-        "source": {
-          "name": "Źródło",
-          "description": "Aplikacja, która utworzyła plik CSV."
         },
         "person_id": {
           "name": "Osoba",
@@ -1005,10 +871,6 @@
         "person_id": {
           "name": "Osoba",
           "description": "ID osoby w Home Assistant."
-        },
-        "format": {
-          "name": "Format pliku",
-          "description": "goodreads lub library."
         }
       }
     },
@@ -1018,7 +880,7 @@
       "fields": {
         "query": {
           "name": "Szukaj",
-          "description": "Tekst w tytule, autorach, ISBN lub tagach."
+          "description": "Tekst w tytule, autorach, kodzie kreskowym lub tagach."
         },
         "room_id": {
           "name": "Pokój",
@@ -1132,8 +994,8 @@
     "invalid_choice": {
       "message": "{field} musi być jedną z wartości: {options}."
     },
-    "invalid_isbn": {
-      "message": "{isbn} nie jest prawidłowym ISBN."
+    "invalid_barcode": {
+      "message": "{barcode} nie jest prawidłowym kodem kreskowym."
     },
     "room_not_found": {
       "message": "Żaden pokój nie ma ID {id}."
@@ -1168,8 +1030,8 @@
     "shelf_not_empty": {
       "message": "Półka ma egzemplarze: {count}. Użyj force, aby zostawić je bez półki."
     },
-    "duplicate_isbn": {
-      "message": "Inna książka ma ISBN {isbn}."
+    "duplicate_barcode": {
+      "message": "Inna książka ma kod kreskowy {barcode}."
     },
     "copy_on_loan": {
       "message": "Egzemplarz jest wypożyczony. Najpierw zwróć wypożyczenie."
@@ -1186,14 +1048,8 @@
     "upload_not_found": {
       "message": "Żadna przesłana okładka nie ma ID {file_id}."
     },
-    "isbn_or_title_required": {
-      "message": "Podaj ID książki, ISBN lub tytuł."
-    },
-    "lookup_unavailable": {
-      "message": "Open Library jest niedostępna. Spróbuj ponownie później."
-    },
-    "no_openlibrary_cover": {
-      "message": "Open Library nie ma okładki tej książki."
+    "barcode_or_title_required": {
+      "message": "Podaj ID książki, kod kreskowy lub tytuł."
     },
     "todo_entity_not_found": {
       "message": "{entity_id} nie jest listą zadań."
@@ -1227,27 +1083,6 @@
     },
     "todo_not_allowed": {
       "message": "Tylko {person} lub administrator może zmienić tę listę zadań."
-    },
-    "openlibrary_not_connected": {
-      "message": "Najpierw połącz konto Open Library w ustawieniach biblioteki."
-    },
-    "openlibrary_already_linked": {
-      "message": "Ta książka jest już połączona z Open Library."
-    },
-    "openlibrary_needs_author": {
-      "message": "Dodaj autora do książki przed wysłaniem."
-    },
-    "openlibrary_ambiguous": {
-      "message": "Open Library znalazła więcej niż 1 dzieło, które może być tą książką. Dodaj książkę w witrynie Open Library."
-    },
-    "openlibrary_login_failed": {
-      "message": "Open Library nie zaakceptowała kluczy konta. Połącz konto ponownie."
-    },
-    "openlibrary_not_found": {
-      "message": "Open Library nie ma rekordu {edition}."
-    },
-    "invalid_openlibrary_edition": {
-      "message": "{edition} nie jest kluczem ani adresem URL Open Library."
     },
     "files_dir_invalid": {
       "message": "Katalog plików musi być w .storage/home_keeper_import_export."

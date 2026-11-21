@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import ex.csv_io as cio
 import ex.models as m
-import ex.openlibrary as ol
 import ex.projections as pr
 import pytest
 
@@ -28,8 +27,7 @@ def test_empty_row() -> None:
         "title": "",
         "subtitle": "",
         "authors": [],
-        "isbn13": None,
-        "isbn10": None,
+        "barcode": None,
         "publisher": "",
         "published": "",
         "pages": None,
@@ -62,8 +60,7 @@ def test_build_book_shape() -> None:
         "title": "Dune",
         "subtitle": "",
         "authors": [],
-        "isbn13": None,
-        "isbn10": None,
+        "barcode": None,
         "publisher": "",
         "published": "",
         "pages": None,
@@ -73,11 +70,8 @@ def test_build_book_shape() -> None:
         "description": "",
         "tags": [],
         "shared_notes": "",
-        "catalogs": {},
         "cover": {"kind": "none", "file": None},
         "needs_details": False,
-        "lookup_tries": 0,
-        "catalog_status": {},
         "created_at": NOW,
         "updated_at": NOW,
         "wishlist": None,
@@ -199,10 +193,10 @@ def test_field_names_in_errors() -> None:
     assert key(m.copy_field, "signed", 1)[1] == {"field": "signed"}
     assert key(m.copy_field, "note", [])[1] == {"field": "note"}
     assert key(m.copy_field, "acquired_from", [])[1] == {"field": "acquired_from"}
-    ol_cover = {"openlibrary": {"cover_id": 0}}
-    assert key(m.book_field, "catalogs", ol_cover)[1]["field"] == "catalogs"
-    assert key(m.book_field, "catalogs", 3)[1] == {"field": "catalogs"}
-    assert key(m.book_field, "catalogs", {"openlibrary": 3})[1] == {"field": "catalogs"}
+    assert key(m.book_field, "barcode", [])[1] == {"field": "barcode"}
+    assert key(m.book_field, "barcode", True)[1] == {"field": "barcode"}
+    assert key(m.book_field, "barcode", "a b#")[1] == {"barcode": "AB#"}
+    assert key(m.book_field, "catalogs", {})[1] == {"field": "catalogs"}
     assert key(m.book_field, "series", [1])[1] == {"field": "series"}
     assert key(m.book_field, "language", [])[1] == {"field": "language"}
     assert key(m.book_field, "needs_details", "yes")[1] == {"field": "needs_details"}
@@ -236,67 +230,21 @@ def test_field_names_in_errors() -> None:
     )
 
 
-def test_catalogs_block() -> None:
-    assert m.book_field("catalogs", {"openlibrary": {"edition_key": "OL1M"}}) == {
-        "openlibrary": {"edition_key": "OL1M", "work_key": None, "cover_id": None}
-    }
-    cover = m.book_field("catalogs", {"openlibrary": {"cover_id": "12"}})
-    assert cover["openlibrary"]["cover_id"] == 12
-
-    def record(**fields):
-        return m.book_field("catalogs", {"openlibrary": fields})["openlibrary"]
-
-    assert record(cover_id=1)["cover_id"] == 1
-    assert record(cover_id=2**53)["cover_id"] == 2**53
-    assert record(edition_key="E" * 50)["edition_key"] == "E" * 50
-    assert record(work_key="W" * 50)["work_key"] == "W" * 50
-    bad = ({"cover_id": 2**53 + 1}, {"edition_key": "E" * 51}, {"work_key": []})
-    for fields in bad:
-        err = _raises(m.book_field, "catalogs", {"openlibrary": fields})
-        assert err.placeholders["field"] == "catalogs"
-    assert _raises(m.book_field, "catalogs", {"openlibrary": {"work_key": "W" * 51}})
+def test_barcode_field() -> None:
+    assert m.book_field("barcode", " 978-0441 478125 ") == "9780441478125"
+    assert m.book_field("barcode", "abc123") == "ABC123"
+    assert m.book_field("barcode", 4006381333931) == "4006381333931"
+    assert m.book_field("barcode", "") is None
+    assert m.book_field("barcode", None) is None
+    assert m.book_field("barcode", "9" * 50) == "9" * 50
+    err = _raises(m.book_field, "barcode", "9" * 51)
+    assert (err.key, err.placeholders) == ("invalid_barcode", {"barcode": "9" * 50})
+    err = _raises(m.book_field, "barcode", " - ")
+    assert (err.key, err.placeholders) == ("invalid_barcode", {"barcode": ""})
     assert m.book_field("series", {"name": "D", "number": 2.5}) == {
         "name": "D",
         "number": "2.5",
     }
-
-
-def test_parse_search_doc_shape() -> None:
-    doc = {
-        "key": "/works/OL5W",
-        "title": "T",
-        "subtitle": "S",
-        "author_name": ["A"],
-        "isbn": ["bad", "9791032305690", "0441478123"],
-        "edition_key": ["OL1M"],
-        "publisher": ["P"],
-        "first_publish_year": 2001,
-        "number_of_pages_median": 10,
-        "language": ["ger"],
-        "subject": ["x"],
-        "cover_i": 3,
-    }
-    assert ol.parse_search_doc(doc) == {
-        "title": "T",
-        "subtitle": "S",
-        "authors": ["A"],
-        "isbn13": "9780441478125",
-        "isbn10": "0441478123",
-        "publisher": "P",
-        "published": "2001",
-        "pages": 10,
-        "language": "de",
-        "subjects": ["x"],
-        "series": None,
-        "description": "",
-        "catalogs": {
-            "openlibrary": {"edition_key": "OL1M", "work_key": "OL5W", "cover_id": 3}
-        },
-    }
-    empty = ol.parse_search_doc({})
-    assert empty["isbn10"] is None and empty["published"] == ""
-    assert empty["publisher"] == ""
-    assert empty["catalogs"]["openlibrary"]["edition_key"] is None
 
 
 def _two_books() -> dict:
@@ -315,7 +263,7 @@ def _two_books() -> dict:
 
 def test_rows_from_state_order_and_reading() -> None:
     state = _two_books()
-    rows = cio.rows_from_state(state, "p", "library")
+    rows = cio.rows_from_state(state, "p")
     assert [(r["book_id"], (r["copy"] or {}).get("id")) for r in rows] == [
         ("z", None),
         ("a", "c2"),
@@ -323,10 +271,8 @@ def test_rows_from_state_order_and_reading() -> None:
     ]
     assert [r["line"] for r in rows] == [1, 2, 3]
     assert rows[1]["status"] == "read" and rows[0]["status"] is None
-    assert cio.rows_from_state(state, None, "library")[1]["status"] is None
-    goodreads = cio.rows_from_state(state, "p", "goodreads")
-    assert [r["owned"] for r in goodreads] == [0, 2]
-    assert goodreads[1]["copy"] == {"format": "paperback"}
+    assert cio.rows_from_state(state, None)[1]["status"] is None
+    assert [r["owned"] for r in rows] == [0, 2, 2]
 
 
 def test_cells() -> None:
@@ -334,8 +280,7 @@ def test_cells() -> None:
     row.update(
         title="T",
         authors=["Ann Lee", "Bo"],
-        isbn13="9780441478125",
-        isbn10="0441478123",
+        barcode="9780441478125",
         status="read",
         rating=4,
         finished="2026-01-02",
@@ -348,37 +293,6 @@ def test_cells() -> None:
         publisher="P",
         published="2001",
     )
-    assert cio._goodreads_cells(row) == {
-        "Book Id": "",
-        "Title": "T",
-        "Author": "Ann Lee",
-        "Author l-f": "Lee, Ann",
-        "Additional Authors": "Bo",
-        "ISBN": '="0441478123"',
-        "ISBN13": '="9780441478125"',
-        "My Rating": "4",
-        "Average Rating": "",
-        "Publisher": "P",
-        "Binding": "Kindle Edition",
-        "Number of Pages": "5",
-        "Year Published": "2001",
-        "Original Publication Year": "",
-        "Date Read": "2026/01/02",
-        "Date Added": "",
-        "Bookshelves": "read, fav",
-        "Bookshelves with positions": "",
-        "Exclusive Shelf": "read",
-        "My Review": "",
-        "Spoiler": "",
-        "Private Notes": "n",
-        "Read Count": "2",
-        "Owned Copies": "1",
-    }
-    plain = cio._goodreads_cells(cio.empty_row(1))
-    assert plain["ISBN"] == '=""' and plain["My Rating"] == "0"
-    assert plain["Bookshelves"] == "" and plain["Binding"] == ""
-    assert plain["Owned Copies"] == "0" and plain["Read Count"] == ""
-    assert plain["Author l-f"] == "" and plain["Number of Pages"] == ""
     row.update(
         book_id="b",
         series={"name": "S", "number": "2"},
@@ -410,8 +324,7 @@ def test_cells() -> None:
         "title": "T",
         "subtitle": "Sub",
         "authors": "Ann Lee; Bo",
-        "isbn13": "9780441478125",
-        "isbn10": "0441478123",
+        "barcode": "9780441478125",
         "publisher": "P",
         "published": "2001",
         "pages": "5",
@@ -446,6 +359,7 @@ def test_cells() -> None:
     empty = cio._library_cells(cio.empty_row(1))
     assert empty["signed"] == "" and empty["first_edition"] == ""
     assert empty["book_id"] == "" and empty["series"] == ""
+    assert empty["barcode"] == ""
     assert empty["wishlist"] == "false" and empty["format"] == ""
 
 

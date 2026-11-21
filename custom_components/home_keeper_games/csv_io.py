@@ -1,17 +1,16 @@
-"""Pure CSV import and export for Goodreads, StoryGraph and the library format.
+"""Pure CSV import and export in the format of the integration.
 
 Import has 2 steps:
 
-1. ``parse(text, source)`` reads the CSV text into *import rows*: plain dicts
-   with the same keys for each source (see :func:`empty_row`).
+1. ``parse(text)`` reads the CSV text into *import rows*: plain dicts with the
+   keys of :func:`empty_row`.
 2. ``apply_import(state, rows, ...)`` returns a new document, a summary and a
    result for each row. It changes no argument, so a dry run is the same call
    with the result thrown away.
 
-Export writes the Goodreads header, so the file imports into Goodreads and
-StoryGraph, or the library format, which has every book and copy field.
-``rows_from_state`` makes the rows, and ``write(rows, fmt)`` writes them, so
-``parse(write(rows))`` gives the rows back (a property test checks this).
+Export writes every book and copy field. ``rows_from_state`` makes the rows, and
+``write(rows)`` writes them, so ``parse(write(rows))`` gives the rows back (a
+property test checks this).
 
 This module imports no Home Assistant code.
 """
@@ -24,7 +23,6 @@ import re
 from datetime import date
 from typing import Any
 
-from . import isbn as isbn_mod
 from .models import (
     COPY_FIELDS,
     FORMATS,
@@ -33,75 +31,21 @@ from .models import (
     build_book,
     build_copy,
     build_wishlist,
+    clean_barcode,
     clone,
     copy_field,
     empty_reading,
     find_shelf_by_path,
-    format_from_binding,
     location_path,
     title_key,
 )
 
-SOURCES = ("goodreads", "storygraph", "library")
-EXPORT_FORMATS = ("goodreads", "library")
-
-GOODREADS_COLUMNS = (
-    "Book Id",
-    "Title",
-    "Author",
-    "Author l-f",
-    "Additional Authors",
-    "ISBN",
-    "ISBN13",
-    "My Rating",
-    "Average Rating",
-    "Publisher",
-    "Binding",
-    "Number of Pages",
-    "Year Published",
-    "Original Publication Year",
-    "Date Read",
-    "Date Added",
-    "Bookshelves",
-    "Bookshelves with positions",
-    "Exclusive Shelf",
-    "My Review",
-    "Spoiler",
-    "Private Notes",
-    "Read Count",
-    "Owned Copies",
-)
-STORYGRAPH_COLUMNS = (
-    "Title",
-    "Authors",
-    "Contributors",
-    "ISBN/UID",
-    "Format",
-    "Read Status",
-    "Star Rating",
-    "Review",
-    "Last Date Read",
-    "Dates Read",
-    "Read Count",
-    "Moods",
-    "Pace",
-    "Character- or Plot-Driven?",
-    "Strong Character Development?",
-    "Loveable Characters?",
-    "Diverse Characters?",
-    "Flawed Characters?",
-    "Content Warnings",
-    "Content Warning Description",
-    "Tags",
-    "Owned?",
-)
 LIBRARY_COLUMNS = (
     "book_id",
     "title",
     "subtitle",
     "authors",
-    "isbn13",
-    "isbn10",
+    "barcode",
     "publisher",
     "published",
     "pages",
@@ -137,22 +81,6 @@ LIBRARY_COLUMNS = (
 LIST_SEP = "; "
 PATH_SEP = " / "
 
-_GOODREADS_SHELVES = {
-    "read": "read",
-    "currently-reading": "reading",
-    "to-read": "want",
-    "did-not-finish": "dnf",
-}
-_STATUS_TO_SHELF = {v: k for k, v in _GOODREADS_SHELVES.items()}
-_STORYGRAPH_STATUS = _GOODREADS_SHELVES
-_BINDINGS = {
-    "hardcover": "Hardcover",
-    "paperback": "Paperback",
-    "ebook": "Kindle Edition",
-    "audiobook": "Audible Audio",
-    "other": "",
-}
-
 # The copy fields of a library row, and their CSV column.
 _COPY_COLUMNS = {
     "format": "format",
@@ -175,8 +103,7 @@ def empty_row(line: int) -> dict[str, Any]:
         "title": "",
         "subtitle": "",
         "authors": [],
-        "isbn13": None,
-        "isbn10": None,
+        "barcode": None,
         "publisher": "",
         "published": "",
         "pages": None,
@@ -208,14 +135,6 @@ def empty_row(line: int) -> dict[str, Any]:
 def _cell(row: dict[str, Any], name: str) -> str:
     value = row.get(name)
     return value.strip() if isinstance(value, str) else ""
-
-
-def isbn_cell(value: str) -> str:
-    """``="0441478123"`` to ``0441478123``. ``=""`` is an empty cell."""
-    value = value.strip()
-    if value.startswith("="):
-        value = value[1:]
-    return value.strip().strip('"').strip()
 
 
 def _int(value: str) -> int | None:
@@ -256,27 +175,11 @@ def _split(value: str, sep: str = ",") -> list[str]:
     return out
 
 
-def _isbns(*cells: str) -> tuple[str | None, str | None]:
-    for cell in cells:
-        found = isbn_mod.try_normalize(isbn_cell(cell))
-        if found[0]:
-            return found
-    return None, None
-
-
 def _rating(value: str) -> int | None:
     number = _float(value)
     if number is None or number <= 0:
         return None
     return max(1, min(5, int(number + 0.5)))
-
-
-def _review(value: str) -> str:
-    return re.sub(r"<br\s*/?>", "\n", value, flags=re.IGNORECASE).strip()
-
-
-def _notes(*parts: str) -> str:
-    return "\n\n".join(part for part in parts if part)
 
 
 def _reader(text: str) -> csv.DictReader[str]:
@@ -297,76 +200,6 @@ def _rows(text: str, required: str) -> list[dict[str, Any]]:
 
 
 # ── Parsers ──────────────────────────────────────────────────────────────────
-
-
-def parse_goodreads(text: str) -> list[dict[str, Any]]:
-    """Import rows from a Goodreads export."""
-    rows = []
-    for index, raw in enumerate(_rows(text, "Title"), start=1):
-        row = empty_row(index)
-        row["title"] = _cell(raw, "Title")
-        first = _cell(raw, "Author")
-        authors = [first] if first else []
-        authors += [
-            a for a in _split(_cell(raw, "Additional Authors")) if a not in authors
-        ]
-        row["authors"] = authors
-        row["isbn13"], row["isbn10"] = _isbns(_cell(raw, "ISBN13"), _cell(raw, "ISBN"))
-        row["publisher"] = _cell(raw, "Publisher")
-        row["published"] = _cell(raw, "Year Published") or _cell(
-            raw, "Original Publication Year"
-        )
-        row["pages"] = _int(_cell(raw, "Number of Pages")) or None
-        owned = _int(_cell(raw, "Owned Copies")) or 0
-        row["owned"] = owned
-        binding = _cell(raw, "Binding")
-        if owned:
-            row["copy"] = {"format": format_from_binding(binding)}
-        shelf = _cell(raw, "Exclusive Shelf")
-        status = _GOODREADS_SHELVES.get(shelf)
-        if status == "want" and not owned:
-            row["wishlist"] = True
-            status = None
-        row["status"] = status
-        row["tags"] = [s for s in _split(_cell(raw, "Bookshelves")) if s != shelf]
-        if status is not None:
-            row["rating"] = _rating(_cell(raw, "My Rating"))
-            row["read_count"] = _int(_cell(raw, "Read Count"))
-            if status == "read":
-                row["finished"] = _date(_cell(raw, "Date Read"))
-        row["notes"] = _notes(
-            _review(_cell(raw, "My Review")), _cell(raw, "Private Notes")
-        )
-        rows.append(row)
-    return rows
-
-
-def parse_storygraph(text: str) -> list[dict[str, Any]]:
-    """Import rows from a StoryGraph export."""
-    rows = []
-    for index, raw in enumerate(_rows(text, "Title"), start=1):
-        row = empty_row(index)
-        row["title"] = _cell(raw, "Title")
-        row["authors"] = _split(_cell(raw, "Authors"))
-        row["isbn13"], row["isbn10"] = _isbns(_cell(raw, "ISBN/UID"))
-        owned = _cell(raw, "Owned?").casefold() in ("yes", "true", "1")
-        row["owned"] = 1 if owned else 0
-        if owned:
-            row["copy"] = {"format": format_from_binding(_cell(raw, "Format"))}
-        status = _STORYGRAPH_STATUS.get(_cell(raw, "Read Status"))
-        if status == "want" and not owned:
-            row["wishlist"] = True
-            status = None
-        row["status"] = status
-        row["tags"] = _split(_cell(raw, "Tags"))
-        if status is not None:
-            row["rating"] = _rating(_cell(raw, "Star Rating"))
-            row["read_count"] = _int(_cell(raw, "Read Count"))
-            if status == "read":
-                row["finished"] = _date(_cell(raw, "Last Date Read"))
-        row["notes"] = _review(_cell(raw, "Review"))
-        rows.append(row)
-    return rows
 
 
 _RECORD_ID_RE = re.compile(r"[0-9a-f]{32}")
@@ -397,9 +230,7 @@ def parse_library(text: str) -> list[dict[str, Any]]:
         row["authors"] = _split(_cell(raw, "authors"), LIST_SEP.strip())
         row["subjects"] = _split(_cell(raw, "subjects"), LIST_SEP.strip())
         row["tags"] = _split(_cell(raw, "tags"), LIST_SEP.strip())
-        row["isbn13"], row["isbn10"] = _isbns(
-            _cell(raw, "isbn13"), _cell(raw, "isbn10")
-        )
+        row["barcode"] = clean_barcode(_cell(raw, "barcode")) or None
         row["pages"] = _int(_cell(raw, "pages")) or None
         row["language"] = _cell(raw, "language") or None
         if series := _cell(raw, "series"):
@@ -446,37 +277,28 @@ def _money_cell(value: str) -> float | int | None:
     return int(number) if number.is_integer() else number
 
 
-def parse(text: str, source: str) -> list[dict[str, Any]]:
-    """Import rows from CSV *text* of *source*."""
-    if source == "goodreads":
-        return parse_goodreads(text)
-    if source == "storygraph":
-        return parse_storygraph(text)
-    if source == "library":
-        return parse_library(text)
-    raise LibraryError("invalid_choice", field="source", options=", ".join(SOURCES))
+def parse(text: str) -> list[dict[str, Any]]:
+    """Import rows from CSV *text*."""
+    return parse_library(text)
 
 
 # ── Import ───────────────────────────────────────────────────────────────────
 
 
 class _Index:
-    """The match keys of the books: ISBN-13, ISBN-10, then title and author."""
+    """The match keys of the books: barcode, then title and author."""
 
     def __init__(self, books: dict[str, dict[str, Any]]) -> None:
         self.by_id: set[str] = set()
-        self.isbn13: dict[str, str] = {}
-        self.isbn10: dict[str, str] = {}
+        self.barcode: dict[str, str] = {}
         self.title: dict[str, str] = {}
         for book in books.values():
             self.add(book)
 
     def add(self, book: dict[str, Any]) -> None:
         self.by_id.add(book["id"])
-        if book["isbn13"]:
-            self.isbn13.setdefault(book["isbn13"], book["id"])
-        if book["isbn10"]:
-            self.isbn10.setdefault(book["isbn10"], book["id"])
+        if book["barcode"]:
+            self.barcode.setdefault(book["barcode"], book["id"])
         key = title_key(book["title"], book["authors"])
         if key.split("|", 1)[0]:
             self.title.setdefault(key, book["id"])
@@ -485,10 +307,8 @@ class _Index:
         """``(book_id, action)``: ``existing``, ``title_match`` or ``new``."""
         if row["book_id"] and row["book_id"] in self.by_id:
             return str(row["book_id"]), ACTION_EXISTING
-        if row["isbn13"] and row["isbn13"] in self.isbn13:
-            return self.isbn13[row["isbn13"]], ACTION_EXISTING
-        if row["isbn10"] and row["isbn10"] in self.isbn10:
-            return self.isbn10[row["isbn10"]], ACTION_EXISTING
+        if row["barcode"] and row["barcode"] in self.barcode:
+            return self.barcode[row["barcode"]], ACTION_EXISTING
         found = self.title.get(title_key(row["title"], row["authors"]))
         return found, ACTION_TITLE_MATCH if found else ACTION_NEW
 
@@ -498,8 +318,7 @@ _ROW_BOOK_FIELDS = (
     "title",
     "subtitle",
     "authors",
-    "isbn13",
-    "isbn10",
+    "barcode",
     "publisher",
     "published",
     "pages",
@@ -571,15 +390,14 @@ def apply_import(
     import_notes: bool,
     replace_reading: bool,
     now: str,
-) -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]], list[str]]:
+) -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]]]:
     """Apply import rows to a copy of *state*.
 
-    Return ``(new_state, counts, results, lookup_ids)``. ``counts`` has the keys
-    of :data:`COUNT_KEYS` and ``reading_kept``. Each result has ``line``,
-    ``title``, ``authors``, ``isbn``, ``book_id`` and ``action`` (``new``,
-    ``existing``, ``title_match`` or ``error``). An error result also has
-    ``error`` (a translation key) and ``placeholders``. ``lookup_ids`` are the
-    new books that need details from Open Library.
+    Return ``(new_state, counts, results)``. ``counts`` has the keys of
+    :data:`COUNT_KEYS` and ``reading_kept``. Each result has ``line``, ``title``,
+    ``authors``, ``barcode``, ``book_id`` and ``action`` (``new``, ``existing``,
+    ``title_match`` or ``error``). An error result also has ``error`` (a
+    translation key) and ``placeholders``.
     """
     new = clone(state)
     index = _Index(new["books"])
@@ -591,13 +409,12 @@ def apply_import(
     counts["rows"] = len(rows)
     counts["reading_kept"] = 0
     results: list[dict[str, Any]] = []
-    lookup_ids: list[str] = []
     for row in rows:
         result: dict[str, Any] = {
             "line": row["line"],
             "title": row["title"],
             "authors": list(row["authors"]),
-            "isbn": row["isbn13"] or row["isbn10"],
+            "barcode": row["barcode"],
             "book_id": None,
             "action": ACTION_NEW,
         }
@@ -613,8 +430,6 @@ def apply_import(
                 new["books"][book["id"]] = book
                 index.add(book)
                 book_id = book["id"]
-                if book["needs_details"]:
-                    lookup_ids.append(book_id)
                 if row["tags"]:
                     counts["tags"] += 1
             else:
@@ -655,7 +470,7 @@ def apply_import(
         results.append(result)
     if not reading:
         new["reading"].pop(person_id, None)
-    return new, counts, results, lookup_ids
+    return new, counts, results
 
 
 def _import_copy(
@@ -669,8 +484,8 @@ def _import_copy(
 ) -> bool:
     """Add the copy of a row, if the row has one and it is not in the library.
 
-    A Goodreads or StoryGraph row adds 1 copy only to a book with no copy. A
-    library row adds its copy unless a copy with its id exists. Return whether a
+    A row with a copy id adds its copy unless a copy with that id exists. A row
+    with no copy id adds 1 copy only to a book with no copy. Return whether a
     copy was added.
     """
     copy = row.get("copy")
@@ -714,13 +529,12 @@ def _reading_row(row: dict[str, Any], import_notes: bool, now: str) -> dict[str,
 
 
 def rows_from_state(
-    state: dict[str, Any], person_id: str | None, fmt: str
+    state: dict[str, Any], person_id: str | None
 ) -> list[dict[str, Any]]:
     """Import rows that describe the library, for :func:`write`.
 
-    The library format has 1 row for each copy, and 1 row for a book with no
-    copy. The Goodreads format has 1 row for each book. With no *person_id*, the
-    rows have no reading status.
+    There is 1 row for each copy, and 1 row for a book with no copy. With no
+    *person_id*, the rows have no reading status.
     """
     copies: dict[str, list[dict[str, Any]]] = {}
     for copy in sorted(
@@ -750,9 +564,7 @@ def rows_from_state(
             base["wishlist_buy"] = bool(wish.get("buy"))
         book_copies = copies.get(book["id"], [])
         base["owned"] = len(book_copies)
-        if fmt == "goodreads" or not book_copies:
-            if book_copies:
-                base["copy"] = {"format": book_copies[0].get("format", "other")}
+        if not book_copies:
             rows.append(base)
             continue
         for copy in book_copies:
@@ -779,47 +591,6 @@ def _num(value: Any) -> str:
     return "" if value is None else str(value)
 
 
-def _goodreads_cells(row: dict[str, Any]) -> dict[str, str]:
-    authors = row["authors"] or []
-    status = row["status"]
-    shelf = _STATUS_TO_SHELF.get(status or "", "")
-    if not shelf and row["wishlist"]:
-        shelf = "to-read"
-    shelves = [*([shelf] if shelf else []), *row["tags"]]
-    copy = row["copy"] or {}
-    first = authors[0] if authors else ""
-    last_first = first
-    if " " in first:
-        given, family = first.rsplit(" ", 1)
-        last_first = f"{family}, {given}"
-    return {
-        "Book Id": "",
-        "Title": row["title"],
-        "Author": first,
-        "Author l-f": last_first,
-        "Additional Authors": ", ".join(authors[1:]),
-        "ISBN": f'="{row["isbn10"] or ""}"',
-        "ISBN13": f'="{row["isbn13"] or ""}"',
-        "My Rating": str(row["rating"] or 0),
-        "Average Rating": "",
-        "Publisher": row["publisher"],
-        "Binding": _BINDINGS.get(copy.get("format", "other"), ""),
-        "Number of Pages": _num(row["pages"]),
-        "Year Published": row["published"],
-        "Original Publication Year": "",
-        "Date Read": (row["finished"] or "").replace("-", "/"),
-        "Date Added": "",
-        "Bookshelves": ", ".join(shelves),
-        "Bookshelves with positions": "",
-        "Exclusive Shelf": shelf,
-        "My Review": "",
-        "Spoiler": "",
-        "Private Notes": row["notes"],
-        "Read Count": _num(row["read_count"]) if status else "",
-        "Owned Copies": str(row["owned"] or 0),
-    }
-
-
 def _bool_text(value: Any) -> str:
     return "true" if value else "false"
 
@@ -832,8 +603,7 @@ def _library_cells(row: dict[str, Any]) -> dict[str, str]:
         "title": row["title"],
         "subtitle": row["subtitle"],
         "authors": LIST_SEP.join(row["authors"] or []),
-        "isbn13": row["isbn13"] or "",
-        "isbn10": row["isbn10"] or "",
+        "barcode": row["barcode"] or "",
         "publisher": row["publisher"],
         "published": row["published"],
         "pages": _num(row["pages"]),
@@ -867,42 +637,29 @@ def _library_cells(row: dict[str, Any]) -> dict[str, str]:
     }
 
 
-def write(rows: list[dict[str, Any]], fmt: str) -> str:
-    """CSV text for import rows, in the Goodreads or the library format."""
-    if fmt == "goodreads":
-        return _write_cells(GOODREADS_COLUMNS, [_goodreads_cells(r) for r in rows])
-    if fmt == "library":
-        return _write_cells(LIBRARY_COLUMNS, [_library_cells(r) for r in rows])
-    raise LibraryError(
-        "invalid_choice", field="format", options=", ".join(EXPORT_FORMATS)
-    )
+def write(rows: list[dict[str, Any]]) -> str:
+    """CSV text for import rows."""
+    return _write_cells(LIBRARY_COLUMNS, [_library_cells(r) for r in rows])
 
 
-def export(state: dict[str, Any], person_id: str | None, fmt: str) -> str:
-    """CSV text of the library in *fmt*."""
-    return write(rows_from_state(state, person_id, fmt), fmt)
+def export(state: dict[str, Any], person_id: str | None) -> str:
+    """CSV text of the library."""
+    return write(rows_from_state(state, person_id))
 
 
-def export_filename(fmt: str, today: str) -> str:
-    """The file name of an export, such as ``library-goodreads-2026-10-05.csv``."""
-    return f"library-{fmt}-{today}.csv"
+def export_filename(today: str) -> str:
+    """The file name of an export, such as ``games-2026-10-05.csv``."""
+    return f"games-{today}.csv"
 
 
 __all__ = [
-    "EXPORT_FORMATS",
-    "GOODREADS_COLUMNS",
     "LIBRARY_COLUMNS",
-    "SOURCES",
-    "STORYGRAPH_COLUMNS",
     "apply_import",
     "empty_row",
     "export",
     "export_filename",
-    "isbn_cell",
     "parse",
-    "parse_goodreads",
     "parse_library",
-    "parse_storygraph",
     "rows_from_state",
     "write",
 ]

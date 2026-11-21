@@ -27,42 +27,16 @@
     "step": {
       "init": {
         "title": "Bibliotheksoptionen",
-        "menu_options": {
-          "currency": "Währung",
-          "openlibrary": "Open-Library-Konto"
-        },
         "data": {
           "currency": "Währung"
         },
         "data_description": {
           "currency": "Ein Code aus 3 Buchstaben, zum Beispiel EUR oder USD."
-        }
-      },
-      "currency": {
-        "title": "Währung",
-        "data": {
-          "currency": "Währung"
-        },
-        "data_description": {
-          "currency": "Ein Code aus 3 Buchstaben, zum Beispiel EUR oder USD."
-        }
-      },
-      "openlibrary": {
-        "title": "Open-Library-Konto",
-        "description": "Fügen Sie den Zugriffsschlüssel und den geheimen Schlüssel von der S3-Schlüsselseite Ihres Archive.org-Kontos ein. Die Bibliothek verwendet sie nur, wenn Sie ein Buch an Open Library senden.",
-        "data": {
-          "access_key": "Zugriffsschlüssel",
-          "secret_key": "Geheimer Schlüssel"
         }
       }
     },
     "error": {
-      "invalid_currency": "Geben Sie einen Währungscode aus 3 Buchstaben ein.",
-      "invalid_auth": "Open Library hat diese Schlüssel nicht akzeptiert.",
-      "cannot_connect": "Open Library ist nicht erreichbar. Versuchen Sie es später erneut."
-    },
-    "abort": {
-      "not_loaded": "Home Keeper Games ist nicht geladen. Versuchen Sie es nach dem Start erneut."
+      "invalid_currency": "Geben Sie einen Währungscode aus 3 Buchstaben ein."
     }
   },
   "entity": {
@@ -274,33 +248,9 @@
         }
       }
     },
-    "lookup_isbn": {
-      "name": "ISBN nachschlagen",
-      "description": "Die Details einer ISBN von Open Library lesen. Die Bibliothek bleibt unverändert.",
-      "fields": {
-        "isbn": {
-          "name": "ISBN",
-          "description": "Eine ISBN-10 oder eine ISBN-13."
-        }
-      }
-    },
-    "search_catalog": {
-      "name": "Katalog durchsuchen",
-      "description": "Das beste Werk in Open Library für einen Titel und einen Autor finden. Die Bibliothek bleibt unverändert.",
-      "fields": {
-        "title": {
-          "name": "Titel",
-          "description": "Der Titel des Buchs."
-        },
-        "authors": {
-          "name": "Autoren",
-          "description": "Die Autoren. Nur der erste Autor wird verwendet."
-        }
-      }
-    },
     "add_book": {
       "name": "Buch hinzufügen",
-      "description": "Ein Buch hinzufügen. Hat ein Buch dieselbe ISBN, gibt der Dienst dieses Buch zurück.",
+      "description": "Ein Buch hinzufügen. Hat ein Buch denselben Barcode, gibt der Dienst dieses Buch zurück.",
       "fields": {
         "title": {
           "name": "Titel",
@@ -314,17 +264,9 @@
           "name": "Autoren",
           "description": "Die Autoren, in Reihenfolge."
         },
-        "isbn": {
-          "name": "ISBN",
-          "description": "Eine ISBN-10 oder eine ISBN-13."
-        },
-        "isbn13": {
-          "name": "ISBN-13",
-          "description": "Die 13-stellige ISBN."
-        },
-        "isbn10": {
-          "name": "ISBN-10",
-          "description": "Die 10-stellige ISBN."
+        "barcode": {
+          "name": "Barcode",
+          "description": "Die Nummer des Barcodes, zum Beispiel ein EAN-13."
         },
         "publisher": {
           "name": "Verlag",
@@ -365,10 +307,6 @@
         "needs_details": {
           "name": "Details fehlen",
           "description": "Das Buch als unvollständig markieren."
-        },
-        "lookup": {
-          "name": "Nachschlagen",
-          "description": "Die Details von Open Library lesen."
         }
       }
     },
@@ -392,17 +330,9 @@
           "name": "Autoren",
           "description": "Die Autoren, in Reihenfolge."
         },
-        "isbn": {
-          "name": "ISBN",
-          "description": "Eine ISBN-10 oder eine ISBN-13."
-        },
-        "isbn13": {
-          "name": "ISBN-13",
-          "description": "Die 13-stellige ISBN."
-        },
-        "isbn10": {
-          "name": "ISBN-10",
-          "description": "Die 10-stellige ISBN."
+        "barcode": {
+          "name": "Barcode",
+          "description": "Die Nummer des Barcodes, zum Beispiel ein EAN-13."
         },
         "publisher": {
           "name": "Verlag",
@@ -456,73 +386,13 @@
         }
       }
     },
-    "refresh_book": {
-      "name": "Von Open Library aktualisieren",
-      "description": "Die leeren Felder eines Buchs von Open Library füllen.",
-      "fields": {
-        "book_id": {
-          "name": "Buch",
-          "description": "Die ID des Buchs."
-        }
-      }
-    },
-    "send_to_catalog": {
-      "name": "An Open Library senden",
-      "description": "Ein Buch, das Open Library nicht hat, mit dem verbundenen Open-Library-Konto hinzufügen und dann das Buch verknüpfen.",
-      "fields": {
-        "book_id": {
-          "name": "Buch",
-          "description": "Die ID des Buchs."
-        },
-        "fields": {
-          "name": "Felder",
-          "description": "Die optionalen Felder zum Senden: publisher, published und isbn. Der Titel und der erste Autor werden immer gesendet."
-        },
-        "include_cover": {
-          "name": "Cover senden",
-          "description": "Auch das eigene Cover des Buchs senden."
-        }
-      }
-    },
-    "link_catalog": {
-      "name": "Mit Open Library verknüpfen",
-      "description": "Ein Buch mit einer Ausgabe oder einem Werk von Open Library verknüpfen und seine leeren Felder füllen.",
-      "fields": {
-        "book_id": {
-          "name": "Buch",
-          "description": "Die ID des Buchs."
-        },
-        "record": {
-          "name": "Ausgabe oder Werk",
-          "description": "Ein Ausgabeschlüssel wie OL123M, ein Werkschlüssel wie OL45W oder die URL der Seite."
-        }
-      }
-    },
-    "skip_catalog": {
-      "name": "Open Library überspringen",
-      "description": "Ein Buch aus der Liste der Bücher entfernen, die nicht in Open Library sind, oder es zurücksetzen.",
-      "fields": {
-        "book_id": {
-          "name": "Buch",
-          "description": "Die ID des Buchs."
-        },
-        "skip": {
-          "name": "Überspringen",
-          "description": "Ausschalten, um das Buch wieder in die Liste aufzunehmen."
-        }
-      }
-    },
-    "disconnect_catalog": {
-      "name": "Open Library trennen",
-      "description": "Die Schlüssel des Open-Library-Kontos entfernen."
-    },
-    "scan_isbn": {
-      "name": "ISBN scannen",
+    "scan_barcode": {
+      "name": "Barcode scannen",
       "description": "Ein gescanntes Buch zu einem Regalboden hinzufügen.",
       "fields": {
-        "isbn": {
-          "name": "ISBN",
-          "description": "Eine ISBN-10 oder eine ISBN-13."
+        "barcode": {
+          "name": "Barcode",
+          "description": "Die Nummer des Barcodes, zum Beispiel ein EAN-13."
         },
         "shelf_id": {
           "name": "Regalboden",
@@ -760,9 +630,9 @@
           "name": "Buch",
           "description": "Die ID des Buchs."
         },
-        "isbn": {
-          "name": "ISBN",
-          "description": "Eine ISBN-10 oder eine ISBN-13."
+        "barcode": {
+          "name": "Barcode",
+          "description": "Die Nummer des Barcodes, zum Beispiel ein EAN-13."
         },
         "title": {
           "name": "Titel",
@@ -864,9 +734,9 @@
           "name": "Buch",
           "description": "Die ID des Buchs."
         },
-        "isbn": {
-          "name": "ISBN",
-          "description": "Eine ISBN-10 oder eine ISBN-13."
+        "barcode": {
+          "name": "Barcode",
+          "description": "Die Nummer des Barcodes, zum Beispiel ein EAN-13."
         },
         "title": {
           "name": "Titel",
@@ -966,15 +836,11 @@
     },
     "import_csv": {
       "name": "CSV importieren",
-      "description": "Bücher aus Goodreads, StoryGraph oder einem Bibliotheksexport importieren.",
+      "description": "Bücher aus einem CSV-Export von Home Keeper Games importieren.",
       "fields": {
         "content": {
           "name": "CSV-Inhalt",
           "description": "Der CSV-Text. Höchstens 5 MB."
-        },
-        "source": {
-          "name": "Quelle",
-          "description": "Die App, die die CSV-Datei erstellt hat."
         },
         "person_id": {
           "name": "Person",
@@ -1005,10 +871,6 @@
         "person_id": {
           "name": "Person",
           "description": "Die ID der Home-Assistant-Person."
-        },
-        "format": {
-          "name": "Dateiformat",
-          "description": "goodreads oder library."
         }
       }
     },
@@ -1018,7 +880,7 @@
       "fields": {
         "query": {
           "name": "Suche",
-          "description": "Text im Titel, in den Autoren, in der ISBN oder in den Schlagwörtern."
+          "description": "Text im Titel, in den Autoren, im Barcode oder in den Schlagwörtern."
         },
         "room_id": {
           "name": "Raum",
@@ -1132,8 +994,8 @@
     "invalid_choice": {
       "message": "{field} muss einer dieser Werte sein: {options}."
     },
-    "invalid_isbn": {
-      "message": "{isbn} ist keine gültige ISBN."
+    "invalid_barcode": {
+      "message": "{barcode} ist kein gültiger Barcode."
     },
     "room_not_found": {
       "message": "Kein Raum hat die ID {id}."
@@ -1168,8 +1030,8 @@
     "shelf_not_empty": {
       "message": "Der Regalboden hat {count} Exemplare. Verwenden Sie force, um sie auf keinen Regalboden zu verschieben."
     },
-    "duplicate_isbn": {
-      "message": "Ein anderes Buch hat die ISBN {isbn}."
+    "duplicate_barcode": {
+      "message": "Ein anderes Buch hat den Barcode {barcode}."
     },
     "copy_on_loan": {
       "message": "Das Exemplar ist verliehen. Geben Sie zuerst die Ausleihe zurück."
@@ -1186,14 +1048,8 @@
     "upload_not_found": {
       "message": "Kein hochgeladenes Cover hat die ID {file_id}."
     },
-    "isbn_or_title_required": {
-      "message": "Geben Sie eine Buch-ID, eine ISBN oder einen Titel an."
-    },
-    "lookup_unavailable": {
-      "message": "Open Library ist nicht erreichbar. Versuchen Sie es später erneut."
-    },
-    "no_openlibrary_cover": {
-      "message": "Open Library hat kein Cover für dieses Buch."
+    "barcode_or_title_required": {
+      "message": "Geben Sie eine Buch-ID, einen Barcode oder einen Titel an."
     },
     "todo_entity_not_found": {
       "message": "{entity_id} ist keine Aufgabenliste."
@@ -1227,27 +1083,6 @@
     },
     "todo_not_allowed": {
       "message": "Nur {person} oder ein Admin-Benutzer kann diese To-do-Liste ändern."
-    },
-    "openlibrary_not_connected": {
-      "message": "Verbinden Sie zuerst ein Open-Library-Konto in den Bibliothekseinstellungen."
-    },
-    "openlibrary_already_linked": {
-      "message": "Dieses Buch ist bereits mit Open Library verknüpft."
-    },
-    "openlibrary_needs_author": {
-      "message": "Fügen Sie dem Buch einen Autor hinzu, bevor Sie es senden."
-    },
-    "openlibrary_ambiguous": {
-      "message": "Open Library hat mehr als 1 Werk gefunden, das dieses Buch sein kann. Fügen Sie das Buch auf der Website von Open Library hinzu."
-    },
-    "openlibrary_login_failed": {
-      "message": "Open Library hat die Kontoschlüssel nicht akzeptiert. Verbinden Sie das Konto erneut."
-    },
-    "openlibrary_not_found": {
-      "message": "Open Library hat keinen Eintrag {edition}."
-    },
-    "invalid_openlibrary_edition": {
-      "message": "{edition} ist kein Schlüssel und keine URL von Open Library."
     },
     "files_dir_invalid": {
       "message": "Das Dateiverzeichnis muss unter .storage/home_keeper_import_export liegen."

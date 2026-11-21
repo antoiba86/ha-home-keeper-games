@@ -25,17 +25,10 @@ _ADMIN_DATA = {
     "add_shelf": {"bookcase_id": "x", "name": "x"},
     "update_shelf": {"shelf_id": "x"},
     "delete_shelf": {"shelf_id": "x"},
-    "lookup_isbn": {"isbn": "0441478123"},
-    "search_catalog": {"title": "x"},
     "add_book": {"title": "x"},
     "update_book": {"book_id": "x"},
     "delete_book": {"book_id": "x"},
-    "refresh_book": {"book_id": "x"},
-    "send_to_catalog": {"book_id": "x"},
-    "link_catalog": {"book_id": "x", "record": "OL1M"},
-    "skip_catalog": {"book_id": "x"},
-    "disconnect_catalog": {},
-    "scan_isbn": {"isbn": "0441478123"},
+    "scan_barcode": {"barcode": "0711719505012"},
     "add_copy": {"book_id": "x"},
     "update_copy": {"copy_id": "x"},
     "move_copy": {"copy_id": "x"},
@@ -50,7 +43,7 @@ _ADMIN_DATA = {
     "update_wishlist": {"book_id": "x"},
     "remove_from_wishlist": {"book_id": "x"},
     "got_wishlist_book": {"book_id": "x"},
-    "import_csv": {"content": "Title\nx\n", "source": "goodreads", "person_id": BOB},
+    "import_csv": {"content": "title\nx\n", "person_id": BOB},
     "export_csv": {},
     "export_data": {},
     "import_data": {"document": {}},
@@ -82,7 +75,7 @@ async def _shelf(call) -> dict:
 
 
 async def _book(call, **data) -> dict:
-    return (await call("add_book", {"title": "Dune", "lookup": False, **data}))["book"]
+    return (await call("add_book", {"title": "Dune", **data}))["book"]
 
 
 async def test_locations_and_delete_rules(hass, setup_entry, call) -> None:
@@ -148,45 +141,29 @@ async def test_move_bookcase_and_shelf(hass, setup_entry, call) -> None:
 
 async def test_books_and_duplicates(hass, setup_entry, call) -> None:
     added = async_capture_events(hass, EVENT("book_added"))
-    book = await _book(call, isbn="0441478123", authors=["Ursula K. Le Guin"])
-    assert book["isbn13"] == "9780441478125" and book["isbn10"] == "0441478123"
+    book = await _book(call, barcode="9780441478125", authors=["Ursula K. Le Guin"])
+    assert book["barcode"] == "9780441478125" and book["title"] == "Dune"
     assert book["owned"] is False and book["cover_url"] is None
-    again = await call("add_book", {"isbn": "978-0-441-47812-5", "lookup": False})
+    again = await call("add_book", {"barcode": "978-0-441-47812-5"})
     assert again["existing"] is True and again["book"]["id"] == book["id"]
     assert len(added) == 1
     with pytest.raises(ServiceValidationError) as info:
-        await call("add_book", {"lookup": False})
-    assert info.value.translation_key == "isbn_or_title_required"
+        await call("add_book", {})
+    assert info.value.translation_key == "barcode_or_title_required"
     with pytest.raises(ServiceValidationError) as info:
-        await call("add_book", {"isbn": "123", "lookup": False})
-    assert info.value.translation_key == "invalid_isbn"
+        await call("add_book", {"barcode": "12#3"})
+    assert info.value.translation_key == "invalid_barcode"
     updated = async_capture_events(hass, EVENT("book_updated"))
     reply = await call("update_book", {"book_id": book["id"], "pages": 304})
     assert reply["book"]["pages"] == 304
     assert updated[0].data["changed_fields"] == ["pages"]
     other = await _book(call, title="Other")
     with pytest.raises(ServiceValidationError) as info:
-        await call("update_book", {"book_id": other["id"], "isbn": "0441478123"})
-    assert info.value.translation_key == "duplicate_isbn"
+        await call("update_book", {"book_id": other["id"], "barcode": "9780441478125"})
+    assert info.value.translation_key == "duplicate_barcode"
     with pytest.raises(ServiceValidationError) as info:
         await call("update_book", {"book_id": book["id"], "pages": 0})
     assert info.value.translation_key == "out_of_range"
-
-
-async def test_fill_book_keeps_the_isbn10_on_a_duplicate_isbn13(
-    hass, setup_entry, call
-) -> None:
-    store = setup_entry.runtime_data.store
-    await _book(call, isbn="9780441478125", title="First")
-    book = await _book(call, title="Second")
-    await call("update_book", {"book_id": book["id"], "isbn10": "0306406152"})
-    updated = async_capture_events(hass, EVENT("book_updated"))
-    filled = await store.fill_book(
-        book["id"], {"isbn13": "9780441478125", "isbn10": "0441478123", "pages": 9}
-    )
-    assert (filled["isbn13"], filled["isbn10"]) == (None, "0306406152")
-    assert filled["pages"] == 9
-    assert updated[0].data["changed_fields"] == ["pages"]
 
 
 async def test_delete_book_cascades(hass, setup_entry, call) -> None:
@@ -366,7 +343,7 @@ async def test_wishlist_services(hass, setup_entry, call) -> None:
     )
     book = reply["book"]
     assert book["wishlist"]["person_id"] == BOB and book["wishlist"]["buy"] is True
-    assert book["needs_details"] is True
+    assert book["needs_details"] is False
     assert added[0].data["buy"] is True
     with pytest.raises(ServiceValidationError) as info:
         await call("add_to_wishlist", {"book_id": book["id"], "person_id": BOB})
@@ -399,16 +376,15 @@ async def test_wishlist_services(hass, setup_entry, call) -> None:
 async def test_import_and_export(hass, setup_entry, call) -> None:
     shelf = await _shelf(call)
     csv_text = (
-        "Title,Author,ISBN13,My Rating,Exclusive Shelf,Owned Copies,Binding,Date Read\n"
-        'Dune,Frank Herbert,"=""9780441013593""",5,read,1,Hardcover,2024/01/02\n'
-        "Emma,Jane Austen,,0,to-read,0,,\n"
+        "title,authors,barcode,rating,status,format,finished,wishlist\n"
+        "Dune,Frank Herbert,9780441013593,5,read,hardcover,2024-01-02,false\n"
+        "Emma,Jane Austen,,,,,,true\n"
     )
     done = async_capture_events(hass, EVENT("import_completed"))
     dry = await call(
         "import_csv",
         {
             "content": csv_text,
-            "source": "goodreads",
             "person_id": BOB,
             "shelf_id": shelf["id"],
             "dry_run": True,
@@ -432,7 +408,7 @@ async def test_import_and_export(hass, setup_entry, call) -> None:
         "line": 1,
         "title": "Dune",
         "authors": ["Frank Herbert"],
-        "isbn": "9780441013593",
+        "barcode": "9780441013593",
         "book_id": dry["rows"][0]["book_id"],
         "action": "new",
         "message": "",
@@ -443,7 +419,6 @@ async def test_import_and_export(hass, setup_entry, call) -> None:
         "import_csv",
         {
             "content": csv_text,
-            "source": "goodreads",
             "person_id": BOB,
             "shelf_id": shelf["id"],
         },
@@ -454,15 +429,14 @@ async def test_import_and_export(hass, setup_entry, call) -> None:
     state = setup_entry.runtime_data.store.state
     assert len(state["books"]) == 2 and len(state["copies"]) == 1
     exported = await call("export_csv", {"person_id": BOB})
-    assert exported["filename"].startswith("library-goodreads-")
-    assert '"=""9780441013593"""' in exported["content"]
+    assert exported["filename"].startswith("games-")
+    assert exported["content"].startswith("book_id,title")
+    assert ",9780441013593," in exported["content"]
     assert ",read," in exported["content"]
-    library = await call("export_csv", {"format": "library"})
-    assert library["content"].startswith("book_id,title")
     with pytest.raises(ServiceValidationError) as info:
         await call(
             "import_csv",
-            {"content": "Name\nx\n", "source": "goodreads", "person_id": BOB},
+            {"content": "Name\nx\n", "person_id": BOB},
         )
     assert info.value.translation_key == "csv_unreadable"
     with pytest.raises(ServiceValidationError) as info:
@@ -470,7 +444,6 @@ async def test_import_and_export(hass, setup_entry, call) -> None:
             "import_csv",
             {
                 "content": "x" * (5 * 1024 * 1024 + 1),
-                "source": "goodreads",
                 "person_id": BOB,
             },
         )
@@ -490,8 +463,7 @@ async def test_import_row_error_message(hass, setup_entry, call) -> None:
     reply = await call(
         "import_csv",
         {
-            "content": "Title,Author\n,Nobody\n",
-            "source": "goodreads",
+            "content": "title,authors\n,Nobody\n",
             "person_id": BOB,
             "dry_run": True,
         },

@@ -389,7 +389,7 @@ def test_frontend_command_names_stay_the_same() -> None:
         "subscribe",
         "list_todo_entities",
         "add_room",
-        "scan_isbn",
+        "scan_barcode",
         "set_reading",
         "lend_book",
         "borrow_book",
@@ -397,7 +397,6 @@ def test_frontend_command_names_stay_the_same() -> None:
         "add_to_wishlist",
         "import_csv",
         "export_csv",
-        "lookup_isbn",
         "set_cover",
         "set_person_settings",
     ):

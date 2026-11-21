@@ -87,12 +87,6 @@ EXCLUDED_KEYS: dict[str, tuple[tuple[str, str], ...]] = {
             "to-do items of this install that the wishlist sync removes",
         ),
     ),
-    "books": (
-        (
-            "lookup_tries",
-            "bookkeeping of the lookup queue of this install; a book starts at 0",
-        ),
-    ),
     "loans": (
         (
             "hk_task_id",
@@ -307,7 +301,6 @@ class ImportPlan:
     records: list[dict[str, Any]] = field(default_factory=list)
     counts: dict[str, dict[str, int]] = field(default_factory=dict)
     covers: list[CoverJob] = field(default_factory=list)
-    lookup_ids: list[str] = field(default_factory=list)
 
     @property
     def ok(self) -> bool:
@@ -595,8 +588,7 @@ class _Planner:
             raw = record.get("id")
             key = {
                 "book_id": raw,
-                "isbn13": fields.get("isbn13"),
-                "isbn10": fields.get("isbn10"),
+                "barcode": fields.get("barcode"),
                 "title": fields["title"],
                 "authors": fields.get("authors") or [],
             }
@@ -606,8 +598,6 @@ class _Planner:
                 index.add(book)
                 target = book["id"]
                 action = ACTION_CREATE
-                if book["needs_details"]:
-                    self.plan.lookup_ids.append(target)
             else:
                 book = self.new["books"][target]
                 changed = False
@@ -880,13 +870,11 @@ class _Planner:
 
 
 def _match_book(index: BookIndex, key: dict[str, Any]) -> tuple[str | None, str | None]:
-    """``(book_id, matched_by)``: by id, ISBN-13, ISBN-10, then title and author."""
+    """``(book_id, matched_by)``: by id, barcode, then title and author."""
     if key["book_id"] in index.by_id:
         return str(key["book_id"]), "id"
-    if key["isbn13"] and key["isbn13"] in index.isbn13:
-        return index.isbn13[key["isbn13"]], "isbn13"
-    if key["isbn10"] and key["isbn10"] in index.isbn10:
-        return index.isbn10[key["isbn10"]], "isbn10"
+    if key["barcode"] and key["barcode"] in index.barcode:
+        return index.barcode[key["barcode"]], "barcode"
     found = index.title.get(title_key(key["title"], key["authors"]))
     return (found, "title") if found else (None, None)
 

@@ -19,7 +19,7 @@ from __future__ import annotations
 from typing import Any
 
 from .const import COVER_URL_PREFIX
-from .models import CATALOGS, clone, is_open, is_overdue, location_path, person_settings
+from .models import clone, is_open, is_overdue, location_path, person_settings
 
 PRIVATE_COPY_FIELDS = ("price", "value", "acquired_from")
 PRIVATE_LOAN_FIELDS = ("party",)
@@ -197,13 +197,8 @@ def project_state(
     currency: str,
     tab: bool,
     revision: int,
-    catalog_accounts: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """The reply of ``home_keeper_games/get_state`` for the viewer.
-
-    Only an admin gets ``catalog_accounts``: for each catalog, if an account is
-    connected, and its user name. The keys of an account are never in the reply.
-    """
+    """The reply of ``home_keeper_games/get_state`` for the viewer."""
     counts = {book_id: len(rows) for book_id, rows in copies_by_book(state).items()}
     books = [
         project_book(
@@ -238,16 +233,6 @@ def project_state(
         "currency": currency,
         "home_keeper": {"tab": tab},
     }
-    if is_admin:
-        accounts = catalog_accounts or {}
-        reply["catalog_accounts"] = {}
-        for name in CATALOGS:
-            account = accounts.get(name) or {}
-            connected = bool(account.get("connected"))
-            reply["catalog_accounts"][name] = {
-                "connected": connected,
-                "username": account.get("username") if connected else None,
-            }
     return reply
 
 
@@ -267,7 +252,7 @@ def book_matches(
 ) -> bool:
     """Whether a book passes the ``list_books`` filters.
 
-    ``query`` searches the title, the subtitle, the authors, the ISBNs, the
+    ``query`` searches the title, the subtitle, the authors, the barcode, the
     series and the tags. ``shelf_id`` and ``room_id`` match a copy location.
     ``owned`` keeps books with or without copies. ``status`` with ``person_id``
     matches a reading status.
@@ -280,8 +265,7 @@ def book_matches(
                 book["title"],
                 book["subtitle"],
                 *book["authors"],
-                book["isbn13"] or "",
-                book["isbn10"] or "",
+                book["barcode"] or "",
                 series["name"],
                 *book["tags"],
             ]

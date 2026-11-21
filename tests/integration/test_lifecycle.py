@@ -22,7 +22,7 @@ HOME_KEEPER = Path(__file__).resolve().parent / ".home_keeper" / "custom_compone
 SERVICES = (
     "add_room",
     "add_book",
-    "scan_isbn",
+    "scan_barcode",
     "set_reading",
     "lend_book",
     "borrow_book",
@@ -88,7 +88,7 @@ def test_no_repair_issue_with_home_keeper(ws):
 def test_loan_adds_a_home_keeper_task(api):
     book = api.post(
         "/api/services/home_keeper_games/add_book?return_response",
-        json={"title": "Integration loan book", "lookup": False},
+        json={"title": "Integration loan book"},
     ).json()["service_response"]["book"]
     copy = api.post(
         "/api/services/home_keeper_games/add_copy?return_response",

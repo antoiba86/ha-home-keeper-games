@@ -7,100 +7,53 @@ import io
 import string
 
 import ex.csv_io as cio
-import ex.isbn as isbn_mod
 import ex.models as m
 import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
 NOW = "2026-10-05T12:00:00+00:00"
+LEFT = "9780441478125"
 
-GOODREADS = (
-    "﻿Book Id,Title,Author,Author l-f,Additional Authors,ISBN,ISBN13,My Rating,"
-    "Average Rating,Publisher,Binding,Number of Pages,Year Published,"
-    "Original Publication Year,Date Read,Date Added,Bookshelves,"
-    "Bookshelves with positions,Exclusive Shelf,My Review,Spoiler,Private Notes,"
-    "Read Count,Owned Copies\n"
-    '1,The Left Hand of Darkness,Ursula K. Le Guin,"Le Guin, Ursula K.",,'
-    '"=""0441478123""","=""9780441478125""",5,4.1,Ace,Mass Market Paperback,'
-    '304,1987,1969,2024/03/05,2024/01/01,"favorites, read",,read,'
-    "Great<br/>book,,Mine,2,1\n"
-    '2,Dune,Frank Herbert,"Herbert, Frank",Kevin J. Anderson,"=""""","=""""",0,4.2,'
-    "Ace,Kindle Edition,,1990,,,,currently-reading,,currently-reading,,,,1,0\n"
-    '3,Emma,Jane Austen,"Austen, Jane",,"=""""","=""""",0,4,Penguin,Hardcover,,,,,,'
-    "to-read,,to-read,,,,0,0\n"
-    '4,Persuasion,Jane Austen,"Austen, Jane",,"=""""","=""""",0,4,Penguin,'
-    "Hardcover,,,,,,to-read,,to-read,,,,0,1\n"
-    '5,Ulysses,James Joyce,"Joyce, James",,,,0,3,X,Paperback,,,,,,'
-    "did-not-finish,,did-not-finish,,,,0,0\n"
-    "6,Notes,Me,,,,,0,0,,,,,,,,custom,,custom,,,,0,0\n"
-)
-
-STORYGRAPH = (
-    "Title,Authors,Contributors,ISBN/UID,Format,Read Status,Star Rating,Review,"
-    "Last Date Read,Dates Read,Read Count,Moods,Pace,Character- or Plot-Driven?,"
-    "Strong Character Development?,Loveable Characters?,Diverse Characters?,"
-    "Flawed Characters?,Content Warnings,Content Warning Description,Tags,Owned?\n"
-    "Dune,Frank Herbert,,9780441013593,paperback,read,4.75,Good,2024/02/01,,1,,,,,,,,,,"
-    '"sf, classic",Yes\n'
-    "Emma,Jane Austen,,,hardcover,to-read,,,,,0,,,,,,,,,,,No\n"
-    "Ulysses,James Joyce,,,digital,did-not-finish,2.25,,,,0,,,,,,,,,,,Yes\n"
-    "Middlemarch,George Eliot,,,audio,currently-reading,,,,,0,,,,,,,,,,,No\n"
+LIB = (
+    "\ufefftitle,authors,barcode,publisher,pages,format,status,rating,finished,"
+    "read_count,private_notes,tags,wishlist\n"
+    f"The Left Hand of Darkness,Ursula K. Le Guin,{LEFT},Ace,304,paperback,read,5,"
+    '2024-03-05,2,"Great\nbook",favorites,false\n'
+    "Dune,Frank Herbert; Kevin J. Anderson,,,,,reading,,,,,,false\n"
+    "Emma,Jane Austen,,,,,,,,,,,true\n"
+    "Persuasion,Jane Austen,,,,hardcover,want,,,,,,false\n"
+    "Ulysses,James Joyce,,,,,dnf,,,,,,false\n"
+    "Notes,Me,,,,,,,,,,,false\n"
 )
 
 
-def test_isbn_cell() -> None:
-    assert cio.isbn_cell('="0441478123"') == "0441478123"
-    assert cio.isbn_cell('=""') == ""
-    assert cio.isbn_cell(" 978 ") == "978"
-
-
-def test_parse_goodreads() -> None:
-    rows = cio.parse(GOODREADS, "goodreads")
+def test_parse() -> None:
+    rows = cio.parse(LIB)
     assert [r["line"] for r in rows] == [1, 2, 3, 4, 5, 6]
     left = rows[0]
     assert left["title"] == "The Left Hand of Darkness"
     assert left["authors"] == ["Ursula K. Le Guin"]
-    assert (left["isbn13"], left["isbn10"]) == ("9780441478125", "0441478123")
+    assert left["barcode"] == LEFT
     assert left["status"] == "read" and left["rating"] == 5
     assert left["finished"] == "2024-03-05" and left["read_count"] == 2
-    assert left["owned"] == 1 and left["copy"] == {"format": "paperback"}
-    assert left["tags"] == ["favorites"]
-    assert left["notes"] == "Great\nbook\n\nMine"
+    assert left["owned"] == 1 and left["copy"]["format"] == "paperback"
+    assert left["tags"] == ["favorites"] and left["notes"] == "Great\nbook"
     assert left["publisher"] == "Ace" and left["pages"] == 304
-    assert left["published"] == "1987"
     dune = rows[1]
     assert dune["authors"] == ["Frank Herbert", "Kevin J. Anderson"]
-    assert dune["isbn13"] is None and dune["status"] == "reading"
+    assert dune["barcode"] is None and dune["status"] == "reading"
     assert dune["rating"] is None and dune["copy"] is None and dune["owned"] == 0
-    assert dune["published"] == "1990"
-    emma = rows[2]
-    assert emma["wishlist"] is True and emma["status"] is None
-    persuasion = rows[3]
-    assert persuasion["status"] == "want" and persuasion["wishlist"] is False
-    assert persuasion["copy"] == {"format": "hardcover"}
+    assert rows[2]["wishlist"] is True and rows[2]["status"] is None
+    assert rows[3]["status"] == "want" and rows[3]["copy"]["format"] == "hardcover"
     assert rows[4]["status"] == "dnf"
     assert rows[5]["status"] is None and rows[5]["tags"] == []
-    assert all(r["needs_details"] for r in rows)
+    assert not any(r["needs_details"] for r in rows)
 
 
-def test_parse_goodreads_falls_back_to_the_original_year() -> None:
-    text = "Title,Year Published,Original Publication Year\nX,,1901\n"
-    assert cio.parse_goodreads(text)[0]["published"] == "1901"
-
-
-def test_parse_storygraph() -> None:
-    rows = cio.parse(STORYGRAPH, "storygraph")
-    dune = rows[0]
-    assert dune["isbn13"] == "9780441013593" and dune["status"] == "read"
-    assert dune["rating"] == 5 and dune["finished"] == "2024-02-01"
-    assert dune["tags"] == ["sf", "classic"] and dune["notes"] == "Good"
-    assert dune["owned"] == 1 and dune["copy"] == {"format": "paperback"}
-    assert dune["read_count"] == 1
-    assert rows[1]["wishlist"] is True and rows[1]["status"] is None
-    assert rows[2]["status"] == "dnf" and rows[2]["rating"] == 2
-    assert rows[2]["copy"] == {"format": "ebook"}
-    assert rows[3]["status"] == "reading" and rows[3]["owned"] == 0
+def test_parse_cleans_the_barcode() -> None:
+    rows = cio.parse("title,barcode\nA, 978-0441 478125 \nB,-\n")
+    assert [r["barcode"] for r in rows] == [LEFT, None]
 
 
 @pytest.mark.parametrize(
@@ -127,16 +80,12 @@ def test_cell_helpers() -> None:
 
 def test_parse_errors() -> None:
     with pytest.raises(m.LibraryError) as info:
-        cio.parse("Name,Author\nx,y\n", "goodreads")
+        cio.parse("Name,Author\nx,y\n")
     assert info.value.key == "csv_unreadable"
-    assert info.value.placeholders == {"column": "Title"}
-    with pytest.raises(m.LibraryError) as info:
-        cio.parse("Title\nx\n", "kindle")
-    assert info.value.key == "invalid_choice"
+    assert info.value.placeholders == {"column": "title"}
+    assert cio.parse("title\n") == []
     with pytest.raises(m.LibraryError):
-        cio.parse("title\n", "goodreads")
-    with pytest.raises(m.LibraryError):
-        cio.parse("", "goodreads")
+        cio.parse("")
 
 
 def test_parse_library_round_trip() -> None:
@@ -162,10 +111,10 @@ def _library() -> dict:
     return state
 
 
-def test_apply_goodreads_import() -> None:
+def test_apply_import() -> None:
     state = _library()
-    rows = cio.parse(GOODREADS, "goodreads")
-    new, summary, results, lookup = cio.apply_import(
+    rows = cio.parse(LIB)
+    new, summary, results = cio.apply_import(
         state,
         rows,
         person_id="p",
@@ -203,7 +152,7 @@ def test_apply_goodreads_import() -> None:
         "line": 1,
         "title": "The Left Hand of Darkness",
         "authors": ["Ursula K. Le Guin"],
-        "isbn": "9780441478125",
+        "barcode": LEFT,
         "book_id": results[0]["book_id"],
         "action": "new",
     }
@@ -217,15 +166,14 @@ def test_apply_goodreads_import() -> None:
         "wishlist_added": 1,
         "errors": 0,
     }
-    assert len(lookup) == 5
-    left = next(b for b in new["books"].values() if b["isbn13"] == "9780441478125")
-    assert left["needs_details"] is True and left["tags"] == ["favorites"]
+    left = next(b for b in new["books"].values() if b["barcode"] == LEFT)
+    assert left["needs_details"] is False and left["tags"] == ["favorites"]
     copies = [c for c in new["copies"].values() if c["book_id"] == left["id"]]
     assert len(copies) == 1 and copies[0]["shelf_id"] == "s"
     assert copies[0]["format"] == "paperback"
     reading = new["reading"]["p"][left["id"]]
     assert reading["status"] == "read" and reading["read_count"] == 2
-    assert reading["private_notes"] == "Great\nbook\n\nMine"
+    assert reading["private_notes"] == "Great\nbook"
     emma = next(b for b in new["books"].values() if b["title"] == "Emma")
     assert emma["wishlist"]["person_id"] == "p" and emma["wishlist"]["buy"] is False
     assert emma["id"] not in new["reading"]["p"]
@@ -234,8 +182,8 @@ def test_apply_goodreads_import() -> None:
 def test_import_matches_and_keeps_reading() -> None:
     state = _library()
     state["reading"]["p"] = {"persuasion": {**m.empty_reading(now=NOW)}}
-    rows = cio.parse(GOODREADS, "goodreads")
-    first, _, _, _ = cio.apply_import(
+    rows = cio.parse(LIB)
+    first, _, _ = cio.apply_import(
         state,
         rows,
         person_id="p",
@@ -245,11 +193,11 @@ def test_import_matches_and_keeps_reading() -> None:
         now=NOW,
     )
     assert first["reading"]["p"]["persuasion"]["status"] == "want"
-    left = next(b for b in first["books"].values() if b["isbn13"] == "9780441478125")
+    left = next(b for b in first["books"].values() if b["barcode"] == LEFT)
     assert first["reading"]["p"][left["id"]]["private_notes"] == ""
     copy = next(c for c in first["copies"].values() if c["book_id"] == left["id"])
     assert copy["shelf_id"] is None
-    _second, summary, _results, lookup = cio.apply_import(
+    _second, summary, _results = cio.apply_import(
         first,
         rows,
         person_id="p",
@@ -263,8 +211,7 @@ def test_import_matches_and_keeps_reading() -> None:
     assert summary["copies"] == 0 and summary["reading_kept"] == 4
     assert summary["read"] + summary["reading"] + summary["want"] == 0
     assert summary["wishlist"] == 0
-    assert lookup == []
-    third, summary, _, _ = cio.apply_import(
+    third, summary, _ = cio.apply_import(
         first,
         rows,
         person_id="p",
@@ -275,13 +222,13 @@ def test_import_matches_and_keeps_reading() -> None:
     )
     assert summary["read"] + summary["want"] + summary["dnf"] == 3
     assert summary["reading"] == 1 and summary["reading_kept"] == 0
-    assert third["reading"]["p"][left["id"]]["private_notes"] == "Great\nbook\n\nMine"
+    assert third["reading"]["p"][left["id"]]["private_notes"] == "Great\nbook"
 
 
 def test_import_row_error_and_empty_person() -> None:
     state = _library()
     rows = [cio.empty_row(1)]
-    new, summary, results, _ = cio.apply_import(
+    new, summary, results = cio.apply_import(
         state,
         rows,
         person_id="p",
@@ -303,15 +250,15 @@ def test_import_library_rows_use_ids_and_locations() -> None:
     state["books"][BOOK_HEX] = book
     copy = m.build_copy({"book_id": BOOK_HEX, "shelf_id": "s"}, now=NOW)
     state["copies"][copy["id"]] = copy
-    text = cio.export(state, None, "library")
-    new, summary, _, _ = cio.apply_import(
+    text = cio.export(state, None)
+    new, summary, _ = cio.apply_import(
         m.empty_state()
         | {
             "shelves": state["shelves"],
             "bookcases": state["bookcases"],
             "rooms": state["rooms"],
         },
-        cio.parse(text, "library"),
+        cio.parse(text),
         person_id="p",
         shelf_id=None,
         import_notes=True,
@@ -321,9 +268,9 @@ def test_import_library_rows_use_ids_and_locations() -> None:
     assert summary["new"] == 1 and summary["copies"] == 1
     assert new["books"][BOOK_HEX]["title"] == "Persuasion"
     assert new["copies"][copy["id"]]["shelf_id"] == "s"
-    _, again, _, _ = cio.apply_import(
+    _, again, _ = cio.apply_import(
         new,
-        cio.parse(text, "library"),
+        cio.parse(text),
         person_id="p",
         shelf_id=None,
         import_notes=True,
@@ -341,7 +288,6 @@ def test_import_library_ids_that_are_not_record_ids_are_dropped() -> None:
         + f"{BOOK_HEX},{BOOK_HEX.upper()},Upper,paperback\n"
         + f"{BOOK_HEX}0,{BOOK_HEX},Long,paperback\n"
         + f"{BOOK_HEX},{BOOK_HEX},Good,paperback\n",
-        "library",
     )
     assert [(r["book_id"], r["copy"]["id"]) for r in rows] == [
         (None, None),
@@ -352,8 +298,8 @@ def test_import_library_ids_that_are_not_record_ids_are_dropped() -> None:
 
 
 def test_import_row_with_a_bad_copy_adds_no_book() -> None:
-    rows = cio.parse("title,format,condition\nPersuasion,paperback,mint\n", "library")
-    new, summary, results, lookup = cio.apply_import(
+    rows = cio.parse("title,format,condition\nPersuasion,paperback,mint\n")
+    new, summary, results = cio.apply_import(
         m.empty_state(),
         rows,
         person_id="p",
@@ -365,7 +311,7 @@ def test_import_row_with_a_bad_copy_adds_no_book() -> None:
     assert results[0]["action"] == "error"
     assert results[0]["error"] == "invalid_choice"
     assert summary["errors"] == 1 and summary["new"] == 0
-    assert new["books"] == {} and new["copies"] == {} and lookup == []
+    assert new["books"] == {} and new["copies"] == {}
 
 
 def test_import_sets_the_reading_of_a_book_once() -> None:
@@ -376,11 +322,11 @@ def test_import_sets_the_reading_of_a_book_once() -> None:
     state["reading"]["p"] = {
         "persuasion": m.empty_reading(now=NOW) | {"status": "read"}
     }
-    text = cio.export(state, "p", "library")
+    text = cio.export(state, "p")
     for replace, read, kept in ((False, 1, 0), (True, 1, 0)):
-        _, summary, _, _ = cio.apply_import(
+        _, summary, _ = cio.apply_import(
             m.empty_state(),
-            cio.parse(text, "library"),
+            cio.parse(text),
             person_id="p",
             shelf_id=None,
             import_notes=True,
@@ -394,10 +340,9 @@ def test_import_sets_the_reading_of_a_book_once() -> None:
 # ── Export ───────────────────────────────────────────────────────────────────
 
 
-def test_export_goodreads_header_and_cells() -> None:
+def test_export_header_and_cells() -> None:
     state = _library()
-    state["books"]["persuasion"]["isbn13"] = "9780441478125"
-    state["books"]["persuasion"]["isbn10"] = "0441478123"
+    state["books"]["persuasion"]["barcode"] = LEFT
     copy = m.build_copy({"book_id": "persuasion", "format": "audiobook"}, now=NOW)
     state["copies"][copy["id"]] = copy
     state["reading"]["p"] = {
@@ -409,31 +354,28 @@ def test_export_goodreads_header_and_cells() -> None:
             "read_count": 1,
         }
     }
-    text = cio.export(state, "p", "goodreads")
+    text = cio.export(state, "p")
     reader = csv.DictReader(io.StringIO(text, newline=""))
-    assert tuple(reader.fieldnames or ()) == cio.GOODREADS_COLUMNS
+    assert tuple(reader.fieldnames or ()) == cio.LIBRARY_COLUMNS
     row = next(reader)
-    assert row["ISBN13"] == '="9780441478125"' and row["ISBN"] == '="0441478123"'
-    assert row["Exclusive Shelf"] == "read" and row["Bookshelves"] == "read"
-    assert row["Date Read"] == "2024/01/02" and row["My Rating"] == "4"
-    assert row["Binding"] == "Audible Audio" and row["Owned Copies"] == "1"
-    assert row["Author"] == "Jane Austen" and row["Author l-f"] == "Austen, Jane"
-    no_person = next(csv.DictReader(io.StringIO(cio.export(state, None, "goodreads"))))
-    assert no_person["Exclusive Shelf"] == "" and no_person["Read Count"] == ""
-    assert cio.export_filename("library", "2026-10-05") == (
-        "library-library-2026-10-05.csv"
-    )
-    with pytest.raises(m.LibraryError):
-        cio.write([], "kindle")
+    assert row["barcode"] == LEFT and row["authors"] == "Jane Austen"
+    assert row["status"] == "read" and row["rating"] == "4"
+    assert row["finished"] == "2024-01-02" and row["format"] == "audiobook"
+    assert row["copy_id"] == copy["id"]
+    no_person = next(csv.DictReader(io.StringIO(cio.export(state, None))))
+    assert no_person["status"] == "" and no_person["read_count"] == ""
+    assert cio.export_filename("2026-10-05") == "games-2026-10-05.csv"
 
 
-def test_export_wishlist_is_to_read() -> None:
+def test_export_wishlist_of_the_person() -> None:
     state = _library()
     state["books"]["persuasion"]["wishlist"] = m.build_wishlist("p", buy=True, now=NOW)
-    row = next(csv.DictReader(io.StringIO(cio.export(state, "p", "goodreads"))))
-    assert row["Exclusive Shelf"] == "to-read" and row["Owned Copies"] == "0"
-    other = next(csv.DictReader(io.StringIO(cio.export(state, "q", "goodreads"))))
-    assert other["Exclusive Shelf"] == ""
+    row = next(csv.DictReader(io.StringIO(cio.export(state, "p"))))
+    assert (row["wishlist"], row["wishlist_buy"], row["format"]) == ("true", "true", "")
+    other = next(csv.DictReader(io.StringIO(cio.export(state, "q"))))
+    assert (other["wishlist"], other["wishlist_buy"]) == ("false", "false")
+    everyone = next(csv.DictReader(io.StringIO(cio.export(state, None))))
+    assert everyone["wishlist"] == "true"
 
 
 def test_export_library_has_a_row_for_each_copy() -> None:
@@ -441,10 +383,9 @@ def test_export_library_has_a_row_for_each_copy() -> None:
     for stamp, fmt in (("t1", "hardcover"), ("t2", "ebook")):
         copy = m.build_copy({"book_id": "persuasion", "format": fmt}, now=stamp)
         state["copies"][copy["id"]] = copy
-    rows = cio.rows_from_state(state, None, "library")
+    rows = cio.rows_from_state(state, None)
     assert [r["copy"]["format"] for r in rows] == ["hardcover", "ebook"]
     assert [r["line"] for r in rows] == [1, 2]
-    assert len(cio.rows_from_state(state, None, "goodreads")) == 1
 
 
 # ── Round trips ──────────────────────────────────────────────────────────────
@@ -461,53 +402,10 @@ _NAME = st.lists(_WORD, min_size=1, max_size=3).map(" ".join)
 _DATE = st.dates(min_value=__import__("datetime").date(1900, 1, 1)).map(
     lambda d: d.isoformat()
 )
-_ISBN = st.text(alphabet="0123456789", min_size=9, max_size=9).map(
-    lambda d: isbn_mod.normalize(d + isbn_mod.isbn10_check_char(d))
-)
+_BARCODE = st.text(alphabet="0123456789ABC", min_size=8, max_size=13)
 _TAG = st.text(alphabet=string.ascii_lowercase + "-", min_size=1, max_size=10).filter(
     lambda t: t not in ("read", "currently-reading", "to-read", "did-not-finish")
 )
-
-
-@st.composite
-def _goodreads_row(draw) -> dict:
-    row = cio.empty_row(1)
-    row["title"] = draw(_TEXT.filter(bool))
-    row["authors"] = draw(st.lists(_NAME, min_size=0, max_size=3, unique=True))
-    isbns = draw(st.none() | _ISBN)
-    if isbns:
-        row["isbn13"], row["isbn10"] = isbns
-    row["publisher"] = draw(_TEXT)
-    row["published"] = draw(st.sampled_from(["", "1969", "2001"]))
-    row["pages"] = draw(st.none() | st.integers(min_value=1, max_value=5000))
-    owned = draw(st.integers(min_value=0, max_value=3))
-    row["owned"] = owned
-    if owned:
-        row["copy"] = {"format": draw(st.sampled_from(m.FORMATS))}
-    status = draw(st.sampled_from([None, *m.STATUSES]))
-    if status == "want" and not owned:
-        row["wishlist"] = True
-        status = None
-    elif status is None and not owned:
-        row["wishlist"] = draw(st.booleans())
-    row["status"] = status
-    row["tags"] = draw(st.lists(_TAG, max_size=3, unique=True))
-    if status is not None:
-        row["rating"] = draw(st.none() | st.integers(min_value=1, max_value=5))
-        row["read_count"] = draw(st.integers(min_value=0, max_value=9))
-        if status == "read":
-            row["finished"] = draw(st.none() | _DATE)
-    row["notes"] = draw(_TEXT)
-    return row
-
-
-@settings(max_examples=150, deadline=None)
-@given(st.lists(_goodreads_row(), min_size=1, max_size=5))
-def test_goodreads_round_trip(rows: list[dict]) -> None:
-    for index, row in enumerate(rows, start=1):
-        row["line"] = index
-    again = cio.parse(cio.write(rows, "goodreads"), "goodreads")
-    assert again == rows
 
 
 @st.composite
@@ -522,9 +420,7 @@ def _library_row(draw) -> dict:
     row["authors"] = draw(st.lists(_NAME, max_size=3, unique=True))
     row["subjects"] = draw(st.lists(_NAME, max_size=3, unique=True))
     row["tags"] = draw(st.lists(_TAG, max_size=3, unique=True))
-    isbns = draw(st.none() | _ISBN)
-    if isbns:
-        row["isbn13"], row["isbn10"] = isbns
+    row["barcode"] = draw(st.none() | _BARCODE)
     row["pages"] = draw(st.none() | st.integers(min_value=1, max_value=5000))
     row["language"] = draw(st.sampled_from([None, "en", "de"]))
     if draw(st.booleans()):
@@ -563,7 +459,7 @@ def _library_row(draw) -> dict:
 def test_library_round_trip(rows: list[dict]) -> None:
     for index, row in enumerate(rows, start=1):
         row["line"] = index
-    again = cio.parse(cio.write(rows, "library"), "library")
+    again = cio.parse(cio.write(rows))
     assert again == rows
 
 
@@ -575,7 +471,7 @@ def test_library_round_trip(rows: list[dict]) -> None:
         max_size=5,
         unique_by=(
             lambda r: m.title_key(r["title"], r["authors"]),
-            lambda r: r["isbn13"] or r["book_id"],
+            lambda r: r["barcode"] or r["book_id"],
         ),
     )
 )
@@ -587,7 +483,7 @@ def test_state_export_import_export_is_stable(rows: list[dict]) -> None:
     for index, row in enumerate(rows, start=1):
         row["line"] = index
         row["location"] = []
-    state, _, _, _ = cio.apply_import(
+    state, _, _ = cio.apply_import(
         m.empty_state(),
         rows,
         person_id="p",
@@ -596,14 +492,14 @@ def test_state_export_import_export_is_stable(rows: list[dict]) -> None:
         replace_reading=True,
         now=NOW,
     )
-    first = cio.export(state, "p", "library")
-    rebuilt, _, _, _ = cio.apply_import(
+    first = cio.export(state, "p")
+    rebuilt, _, _ = cio.apply_import(
         m.empty_state(),
-        cio.parse(first, "library"),
+        cio.parse(first),
         person_id="p",
         shelf_id=None,
         import_notes=True,
         replace_reading=True,
         now=NOW,
     )
-    assert cio.export(rebuilt, "p", "library") == first
+    assert cio.export(rebuilt, "p") == first
