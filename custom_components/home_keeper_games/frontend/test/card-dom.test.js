@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import '../src/card-index.ts';
 import { sectionsOn } from '../src/card.ts';
-import { ALEX, bookId, fakeHass, fixture, flush, SAM } from './fake-hass.js';
+import { ALEX, gameId, fakeHass, fixture, flush, SAM } from './fake-hass.js';
 
 let el;
 
@@ -58,20 +58,20 @@ describe('card', () => {
 
   it('sets the page and the read status for the caller, with no person_id', async () => {
     const state = fixture();
-    const id = bookId(state, 'Project Hail Mary');
+    const id = gameId(state, 'Project Hail Mary');
     const fake = await mount();
     $(`[data-k="sp-${id}"]`).click();
     const input = $(`[data-k="page-${id}"]`);
     input.value = '250';
     input.form.requestSubmit();
     await flush();
-    expect(fake.calls('set_reading')[0]).toEqual({ type: 'home_keeper_games/set_reading', book_id: id, page: 250 });
+    expect(fake.calls('set_reading')[0]).toEqual({ type: 'home_keeper_games/set_reading', game_id: id, page: 250 });
     $(`[data-k="rd-${id}"]`).click();
     await flush();
-    expect(fake.calls('set_reading')[1]).toEqual({ type: 'home_keeper_games/set_reading', book_id: id, status: 'read', finished: '2026-10-05', read_count: 1 });
+    expect(fake.calls('set_reading')[1]).toEqual({ type: 'home_keeper_games/set_reading', game_id: id, status: 'read', finished: '2026-10-05', read_count: 1 });
   });
 
-  it('searches and adds a book to want to read', async () => {
+  it('searches and adds a game to want to read', async () => {
     const state = fixture();
     const fake = await mount();
     const input = $('[data-k="q"]');
@@ -79,21 +79,21 @@ describe('card', () => {
     input.value = 'lavinia';
     input.dispatchEvent(new Event('input', { bubbles: true }));
     await new Promise((r) => setTimeout(r, 200));
-    expect(text()).toContain('Living room › Bookcase A › Shelf 3');
+    expect(text()).toContain('Living room › Unit A › Shelf 3');
     expect(el.shadowRoot.activeElement?.dataset.k).toBe('q');
-    $(`[data-k="w-${bookId(state, 'Lavinia')}"]`).click();
+    $(`[data-k="w-${gameId(state, 'Lavinia')}"]`).click();
     await flush();
-    expect(fake.calls('set_reading')[0]).toMatchObject({ book_id: bookId(state, 'Lavinia'), status: 'want' });
+    expect(fake.calls('set_reading')[0]).toMatchObject({ game_id: gameId(state, 'Lavinia'), status: 'want' });
   });
 
   it('shows another person for an admin, with person_id in the call', async () => {
     const state = fixture();
     const fake = await mount({ person: SAM });
     expect($('h2').textContent).toBe('Library: Sam');
-    const id = bookId(state, 'The Left Hand of Darkness');
+    const id = gameId(state, 'The Left Hand of Darkness');
     $(`[data-k="rd-${id}"]`).click();
     await flush();
-    expect(fake.calls('set_reading')[0]).toMatchObject({ book_id: id, person_id: SAM, status: 'read' });
+    expect(fake.calls('set_reading')[0]).toMatchObject({ game_id: id, person_id: SAM, status: 'read' });
   });
 
   it('ignores the person option for a non-admin user', async () => {
@@ -110,7 +110,7 @@ describe('card', () => {
     expect(text()).toContain('No person is linked to this user.');
   });
 
-  it('picks a random book to read', async () => {
+  it('picks a random game to read', async () => {
     const rnd = vi.spyOn(Math, 'random').mockReturnValue(0.99);
     await mount();
     $('[data-k="random"]').click();
@@ -120,8 +120,8 @@ describe('card', () => {
   });
 
   it('hides the sections that are off', async () => {
-    await mount({ search: false, reading: false, want: false, household: false, title: 'Books' });
-    expect($('h2').textContent).toBe('Books');
+    await mount({ search: false, reading: false, want: false, household: false, title: 'Games' });
+    expect($('h2').textContent).toBe('Games');
     expect($('[data-k="q"]')).toBeNull();
     expect(text()).not.toContain('Project Hail Mary');
     expect(text()).toContain('6 of 24 books in 2026');

@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import '../src/tab-index.ts';
 import { coverUrls } from '../src/markup.ts';
-import { ALEX, bookId, fakeHass, fixture, flush, SAM } from './fake-hass.js';
+import { ALEX, gameId, fakeHass, fixture, flush, SAM } from './fake-hass.js';
 
 let el;
 let host;
 
-async function mount(path = '/books', opts = {}) {
+async function mount(path = '/games', opts = {}) {
   const fake = fakeHass(opts);
   el = document.createElement('home-keeper-games-tab');
   host = {
@@ -59,7 +59,7 @@ describe('data', () => {
     let resolve;
     fake.hass.connection.subscribeMessage = vi.fn(() => new Promise((r) => (resolve = r)));
     el = document.createElement('home-keeper-games-tab');
-    el.route = { path: '/books' };
+    el.route = { path: '/games' };
     document.body.appendChild(el);
     el.hass = fake.hass;
     await flush();
@@ -73,7 +73,7 @@ describe('data', () => {
     const fake = fakeHass();
     fake.send.mockRejectedValueOnce({ message: 'boom' });
     el = document.createElement('home-keeper-games-tab');
-    el.route = { path: '/books' };
+    el.route = { path: '/games' };
     document.body.appendChild(el);
     el.hass = fake.hass;
     await flush();
@@ -81,17 +81,17 @@ describe('data', () => {
   });
 });
 
-describe('books view', () => {
-  it('shows the owned books with the status counts', async () => {
+describe('games view', () => {
+  it('shows the owned games with the status counts', async () => {
     await mount();
     expect($$('.hkl-tile')).toHaveLength(38);
     expect($('[data-k="st-all"]').textContent).toContain('38');
     expect($('[data-k="st-read"]').textContent).toContain('9');
-    expect($('[data-k="nav-books"]').getAttribute('aria-current')).toBe('page');
+    expect($('[data-k="nav-games"]').getAttribute('aria-current')).toBe('page');
   });
 
   it('reads the filters from the route', async () => {
-    await mount('/books;status=reading;view=rows');
+    await mount('/games;status=reading;view=rows');
     expect($$('.hkl-row').map((r) => r.querySelector('.hkl-row-title').textContent)).toEqual([
       'Every Grain of Rice',
       'Integrated Chinese 1',
@@ -101,28 +101,28 @@ describe('books view', () => {
     expect($('[data-k="st-reading"]').getAttribute('aria-pressed')).toBe('true');
   });
 
-  it('includes books with no copy when owned is all', async () => {
-    await mount('/books;owned=all');
+  it('includes games with no copy when owned is all', async () => {
+    await mount('/games;owned=all');
     expect($$('.hkl-tile')).toHaveLength(44);
   });
 
   it('navigates with replace when a chip or a menu changes', async () => {
     await mount();
     $('[data-k="st-read"]').click();
-    expect(host.navigate).toHaveBeenLastCalledWith('/books;status=read', { replace: true });
+    expect(host.navigate).toHaveBeenLastCalledWith('/games;status=read', { replace: true });
     change($('[data-k="f-sort"]'), 'title');
-    expect(host.navigate).toHaveBeenLastCalledWith('/books;status=read;sort=title', { replace: true });
+    expect(host.navigate).toHaveBeenLastCalledWith('/games;status=read;sort=title', { replace: true });
     $('[data-k="clear"]').click();
-    expect(host.navigate).toHaveBeenLastCalledWith('/books;sort=title', { replace: true });
+    expect(host.navigate).toHaveBeenLastCalledWith('/games;sort=title', { replace: true });
   });
 
   it('clears a shelf that is not in the new room', async () => {
     const state = fixture();
     const shelf = Object.values(state.shelves).find((s) => s.name === 'Top').id;
     const office = Object.values(state.rooms).find((r) => r.name === 'Office').id;
-    await mount(`/books;shelf=${shelf}`);
+    await mount(`/games;shelf=${shelf}`);
     change($('[data-k="f-room"]'), office);
-    expect(host.navigate).toHaveBeenLastCalledWith(`/books;room=${office}`, { replace: true });
+    expect(host.navigate).toHaveBeenLastCalledWith(`/games;room=${office}`, { replace: true });
   });
 
   it('debounces the search into the URL and keeps the focus', async () => {
@@ -134,22 +134,22 @@ describe('books view', () => {
     input.dispatchEvent(new Event('input', { bubbles: true }));
     expect(host.navigate).not.toHaveBeenCalled();
     vi.advanceTimersByTime(260);
-    expect(host.navigate).toHaveBeenCalledWith('/books;q=le%20guin', { replace: true });
+    expect(host.navigate).toHaveBeenCalledWith('/games;q=le%20guin', { replace: true });
     expect(el.shadowRoot.activeElement?.dataset.k).toBe('q');
     expect($$('.hkl-tile').length).toBe(12);
   });
 
-  it('opens a book with a push', async () => {
+  it('opens a game with a push', async () => {
     await mount();
     $('.hkl-tile').click();
-    expect(host.navigate.mock.calls[0][0]).toMatch(/^\/books\/[0-9a-f]{32}$/);
+    expect(host.navigate.mock.calls[0][0]).toMatch(/^\/games\/[0-9a-f]{32}$/);
     expect(host.navigate.mock.calls[0][1]).toEqual({ replace: false });
   });
 
   it('escapes user text', async () => {
     const state = fixture();
-    state.books.find((b) => b.title === 'Dune').title = '<img src=x onerror="alert(1)">';
-    await mount('/books', { state });
+    state.games.find((b) => b.title === 'Dune').title = '<img src=x onerror="alert(1)">';
+    await mount('/games', { state });
     expect(el.shadowRoot.querySelector('img[src="x"]')).toBeNull();
     expect(text()).toContain('<img src=x onerror="alert(1)">');
   });
@@ -157,7 +157,7 @@ describe('books view', () => {
   it('shows a banner for a non-admin user', async () => {
     const state = fixture();
     state.me.is_admin = false;
-    await mount('/books', { state });
+    await mount('/games', { state });
     expect(text()).toContain('Only an admin can change the library.');
   });
 });
@@ -167,14 +167,14 @@ describe('covers', () => {
 
   it('signs each cover path, then shows the image with the signed URL', async () => {
     const state = fixture();
-    const book = state.books.find((b) => b.title === 'The Left Hand of Darkness');
-    expect(book.cover_url).toMatch(/^\/api\/home_keeper_games\/cover\/[0-9a-f]{32}\?v=[0-9a-f]{8}$/);
-    const fake = await mount('/books');
+    const game = state.games.find((b) => b.title === 'The Left Hand of Darkness');
+    expect(game.cover_url).toMatch(/^\/api\/home_keeper_games\/cover\/[0-9a-f]{32}\?v=[0-9a-f]{8}$/);
+    const fake = await mount('/games');
     const signs = fake.send.mock.calls.map((c) => c[0]).filter((m) => m.type === 'auth/sign_path');
-    expect(signs.length).toBe(state.books.filter((b) => b.owned && b.cover_url).length);
+    expect(signs.length).toBe(state.games.filter((b) => b.owned && b.cover_url).length);
     expect(signs[0].expires).toBe(3600);
-    const tile = $(`[data-k="b-${book.id}"]`);
-    expect(tile.querySelector('img').getAttribute('src')).toBe(`${book.cover_url}&authSig=t3600`);
+    const tile = $(`[data-k="b-${game.id}"]`);
+    expect(tile.querySelector('img').getAttribute('src')).toBe(`${game.cover_url}&authSig=t3600`);
     expect(tile.querySelector('.hkl-cover-badge').textContent).toBe('Custom cover');
     const plain = $$('.hkl-tile .hkl-cover:not([data-cover])');
     expect(plain.length).toBeGreaterThan(0);
@@ -183,19 +183,19 @@ describe('covers', () => {
 
   it('shows the title block when the sign fails', async () => {
     const state = fixture();
-    const book = state.books.find((b) => b.title === 'Piranesi');
-    await mount(`/books/${book.id}`, { replies: { 'auth/sign_path': () => Promise.reject(new Error('no')) } });
+    const game = state.games.find((b) => b.title === 'Piranesi');
+    await mount(`/games/${game.id}`, { replies: { 'auth/sign_path': () => Promise.reject(new Error('no')) } });
     const block = $('.hkl-cover-large');
-    expect(block.dataset.cover).toBe(book.cover_url);
+    expect(block.dataset.cover).toBe(game.cover_url);
     expect(block.querySelector('img')).toBeNull();
     expect(block.querySelector('.hkl-cover-title').textContent).toBe('Piranesi');
   });
 
   it('puts the reader marks in their own row and shows the ring colors in the legend', async () => {
     const state = fixture();
-    const book = state.books.find((b) => b.title === 'The Left Hand of Darkness');
-    await mount('/books');
-    const tile = $(`[data-k="b-${book.id}"]`);
+    const game = state.games.find((b) => b.title === 'The Left Hand of Darkness');
+    await mount('/games');
+    const tile = $(`[data-k="b-${game.id}"]`);
     const dots = tile.querySelectorAll('.hkl-tile-readers .hkl-dot');
     expect([...dots].map((d) => d.getAttribute('aria-label'))).toEqual(['Alex: Read', 'Sam: Reading']);
     expect(tile.querySelector('.hkl-tile-meta .hkl-dot')).toBeNull();
@@ -204,14 +204,14 @@ describe('covers', () => {
   });
 });
 
-describe('book detail', () => {
+describe('game detail', () => {
   it('shows the location, the loan and the task link', async () => {
     const state = fixture();
-    await mount(`/books/${bookId(state, 'The Left Hand of Darkness')}`);
+    await mount(`/games/${gameId(state, 'The Left Hand of Darkness')}`);
     expect($('h1').textContent).toBe('The Left Hand of Darkness');
-    expect(text()).toContain('Living room › Bookcase A › Shelf 2');
+    expect(text()).toContain('Living room › Unit A › Shelf 2');
     expect(text()).toContain('Priya · since Sep 12, 2026');
-    const task = state.loans.find((l) => l.party === 'Priya' && l.book_id === bookId(state, 'The Left Hand of Darkness')).hk_task_id;
+    const task = state.loans.find((l) => l.party === 'Priya' && l.game_id === gameId(state, 'The Left Hand of Darkness')).hk_task_id;
     expect(task).toMatch(/^[0-9a-f]{32}$/);
     expect($('.hkl-task').getAttribute('href')).toBe(`/home-keeper/tasks/${task}`);
     expect(host.taskLink).toHaveBeenCalledWith(task);
@@ -223,7 +223,7 @@ describe('book detail', () => {
 
   it('opens the task with host.openTask, or leaves the link to the browser', async () => {
     const state = fixture();
-    await mount(`/books/${bookId(state, 'The Left Hand of Darkness')}`);
+    await mount(`/games/${gameId(state, 'The Left Hand of Darkness')}`);
     const link = $('.hkl-task');
     const plain = new MouseEvent('click', { bubbles: true, cancelable: true, composed: true });
     link.dispatchEvent(plain);
@@ -238,16 +238,16 @@ describe('book detail', () => {
 
   it('sets the status, the rating and the page for the person', async () => {
     const state = fixture();
-    const id = bookId(state, 'The Lathe of Heaven');
-    const fake = await mount(`/books/${id}`);
+    const id = gameId(state, 'The Lathe of Heaven');
+    const fake = await mount(`/games/${id}`);
     $('[data-k="rs-reading"]').click();
     await flush();
     const [msg] = fake.calls('set_reading');
-    expect(msg).toMatchObject({ book_id: id, person_id: ALEX, status: 'reading' });
+    expect(msg).toMatchObject({ game_id: id, person_id: ALEX, status: 'reading' });
     expect(msg.started).toMatch(/^\d{4}-\d\d-\d\d$/);
     $('[data-k="star-3"]').click();
     await flush();
-    expect(fake.calls('set_reading')[1]).toMatchObject({ book_id: id, rating: 3 });
+    expect(fake.calls('set_reading')[1]).toMatchObject({ game_id: id, rating: 3 });
     change($('[data-k="r-page"]'), '42');
     await flush();
     expect(fake.calls('set_reading')[2]).toMatchObject({ page: 42 });
@@ -255,8 +255,8 @@ describe('book detail', () => {
 
   it('sets the status of another person', async () => {
     const state = fixture();
-    const id = bookId(state, 'Dune');
-    const fake = await mount(`/books/${id}`);
+    const id = gameId(state, 'Dune');
+    const fake = await mount(`/games/${id}`);
     change($('[data-k="rp"]'), SAM);
     $('[data-k="rs-read"]').click();
     await flush();
@@ -265,7 +265,7 @@ describe('book detail', () => {
 
   it('returns a loan', async () => {
     const state = fixture();
-    const fake = await mount(`/books/${bookId(state, 'The Left Hand of Darkness')}`);
+    const fake = await mount(`/games/${gameId(state, 'The Left Hand of Darkness')}`);
     $('[data-act="return-loan"]').click();
     await flush();
     expect(fake.calls('return_loan')).toEqual([{ type: 'home_keeper_games/return_loan', loan_id: expect.any(String) }]);
@@ -274,37 +274,37 @@ describe('book detail', () => {
 
   it('deletes after the confirmation and goes back to the list', async () => {
     const state = fixture();
-    const id = bookId(state, 'Dune');
-    const fake = await mount(`/books/${id}`);
-    $('[data-k="delete-book"]').click();
+    const id = gameId(state, 'Dune');
+    const fake = await mount(`/games/${id}`);
+    $('[data-k="delete-game"]').click();
     expect(el.shadowRoot.getElementById('dlg').textContent).toContain('Delete "Dune"');
     $('[data-k="d-submit"]').click();
     await flush();
-    expect(fake.calls('delete_book')[0]).toMatchObject({ book_id: id });
-    expect(host.navigate).toHaveBeenLastCalledWith('/books', { replace: true });
+    expect(fake.calls('delete_game')[0]).toMatchObject({ game_id: id });
+    expect(host.navigate).toHaveBeenLastCalledWith('/games', { replace: true });
   });
 
-  it('shows the gone notice for a deleted book', async () => {
-    await mount('/books/nope');
+  it('shows the gone notice for a deleted game', async () => {
+    await mount('/games/nope');
     expect(text()).toContain('This book is not in the library.');
   });
 
   it('saves the shared notes', async () => {
     const state = fixture();
-    const id = bookId(state, 'Dune');
-    const fake = await mount(`/books/${id}`);
+    const id = gameId(state, 'Dune');
+    const fake = await mount(`/games/${id}`);
     $('[data-k="notes-edit"]').click();
     $('[data-k="notes-text"]').value = '**Good**';
     $('[data-k="notes-save"]').click();
     await flush();
-    expect(fake.calls('update_book')[0]).toMatchObject({ book_id: id, shared_notes: '**Good**' });
+    expect(fake.calls('update_game')[0]).toMatchObject({ game_id: id, shared_notes: '**Good**' });
   });
 
-  it('edits the book from the dialog', async () => {
+  it('edits the game from the dialog', async () => {
     const state = fixture();
-    const id = bookId(state, 'Dune');
-    const fake = await mount(`/books/${id}`);
-    $('[data-k="edit-book"]').click();
+    const id = gameId(state, 'Dune');
+    const fake = await mount(`/games/${id}`);
+    $('[data-k="edit-game"]').click();
     const dlg = el.shadowRoot.getElementById('dlg');
     dlg.querySelector('[name="authors"]').value = 'Frank Herbert, Someone Else';
     dlg.querySelector('[name="barcode"]').value = 'ab-12';
@@ -312,8 +312,8 @@ describe('book detail', () => {
     dlg.querySelector('[name="series_number"]').value = '1';
     dlg.querySelector('[data-k="d-submit"]').click();
     await flush();
-    expect(fake.calls('update_book')[0]).toMatchObject({
-      book_id: id,
+    expect(fake.calls('update_game')[0]).toMatchObject({
+      game_id: id,
       title: 'Dune',
       authors: ['Frank Herbert', 'Someone Else'],
       barcode: 'AB12',
@@ -326,8 +326,8 @@ describe('book detail', () => {
   it('shows the error of a failed dialog inline and keeps what the user typed', async () => {
     const state = fixture();
     let n = 0;
-    await mount(`/books/${bookId(state, 'Dune')}`, { replies: { update_book: () => Promise.reject({ message: `Not allowed ${++n}` }) } });
-    $('[data-k="edit-book"]').click();
+    await mount(`/games/${gameId(state, 'Dune')}`, { replies: { update_game: () => Promise.reject({ message: `Not allowed ${++n}` }) } });
+    $('[data-k="edit-game"]').click();
     const dlg = el.shadowRoot.getElementById('dlg');
     dlg.querySelector('[name="subtitle"]').value = 'Typed text';
     dlg.querySelector('[data-k="d-submit"]').click();
@@ -344,15 +344,15 @@ describe('book detail', () => {
   it('disables the submit button while the call runs, and a late reply leaves a new dialog open', async () => {
     const state = fixture();
     let finish;
-    await mount(`/books/${bookId(state, 'Dune')}`, { replies: { update_book: () => new Promise((r) => (finish = r)) } });
-    $('[data-k="edit-book"]').click();
+    await mount(`/games/${gameId(state, 'Dune')}`, { replies: { update_game: () => new Promise((r) => (finish = r)) } });
+    $('[data-k="edit-game"]').click();
     const dlg = el.shadowRoot.getElementById('dlg');
     dlg.querySelector('[data-k="d-submit"]').click();
     await flush();
     expect(dlg.querySelector('[data-k="d-submit"]').disabled).toBe(true);
     dlg.querySelector('[data-k="d-x"]').click();
     expect(dlg.innerHTML).toBe('');
-    $('[data-k="edit-book"]').click();
+    $('[data-k="edit-game"]').click();
     finish({});
     await flush();
     expect(dlg.querySelector('[data-k="d-submit"]').disabled).toBe(false);
@@ -360,8 +360,8 @@ describe('book detail', () => {
 
   it('keeps the notes editor open with the text when the save fails', async () => {
     const state = fixture();
-    const id = bookId(state, 'Dune');
-    await mount(`/books/${id}`, { replies: { update_book: () => Promise.reject({ message: 'No' }) } });
+    const id = gameId(state, 'Dune');
+    await mount(`/games/${id}`, { replies: { update_game: () => Promise.reject({ message: 'No' }) } });
     $('[data-k="notes-edit"]').click();
     $('[data-k="notes-text"]').value = 'Kept';
     $('[data-k="notes-save"]').click();
@@ -372,8 +372,8 @@ describe('book detail', () => {
 
   it('shows the stored status again when a change fails', async () => {
     const state = fixture();
-    const id = bookId(state, 'The Lathe of Heaven');
-    await mount(`/books/${id}`, { replies: { set_reading: () => Promise.reject({ message: 'No' }) } });
+    const id = gameId(state, 'The Lathe of Heaven');
+    await mount(`/games/${id}`, { replies: { set_reading: () => Promise.reject({ message: 'No' }) } });
     const page = $('[data-k="r-page"]');
     const before = page.value;
     change(page, '42');
@@ -383,7 +383,7 @@ describe('book detail', () => {
 });
 
 describe('shelves, loans, wishlist and settings', () => {
-  it('draws a spine for each book on a shelf', async () => {
+  it('draws a spine for each game on a shelf', async () => {
     await mount('/shelves');
     const shelf = $$('.hkl-shelf')[1];
     expect(shelf.querySelector('.hkl-shelf-name').textContent).toBe('Shelf 2');
@@ -391,16 +391,16 @@ describe('shelves, loans, wishlist and settings', () => {
     expect(text()).toContain('No shelf: 2 copies');
   });
 
-  it('adds a bookcase with shelves', async () => {
-    const fake = await mount('/shelves', { replies: { add_bookcase: { id: 'newcase' } } });
-    $('[data-act="add-bookcase"]').click();
+  it('adds a unit with shelves', async () => {
+    const fake = await mount('/shelves', { replies: { add_unit: { id: 'newcase' } } });
+    $('[data-act="add-unit"]').click();
     const dlg = el.shadowRoot.getElementById('dlg');
     dlg.querySelector('[name="name"]').value = 'Case C';
     dlg.querySelector('[name="shelves"]').value = '2';
     dlg.querySelector('[data-k="d-submit"]').click();
     await flush(10);
-    expect(fake.calls('add_bookcase')[0]).toMatchObject({ name: 'Case C', room_id: expect.any(String) });
-    expect(fake.calls('add_shelf').map((m) => [m.bookcase_id, m.name])).toEqual([
+    expect(fake.calls('add_unit')[0]).toMatchObject({ name: 'Case C', room_id: expect.any(String) });
+    expect(fake.calls('add_shelf').map((m) => [m.unit_id, m.name])).toEqual([
       ['newcase', 'Shelf 1'],
       ['newcase', 'Shelf 2'],
     ]);
@@ -416,16 +416,16 @@ describe('shelves, loans, wishlist and settings', () => {
 
   it('lends a copy with a task', async () => {
     const fake = await mount('/loans');
-    $('[data-k="lend-book"]').click();
+    $('[data-k="lend-game"]').click();
     const dlg = el.shadowRoot.getElementById('dlg');
     dlg.querySelector('[name="party"]').value = 'Priya';
     dlg.querySelector('[name="due"]').value = '2026-11-04';
     dlg.querySelector('[data-k="d-submit"]').click();
     await flush();
-    expect(fake.calls('lend_book')[0]).toMatchObject({ party: 'Priya', due: '2026-11-04', add_task: true, copy_id: expect.any(String) });
+    expect(fake.calls('lend_game')[0]).toMatchObject({ party: 'Priya', due: '2026-11-04', add_task: true, copy_id: expect.any(String) });
   });
 
-  it('adds a borrowed book by barcode', async () => {
+  it('adds a borrowed game by barcode', async () => {
     const fake = await mount('/loans');
     $('[data-k="add-borrowed"]').click();
     const dlg = el.shadowRoot.getElementById('dlg');
@@ -433,24 +433,24 @@ describe('shelves, loans, wishlist and settings', () => {
     dlg.querySelector('[name="party"]').value = 'Library';
     dlg.querySelector('[data-k="d-submit"]').click();
     await flush();
-    expect(fake.calls('borrow_book')[0]).toMatchObject({ barcode: '9780441478125', party: 'Library', person_id: ALEX });
-    expect(fake.calls('borrow_book')[0].title).toBeUndefined();
+    expect(fake.calls('borrow_game')[0]).toMatchObject({ barcode: '9780441478125', party: 'Library', person_id: ALEX });
+    expect(fake.calls('borrow_game')[0].title).toBeUndefined();
   });
 
-  it('sets Buy on a wishlist book', async () => {
+  it('sets Buy on a wishlist game', async () => {
     const fake = await mount('/wishlist');
     expect($$('.hkl-listrow')).toHaveLength(4);
     const box = $('[data-chg="wish-buy"]:not(:checked)');
     change(box, true);
     await flush();
-    expect(fake.calls('update_wishlist')[0]).toMatchObject({ book_id: box.dataset.id, buy: true });
+    expect(fake.calls('update_wishlist')[0]).toMatchObject({ game_id: box.dataset.id, buy: true });
   });
 
   it('saves the person settings', async () => {
-    const fake = await mount('/settings', { replies: { list_todo_entities: { entities: [{ entity_id: 'todo.books', name: 'Books list' }] } } });
+    const fake = await mount('/settings', { replies: { list_todo_entities: { entities: [{ entity_id: 'todo.books', name: 'Games list' }] } } });
     await flush();
     expect(fake.calls('list_todo_entities')).toHaveLength(1);
-    expect($$('[data-key="wishlist_todo"] option').map((o) => o.textContent)).toContain('Books list');
+    expect($$('[data-key="wishlist_todo"] option').map((o) => o.textContent)).toContain('Games list');
     change($(`[data-k="pg-${ALEX}"]`), '30');
     await flush();
     expect(fake.calls('set_person_settings')[0]).toEqual({ type: 'home_keeper_games/set_person_settings', person_id: ALEX, yearly_goal: 30 });
@@ -528,14 +528,14 @@ describe('scan', () => {
   it('scans a barcode and resolves a duplicate', async () => {
     const state = fixture();
     const shelf = Object.values(state.shelves)[0].id;
-    const dune = Object.values(state.books).find((b) => b.title === 'Dune');
-    const copies = Object.values(state.copies).filter((c) => c.book_id === dune.id);
+    const dune = Object.values(state.games).find((b) => b.title === 'Dune');
+    const copies = Object.values(state.copies).filter((c) => c.game_id === dune.id);
     const fake = await mount(`/scan;shelf=${shelf};step=camera`, {
       replies: {
         scan_barcode: (m) =>
           m.on_duplicate === 'ask'
-            ? { result: 'duplicate', book: dune, copy: null, existing_copies: copies }
-            : { result: 'moved', book: dune, copy: copies[0], existing_copies: copies },
+            ? { result: 'duplicate', game: dune, copy: null, existing_copies: copies }
+            : { result: 'moved', game: dune, copy: copies[0], existing_copies: copies },
       },
     });
     const input = $('[data-k="barcode-input"]');
@@ -546,7 +546,7 @@ describe('scan', () => {
     $('[data-k="barcode-add"]').click();
     await flush();
     expect(fake.calls('scan_barcode')[0]).toMatchObject({ barcode: dune.barcode, shelf_id: shelf, on_duplicate: 'ask' });
-    expect(text()).toContain('Already in Living room › Bookcase A › Shelf 1');
+    expect(text()).toContain('Already in Living room › Unit A › Shelf 1');
     $('[data-value="move"]').click();
     await flush();
     expect(fake.calls('scan_barcode')[1]).toMatchObject({ on_duplicate: 'move' });
@@ -571,17 +571,17 @@ describe('scan', () => {
     expect(el.shadowRoot.activeElement).toBe(now);
   });
 
-  it('marks a scanned book that comes from the wishlist', async () => {
+  it('marks a scanned game that comes from the wishlist', async () => {
     const state = fixture();
     const shelf = state.shelves[0].id;
-    const wished = state.books.find((b) => b.title === 'The Other Wind');
-    const dune = state.books.find((b) => b.title === 'Dune');
+    const wished = state.games.find((b) => b.title === 'The Other Wind');
+    const dune = state.games.find((b) => b.title === 'Dune');
     const fake = await mount(`/scan;shelf=${shelf};step=camera`, {
       replies: {
         scan_barcode: (m) =>
           m.barcode === wished.barcode
-            ? { result: 'added', book: wished, copy: null, existing_copies: [], from_wishlist: true }
-            : { result: 'added', book: dune, copy: null, existing_copies: [] },
+            ? { result: 'added', game: wished, copy: null, existing_copies: [], from_wishlist: true }
+            : { result: 'added', game: dune, copy: null, existing_copies: [] },
       },
     });
     void fake;
@@ -598,12 +598,12 @@ describe('scan', () => {
     expect(duneRow.querySelector('[data-k^="from-wish-"]')).toBeNull();
   });
 
-  it('sets Read for me on the scanned books when the box is set', async () => {
+  it('sets Read for me on the scanned games when the box is set', async () => {
     const state = fixture();
     const shelf = Object.values(state.shelves)[0].id;
-    const dune = Object.values(state.books).find((b) => b.title === 'Dune');
+    const dune = Object.values(state.games).find((b) => b.title === 'Dune');
     const fake = await mount(`/scan;shelf=${shelf};step=camera`, {
-      replies: { scan_barcode: { result: 'added', book: dune, copy: null, existing_copies: [] } },
+      replies: { scan_barcode: { result: 'added', game: dune, copy: null, existing_copies: [] } },
     });
     $('[data-k="barcode-input"]').value = dune.barcode;
     $('[data-k="barcode-add"]').click();
@@ -612,7 +612,7 @@ describe('scan', () => {
     change($('[data-k="markread"]'), true);
     $('[data-k="scan-finish"]').click();
     await flush();
-    expect(fake.calls('set_reading')[0]).toMatchObject({ book_id: dune.id, person_id: ALEX, status: 'read' });
+    expect(fake.calls('set_reading')[0]).toMatchObject({ game_id: dune.id, person_id: ALEX, status: 'read' });
   });
 });
 
@@ -621,14 +621,14 @@ describe('scan with no match', () => {
     Object.defineProperty(window, 'isSecureContext', { value: false, configurable: true });
   });
 
-  /** A book that a scan of a new barcode saved: its barcode is its title. */
+  /** A game that a scan of a new barcode saved: its barcode is its title. */
   function missing(state, code, id) {
     const shelf = state.shelves[0].id;
-    const book = { ...state.books[0], id, title: code, subtitle: '', authors: [], barcode: code, publisher: '', published: '', pages: null, needs_details: true, cover: null };
-    const copy = { ...state.copies[0], id: `c-${id}`, book_id: id, shelf_id: shelf, format: 'paperback' };
-    state.books.push(book);
+    const game = { ...state.games[0], id, title: code, subtitle: '', authors: [], barcode: code, publisher: '', published: '', pages: null, needs_details: true, cover: null };
+    const copy = { ...state.copies[0], id: `c-${id}`, game_id: id, shelf_id: shelf, format: 'paperback' };
+    state.games.push(game);
     state.copies.push(copy);
-    return { book, copy, reply: { result: 'not_found', book, copy, existing_copies: [] } };
+    return { game, copy, reply: { result: 'not_found', game, copy, existing_copies: [] } };
   }
 
   async function scan(code) {
@@ -651,13 +651,13 @@ describe('scan with no match', () => {
       state,
       replies: {
         scan_barcode: miss.reply,
-        update_book: (m) => {
-          miss.book.title = m.title;
-          return { book: miss.book };
+        update_game: (m) => {
+          miss.game.title = m.title;
+          return { game: miss.game };
         },
       },
     });
-    await scan(miss.book.barcode);
+    await scan(miss.game.barcode);
     await flush();
     expect(sheet()).not.toBeNull();
     expect(sheet().querySelector('h2').textContent).toBe('No book has this barcode');
@@ -684,9 +684,9 @@ describe('scan with no match', () => {
     expect(submit.disabled).toBe(false);
     submit.click();
     await flush();
-    const calls = fake.calls('update_book');
+    const calls = fake.calls('update_game');
     expect(calls).toHaveLength(1);
-    expect(calls[0]).toEqual({ type: 'home_keeper_games/update_book', book_id: 'new', title: 'Field Notes on Moss' });
+    expect(calls[0]).toEqual({ type: 'home_keeper_games/update_game', game_id: 'new', title: 'Field Notes on Moss' });
     expect(fake.calls('update_copy')).toHaveLength(0);
     expect(fake.calls('set_cover')).toHaveLength(0);
     expect(sheet()).toBeNull();
@@ -704,12 +704,12 @@ describe('scan with no match', () => {
     const state = fixture();
     const miss = missing(state, '9781402894626', 'new');
     const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, { state, replies: { scan_barcode: miss.reply } });
-    await scan(miss.book.barcode);
+    await scan(miss.game.barcode);
     await flush();
     sheet().dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     await flush();
     expect(sheet().querySelector('.hkl-error').textContent).toBe('Type the title.');
-    expect(fake.calls('update_book')).toHaveLength(0);
+    expect(fake.calls('update_game')).toHaveLength(0);
   });
 
   it('keeps the sheet open with the error when a save call fails', async () => {
@@ -724,13 +724,13 @@ describe('scan with no match', () => {
         },
       },
     });
-    await scan(miss.book.barcode);
+    await scan(miss.game.barcode);
     await flush();
     typeTitle('Field Notes on Moss');
     sheet().querySelector('[name="format"]').value = 'hardcover';
     sheet().querySelector('[data-k="d-submit"]').click();
     await flush();
-    expect(fake.calls('update_book')).toHaveLength(1);
+    expect(fake.calls('update_game')).toHaveLength(1);
     expect(sheet()).not.toBeNull();
     expect(sheet().querySelector('.hkl-error').textContent).toContain('Copy save failed');
     expect(sheet().querySelector('[name="title"]').value).toBe('Field Notes on Moss');
@@ -744,7 +744,7 @@ describe('scan with no match', () => {
     const state = fixture();
     const miss = missing(state, '9781402894626', 'new');
     const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, { state, replies: { scan_barcode: miss.reply } });
-    await scan(miss.book.barcode);
+    await scan(miss.game.barcode);
     await flush();
     sheet().querySelector('[data-k="d-more-toggle"]').click();
     expect(sheet().querySelector('[data-k="d-more"]').open).toBe(true);
@@ -757,9 +757,9 @@ describe('scan with no match', () => {
     set('format', 'hardcover');
     sheet().querySelector('[data-k="d-submit"]').click();
     await flush();
-    expect(fake.calls('update_book')[0]).toEqual({
-      type: 'home_keeper_games/update_book',
-      book_id: 'new',
+    expect(fake.calls('update_game')[0]).toEqual({
+      type: 'home_keeper_games/update_game',
+      game_id: 'new',
       title: 'Field Notes on Moss',
       authors: ['A. Hollins', 'B. Reed'],
       published: '2004',
@@ -769,17 +769,17 @@ describe('scan with no match', () => {
     expect(sheet()).toBeNull();
   });
 
-  it('removes a scan, then asks for the next book with no match', async () => {
+  it('removes a scan, then asks for the next game with no match', async () => {
     const state = fixture();
     const first = missing(state, '9781402894626', 'one');
     const second = missing(state, '9780306406157', 'two');
     const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, {
       state,
-      replies: { scan_barcode: (m) => (m.barcode === first.book.barcode ? first.reply : second.reply) },
+      replies: { scan_barcode: (m) => (m.barcode === first.game.barcode ? first.reply : second.reply) },
     });
     // The 2nd scan starts while the lookup of the 1st one runs.
-    void scan(first.book.barcode);
-    void scan(second.book.barcode);
+    void scan(first.game.barcode);
+    void scan(second.game.barcode);
     await flush();
     expect(fake.calls('scan_barcode')).toHaveLength(2);
     expect(sheet().querySelector('[data-k="d-barcode"]').textContent).toBe('Barcode 9781402894626');
@@ -787,11 +787,11 @@ describe('scan with no match', () => {
     expect(remove.textContent).toBe('Remove this scan');
     remove.click();
     await flush();
-    expect(fake.calls('delete_book')).toEqual([{ type: 'home_keeper_games/delete_book', book_id: 'one' }]);
+    expect(fake.calls('delete_game')).toEqual([{ type: 'home_keeper_games/delete_game', game_id: 'one' }]);
     expect(sheet().querySelector('[data-k="d-barcode"]').textContent).toBe('Barcode 9780306406157');
     expect($$('[data-k^="removed-"]').map((p) => p.textContent)).toEqual(['Removed']);
 
-    typeTitle('Second book');
+    typeTitle('Second game');
     sheet().querySelector('[data-k="d-submit"]').click();
     await flush();
     expect(sheet()).toBeNull();
@@ -806,7 +806,7 @@ describe('scan with no match', () => {
       state,
       replies: { scan_barcode: miss.reply },
     });
-    await scan(miss.book.barcode);
+    await scan(miss.game.barcode);
     await flush();
     typeTitle('Field Notes on Moss');
     sheet().querySelector('[data-k="d-submit"]').click();
@@ -821,10 +821,10 @@ describe('scan with no match', () => {
     const state = fixture();
     const miss = missing(state, '9781402894626', 'new');
     await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, { state, replies: { scan_barcode: miss.reply } });
-    await scan(miss.book.barcode);
+    await scan(miss.game.barcode);
     await flush();
     expect(sheet()).not.toBeNull();
-    el.route = { path: '/books' };
+    el.route = { path: '/games' };
     await flush();
     expect(sheet()).toBeNull();
   });
@@ -891,9 +891,9 @@ describe('scan camera', () => {
 
   it('keeps the video in the page when a scan renders the view', async () => {
     const state = fixture();
-    const dune = state.books.find((b) => b.title === 'Dune');
+    const dune = state.games.find((b) => b.title === 'Dune');
     const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, {
-      replies: { scan_barcode: { result: 'added', book: dune, copy: null, existing_copies: [] } },
+      replies: { scan_barcode: { result: 'added', game: dune, copy: null, existing_copies: [] } },
     });
     const v = video();
     const slot = v.parentNode;
@@ -997,9 +997,9 @@ describe('import', () => {
       dry_run: true,
       counts: { rows: 900, read: 3, existing: 1, new: 1, title_match: 1, errors: 1 },
       rows: [
-        { line: 2, title: 'Piranesi', authors: ['Susanna Clarke'], barcode: '9781635575637', book_id: 'b1', action: 'existing', message: '' },
-        { line: 3, title: 'Dune', authors: ['Frank Herbert'], barcode: null, book_id: 'b2', action: 'title_match', message: '' },
-        { line: 4, title: '', authors: [], barcode: null, book_id: null, action: 'error', message: 'The row has no title.' },
+        { line: 2, title: 'Piranesi', authors: ['Susanna Clarke'], barcode: '9781635575637', game_id: 'b1', action: 'existing', message: '' },
+        { line: 3, title: 'Dune', authors: ['Frank Herbert'], barcode: null, game_id: 'b2', action: 'title_match', message: '' },
+        { line: 4, title: '', authors: [], barcode: null, game_id: null, action: 'error', message: 'The row has no title.' },
       ],
       truncated: true,
     };
@@ -1045,13 +1045,13 @@ describe('import', () => {
 });
 
 describe('no Open Library', () => {
-  it('shows no Open Library control in the books, the book and the settings views', async () => {
+  it('shows no Open Library control in the games, the game and the settings views', async () => {
     const state = fixture();
-    const id = bookId(state, 'Dune');
-    await mount('/books');
+    const id = gameId(state, 'Dune');
+    await mount('/games');
     expect($('[data-k="st-not_on_ol"]')).toBeNull();
     expect(text()).not.toContain('Open Library');
-    el.route = { path: `/books/${id}` };
+    el.route = { path: `/games/${id}` };
     await flush();
     expect($('[data-k="ol-banner"]')).toBeNull();
     expect($('[data-k="refresh"]')).toBeNull();

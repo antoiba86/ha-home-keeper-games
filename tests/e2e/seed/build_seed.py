@@ -85,7 +85,8 @@ def _load_pure() -> tuple[types.ModuleType, types.ModuleType]:
 
 def seed_id(kind: str, key: str) -> str:
     """A stable uuid4 hex for a seed record."""
-    # The salt keeps the old name, so the ids of the committed seed files stay the same.
+    # The salt and the kinds keep the old names (book, bookcase), so the ids of the
+    # committed seed files and cover files stay the same.
     digest = hashlib.sha256(f"home-keeper-library-seed:{kind}:{key}".encode()).digest()
     return uuid.UUID(bytes=digest[:16], version=4).hex
 
@@ -100,10 +101,10 @@ def ean13(first12: str) -> str:
 # ── Places ───────────────────────────────────────────────────────────────────
 
 ROOMS = [("living", "Living room", "living_room"), ("office", "Office", "office")]
-BOOKCASES = [
-    ("case_a", "living", "Bookcase A", "By the window"),
-    ("case_b", "living", "Bookcase B", "Next to the TV"),
-    ("tall", "office", "Tall bookcase", ""),
+UNITS = [
+    ("case_a", "living", "Unit A", "By the window"),
+    ("case_b", "living", "Unit B", "Next to the TV"),
+    ("tall", "office", "Tall unit", ""),
 ]
 SHELVES = [
     ("a1", "case_a", "Shelf 1"),
@@ -117,17 +118,17 @@ SHELVES = [
     ("o3", "tall", "Shelf 3"),
 ]
 
-# ── Books ────────────────────────────────────────────────────────────────────
+# ── Games ────────────────────────────────────────────────────────────────────
 # key: (title, authors, barcode first 12 digits, publisher, published, pages,
 #       subjects, series, tags, cover)
 # cover: None or "custom". Each cover is a file in tests/e2e/seed/covers.
 LE_GUIN = ["Ursula K. Le Guin"]
 SF = ["Science fiction"]
 FANTASY = ["Fantasy"]
-BOOKS: dict[str, tuple[Any, ...]] = {
-    "left_hand": ("The Left Hand of Darkness", LE_GUIN, "978044147812", "Ace Books",
+GAMES: dict[str, tuple[Any, ...]] = {
+    "left_hand": ("The Left Hand of Darkness", LE_GUIN, "978044147812", "Ace Games",
                   "1969", 304, [*SF, "Gender"], ("Hainish Cycle", 4), ["Hugo winner"], "custom"),
-    "earthsea": ("A Wizard of Earthsea", LE_GUIN, "978054777374", "Clarion Books",
+    "earthsea": ("A Wizard of Earthsea", LE_GUIN, "978054777374", "Clarion Games",
                  "1968", 183, FANTASY, ("Earthsea", 1), [], "custom"),
     "dispossessed": ("The Dispossessed", LE_GUIN, "978006105488", "Harper Voyager",
                      "1974", 387, [*SF, "Utopias"], ("Hainish Cycle", 6), ["Hugo winner"], "custom"),
@@ -141,20 +142,20 @@ BOOKS: dict[str, tuple[Any, ...]] = {
                "1990", 252, FANTASY, ("Earthsea", 4), ["Nebula winner"], None),
     "always": ("Always Coming Home", LE_GUIN, "978159853705", "Library of America",
                "1985", 523, SF, None, [], None),
-    "word_world": ("The Word for World Is Forest", LE_GUIN, "978076532345", "Tor Books",
+    "word_world": ("The Word for World Is Forest", LE_GUIN, "978076532345", "Tor Games",
                    "1972", 189, SF, ("Hainish Cycle", 5), [], None),
-    "lavinia": ("Lavinia", LE_GUIN, "978015603368", "Mariner Books",
+    "lavinia": ("Lavinia", LE_GUIN, "978015603368", "Mariner Games",
                 "2008", 279, ["Historical fiction"], None, [], None),
     "piranesi": ("Piranesi", ["Susanna Clarke"], "978163557563", "Bloomsbury",
-                 "2020", 272, FANTASY, None, ["Book club"], "custom"),
-    "hail_mary": ("Project Hail Mary", ["Andy Weir"], "978059313520", "Ballantine Books",
+                 "2020", 272, FANTASY, None, ["Game club"], "custom"),
+    "hail_mary": ("Project Hail Mary", ["Andy Weir"], "978059313520", "Ballantine Games",
                   "2021", 476, SF, None, [], "custom"),
     "fifth_season": ("The Fifth Season", ["N. K. Jemisin"], "978031622929", "Orbit",
                      "2015", 468, [*FANTASY, "Science fiction"], ("The Broken Earth", 1),
                      ["Hugo winner"], "custom"),
-    "dune": ("Dune", ["Frank Herbert"], "978044101359", "Ace Books",
+    "dune": ("Dune", ["Frank Herbert"], "978044101359", "Ace Games",
              "1965", 688, SF, ("Dune", 1), [], "custom"),
-    "name_wind": ("The Name of the Wind", ["Patrick Rothfuss"], "978075640474", "DAW Books",
+    "name_wind": ("The Name of the Wind", ["Patrick Rothfuss"], "978075640474", "DAW Games",
                   "2007", 662, FANTASY, ("The Kingkiller Chronicle", 1), [], None),
     "klara": ("Klara and the Sun", ["Kazuo Ishiguro"], "978059331817", "Knopf",
               "2021", 303, SF, None, [], "custom"),
@@ -164,18 +165,18 @@ BOOKS: dict[str, tuple[Any, ...]] = {
                  "2017", 480, ["Cooking"], None, ["Kitchen"], "custom"),
     "food_lab": ("The Food Lab", ["J. Kenji López-Alt"], "978039308108", "W. W. Norton",
                  "2015", 958, ["Cooking", "Science"], None, ["Kitchen"], None),
-    "atlas": ("Atlas of Remote Islands", ["Judith Schalansky"], "978014311820", "Penguin Books",
+    "atlas": ("Atlas of Remote Islands", ["Judith Schalansky"], "978014311820", "Penguin Games",
               "2009", 144, ["Travel", "Maps"], None, [], None),
-    "geb": ("Gödel, Escher, Bach", ["Douglas Hofstadter"], "978046502656", "Basic Books",
+    "geb": ("Gödel, Escher, Bach", ["Douglas Hofstadter"], "978046502656", "Basic Games",
             "1979", 777, ["Mathematics", "Philosophy"], None, [], None),
     "overstory": ("The Overstory", ["Richard Powers"], "978039363552", "W. W. Norton",
                   "2018", 502, ["Literary fiction", "Trees"], None, ["Pulitzer winner"], None),
     "sweetgrass": ("Braiding Sweetgrass", ["Robin Wall Kimmerer"], "978157131356",
                    "Milkweed Editions", "2013", 391, ["Nature", "Botany"], None, [], None),
-    "hobbit": ("The Hobbit", ["J. R. R. Tolkien"], "978054792822", "Mariner Books",
+    "hobbit": ("The Hobbit", ["J. R. R. Tolkien"], "978054792822", "Mariner Games",
                "1937", 310, FANTASY, None, ["Family"], "custom"),
     "wild_things": ("Where the Wild Things Are", ["Maurice Sendak"], "978006025492",
-                    "HarperCollins", "1963", 48, ["Picture books"], None, ["Family"], None),
+                    "HarperCollins", "1963", 48, ["Picture games"], None, ["Family"], None),
     "chinese_1": ("Integrated Chinese 1", ["Yuehua Liu", "Tao-chung Yao"], "978162291135",
                   "Cheng & Tsui", "2017", 420, ["Chinese language"], ("Integrated Chinese", 1),
                   ["Study"], None),
@@ -188,7 +189,7 @@ BOOKS: dict[str, tuple[Any, ...]] = {
                  "Farrar, Straus and Giroux", "2011", 499, ["Psychology"], None, [], None),
     "sapiens": ("Sapiens", ["Yuval Noah Harari"], "978006231609", "Harper",
                 "2011", 443, ["History"], None, [], None),
-    "memory_empire": ("A Memory Called Empire", ["Arkady Martine"], "978125018643", "Tor Books",
+    "memory_empire": ("A Memory Called Empire", ["Arkady Martine"], "978125018643", "Tor Games",
                       "2019", 462, SF, ("Teixcalaan", 1), ["Hugo winner"], None),
     "station_eleven": ("Station Eleven", ["Emily St. John Mandel"], "978080417244", "Vintage",
                        "2014", 333, ["Literary fiction"], None, [], None),
@@ -196,18 +197,18 @@ BOOKS: dict[str, tuple[Any, ...]] = {
                "2012", 320, ["Short stories"], None, [], None),
     "untitled": ("Untitled paperback", [], "978098012345", "", "", None, [], None, [], None),
     "code_only": ("9780980123468", [], "978098012346", "", "", None, [], None, [], None),
-    "steering": ("Steering the Craft", LE_GUIN, "978054461161", "Mariner Books",
+    "steering": ("Steering the Craft", LE_GUIN, "978054461161", "Mariner Games",
                  "1998", 176, ["Writing"], None, [], None),
     "ministry": ("The Ministry for the Future", ["Kim Stanley Robinson"], "978031630013",
                  "Orbit", "2020", 563, SF, None, [], "custom"),
     "tomorrow": ("Tomorrow, and Tomorrow, and Tomorrow", ["Gabrielle Zevin"], "978059332120",
                  "Knopf", "2022", 401, ["Literary fiction"], None, [], None),
-    # Books with no copy: a borrowed book and the wishlist.
+    # Games with no copy: a borrowed game and the wishlist.
     "spinning": ("Spinning Silver", ["Naomi Novik"], "978039958103", "Del Rey",
                  "2018", 466, FANTASY, None, [], None),
     "sea_tranquility": ("Sea of Tranquility", ["Emily St. John Mandel"], "978059332144",
                         "Knopf", "2022", 255, SF, None, [], None),
-    "other_wind": ("The Other Wind", LE_GUIN, "978054777376", "Clarion Books",
+    "other_wind": ("The Other Wind", LE_GUIN, "978054777376", "Clarion Games",
                    "2001", 246, FANTASY, ("Earthsea", 6), [], None),
     "obelisk": ("The Obelisk Gate", ["N. K. Jemisin"], "978031622926", "Orbit",
                 "2016", 448, FANTASY, ("The Broken Earth", 2), [], None),
@@ -219,22 +220,22 @@ BOOKS: dict[str, tuple[Any, ...]] = {
 }
 NEEDS_DETAILS = {"untitled", "code_only"}
 SHARED_NOTES = {
-    "left_hand": "Book club pick, **Oct 2026**. Sam has the map of Gethen bookmarked on page 6.",
+    "left_hand": "Game club pick, **Oct 2026**. Sam has the map of Gethen bookmarked on page 6.",
     "food_lab": "The *pancake* recipe is on page 102.\n\n- Sticky notes from Jo\n- Do not lend",
     "hobbit": "First edition of the family. Keep it out of the sun.",
 }
 
-# (book, shelf or None, format, condition, acquired, acquired_from, price, value,
+# (game, shelf or None, format, condition, acquired, acquired_from, price, value,
 #  signed, first_edition, note)
 COPIES = [
-    ("left_hand", "a2", "paperback", "good", "2019-05-04", "Elliott Bay Book Co.", 7.99, 45,
+    ("left_hand", "a2", "paperback", "good", "2019-05-04", "Elliott Bay Game Co.", 7.99, 45,
      True, False, "Signed at a reading in Portland."),
     ("left_hand", "o1", "hardcover", "fine", "2023-12-24", "Gift from Jo", None, None,
      False, False, ""),
     ("earthsea", "a2", "paperback", "fair", "2008-07-01", "", 6.5, None, False, False, ""),
-    ("dispossessed", "a2", "paperback", "good", "2015-02-10", "Powell's Books", 9.99, None,
+    ("dispossessed", "a2", "paperback", "good", "2015-02-10", "Powell's Games", 9.99, None,
      False, False, ""),
-    ("lathe", "a2", "paperback", "good", "2015-02-10", "Powell's Books", 8.99, None,
+    ("lathe", "a2", "paperback", "good", "2015-02-10", "Powell's Games", 8.99, None,
      False, False, ""),
     ("atuan", "a2", "paperback", "good", "2008-07-01", "", 6.5, None, False, False, ""),
     ("farthest", "a2", "paperback", "good", "2008-07-01", "", 6.5, None, False, False, ""),
@@ -243,7 +244,7 @@ COPIES = [
      False, False, ""),
     ("word_world", "a3", "paperback", "good", "2016-03-03", "", 8, None, False, False, ""),
     ("lavinia", "a3", "paperback", "good", "2010-05-05", "", 12, None, False, False, ""),
-    ("piranesi", "a1", "hardcover", "fine", "2020-09-15", "Elliott Bay Book Co.", 27,
+    ("piranesi", "a1", "hardcover", "fine", "2020-09-15", "Elliott Bay Game Co.", 27,
      None, False, True, ""),
     ("hail_mary", "a1", "hardcover", "fine", "2021-05-04", "Amazon", 28.99, None,
      False, False, ""),
@@ -252,7 +253,7 @@ COPIES = [
     ("dune", "a1", "paperback", "fair", "2004-06-01", "Garage sale", 1,
      None, False, False, "Spine is cracked."),
     ("name_wind", "a1", "paperback", "good", "2012-08-08", "", 9.99, None, False, False, ""),
-    ("klara", "a1", "hardcover", "fine", "2021-03-02", "Elliott Bay Book Co.", 28, None,
+    ("klara", "a1", "hardcover", "fine", "2021-03-02", "Elliott Bay Game Co.", 28, None,
      False, False, ""),
     ("grain_rice", "oversize", "hardcover", "good", "2014-01-20", "", 35, None,
      False, False, ""),
@@ -260,7 +261,7 @@ COPIES = [
     ("food_lab", "oversize", "hardcover", "good", "2016-12-25", "Gift from Sam", 49.95, 30,
      False, False, ""),
     ("atlas", "oversize", "hardcover", "fine", "2011-06-06", "", 25, None, False, False, ""),
-    ("geb", "o1", "paperback", "fair", "2001-09-01", "University Book Store", 22, None,
+    ("geb", "o1", "paperback", "fair", "2001-09-01", "University Game Store", 22, None,
      False, False, ""),
     ("overstory", "top", "paperback", "good", "2019-10-10", "", 18, None, False, False, ""),
     ("sweetgrass", "top", "paperback", "good", "2021-02-14", "", 20, None, False, False, ""),
@@ -270,7 +271,7 @@ COPIES = [
      False, False, ""),
     ("chinese_1", "o2", "paperback", "good", "2024-01-08", "Cheng & Tsui", 59.99, None,
      False, False, ""),
-    ("sicp", "o2", "hardcover", "good", "2003-09-01", "University Book Store", 75, 60,
+    ("sicp", "o2", "hardcover", "good", "2003-09-01", "University Game Store", 75, 60,
      False, False, ""),
     ("pragmatic", "o2", "paperback", "good", "2005-02-02", "", 39.99, None, False, False, ""),
     ("thinking", "o3", "paperback", "good", "2013-07-07", "", 17, None, False, False, ""),
@@ -287,7 +288,7 @@ COPIES = [
     ("tomorrow", "a4", "hardcover", "fine", "2022-07-05", "", 28, None, False, False, ""),
 ]
 
-# (book, person, status, rating, page, started, finished, read_count, private notes,
+# (game, person, status, rating, page, started, finished, read_count, private notes,
 #  updated_at)
 READING = [
     ("left_hand", ALEX, "read", 4, None, "2025-02-01", "2025-03-02", 2,
@@ -338,14 +339,14 @@ READING = [
      "2026-09-25T10:00:00+00:00"),
 ]
 
-# (key, direction, book, copy index of the book or None, party, person, format,
+# (key, direction, game, copy index of the game or None, party, person, format,
 #  started, due, returned, note)
 LOANS = [
     ("priya_piranesi", "out", "piranesi", 0, "Priya", None, None, "2026-08-12",
      "2026-09-13", None, ""),
     ("priya_left", "out", "left_hand", 1, "Priya", None, None, "2026-09-12", "2026-10-13",
      None, ""),
-    ("club_ministry", "out", "ministry", 0, "Book club", None, None, "2026-10-01", None,
+    ("club_ministry", "out", "ministry", 0, "Game club", None, None, "2026-10-01", None,
      None, "For the November meeting."),
     ("friend_dispossessed", "out", "dispossessed", 0, "Sam's friend Lee", None, None,
      "2026-05-01", "2026-06-01", "2026-05-28", ""),
@@ -355,7 +356,7 @@ LOANS = [
      "2026-09-25", "2026-10-25", None, ""),
 ]
 
-# (book, person, buy, added_at)
+# (game, person, buy, added_at)
 WISHLIST = [
     ("other_wind", ALEX, True, "2026-09-02T10:00:00+00:00"),
     ("obelisk", ALEX, False, "2026-08-15T10:00:00+00:00"),
@@ -373,7 +374,7 @@ PEOPLE = {
 
 
 def cover_file(key: str) -> str:
-    """The stored cover file name of a book: ``<book_id>-<token>.jpg``."""
+    """The stored cover file name of a game: ``<game_id>-<token>.jpg``."""
     token = hashlib.sha256(f"cover:{key}".encode()).hexdigest()[:8]
     return f"{seed_id('book', key)}-{token}.jpg"
 
@@ -385,21 +386,21 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
         room = models.build_room({"name": name, "area_id": area}, order=order)
         room["id"] = seed_id("room", key)
         state["rooms"][room["id"]] = room
-    for order, (key, room, name, note) in enumerate(BOOKCASES, 1):
-        case = models.build_bookcase(
+    for order, (key, room, name, note) in enumerate(UNITS, 1):
+        case = models.build_unit(
             {"room_id": seed_id("room", room), "name": name, "note": note}, order=order
         )
         case["id"] = seed_id("bookcase", key)
-        state["bookcases"][case["id"]] = case
+        state["units"][case["id"]] = case
     orders: dict[str, int] = {}
     for key, case, name in SHELVES:
         orders[case] = orders.get(case, 0) + 1
         shelf = models.build_shelf(
-            {"bookcase_id": seed_id("bookcase", case), "name": name}, order=orders[case]
+            {"unit_id": seed_id("bookcase", case), "name": name}, order=orders[case]
         )
         shelf["id"] = seed_id("shelf", key)
         state["shelves"][shelf["id"]] = shelf
-    for n, (key, row) in enumerate(BOOKS.items()):
+    for n, (key, row) in enumerate(GAMES.items()):
         (
             title,
             authors,
@@ -426,21 +427,21 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
             "tags": tags,
             "shared_notes": SHARED_NOTES.get(key, ""),
         }
-        book = models.build_book(data, now=created)
-        book["id"] = seed_id("book", key)
-        book["updated_at"] = created
-        book["needs_details"] = key in NEEDS_DETAILS
+        game = models.build_game(data, now=created)
+        game["id"] = seed_id("book", key)
+        game["updated_at"] = created
+        game["needs_details"] = key in NEEDS_DETAILS
         if cov:
-            book["cover"] = {"kind": "custom", "file": cover_file(key)}
-        state["books"][book["id"]] = book
+            game["cover"] = {"kind": "custom", "file": cover_file(key)}
+        state["games"][game["id"]] = game
     copy_ids: dict[str, list[str]] = {}
     for row in COPIES:
-        book, shelf, fmt, cond, acquired, source, price, value, signed, first, note = (
+        game, shelf, fmt, cond, acquired, source, price, value, signed, first, note = (
             row
         )
         copy = models.build_copy(
             {
-                "book_id": seed_id("book", book),
+                "game_id": seed_id("book", game),
                 "shelf_id": seed_id("shelf", shelf) if shelf else None,
                 "format": fmt,
                 "condition": cond,
@@ -452,14 +453,14 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
                 "first_edition": first,
                 "note": note,
             },
-            now=state["books"][seed_id("book", book)]["created_at"],
+            now=state["games"][seed_id("book", game)]["created_at"],
         )
-        index = len(copy_ids.setdefault(book, []))
-        copy["id"] = seed_id("copy", f"{book}:{index}")
-        copy_ids[book].append(copy["id"])
+        index = len(copy_ids.setdefault(game, []))
+        copy["id"] = seed_id("copy", f"{game}:{index}")
+        copy_ids[game].append(copy["id"])
         state["copies"][copy["id"]] = copy
     for (
-        book,
+        game,
         person,
         status,
         rating,
@@ -482,11 +483,11 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
                 "private_notes": notes,
             }
         )
-        state["reading"].setdefault(person, {})[seed_id("book", book)] = row
+        state["reading"].setdefault(person, {})[seed_id("book", game)] = row
     for (
         key,
         direction,
-        book,
+        game,
         index,
         party,
         person,
@@ -499,8 +500,8 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
         loan = models.build_loan(
             {
                 "direction": direction,
-                "book_id": seed_id("book", book),
-                "copy_id": copy_ids[book][index] if index is not None else None,
+                "game_id": seed_id("book", game),
+                "copy_id": copy_ids[game][index] if index is not None else None,
                 "party": party,
                 "person_id": person,
                 "format": fmt,
@@ -517,8 +518,8 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
         if due and not back:
             loan["hk_task_id"] = seed_id("task", key)
         state["loans"][loan["id"]] = loan
-    for book, person, buy, at in WISHLIST:
-        state["books"][seed_id("book", book)]["wishlist"] = models.build_wishlist(
+    for game, person, buy, at in WISHLIST:
+        state["games"][seed_id("book", game)]["wishlist"] = models.build_wishlist(
             person, buy=buy, now=at
         )
     state["people"] = {pid: dict(settings) for pid, settings in PEOPLE.items()}
@@ -540,7 +541,7 @@ def project(projections: types.ModuleType, state: dict[str, Any]) -> dict[str, A
 
 
 def draw_covers(state: dict[str, Any]) -> None:
-    """Draw a simple cover image for each book with a cover file."""
+    """Draw a simple cover image for each game with a cover file."""
     from PIL import Image, ImageDraw, ImageFont
 
     fonts = Path("/usr/share/fonts/truetype/dejavu")
@@ -561,8 +562,8 @@ def draw_covers(state: dict[str, Any]) -> None:
     COVERS_OUT.mkdir(parents=True, exist_ok=True)
     for old in COVERS_OUT.glob("*.jpg"):
         old.unlink()
-    for n, book in enumerate(sorted(state["books"].values(), key=lambda b: b["id"])):
-        file = book["cover"]["file"]
+    for n, game in enumerate(sorted(state["games"].values(), key=lambda b: b["id"])):
+        file = game["cover"]["file"]
         if not file:
             continue
         bg, ink = palette[n % len(palette)]
@@ -571,7 +572,7 @@ def draw_covers(state: dict[str, Any]) -> None:
         draw.rectangle((0, 0, 18, 600), fill=ink)
         draw.rectangle((40, 330, 360, 334), fill=ink)
         title_font = ImageFont.truetype(str(fonts / "DejaVuSerif-Bold.ttf"), 40)
-        words, lines, line = book["title"].split(), [], ""
+        words, lines, line = game["title"].split(), [], ""
         for word in words:
             test = f"{line} {word}".strip()
             if draw.textlength(test, font=title_font) > 310 and line:
@@ -586,7 +587,7 @@ def draw_covers(state: dict[str, Any]) -> None:
             y += 50
         author_font = ImageFont.truetype(str(fonts / "DejaVuSans.ttf"), 22)
         draw.text(
-            (40, 360), ", ".join(book["authors"]).upper(), font=author_font, fill=ink
+            (40, 360), ", ".join(game["authors"]).upper(), font=author_font, fill=ink
         )
         img.save(COVERS_OUT / file, "JPEG", quality=82)
 
@@ -607,7 +608,7 @@ def main() -> None:
     if "--covers" in sys.argv:
         draw_covers(state)
     print(
-        f"{len(state['books'])} books, {len(state['copies'])} copies, "
+        f"{len(state['games'])} games, {len(state['copies'])} copies, "
         f"{len(state['loans'])} loans"
     )
 

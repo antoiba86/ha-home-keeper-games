@@ -9,7 +9,7 @@ An admin reads the full document. A non-admin reads a projection:
 * A person setting of another person has no ``wishlist_todo``.
 
 A reply never leaks: each read surface goes through :func:`project_state` or
-:func:`project_book`. The sensors use the stats functions at the end.
+:func:`project_game`. The sensors use the stats functions at the end.
 
 This module imports no Home Assistant code.
 """
@@ -45,7 +45,7 @@ def project_export(data: dict[str, Any], *, is_admin: bool) -> dict[str, Any]:
         for name in PRIVATE_LOAN_FIELDS:
             loan.pop(name, None)
     for entry in out.get("reading", []):
-        for row in entry.get("books", []):
+        for row in entry.get("games", []):
             for name in PRIVATE_READING_FIELDS:
                 row.pop(name, None)
     for person in out.get("people", []):
@@ -54,31 +54,31 @@ def project_export(data: dict[str, Any], *, is_admin: bool) -> dict[str, Any]:
     return out
 
 
-def cover_url(book: dict[str, Any]) -> str | None:
-    """The cover path of a book, or None if it has no stored cover file.
+def cover_url(game: dict[str, Any]) -> str | None:
+    """The cover path of a game, or None if it has no stored cover file.
 
     The ``v`` query is the version token in the file name, so a new cover gets a
     new URL and the browser cache does not show the old one.
     """
-    cover = book.get("cover") or {}
+    cover = game.get("cover") or {}
     file = cover.get("file")
     if cover.get("kind", "none") == "none" or not isinstance(file, str) or not file:
         return None
     token = file.rsplit(".", 1)[0].rsplit("-", 1)[-1]
-    return f"{COVER_URL_PREFIX}/{book['id']}?v={token}"
+    return f"{COVER_URL_PREFIX}/{game['id']}?v={token}"
 
 
 def visible_reading(
     state: dict[str, Any],
-    book_id: str,
+    game_id: str,
     *,
     viewer: str | None,
     is_admin: bool,
 ) -> dict[str, dict[str, Any]]:
-    """The reading rows of a book that the viewer can read, by person id."""
+    """The reading rows of a game that the viewer can read, by person id."""
     out: dict[str, dict[str, Any]] = {}
     for person_id, rows in state["reading"].items():
-        row = rows.get(book_id) if isinstance(rows, dict) else None
+        row = rows.get(game_id) if isinstance(rows, dict) else None
         if row is None:
             continue
         if is_admin or person_id == viewer:
@@ -111,27 +111,27 @@ def project_loan(loan: dict[str, Any], *, is_admin: bool) -> dict[str, Any]:
     return out
 
 
-def project_book(
+def project_game(
     state: dict[str, Any],
-    book: dict[str, Any],
+    game: dict[str, Any],
     *,
     viewer: str | None,
     is_admin: bool,
     copy_count: int | None = None,
 ) -> dict[str, Any]:
-    """A book with its visible ``reading``, ``owned`` and ``cover_url``."""
-    out = dict(book)
+    """A game with its visible ``reading``, ``owned`` and ``cover_url``."""
+    out = dict(game)
     if copy_count is None:
         copy_count = sum(
-            1 for c in state["copies"].values() if c.get("book_id") == book["id"]
+            1 for c in state["copies"].values() if c.get("game_id") == game["id"]
         )
     out["owned"] = copy_count > 0
     out["copy_count"] = copy_count
-    out["cover_url"] = cover_url(book)
+    out["cover_url"] = cover_url(game)
     out["reading"] = visible_reading(
-        state, book["id"], viewer=viewer, is_admin=is_admin
+        state, game["id"], viewer=viewer, is_admin=is_admin
     )
-    wishlist = book.get("wishlist")
+    wishlist = game.get("wishlist")
     if wishlist and not is_admin and wishlist.get("person_id") != viewer:
         out["wishlist"] = {
             k: v for k, v in wishlist.items() if k not in PRIVATE_WISHLIST_FIELDS
@@ -199,27 +199,27 @@ def project_state(
     revision: int,
 ) -> dict[str, Any]:
     """The reply of ``home_keeper_games/get_state`` for the viewer."""
-    counts = {book_id: len(rows) for book_id, rows in copies_by_book(state).items()}
-    books = [
-        project_book(
+    counts = {game_id: len(rows) for game_id, rows in copies_by_game(state).items()}
+    games = [
+        project_game(
             state,
-            book,
+            game,
             viewer=viewer,
             is_admin=is_admin,
-            copy_count=counts.get(book["id"], 0),
+            copy_count=counts.get(game["id"], 0),
         )
-        for book in state["books"].values()
+        for game in state["games"].values()
     ]
-    books.sort(key=lambda b: (b["title"].casefold(), b["id"]))
+    games.sort(key=lambda b: (b["title"].casefold(), b["id"]))
     reply: dict[str, Any] = {
         "revision": revision,
         "rooms": _by_order(state["rooms"], None),
-        "bookcases": _by_order(state["bookcases"], "room_id"),
-        "shelves": _by_order(state["shelves"], "bookcase_id"),
-        "books": books,
+        "units": _by_order(state["units"], "room_id"),
+        "shelves": _by_order(state["shelves"], "unit_id"),
+        "games": games,
         "copies": [
             project_copy(c, is_admin=is_admin)
-            for c in _sorted(state["copies"], "book_id", "created_at")
+            for c in _sorted(state["copies"], "game_id", "created_at")
         ],
         "loans": [
             project_loan(loan, is_admin=is_admin)
@@ -236,45 +236,45 @@ def project_state(
     return reply
 
 
-def copies_by_book(state: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
-    """The copies of each book, by book id."""
+def copies_by_game(state: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
+    """The copies of each game, by game id."""
     index: dict[str, list[dict[str, Any]]] = {}
     for copy in state["copies"].values():
-        index.setdefault(copy.get("book_id", ""), []).append(copy)
+        index.setdefault(copy.get("game_id", ""), []).append(copy)
     return index
 
 
-def book_matches(
+def game_matches(
     state: dict[str, Any],
-    book: dict[str, Any],
+    game: dict[str, Any],
     filters: dict[str, Any],
     copies_index: dict[str, list[dict[str, Any]]] | None = None,
 ) -> bool:
-    """Whether a book passes the ``list_books`` filters.
+    """Whether a game passes the ``list_games`` filters.
 
     ``query`` searches the title, the subtitle, the authors, the barcode, the
     series and the tags. ``shelf_id`` and ``room_id`` match a copy location.
-    ``owned`` keeps books with or without copies. ``status`` with ``person_id``
+    ``owned`` keeps games with or without copies. ``status`` with ``person_id``
     matches a reading status.
     """
     query = str(filters.get("query") or "").strip().casefold()
     if query:
-        series = book["series"] or {"name": ""}
+        series = game["series"] or {"name": ""}
         haystack = " ".join(
             [
-                book["title"],
-                book["subtitle"],
-                *book["authors"],
-                book["barcode"] or "",
+                game["title"],
+                game["subtitle"],
+                *game["authors"],
+                game["barcode"] or "",
                 series["name"],
-                *book["tags"],
+                *game["tags"],
             ]
         ).casefold()
         if query not in haystack:
             return False
     if copies_index is None:
-        copies_index = copies_by_book(state)
-    copies = copies_index.get(book["id"], [])
+        copies_index = copies_by_game(state)
+    copies = copies_index.get(game["id"], [])
     owned = filters.get("owned")
     if owned is not None and bool(copies) != owned:
         return False
@@ -286,61 +286,61 @@ def book_matches(
         rooms = set()
         for copy in copies:
             shelf = state["shelves"].get(copy.get("shelf_id") or "") or {}
-            bookcase = state["bookcases"].get(shelf.get("bookcase_id") or "") or {}
-            rooms.add(bookcase.get("room_id"))
+            unit = state["units"].get(shelf.get("unit_id") or "") or {}
+            rooms.add(unit.get("room_id"))
         if room_id not in rooms:
             return False
     status = filters.get("status")
     if status:
         person_id = filters.get("person_id")
-        row = (state["reading"].get(person_id) or {}).get(book["id"]) or {}
+        row = (state["reading"].get(person_id) or {}).get(game["id"]) or {}
         if row.get("status") != status:
             return False
     return True
 
 
-def list_books(
+def list_games(
     state: dict[str, Any],
     filters: dict[str, Any],
     *,
     viewer: str | None,
     is_admin: bool,
 ) -> list[dict[str, Any]]:
-    """The projected books that pass *filters*, sorted by title."""
+    """The projected games that pass *filters*, sorted by title."""
     limit = int(filters.get("limit") or 0)
-    index = copies_by_book(state)
+    index = copies_by_game(state)
     rows = [
-        project_book(
+        project_game(
             state,
-            book,
+            game,
             viewer=viewer,
             is_admin=is_admin,
-            copy_count=len(index.get(book["id"], [])),
+            copy_count=len(index.get(game["id"], [])),
         )
-        for book in sorted(
-            state["books"].values(),
+        for game in sorted(
+            state["games"].values(),
             key=lambda b: (b["title"].casefold(), b["id"]),
         )
-        if book_matches(state, book, filters, index)
+        if game_matches(state, game, filters, index)
     ]
     return rows[:limit] if limit > 0 else rows
 
 
-def book_detail(
+def game_detail(
     state: dict[str, Any],
-    book_id: str,
+    game_id: str,
     *,
     viewer: str | None,
     is_admin: bool,
 ) -> dict[str, Any] | None:
-    """A book with its copies (each with a location path) and its loans."""
-    book = state["books"].get(book_id)
-    if book is None:
+    """A game with its copies (each with a location path) and its loans."""
+    game = state["games"].get(game_id)
+    if game is None:
         return None
-    out = project_book(state, book, viewer=viewer, is_admin=is_admin)
+    out = project_game(state, game, viewer=viewer, is_admin=is_admin)
     copies = []
     for copy in state["copies"].values():
-        if copy.get("book_id") != book_id:
+        if copy.get("game_id") != game_id:
             continue
         row = project_copy(copy, is_admin=is_admin)
         row["location"] = location_path(state, copy.get("shelf_id"))
@@ -350,7 +350,7 @@ def book_detail(
     out["loans"] = [
         project_loan(loan, is_admin=is_admin)
         for loan in sorted(
-            (lo for lo in state["loans"].values() if lo.get("book_id") == book_id),
+            (lo for lo in state["loans"].values() if lo.get("game_id") == game_id),
             key=lambda lo: (str(lo.get("started", "")), lo["id"]),
         )
     ]
@@ -360,49 +360,49 @@ def book_detail(
 # ── Stats for the sensors ────────────────────────────────────────────────────
 
 
-def books_read_in_year(
+def games_read_in_year(
     state: dict[str, Any], person_id: str, year: int
 ) -> tuple[int, int]:
-    """``(books, pages)`` that the person finished in *year*."""
+    """``(games, pages)`` that the person finished in *year*."""
     count = 0
     pages = 0
-    for book_id, row in (state["reading"].get(person_id) or {}).items():
+    for game_id, row in (state["reading"].get(person_id) or {}).items():
         finished = row.get("finished")
         if row.get("status") != "read" or not isinstance(finished, str):
             continue
         if not finished.startswith(f"{year:04d}-"):
             continue
         count += 1
-        book = state["books"].get(book_id) or {}
-        pages += int(book.get("pages") or 0)
+        game = state["games"].get(game_id) or {}
+        pages += int(game.get("pages") or 0)
     return count, pages
 
 
 def reading_now(state: dict[str, Any], person_id: str) -> list[str]:
     """The titles that the person reads now, sorted by the last change."""
     rows = [
-        (row.get("updated_at") or "", book_id)
-        for book_id, row in (state["reading"].get(person_id) or {}).items()
-        if row.get("status") == "reading" and book_id in state["books"]
+        (row.get("updated_at") or "", game_id)
+        for game_id, row in (state["reading"].get(person_id) or {}).items()
+        if row.get("status") == "reading" and game_id in state["games"]
     ]
     rows.sort(reverse=True)
-    return [str(state["books"][book_id].get("title", "")) for _, book_id in rows]
+    return [str(state["games"][game_id].get("title", "")) for _, game_id in rows]
 
 
 def want_to_read(state: dict[str, Any], person_id: str) -> list[dict[str, Any]]:
-    """The books with status ``want`` for the person, oldest first."""
+    """The games with status ``want`` for the person, oldest first."""
     rows = [
-        (row.get("updated_at") or "", book_id)
-        for book_id, row in (state["reading"].get(person_id) or {}).items()
-        if row.get("status") == "want" and book_id in state["books"]
+        (row.get("updated_at") or "", game_id)
+        for game_id, row in (state["reading"].get(person_id) or {}).items()
+        if row.get("status") == "want" and game_id in state["games"]
     ]
     rows.sort()
-    return [state["books"][book_id] for _, book_id in rows]
+    return [state["games"][game_id] for _, game_id in rows]
 
 
-def owned_book_count(state: dict[str, Any]) -> int:
-    """The number of books with 1 copy or more."""
-    return len({c.get("book_id") for c in state["copies"].values()})
+def owned_game_count(state: dict[str, Any]) -> int:
+    """The number of games with 1 copy or more."""
+    return len({c.get("game_id") for c in state["copies"].values()})
 
 
 def loans_out_count(state: dict[str, Any]) -> int:

@@ -26,29 +26,29 @@ Names follow `home_keeper_games_<noun>_<verb>`.
 | `home_keeper_games_room_added` | A room is added. |
 | `home_keeper_games_room_updated` | A room changes. The payload has `changed_fields`. |
 | `home_keeper_games_room_removed` | A room is deleted. |
-| `home_keeper_games_bookcase_added` | A bookcase is added. |
-| `home_keeper_games_bookcase_updated` | A bookcase changes or moves to another room. |
-| `home_keeper_games_bookcase_removed` | A bookcase is deleted. |
+| `home_keeper_games_unit_added` | A unit is added. |
+| `home_keeper_games_unit_updated` | A unit changes or moves to another room. |
+| `home_keeper_games_unit_removed` | A unit is deleted. |
 | `home_keeper_games_shelf_added` | A shelf is added. |
-| `home_keeper_games_shelf_updated` | A shelf changes or moves to another bookcase. |
+| `home_keeper_games_shelf_updated` | A shelf changes or moves to another unit. |
 | `home_keeper_games_shelf_removed` | A shelf is deleted. |
-| `home_keeper_games_book_added` | A book is added. |
-| `home_keeper_games_book_updated` | The fields, the cover or the wishlist entry of a book change. |
-| `home_keeper_games_book_removed` | A book is deleted with its copies, reading rows and loans. |
+| `home_keeper_games_game_added` | A game is added. |
+| `home_keeper_games_game_updated` | The fields, the cover or the wishlist entry of a game change. |
+| `home_keeper_games_game_removed` | A game is deleted with its copies, reading rows and loans. |
 | `home_keeper_games_copy_added` | A copy is added. |
 | `home_keeper_games_copy_moved` | A copy moves to another shelf, or to no shelf. |
 | `home_keeper_games_copy_updated` | A field of a copy other than its shelf changes. |
 | `home_keeper_games_copy_removed` | A copy is deleted. |
 | `home_keeper_games_reading_changed` | The reading status of a person changes. |
 | `home_keeper_games_reading_updated` | The rating, page, dates, count or notes of a reading row change, and the status stays. |
-| `home_keeper_games_book_finished` | The reading status of a person becomes `read`. |
-| `home_keeper_games_loan_started` | A book is lent or borrowed. |
+| `home_keeper_games_game_finished` | The reading status of a person becomes `read`. |
+| `home_keeper_games_loan_started` | A game is lent or borrowed. |
 | `home_keeper_games_loan_returned` | A loan is returned. |
 | `home_keeper_games_loan_overdue` | An open loan passes its due date. |
 | `home_keeper_games_loan_updated` | The party, the dates, the format or the note of a loan change. |
 | `home_keeper_games_loan_removed` | A loan is deleted. |
-| `home_keeper_games_wishlist_added` | A book goes on the wishlist of a person. |
-| `home_keeper_games_wishlist_removed` | A book leaves the wishlist. |
+| `home_keeper_games_wishlist_added` | A game goes on the wishlist of a person. |
+| `home_keeper_games_wishlist_removed` | A game leaves the wishlist. |
 | `home_keeper_games_import_completed` | A CSV import is written. |
 | `home_keeper_games_data_imported` | The library section of a Home Keeper import is written. |
 | `home_keeper_games_person_settings_updated` | The library settings of a person change. |
@@ -56,11 +56,11 @@ Names follow `home_keeper_games_<noun>_<verb>`.
 
 ## Payloads
 
-The book, copy, reading, loan and wishlist events share 1 spine:
+The game, copy, reading, loan and wishlist events share 1 spine:
 
 ```json
 {
-  "book_id": "5f0c1b2a9d8e4f7a8b6c5d4e3f2a1b0c",
+  "game_id": "5f0c1b2a9d8e4f7a8b6c5d4e3f2a1b0c",
   "title": "The Left Hand of Darkness",
   "person_id": "alice",
   "origin": null
@@ -74,7 +74,7 @@ Keeper task has the origin `home_keeper_games`.
 The other keys of each event are in the generated API reference and in
 `api_surface.EVENTS`:
 
-- `book_updated` and the location `*_updated` events add `changed_fields`.
+- `game_updated` and the location `*_updated` events add `changed_fields`.
 - The copy events add `copy_id` and `shelf_id`. `copy_moved` adds
   `previous_shelf_id`. `copy_updated` adds `changed_fields`, with the names of
   the fields only, not their values (no price or value).
@@ -82,17 +82,17 @@ The other keys of each event are in the generated API reference and in
   has `status: null`.
 - `reading_updated` adds `status` and `changed_fields`. It names the changed
   fields and never gives the private notes.
-- `book_finished` adds `finished`, `rating` and `read_count`.
+- `game_finished` adds `finished`, `rating` and `read_count`.
 - The loan events add `loan_id`, `direction`, `copy_id`, `party`, `started`,
   `due` and `returned`. `direction` is `out` for a lent copy and `in` for a
-  borrowed book. `loan_updated` adds `changed_fields`. `loan_removed` has the
+  borrowed game. `loan_updated` adds `changed_fields`. `loan_removed` has the
   loan as it was before the delete.
 - The wishlist events add `buy` and `bought`.
-- The room, bookcase and shelf events have their own ids and `name` in place of
-  the book spine.
+- The room, unit and shelf events have their own ids and `name` in place of
+  the game spine.
 - `import_completed` has `person_id`, `source` (always `csv`) and the counts of the import.
 - `data_imported` has `counts` and `origin`. `counts` has `created`, `updated` and
-  `skipped` for each section, such as `books`.
+  `skipped` for each section, such as `games`.
 - `person_settings_updated` has `person_id`, `changed_fields` and `origin`, and
   no setting values.
 - `settings_updated` has `changed_fields`, `currency` and `origin`. The
@@ -105,11 +105,11 @@ The other keys of each event are in the generated API reference and in
   each hour. A new due date can fire it again.
 - A CSV import fires only `import_completed`. It fires no event for each row.
 - A Home Keeper import fires only `data_imported`. It fires no event for each record.
-- `book_finished` fires with `reading_changed`, in that order.
-- The first copy of a book on the wishlist takes the book off the wishlist. The
-  scan, `add_copy` and `got_wishlist_book` fire `copy_added` and then
+- `game_finished` fires with `reading_changed`, in that order.
+- The first copy of a game on the wishlist takes the game off the wishlist. The
+  scan, `add_copy` and `got_wishlist_game` fire `copy_added` and then
   `wishlist_removed`.
-- Deleting a room, a bookcase or a shelf with `force: true` fires a `*_removed`
+- Deleting a room, a unit or a shelf with `force: true` fires a `*_removed`
   event for each child and a `copy_moved` event for each copy that moves to no
   shelf.
 - An update that changes no field fires no event.
@@ -142,14 +142,14 @@ automation:
           message: "{{ trigger.event.data.title }} was due on {{ trigger.event.data.due }}."
 ```
 
-A second example sends a message when a person finishes a book:
+A second example sends a message when a person finishes a game:
 
 ```yaml
 automation:
-  - alias: Book finished
+  - alias: Game finished
     triggers:
       - trigger: event
-        event_type: home_keeper_games_book_finished
+        event_type: home_keeper_games_game_finished
     actions:
       - action: notify.notify
         data:

@@ -25,39 +25,39 @@ Each operation of the tab is a `home_keeper_games.*` service. The groups are:
 
 | Group | Services |
 |---|---|
-| Locations | `add_room`, `update_room`, `delete_room`, the same 3 for `bookcase` and `shelf` |
-| Books | `add_book`, `update_book`, `delete_book`, `scan_barcode` |
+| Locations | `add_room`, `update_room`, `delete_room`, the same 3 for `unit` and `shelf` |
+| Games | `add_game`, `update_game`, `delete_game`, `scan_barcode` |
 | Copies and covers | `add_copy`, `update_copy`, `move_copy`, `delete_copy`, `set_cover` |
 | Reading | `set_reading` |
-| Loans | `lend_book`, `borrow_book`, `return_loan`, `update_loan`, `delete_loan` |
-| Wishlist | `add_to_wishlist`, `update_wishlist`, `remove_from_wishlist`, `got_wishlist_book` |
+| Loans | `lend_game`, `borrow_game`, `return_loan`, `update_loan`, `delete_loan` |
+| Wishlist | `add_to_wishlist`, `update_wishlist`, `remove_from_wishlist`, `got_wishlist_game` |
 | People and settings | `set_person_settings`, `set_settings` |
 | Files | `import_csv`, `export_csv`, `export_data`, `import_data` |
-| Reads | `list_books`, `get_book`, `list_locations`, `list_loans`, `list_people` |
+| Reads | `list_games`, `get_game`, `list_locations`, `list_loans`, `list_people` |
 
 A service that changes data returns its record when the call asks for a response. A read
-service always returns a response. Use `book_id` to name a book, because 2 books can have
+service always returns a response. Use `game_id` to name a game, because 2 games can have
 the same title.
 
-### Add a book by barcode
+### Add a game by barcode
 
 ```yaml
 action:
-  - action: home_keeper_games.add_book
+  - action: home_keeper_games.add_game
     data:
       barcode: "0711719505012"
       title: "Sky Garden"
     response_variable: result
-  # result.book.id is the book id. result.existing is true if the barcode was stored.
+  # result.game.id is the game id. result.existing is true if the barcode was stored.
 ```
 
-### Mark a book as read
+### Mark a game as read
 
 ```yaml
 action:
   - action: home_keeper_games.set_reading
     data:
-      book_id: "5f0c1b2a9d8e4f7a8b6c5d4e3f2a1b0c"
+      game_id: "5f0c1b2a9d8e4f7a8b6c5d4e3f2a1b0c"
       person_id: "alice"
       status: read
       rating: 5
@@ -67,18 +67,18 @@ action:
 user with no `person_id` acts for the person of that user. A call from an automation has
 no user, so it names the person.
 
-### Find a book
+### Find a game
 
 ```yaml
 action:
-  - action: home_keeper_games.list_books
+  - action: home_keeper_games.list_games
     data:
       query: dune
       owned: true
     response_variable: found
 ```
 
-Each book in the reply has `owned`, `copy_count`, `cover_url` and the reading rows that
+Each game in the reply has `owned`, `copy_count`, `cover_url` and the reading rows that
 the caller can read.
 
 Guard each call from another integration with
@@ -89,18 +89,18 @@ still works when the library is not installed.
 
 [EVENTS.md](EVENTS.md) has the catalog, the payloads and an example automation. Use an
 `event` trigger on a `home_keeper_games_<noun>_<verb>` event, such as
-`home_keeper_games_book_finished` or `home_keeper_games_loan_overdue`.
+`home_keeper_games_game_finished` or `home_keeper_games_loan_overdue`.
 
 ## Entities
 
 | Entity | State |
 |---|---|
-| `sensor` Books | The books with 1 copy or more |
+| `sensor` Games | The games with 1 copy or more |
 | `sensor` Loans out | The open loans of lent copies |
 | `sensor` Loans overdue | The open loans past their due date |
-| `sensor` *person* books read this year | The books that the person finished this year, with `goal`, `pages` and `year` |
-| `sensor` *person* reading now | The books with status Reading, with `books` |
-| `todo` *person* to read | The books with status Want to read |
+| `sensor` *person* games read this year | The games that the person finished this year, with `goal`, `pages` and `year` |
+| `sensor` *person* reading now | The games with status Reading, with `games` |
+| `todo` *person* to read | The games with status Want to read |
 
 The entities are on 1 service device, Home Keeper Games. The unique id of a
 per-person entity holds the person id, so a new name of the person keeps the entity.

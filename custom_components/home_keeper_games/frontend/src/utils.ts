@@ -5,8 +5,8 @@
 // function has direct tests in `test/utils.test.js`.
 
 import type {
-  Book,
-  Bookcase,
+  Game,
+  Unit,
   Copy,
   Lib,
   Loan,
@@ -86,7 +86,7 @@ export function normalizePeople(raw: Record<string, RawPerson> | null | undefine
 
 /** Turn the raw `get_state` reply into the `Lib` that the views read. */
 export function normalizeState(raw: Partial<RawState>): Lib {
-  const books = asList(raw.books).map((b) => ({
+  const games = asList(raw.games).map((b) => ({
     ...b,
     authors: b.authors ?? [],
     tags: b.tags ?? [],
@@ -95,9 +95,9 @@ export function normalizeState(raw: Partial<RawState>): Lib {
   }));
   return {
     rooms: asList(raw.rooms).sort(byOrder),
-    bookcases: asList(raw.bookcases).sort(byOrder),
+    units: asList(raw.units).sort(byOrder),
     shelves: asList(raw.shelves).sort(byOrder),
-    books,
+    games,
     copies: asList(raw.copies),
     loans: asList(raw.loans),
     people: normalizePeople(raw.people),
@@ -125,14 +125,14 @@ export function personNames(
 
 export interface Index {
   room: Map<string, Room>;
-  bookcase: Map<string, Bookcase>;
+  unit: Map<string, Unit>;
   shelf: Map<string, Shelf>;
-  book: Map<string, Book>;
+  game: Map<string, Game>;
   copy: Map<string, Copy>;
   person: Map<string, Person>;
-  copiesByBook: Map<string, Copy[]>;
+  copiesByGame: Map<string, Copy[]>;
   copiesByShelf: Map<string, Copy[]>;
-  /** Loans that are not returned, by book id. */
+  /** Loans that are not returned, by game id. */
   activeLoans: Map<string, Loan[]>;
   /** The open "out" loan of each copy. */
   loanByCopy: Map<string, Loan>;
@@ -148,58 +148,58 @@ function push<K, V>(map: Map<K, V[]>, key: K, value: V): void {
 export function buildIndex(lib: Lib): Index {
   const idx: Index = {
     room: new Map(lib.rooms.map((r) => [r.id, r])),
-    bookcase: new Map(lib.bookcases.map((c) => [c.id, c])),
+    unit: new Map(lib.units.map((c) => [c.id, c])),
     shelf: new Map(lib.shelves.map((s) => [s.id, s])),
-    book: new Map(lib.books.map((b) => [b.id, b])),
+    game: new Map(lib.games.map((b) => [b.id, b])),
     copy: new Map(lib.copies.map((c) => [c.id, c])),
     person: new Map(lib.people.map((p) => [p.id, p])),
-    copiesByBook: new Map(),
+    copiesByGame: new Map(),
     copiesByShelf: new Map(),
     activeLoans: new Map(),
     loanByCopy: new Map(),
   };
   for (const copy of lib.copies) {
-    push(idx.copiesByBook, copy.book_id, copy);
+    push(idx.copiesByGame, copy.game_id, copy);
     push(idx.copiesByShelf, copy.shelf_id ?? '', copy);
   }
   for (const loan of lib.loans) {
     if (loan.returned) continue;
-    push(idx.activeLoans, loan.book_id, loan);
+    push(idx.activeLoans, loan.game_id, loan);
     if (loan.direction === 'out' && loan.copy_id) idx.loanByCopy.set(loan.copy_id, loan);
   }
   return idx;
 }
 
-/** The room, bookcase and shelf of a shelf id. Missing parts are null. */
+/** The room, unit and shelf of a shelf id. Missing parts are null. */
 export function shelfPath(
   idx: Index,
   shelfId: string | null | undefined,
-): { room: Room | null; bookcase: Bookcase | null; shelf: Shelf | null } {
+): { room: Room | null; unit: Unit | null; shelf: Shelf | null } {
   const shelf = shelfId ? (idx.shelf.get(shelfId) ?? null) : null;
-  const bookcase = shelf ? (idx.bookcase.get(shelf.bookcase_id) ?? null) : null;
-  const room = bookcase ? (idx.room.get(bookcase.room_id) ?? null) : null;
-  return { room, bookcase, shelf };
+  const unit = shelf ? (idx.unit.get(shelf.unit_id) ?? null) : null;
+  const room = unit ? (idx.room.get(unit.room_id) ?? null) : null;
+  return { room, unit, shelf };
 }
 
-/** "Room › Bookcase › Shelf" for a shelf id, or '' for no shelf. */
+/** "Room › Unit › Shelf" for a shelf id, or '' for no shelf. */
 export function locationLabel(idx: Index, shelfId: string | null | undefined): string {
-  const { room, bookcase, shelf } = shelfPath(idx, shelfId);
-  return [room?.name, bookcase?.name, shelf?.name].filter(Boolean).join(' › ');
+  const { room, unit, shelf } = shelfPath(idx, shelfId);
+  return [room?.name, unit?.name, shelf?.name].filter(Boolean).join(' › ');
 }
 
-/** "Room · Shelf", the short form for a book tile. */
+/** "Room · Shelf", the short form for a game tile. */
 export function shortLocation(idx: Index, shelfId: string | null | undefined): string {
   const { room, shelf } = shelfPath(idx, shelfId);
   return [room?.name, shelf?.name].filter(Boolean).join(' · ');
 }
 
-/** The shelves in display order: room, then bookcase, then shelf. */
+/** The shelves in display order: room, then unit, then shelf. */
 export function orderedShelves(lib: Lib): Shelf[] {
   const out: Shelf[] = [];
   for (const room of lib.rooms) {
-    for (const bc of lib.bookcases) {
+    for (const bc of lib.units) {
       if (bc.room_id !== room.id) continue;
-      for (const sh of lib.shelves) if (sh.bookcase_id === bc.id) out.push(sh);
+      for (const sh of lib.shelves) if (sh.unit_id === bc.id) out.push(sh);
     }
   }
   return out;
@@ -215,8 +215,8 @@ export function nextShelf(lib: Lib, shelfId: string | null): Shelf | null {
 // ── Routes ───────────────────────────────────────────────────────────────────
 
 export type View =
-  | 'books'
-  | 'book'
+  | 'games'
+  | 'game'
   | 'shelves'
   | 'loans'
   | 'wishlist'
@@ -226,7 +226,7 @@ export type View =
 
 export interface TabRoute {
   view: View;
-  /** The book id for `book`, the room id for `shelves`, else null. */
+  /** The game id for `game`, the room id for `shelves`, else null. */
   id: string | null;
   /** The filter values that are not the default: the `;key=value` parameters. */
   query: Record<string, string>;
@@ -245,8 +245,8 @@ export const QUERY_DEFAULTS: Record<string, string> = {
 
 /** The query keys that each view keeps, in URL order. */
 const VIEW_QUERY: Record<View, string[]> = {
-  books: ['q', 'status', 'room', 'shelf', 'reader', 'subject', 'owned', 'sort', 'view'],
-  book: [],
+  games: ['q', 'status', 'room', 'shelf', 'reader', 'subject', 'owned', 'sort', 'view'],
+  game: [],
   shelves: [],
   loans: ['tab'],
   wishlist: [],
@@ -290,10 +290,10 @@ function cleanQuery(view: View, query: Record<string, string>): Record<string, s
  * Parse the tab path (after `/home-keeper/games`) into a route.
  *
  * The filters of a view are `;key=value` parameters on the last segment, as in
- * `/books;q=le%20guin;status=read`. The host API of Home Keeper keeps the path
+ * `/games;q=le%20guin;status=read`. The host API of Home Keeper keeps the path
  * and drops a `?query`, so the parameters are in the path. A `?query` in the
  * path, or *search* when the path has none, is also read, and a parameter wins
- * over it. An unknown path gives the book list.
+ * over it. An unknown path gives the game list.
  */
 export function parseRoute(path: string | undefined, search = ''): TabRoute {
   const raw = path ?? '';
@@ -310,11 +310,11 @@ export function parseRoute(path: string | undefined, search = ''): TabRoute {
     }
   }
   const segs = parts.filter(Boolean).map(decodePart);
-  const head = segs[0] ?? 'books';
-  let view: View = 'books';
+  const head = segs[0] ?? 'games';
+  let view: View = 'games';
   let id: string | null = null;
-  if (head === 'books' && segs[1]) {
-    view = 'book';
+  if (head === 'games' && segs[1]) {
+    view = 'game';
     id = segs[1];
   } else if (head === 'shelves') {
     view = 'shelves';
@@ -329,7 +329,7 @@ export function parseRoute(path: string | undefined, search = ''): TabRoute {
 export function buildPath(route: { view: View; id?: string | null; query?: Record<string, string> }): string {
   const id = route.id ? `/${encodeURIComponent(route.id)}` : '';
   let path: string;
-  if (route.view === 'book') path = `/books${id}`;
+  if (route.view === 'game') path = `/games${id}`;
   else if (route.view === 'shelves') path = `/shelves${id}`;
   else path = `/${route.view}`;
   const query = cleanQuery(route.view, route.query ?? {});
@@ -349,14 +349,14 @@ export function withQuery(
   return out;
 }
 
-// ── Book filters ─────────────────────────────────────────────────────────────
+// ── Game filters ─────────────────────────────────────────────────────────────
 
 export type StatusFilter = 'all' | 'unread' | 'reading' | 'read' | 'needs';
 export const STATUS_FILTERS: StatusFilter[] = ['all', 'unread', 'reading', 'read', 'needs'];
 export type SortKey = 'author' | 'title' | 'added' | 'published' | 'rating';
 export const SORT_KEYS: SortKey[] = ['author', 'title', 'added', 'published', 'rating'];
 
-export interface BookFilters {
+export interface GameFilters {
   q: string;
   status: StatusFilter;
   room: string;
@@ -372,8 +372,8 @@ function oneOf<T extends string>(value: string | undefined, allowed: readonly T[
   return allowed.includes(value as T) ? (value as T) : fallback;
 }
 
-/** Read the book filters from a route query. An unknown value reads as the default. */
-export function readFilters(query: Record<string, string>): BookFilters {
+/** Read the game filters from a route query. An unknown value reads as the default. */
+export function readFilters(query: Record<string, string>): GameFilters {
   return {
     q: query.q ?? '',
     status: oneOf(query.status, STATUS_FILTERS, 'all'),
@@ -388,41 +388,41 @@ export function readFilters(query: Record<string, string>): BookFilters {
 }
 
 /** True if a filter other than sort, layout and the owned default narrows the list. */
-export function hasFilters(f: BookFilters): boolean {
+export function hasFilters(f: GameFilters): boolean {
   return Boolean(f.q || f.room || f.shelf || f.reader || f.subject || f.status !== 'all' || f.owned !== 'yes');
 }
 
-/** The reading row of *personId* for *book*, or null. */
-export function readingOf(book: Book, personId: string | null | undefined): ReadingRow | null {
+/** The reading row of *personId* for *game*, or null. */
+export function readingOf(game: Game, personId: string | null | undefined): ReadingRow | null {
   if (!personId) return null;
-  return book.reading?.[personId] ?? null;
+  return game.reading?.[personId] ?? null;
 }
 
-/** The status of *personId* for *book*, or null. */
-export function statusOf(book: Book, personId: string | null | undefined): ReadingStatus | null {
-  return readingOf(book, personId)?.status ?? null;
+/** The status of *personId* for *game*, or null. */
+export function statusOf(game: Game, personId: string | null | undefined): ReadingStatus | null {
+  return readingOf(game, personId)?.status ?? null;
 }
 
-/** The text that a search reads for a book. */
-export function searchText(book: Book, personId: string | null): string {
+/** The text that a search reads for a game. */
+export function searchText(game: Game, personId: string | null): string {
   const parts = [
-    book.title,
-    book.subtitle,
-    ...book.authors,
-    book.barcode,
-    book.series?.name,
-    book.shared_notes,
-    ...book.tags,
-    readingOf(book, personId)?.private_notes,
+    game.title,
+    game.subtitle,
+    ...game.authors,
+    game.barcode,
+    game.series?.name,
+    game.shared_notes,
+    ...game.tags,
+    readingOf(game, personId)?.private_notes,
   ];
   return fold(parts.filter(Boolean).join(' \n '));
 }
 
-/** True if every word of *q* is in the search text of *book*. */
-export function matchesSearch(book: Book, q: string, personId: string | null): boolean {
+/** True if every word of *q* is in the search text of *game*. */
+export function matchesSearch(game: Game, q: string, personId: string | null): boolean {
   const words = fold(q).split(/\s+/).filter(Boolean);
   if (!words.length) return true;
-  const text = searchText(book, personId);
+  const text = searchText(game, personId);
   const digits = text.replace(/-/g, '');
   return words.every((w) => text.includes(w) || (/^[\d-]+$/.test(w) && digits.includes(w.replace(/-/g, ''))));
 }
@@ -432,9 +432,9 @@ export interface FilterContext {
   me: string | null;
 }
 
-function inPlace(book: Book, f: BookFilters, ctx: FilterContext): boolean {
+function inPlace(game: Game, f: GameFilters, ctx: FilterContext): boolean {
   if (!f.room && !f.shelf) return true;
-  const copies = ctx.idx.copiesByBook.get(book.id) ?? [];
+  const copies = ctx.idx.copiesByGame.get(game.id) ?? [];
   return copies.some((c) => {
     if (f.shelf === 'none') return !c.shelf_id;
     if (f.shelf && c.shelf_id !== f.shelf) return false;
@@ -443,8 +443,8 @@ function inPlace(book: Book, f: BookFilters, ctx: FilterContext): boolean {
   });
 }
 
-function matchesStatus(book: Book, status: StatusFilter, me: string | null): boolean {
-  const mine = statusOf(book, me);
+function matchesStatus(game: Game, status: StatusFilter, me: string | null): boolean {
+  const mine = statusOf(game, me);
   switch (status) {
     case 'unread':
       return mine !== 'read';
@@ -453,34 +453,34 @@ function matchesStatus(book: Book, status: StatusFilter, me: string | null): boo
     case 'read':
       return mine === 'read';
     case 'needs':
-      return book.needs_details;
+      return game.needs_details;
     default:
       return true;
   }
 }
 
-/** True if *book* passes every filter except the status filter. */
-export function matchesBase(book: Book, f: BookFilters, ctx: FilterContext): boolean {
-  if (f.owned === 'yes' && !book.owned) return false;
-  if (f.owned === 'no' && book.owned) return false;
-  if (f.subject && !book.subjects.includes(f.subject)) return false;
-  if (f.reader && statusOf(book, f.reader) !== 'read') return false;
-  if (!inPlace(book, f, ctx)) return false;
-  return matchesSearch(book, f.q, ctx.me);
+/** True if *game* passes every filter except the status filter. */
+export function matchesBase(game: Game, f: GameFilters, ctx: FilterContext): boolean {
+  if (f.owned === 'yes' && !game.owned) return false;
+  if (f.owned === 'no' && game.owned) return false;
+  if (f.subject && !game.subjects.includes(f.subject)) return false;
+  if (f.reader && statusOf(game, f.reader) !== 'read') return false;
+  if (!inPlace(game, f, ctx)) return false;
+  return matchesSearch(game, f.q, ctx.me);
 }
 
-/** The books that pass all the filters, sorted. */
-export function filterBooks(books: Book[], f: BookFilters, ctx: FilterContext): Book[] {
-  const out = books.filter((b) => matchesBase(b, f, ctx) && matchesStatus(b, f.status, ctx.me));
-  return sortBooks(out, f.sort, ctx.me);
+/** The games that pass all the filters, sorted. */
+export function filterGames(games: Game[], f: GameFilters, ctx: FilterContext): Game[] {
+  const out = games.filter((b) => matchesBase(b, f, ctx) && matchesStatus(b, f.status, ctx.me));
+  return sortGames(out, f.sort, ctx.me);
 }
 
 /** The count for each status chip, with the other filters applied. */
-export function statusCounts(books: Book[], f: BookFilters, ctx: FilterContext): Record<StatusFilter, number> {
+export function statusCounts(games: Game[], f: GameFilters, ctx: FilterContext): Record<StatusFilter, number> {
   const counts: Record<StatusFilter, number> = { all: 0, unread: 0, reading: 0, read: 0, needs: 0 };
-  for (const book of books) {
-    if (!matchesBase(book, f, ctx)) continue;
-    for (const s of STATUS_FILTERS) if (matchesStatus(book, s, ctx.me)) counts[s] += 1;
+  for (const game of games) {
+    if (!matchesBase(game, f, ctx)) continue;
+    for (const s of STATUS_FILTERS) if (matchesStatus(game, s, ctx.me)) counts[s] += 1;
   }
   return counts;
 }
@@ -488,7 +488,7 @@ export function statusCounts(books: Book[], f: BookFilters, ctx: FilterContext):
 /** The sort key of an author name: the last word, then the full name. */
 export function authorKey(name: string | undefined): string {
   const words = fold(name).trim().split(/\s+/).filter(Boolean);
-  // A book with no author sorts after every book with an author.
+  // A game with no author sorts after every game with an author.
   if (!words.length) return '\uffff';
   return `${words[words.length - 1]} ${words.join(' ')}`;
 }
@@ -499,15 +499,15 @@ export function yearOf(value: string | null | undefined): number | null {
   return m ? Number(m[1]) : null;
 }
 
-function seriesNumber(book: Book): number {
-  const n = Number(book.series?.number);
+function seriesNumber(game: Game): number {
+  const n = Number(game.series?.number);
   return Number.isFinite(n) ? n : 0;
 }
 
-/** Sort books by *key*. Title is the tiebreak for every key. */
-export function sortBooks(books: Book[], key: SortKey, me: string | null): Book[] {
-  const byTitle = (a: Book, b: Book) => fold(a.title).localeCompare(fold(b.title));
-  const cmp: Record<SortKey, (a: Book, b: Book) => number> = {
+/** Sort games by *key*. Title is the tiebreak for every key. */
+export function sortGames(games: Game[], key: SortKey, me: string | null): Game[] {
+  const byTitle = (a: Game, b: Game) => fold(a.title).localeCompare(fold(b.title));
+  const cmp: Record<SortKey, (a: Game, b: Game) => number> = {
     author: (a, b) =>
       authorKey(a.authors[0]).localeCompare(authorKey(b.authors[0])) ||
       fold(a.series?.name).localeCompare(fold(b.series?.name)) ||
@@ -517,12 +517,12 @@ export function sortBooks(books: Book[], key: SortKey, me: string | null): Book[
     published: (a, b) => (yearOf(a.published) ?? 99999) - (yearOf(b.published) ?? 99999),
     rating: (a, b) => (readingOf(b, me)?.rating ?? 0) - (readingOf(a, me)?.rating ?? 0),
   };
-  return [...books].sort((a, b) => cmp[key](a, b) || byTitle(a, b));
+  return [...games].sort((a, b) => cmp[key](a, b) || byTitle(a, b));
 }
 
-/** The subjects of all books, sorted, with no duplicates. */
-export function allSubjects(books: Book[]): string[] {
-  return [...new Set(books.flatMap((b) => b.subjects))].sort((a, b) => a.localeCompare(b));
+/** The subjects of all games, sorted, with no duplicates. */
+export function allSubjects(games: Game[]): string[] {
+  return [...new Set(games.flatMap((b) => b.subjects))].sort((a, b) => a.localeCompare(b));
 }
 
 // ── Barcodes ─────────────────────────────────────────────────────────────────
@@ -627,7 +627,7 @@ export const COVER_COLORS: Array<[string, string]> = [
   ['#4e342e', '#efebe9'],
 ];
 
-/** The cover colors of a book id. The same id always gives the same colors. */
+/** The cover colors of a game id. The same id always gives the same colors. */
 export function coverColors(id: string): { bg: string; ink: string } {
   const [bg, ink] = COVER_COLORS[hash(id) % COVER_COLORS.length];
   return { bg, ink };
@@ -642,11 +642,11 @@ export interface Spine {
 }
 
 /**
- * The spines to draw for the books on a shelf. Width comes from the page count,
- * height and color from the book id.
+ * The spines to draw for the games on a shelf. Width comes from the page count,
+ * height and color from the game id.
  */
-export function spines(books: Book[], max = 60): Spine[] {
-  return books.slice(0, max).map((b) => {
+export function spines(games: Game[], max = 60): Spine[] {
+  return games.slice(0, max).map((b) => {
     const h = hash(b.id);
     const w = b.pages ? Math.min(22, Math.max(8, Math.round(6 + b.pages / 40))) : 8 + (h % 10);
     return {
@@ -721,13 +721,13 @@ export function progress(page: number | null | undefined, pages: number | null |
 
 export interface Activity {
   person: Person;
-  book: Book;
+  game: Game;
   row: ReadingRow;
 }
 
 export interface CardModel {
-  reading: Array<{ book: Book; row: ReadingRow }>;
-  want: Book[];
+  reading: Array<{ game: Game; row: ReadingRow }>;
+  want: Game[];
   goal: { done: number; goal: number | null; pages: number; year: number };
   household: Activity[];
 }
@@ -736,22 +736,22 @@ export interface CardModel {
 export function cardModel(lib: Lib, personId: string | null, now: Date, maxActivity = 5): CardModel {
   const year = now.getFullYear();
   const reading: CardModel['reading'] = [];
-  const want: Book[] = [];
+  const want: Game[] = [];
   let done = 0;
   let pages = 0;
   const household: Activity[] = [];
   const person = new Map(lib.people.map((p) => [p.id, p]));
-  for (const book of lib.books) {
-    for (const [pid, row] of Object.entries(book.reading)) {
+  for (const game of lib.games) {
+    for (const [pid, row] of Object.entries(game.reading)) {
       if (pid === personId) {
-        if (row.status === 'reading') reading.push({ book, row });
-        if (row.status === 'want') want.push(book);
+        if (row.status === 'reading') reading.push({ game, row });
+        if (row.status === 'want') want.push(game);
         if (row.status === 'read' && yearOf(row.finished) === year) {
           done += 1;
-          pages += book.pages ?? 0;
+          pages += game.pages ?? 0;
         }
       } else if (row.status && row.status !== 'want' && person.get(pid)?.share_reading) {
-        household.push({ person: person.get(pid)!, book, row });
+        household.push({ person: person.get(pid)!, game, row });
       }
     }
   }
@@ -782,31 +782,31 @@ export interface ScanTally {
 }
 
 /** Count the results of a scan session. */
-export function scanTally(results: Array<Pick<ScanResult, 'result' | 'book'>>): ScanTally {
+export function scanTally(results: Array<Pick<ScanResult, 'result' | 'game'>>): ScanTally {
   const out: ScanTally = { added: 0, moved: 0, needs: 0, duplicate: 0, skipped: 0 };
   for (const r of results) {
     if (r.result === 'added') out.added += 1;
     else if (r.result === 'moved') out.moved += 1;
     else if (r.result === 'duplicate') out.duplicate += 1;
     else if (r.result === 'skipped') out.skipped += 1;
-    if (r.result === 'not_found' || r.book?.needs_details) out.needs += 1;
+    if (r.result === 'not_found' || r.game?.needs_details) out.needs += 1;
   }
   return out;
 }
 
 /** A scan row that can ask for a title: its reply, and what the user did. */
 export interface MissRow {
-  res: Pick<ScanResult, 'result' | 'book'> | null;
+  res: Pick<ScanResult, 'result' | 'game'> | null;
   named?: boolean;
   removed?: boolean;
 }
 
 /**
- * The first scan of a barcode that no book had, and that still has no title from
+ * The first scan of a barcode that no game had, and that still has no title from
  * the user, or null. The scan pauses until the user names or removes it.
  */
 export function nextMiss<T extends MissRow>(results: T[]): T | null {
-  return results.find((r) => r.res?.result === 'not_found' && r.res.book !== null && !r.named && !r.removed) ?? null;
+  return results.find((r) => r.res?.result === 'not_found' && r.res.game !== null && !r.named && !r.removed) ?? null;
 }
 
 // ── Loans ────────────────────────────────────────────────────────────────────
@@ -825,7 +825,7 @@ export function loansFor(loans: Loan[], tab: LoanTab): Loan[] {
     .sort((a, b) => (a.due ?? '9999').localeCompare(b.due ?? '9999') || a.started.localeCompare(b.started));
 }
 
-/** The book value of a room: the sum of copy values. */
+/** The game value of a room: the sum of copy values. */
 export function roomValue(lib: Lib, idx: Index, roomId: string): number {
   let sum = 0;
   for (const copy of lib.copies) {

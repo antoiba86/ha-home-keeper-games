@@ -211,7 +211,7 @@ def test_every_event_has_a_summary_and_a_known_payload() -> None:
         assert spec.payload == "none" or spec.payload in api_surface.PAYLOAD_SPINES
 
 
-_BOOK = {"id": "b1", "title": "Dune"}
+_GAME = {"id": "b1", "title": "Dune"}
 _COPY = {"id": "c1", "shelf_id": "s1"}
 _LOAN = {
     "id": "l1",
@@ -228,8 +228,8 @@ _LOAN = {
 def _built() -> dict[str, dict[str, Any]]:
     """1 payload for each fired event, from the real builders."""
     room = {"id": "r1", "name": "Den"}
-    bookcase = {"id": "k1", "room_id": "r1", "name": "Left"}
-    shelf = {"id": "s1", "bookcase_id": "k1", "name": "Top"}
+    unit = {"id": "k1", "room_id": "r1", "name": "Left"}
+    shelf = {"id": "s1", "unit_id": "k1", "name": "Top"}
     entry = {"person_id": "p1", "buy": True, "bought": False}
     return {
         const.EVENT_ROOM_ADDED: events.room_event_data(room, None),
@@ -237,49 +237,49 @@ def _built() -> dict[str, dict[str, Any]]:
             events.room_event_data(room, None), ["name"]
         ),
         const.EVENT_ROOM_REMOVED: events.room_event_data(room, None),
-        const.EVENT_BOOKCASE_ADDED: events.bookcase_event_data(bookcase, None),
-        const.EVENT_BOOKCASE_UPDATED: events.location_changed_data(
-            events.bookcase_event_data(bookcase, None), ["name"]
+        const.EVENT_UNIT_ADDED: events.unit_event_data(unit, None),
+        const.EVENT_UNIT_UPDATED: events.location_changed_data(
+            events.unit_event_data(unit, None), ["name"]
         ),
-        const.EVENT_BOOKCASE_REMOVED: events.bookcase_event_data(bookcase, None),
+        const.EVENT_UNIT_REMOVED: events.unit_event_data(unit, None),
         const.EVENT_SHELF_ADDED: events.shelf_event_data(shelf, None),
         const.EVENT_SHELF_UPDATED: events.location_changed_data(
             events.shelf_event_data(shelf, None), ["name"]
         ),
         const.EVENT_SHELF_REMOVED: events.shelf_event_data(shelf, None),
-        const.EVENT_BOOK_ADDED: events.book_event_data(_BOOK, None),
-        const.EVENT_BOOK_UPDATED: events.book_updated_event_data(_BOOK, ["x"], None),
-        const.EVENT_BOOK_REMOVED: events.book_event_data(_BOOK, None),
-        const.EVENT_COPY_ADDED: events.copy_event_data(_BOOK, _COPY, None),
-        const.EVENT_COPY_MOVED: events.copy_moved_event_data(_BOOK, _COPY, "s0", None),
-        const.EVENT_COPY_REMOVED: events.copy_event_data(_BOOK, _COPY, None),
+        const.EVENT_GAME_ADDED: events.game_event_data(_GAME, None),
+        const.EVENT_GAME_UPDATED: events.game_updated_event_data(_GAME, ["x"], None),
+        const.EVENT_GAME_REMOVED: events.game_event_data(_GAME, None),
+        const.EVENT_COPY_ADDED: events.copy_event_data(_GAME, _COPY, None),
+        const.EVENT_COPY_MOVED: events.copy_moved_event_data(_GAME, _COPY, "s0", None),
+        const.EVENT_COPY_REMOVED: events.copy_event_data(_GAME, _COPY, None),
         const.EVENT_COPY_UPDATED: events.copy_updated_event_data(
-            _BOOK, _COPY, ["note"], None
+            _GAME, _COPY, ["note"], None
         ),
         const.EVENT_READING_UPDATED: events.reading_updated_event_data(
-            _BOOK, "p1", "reading", ["page"], None
+            _GAME, "p1", "reading", ["page"], None
         ),
         const.EVENT_READING_CHANGED: events.reading_changed_event_data(
-            _BOOK, "p1", "read", "reading", None
+            _GAME, "p1", "read", "reading", None
         ),
-        const.EVENT_BOOK_FINISHED: events.book_finished_event_data(
-            _BOOK, "p1", {"finished": "2026-10-01", "rating": 5}, None
+        const.EVENT_GAME_FINISHED: events.game_finished_event_data(
+            _GAME, "p1", {"finished": "2026-10-01", "rating": 5}, None
         ),
-        const.EVENT_LOAN_STARTED: events.loan_event_data(_BOOK, _LOAN, None),
-        const.EVENT_LOAN_RETURNED: events.loan_event_data(_BOOK, _LOAN, None),
-        const.EVENT_LOAN_OVERDUE: events.loan_event_data(_BOOK, _LOAN, None),
+        const.EVENT_LOAN_STARTED: events.loan_event_data(_GAME, _LOAN, None),
+        const.EVENT_LOAN_RETURNED: events.loan_event_data(_GAME, _LOAN, None),
+        const.EVENT_LOAN_OVERDUE: events.loan_event_data(_GAME, _LOAN, None),
         const.EVENT_LOAN_UPDATED: events.loan_updated_event_data(
-            _BOOK, _LOAN, ["due"], None
+            _GAME, _LOAN, ["due"], None
         ),
-        const.EVENT_LOAN_REMOVED: events.loan_event_data(_BOOK, _LOAN, None),
+        const.EVENT_LOAN_REMOVED: events.loan_event_data(_GAME, _LOAN, None),
         const.EVENT_PERSON_SETTINGS_UPDATED: events.person_settings_event_data(
             "p1", ["yearly_goal"], None
         ),
         const.EVENT_SETTINGS_UPDATED: events.settings_event_data(
             ["currency"], "EUR", None
         ),
-        const.EVENT_WISHLIST_ADDED: events.wishlist_event_data(_BOOK, entry, None),
-        const.EVENT_WISHLIST_REMOVED: events.wishlist_event_data(_BOOK, entry, None),
+        const.EVENT_WISHLIST_ADDED: events.wishlist_event_data(_GAME, entry, None),
+        const.EVENT_WISHLIST_REMOVED: events.wishlist_event_data(_GAME, entry, None),
         const.EVENT_IMPORT_COMPLETED: events.import_completed_event_data(
             {}, "p1", "csv", None
         ),
@@ -391,8 +391,8 @@ def test_frontend_command_names_stay_the_same() -> None:
         "add_room",
         "scan_barcode",
         "set_reading",
-        "lend_book",
-        "borrow_book",
+        "lend_game",
+        "borrow_game",
         "return_loan",
         "add_to_wishlist",
         "import_csv",
@@ -428,10 +428,10 @@ def test_http_views_match_source() -> None:
         if isinstance(n, ast.Call) and ast.unparse(n.func).endswith("StaticPathConfig")
     }
     assert statics == {"STATIC_URL"}
-    assert _view_urls() == {"COVER_URL_PREFIX + '/{book_id}'", "COVER_UPLOAD_URL"}
+    assert _view_urls() == {"COVER_URL_PREFIX + '/{game_id}'", "COVER_UPLOAD_URL"}
     assert {view.url for view in api_surface.HTTP_VIEWS} == {
         const.STATIC_URL,
-        const.COVER_URL_PREFIX + "/{book_id}",
+        const.COVER_URL_PREFIX + "/{game_id}",
         const.COVER_UPLOAD_URL,
     }
     static = next(v for v in api_surface.HTTP_VIEWS if v.url == const.STATIC_URL)

@@ -8,7 +8,7 @@ records where each book is, who reads it, who borrowed it and what to buy next.
 **Library** tab to the Home Keeper panel, and puts the return date of each loan in Home
 Keeper as a task.
 
-![The book list of the Library tab in Home Keeper](../../images/books-desktop.png)
+![The book list of the Library tab in Home Keeper](../../images/games-desktop.png)
 
 ## What the library records
 

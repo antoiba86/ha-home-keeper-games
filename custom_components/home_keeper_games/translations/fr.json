@@ -41,7 +41,7 @@
   },
   "entity": {
     "sensor": {
-      "books": {
+      "games": {
         "name": "Livres"
       },
       "loans_out": {
@@ -50,7 +50,7 @@
       "loans_overdue": {
         "name": "Prêts en retard"
       },
-      "books_read_this_year": {
+      "games_read_this_year": {
         "name": "{person} livres lus cette année"
       },
       "reading_now": {
@@ -132,7 +132,7 @@
         }
       }
     },
-    "add_bookcase": {
+    "add_unit": {
       "name": "Ajouter une bibliothèque",
       "description": "Ajouter un meuble bibliothèque à une pièce.",
       "fields": {
@@ -154,11 +154,11 @@
         }
       }
     },
-    "update_bookcase": {
+    "update_unit": {
       "name": "Modifier une bibliothèque",
       "description": "Modifier un meuble bibliothèque ou le déplacer dans une autre pièce.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Bibliothèque",
           "description": "L'ID du meuble bibliothèque."
         },
@@ -180,11 +180,11 @@
         }
       }
     },
-    "delete_bookcase": {
+    "delete_unit": {
       "name": "Supprimer une bibliothèque",
       "description": "Supprimer un meuble bibliothèque. Un meuble avec des étagères demande force.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Bibliothèque",
           "description": "L'ID du meuble bibliothèque."
         },
@@ -198,7 +198,7 @@
       "name": "Ajouter une étagère",
       "description": "Ajouter une étagère à un meuble bibliothèque.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Bibliothèque",
           "description": "L'ID du meuble bibliothèque."
         },
@@ -220,7 +220,7 @@
           "name": "Étagère",
           "description": "L'ID de l'étagère. Vide pour aucune étagère."
         },
-        "bookcase_id": {
+        "unit_id": {
           "name": "Bibliothèque",
           "description": "L'ID du meuble bibliothèque."
         },
@@ -248,7 +248,7 @@
         }
       }
     },
-    "add_book": {
+    "add_game": {
       "name": "Ajouter un livre",
       "description": "Ajouter un livre. Si un livre a le même code-barres, le service renvoie ce livre.",
       "fields": {
@@ -310,11 +310,11 @@
         }
       }
     },
-    "update_book": {
+    "update_game": {
       "name": "Modifier un livre",
       "description": "Modifier les détails d'un livre.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livre",
           "description": "L'ID du livre."
         },
@@ -376,11 +376,11 @@
         }
       }
     },
-    "delete_book": {
+    "delete_game": {
       "name": "Supprimer un livre",
       "description": "Supprimer un livre avec ses exemplaires, son statut de lecture, ses prêts et sa couverture.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livre",
           "description": "L'ID du livre."
         }
@@ -412,7 +412,7 @@
       "name": "Ajouter un exemplaire",
       "description": "Ajouter un exemplaire d'un livre.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livre",
           "description": "L'ID du livre."
         },
@@ -536,7 +536,7 @@
       "name": "Définir la couverture",
       "description": "Définir la couverture d'un livre.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livre",
           "description": "L'ID du livre."
         },
@@ -554,7 +554,7 @@
       "name": "Définir le statut de lecture",
       "description": "Définir le statut de lecture d'un livre pour une personne. Un utilisateur non administrateur ne peut définir que son propre statut.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livre",
           "description": "L'ID du livre."
         },
@@ -592,7 +592,7 @@
         }
       }
     },
-    "lend_book": {
+    "lend_game": {
       "name": "Prêter un livre",
       "description": "Prêter un exemplaire à une autre personne.",
       "fields": {
@@ -622,11 +622,11 @@
         }
       }
     },
-    "borrow_book": {
+    "borrow_game": {
       "name": "Ajouter un livre emprunté",
       "description": "Enregistrer un livre qu'une personne a emprunté.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livre",
           "description": "L'ID du livre."
         },
@@ -730,7 +730,7 @@
       "name": "Ajouter aux souhaits",
       "description": "Mettre un livre sur la liste des souhaits d'une personne.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livre",
           "description": "L'ID du livre."
         },
@@ -760,7 +760,7 @@
       "name": "Modifier un souhait",
       "description": "Modifier une entrée de la liste des souhaits.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livre",
           "description": "L'ID du livre."
         },
@@ -778,17 +778,17 @@
       "name": "Retirer des souhaits",
       "description": "Retirer un livre de la liste des souhaits.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livre",
           "description": "L'ID du livre."
         }
       }
     },
-    "got_wishlist_book": {
+    "got_wishlist_game": {
       "name": "Livre souhaité reçu",
       "description": "Ajouter un exemplaire d'un livre souhaité et le retirer de la liste des souhaits.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livre",
           "description": "L'ID du livre."
         },
@@ -874,7 +874,7 @@
         }
       }
     },
-    "list_books": {
+    "list_games": {
       "name": "Lister les livres",
       "description": "Renvoyer les livres qui correspondent aux filtres.",
       "fields": {
@@ -908,11 +908,11 @@
         }
       }
     },
-    "get_book": {
+    "get_game": {
       "name": "Obtenir un livre",
       "description": "Renvoyer un livre avec ses exemplaires et ses prêts.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Livre",
           "description": "L'ID du livre."
         }
@@ -1000,13 +1000,13 @@
     "room_not_found": {
       "message": "Aucune pièce n'a l'ID {id}."
     },
-    "bookcase_not_found": {
+    "unit_not_found": {
       "message": "Aucune bibliothèque n'a l'ID {id}."
     },
     "shelf_not_found": {
       "message": "Aucune étagère n'a l'ID {id}."
     },
-    "book_not_found": {
+    "game_not_found": {
       "message": "Aucun livre n'a l'ID {id}."
     },
     "copy_not_found": {
@@ -1024,7 +1024,7 @@
     "room_not_empty": {
       "message": "La pièce a {count} bibliothèques. Utilisez force pour les supprimer aussi."
     },
-    "bookcase_not_empty": {
+    "unit_not_empty": {
       "message": "La bibliothèque a {count} étagères. Utilisez force pour les supprimer aussi."
     },
     "shelf_not_empty": {

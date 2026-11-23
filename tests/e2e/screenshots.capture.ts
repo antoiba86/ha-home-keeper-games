@@ -6,18 +6,18 @@
  *
  * Desktop shots are 1280 px wide and phone shots 390 px wide (`viewports.ts`). The
  * phone shots come last, in 1 `setViewportSize(PHONE)` block, and have `-mobile` in
- * the name. The capture puts the seed back: it deletes the books that the scan adds.
+ * the name. The capture puts the seed back: it deletes the games that the scan adds.
  * A spec under tests/ asserts on each surface here.
  */
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { resolve } from 'node:path';
 import { library } from './ha-ws';
-import { adminState, bookByTitle, fakeCamera, libraryTab, noServiceWorker, openCard, openTab } from './tests/helpers';
+import { adminState, gameByTitle, fakeCamera, libraryTab, noServiceWorker, openCard, openTab } from './tests/helpers';
 import { PHONE } from './viewports';
 
 const SHOT_DIR = resolve(__dirname, process.env.SHOT_DIR || '../../docs/images');
 const DESKTOP_SHOT = { width: 1280, height: 900 };
-/** The 1st barcode is a seeded book. No book has the 2nd, so the scan asks for its title. */
+/** The 1st barcode is a seeded game. No game has the 2nd, so the scan asks for its title. */
 const SCAN_CODES = ['9780441478125', '9781250313188'];
 const NEW_CODES = [SCAN_CODES[1]];
 const MISS_TITLE = 'Field Notes on Moss';
@@ -59,22 +59,22 @@ async function coversLoaded(page: Page): Promise<void> {
 
 async function deleteScanned(): Promise<void> {
   const state = await adminState();
-  for (const book of state.books) {
-    if (NEW_CODES.includes(book.barcode)) {
-      await library('delete_book', { book_id: book.id });
+  for (const game of state.games) {
+    if (NEW_CODES.includes(game.barcode)) {
+      await library('delete_game', { game_id: game.id });
     }
   }
 }
 
 /**
- * Scan the 2 barcodes into Shelf 3. No book has the 2nd one, so the title sheet opens: shoot it as *missShot*, and with its details open as
+ * Scan the 2 barcodes into Shelf 3. No game has the 2nd one, so the title sheet opens: shoot it as *missShot*, and with its details open as
  * *detailsShot*. Then give the title, so the scan goes on.
  */
 async function scanSession(page: Page, missShot: string, detailsShot?: string): Promise<void> {
   const state = await adminState();
   const office = state.rooms.find((r: { name: string }) => r.name === 'Office');
-  const tall = state.bookcases.find((c: { room_id: string }) => c.room_id === office.id);
-  const shelf = state.shelves.find((s: { bookcase_id: string; name: string }) => s.bookcase_id === tall.id && s.name === 'Shelf 3');
+  const tall = state.units.find((c: { room_id: string }) => c.room_id === office.id);
+  const shelf = state.shelves.find((s: { unit_id: string; name: string }) => s.unit_id === tall.id && s.name === 'Shelf 3');
   const tab = await openTab(page, `/scan;shelf=${shelf.id}`);
   await tab.locator('[data-k="m-manual"]').check();
   await expect(tab.locator('[data-k="m-manual"]')).toBeChecked();
@@ -101,13 +101,13 @@ async function scanSession(page: Page, missShot: string, detailsShot?: string): 
   await expect(tab.locator('.hkl-result').filter({ hasText: MISS_TITLE })).toBeVisible();
 }
 
-/** Open the Lend dialog of a book with a copy to lend, type a note, and submit with no borrower. */
+/** Open the Lend dialog of a game with a copy to lend, type a note, and submit with no borrower. */
 async function openLendError(page: Page): Promise<void> {
   const state = await adminState();
   const lent = new Set(state.loans.filter((l: any) => !l.returned).map((l: any) => l.copy_id));
   const copy = state.copies.find((c: any) => !lent.has(c.id) && c.format !== 'ebook' && c.format !== 'audiobook');
   if (!copy) throw new Error('no copy to lend in the seed');
-  const tab = await openTab(page, `/books/${copy.book_id}`);
+  const tab = await openTab(page, `/games/${copy.game_id}`);
   await coversLoaded(page);
   await tab.locator('[data-k="lend"]').click();
   const dialog = tab.locator('.hkl-dialog');
@@ -124,19 +124,19 @@ test('capture the Library screenshots', async ({ page, browser }) => {
   await deleteScanned();
   await page.setViewportSize(DESKTOP_SHOT);
 
-  // Books grid.
-  await openTab(page, '/books');
+  // Games grid.
+  await openTab(page, '/games');
   await coversLoaded(page);
-  await shot(page, 'books-desktop');
+  await shot(page, 'games-desktop');
 
-  // Book detail: a custom cover, a loan with its task, shared notes in Markdown. The
+  // Game detail: a custom cover, a loan with its task, shared notes in Markdown. The
   // window is tall enough to show the notes.
   await page.setViewportSize({ width: 1280, height: 1400 });
-  const left = await bookByTitle('The Left Hand of Darkness');
-  let tab = await openTab(page, `/books/${left.id}`);
+  const left = await gameByTitle('The Left Hand of Darkness');
+  let tab = await openTab(page, `/games/${left.id}`);
   await expect(tab.locator('ha-markdown strong')).toHaveText('Oct 2026');
   await coversLoaded(page);
-  await shot(page, 'book-detail-desktop');
+  await shot(page, 'game-detail-desktop');
 
   // The Lend dialog after an error: the error line shows and the typed text stays.
   await page.setViewportSize(DESKTOP_SHOT);
@@ -183,13 +183,13 @@ test('capture the Library screenshots', async ({ page, browser }) => {
 
   // ── Phone ────────────────────────────────────────────────────────────────
   await page.setViewportSize(PHONE);
-  await openTab(page, '/books');
+  await openTab(page, '/games');
   await coversLoaded(page);
-  await shot(page, 'books-mobile');
+  await shot(page, 'games-mobile');
 
-  await openTab(page, `/books/${left.id}`);
+  await openTab(page, `/games/${left.id}`);
   await coversLoaded(page);
-  await shot(page, 'book-detail-mobile');
+  await shot(page, 'game-detail-mobile');
 
   await openLendError(page);
   await shot(page, 'dialog-error-mobile');

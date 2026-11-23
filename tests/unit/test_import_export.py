@@ -36,7 +36,7 @@ def _state() -> dict:
         "area_id": "living_room",
         "order": 0,
     }
-    state["bookcases"][CASE] = {
+    state["units"][CASE] = {
         "id": CASE,
         "room_id": ROOM,
         "name": "Oak",
@@ -45,17 +45,17 @@ def _state() -> dict:
     }
     state["shelves"][SHELF] = {
         "id": SHELF,
-        "bookcase_id": CASE,
+        "unit_id": CASE,
         "name": "Top",
         "order": 0,
     }
-    dune = m.build_book(
+    dune = m.build_game(
         {"title": "Dune", "authors": ["Frank Herbert"], "barcode": "9780441013593"},
         now=NOW,
     )
     dune["id"] = DUNE
     dune["cover"] = {"kind": "custom", "file": f"{DUNE}-0a1b2c3d.jpg"}
-    emma = m.build_book({"title": "Emma", "authors": ["Jane Austen"]}, now=NOW)
+    emma = m.build_game({"title": "Emma", "authors": ["Jane Austen"]}, now=NOW)
     emma["id"] = EMMA
     emma["wishlist"] = {
         "person_id": BOB,
@@ -65,21 +65,21 @@ def _state() -> dict:
         "todo_entity": "todo.books",
         "bought": False,
     }
-    state["books"] = {DUNE: dune, EMMA: emma}
+    state["games"] = {DUNE: dune, EMMA: emma}
     copy = m.build_copy(
-        {"book_id": DUNE, "shelf_id": SHELF, "format": "hardcover", "price": 12},
+        {"game_id": DUNE, "shelf_id": SHELF, "format": "hardcover", "price": 12},
         now=NOW,
     )
     copy["id"] = COPY
     state["copies"][COPY] = copy
     out = m.build_loan(
-        {"direction": "out", "book_id": DUNE, "copy_id": COPY, "party": "Sam"},
+        {"direction": "out", "game_id": DUNE, "copy_id": COPY, "party": "Sam"},
         today="2026-10-01",
     )
     out["id"] = LOAN_OUT
     out["hk_task_id"] = "hk-task-9"
     borrowed = m.build_loan(
-        {"direction": "in", "book_id": EMMA, "party": "Lib", "person_id": BOB},
+        {"direction": "in", "game_id": EMMA, "party": "Lib", "person_id": BOB},
         today="2026-10-02",
     )
     borrowed["id"] = LOAN_IN
@@ -137,22 +137,22 @@ def test_export_shape_and_names() -> None:
             "area_name": "Living room",
         }
     ]
-    assert data["bookcases"][0]["note"] == "By the window"
-    assert data["shelves"][0]["bookcase_id"] == CASE
-    assert [b["id"] for b in data["books"]] == [DUNE, EMMA]
-    assert data["books"][1]["wishlist"] == {
+    assert data["units"][0]["note"] == "By the window"
+    assert data["shelves"][0]["unit_id"] == CASE
+    assert [b["id"] for b in data["games"]] == [DUNE, EMMA]
+    assert data["games"][1]["wishlist"] == {
         "person_id": BOB,
         "buy": True,
         "added_at": NOW,
         "bought": False,
         "person_name": "Bob",
     }
-    assert data["books"][0]["wishlist"] is None
+    assert data["games"][0]["wishlist"] is None
     assert data["reading"] == [
         {
             "person_id": ALICE,
             "person_name": "Alice",
-            "books": [{"book_id": DUNE, **_state()["reading"][ALICE][DUNE]}],
+            "games": [{"game_id": DUNE, **_state()["reading"][ALICE][DUNE]}],
         }
     ]
     assert data["people"] == [
@@ -183,7 +183,7 @@ def test_export_drops_each_install_only_value() -> None:
     data, _ = _export(_state())
     assert "todo_orphans" not in data
     assert all("hk_task_id" not in loan for loan in data["loans"])
-    wish = data["books"][1]["wishlist"]
+    wish = data["games"][1]["wishlist"]
     assert "todo_uid" not in wish
     assert "todo_entity" not in wish
 
@@ -194,9 +194,9 @@ def test_every_stored_key_is_exported_or_excluded_with_a_reason() -> None:
     data, _ = _export(state, {DUNE: "covers/x.jpg"})
     sections = {
         "rooms": "rooms",
-        "bookcases": "bookcases",
+        "units": "units",
         "shelves": "shelves",
-        "books": "books",
+        "games": "games",
         "copies": "copies",
         "loans": "loans",
     }
@@ -206,9 +206,9 @@ def test_every_stored_key_is_exported_or_excluded_with_a_reason() -> None:
         excluded = {k for k, _ in iex.EXCLUDED_KEYS.get(section, ())}
         assert stored - excluded <= exported, section
         assert not (excluded & exported), section
-    wish_keys = set(state["books"][EMMA]["wishlist"])
+    wish_keys = set(state["games"][EMMA]["wishlist"])
     wish_excluded = {k for k, _ in iex.EXCLUDED_KEYS["wishlist"]}
-    assert wish_keys - wish_excluded <= set(data["books"][1]["wishlist"])
+    assert wish_keys - wish_excluded <= set(data["games"][1]["wishlist"])
     top = set(state) - set(iex.SECTIONS)
     assert top == {k for k, _ in iex.EXCLUDED_KEYS["document"]}
     for pairs in iex.EXCLUDED_KEYS.values():
@@ -217,14 +217,14 @@ def test_every_stored_key_is_exported_or_excluded_with_a_reason() -> None:
 
 def test_export_cover_with_files() -> None:
     data, skipped = _export(_state(), {DUNE: iex.cover_export_path(DUNE)})
-    assert data["books"][0]["cover"] == {"kind": "custom", "file": f"covers/{DUNE}.jpg"}
-    assert data["books"][1]["cover"] is None
+    assert data["games"][0]["cover"] == {"kind": "custom", "file": f"covers/{DUNE}.jpg"}
+    assert data["games"][1]["cover"] is None
     assert skipped == {"covers": 0}
 
 
 def test_covers_to_copy() -> None:
     state = _state()
-    state["books"][EMMA]["cover"] = {"kind": "none", "file": "stale.jpg"}
+    state["games"][EMMA]["cover"] = {"kind": "none", "file": "stale.jpg"}
     assert iex.covers_to_copy(state) == [(DUNE, f"{DUNE}-0a1b2c3d.jpg")]
 
 
@@ -241,14 +241,14 @@ def test_round_trip_into_an_empty_library() -> None:
     assert again == data
     counts = plan.counts
     assert counts["rooms"] == {"created": 1, "updated": 0, "skipped": 0}
-    assert counts["books"] == {"created": 2, "updated": 0, "skipped": 0}
+    assert counts["games"] == {"created": 2, "updated": 0, "skipped": 0}
     assert counts["copies"]["created"] == 1
     assert counts["loans"]["created"] == 2
     assert counts["reading"]["created"] == 1
     assert counts["people"]["created"] == 2
     # The syncs make the install-only values again.
     assert plan.state["loans"][LOAN_OUT]["hk_task_id"] is None
-    assert plan.state["books"][EMMA]["wishlist"]["todo_uid"] is None
+    assert plan.state["games"][EMMA]["wishlist"]["todo_uid"] is None
     assert plan.state["todo_orphans"] == []
 
 
@@ -269,7 +269,7 @@ def test_import_into_the_same_library_changes_no_record() -> None:
     assert plan.ok
     assert plan.state == state
     actions = {(r["section"], r["action"], r["matched_by"]) for r in plan.records}
-    assert ("books", "update", "id") in actions
+    assert ("games", "update", "id") in actions
     assert ("rooms", "update", "id") in actions
     assert all(r["action"] == "update" for r in plan.records)
 
@@ -293,20 +293,20 @@ def test_records_report_names_and_matches() -> None:
         "action": "create",
         "matched_by": None,
     }
-    books = [r for r in plan.records if r["section"] == "books"]
-    assert [b["name"] for b in books] == ["Dune", "Emma"]
+    games = [r for r in plan.records if r["section"] == "games"]
+    assert [b["name"] for b in games] == ["Dune", "Emma"]
 
 
 # ── Matching ─────────────────────────────────────────────────────────────────
 
 
-def test_books_match_by_barcode_then_title() -> None:
+def test_games_match_by_barcode_then_title() -> None:
     state = m.empty_state()
-    stored = m.build_book({"title": "Dune", "barcode": "9780441013593"}, now=NOW)
-    other = m.build_book({"title": "Emma", "authors": ["Jane Austen"]}, now=NOW)
-    state["books"] = {b["id"]: b for b in (stored, other)}
+    stored = m.build_game({"title": "Dune", "barcode": "9780441013593"}, now=NOW)
+    other = m.build_game({"title": "Emma", "authors": ["Jane Austen"]}, now=NOW)
+    state["games"] = {b["id"]: b for b in (stored, other)}
     document = {
-        "books": [
+        "games": [
             {"id": "x" * 32, "title": "Dune Messiah", "barcode": "9780441013593"},
             {"title": "Emma: A Novel", "authors": ["Austen"]},
             {"title": "Dune", "barcode": "978-0441013593"},
@@ -320,46 +320,46 @@ def test_books_match_by_barcode_then_title() -> None:
         (other["id"], "title"),
         (stored["id"], "barcode"),
     ]
-    assert len(plan.state["books"]) == 2
-    assert plan.state["books"][stored["id"]]["title"] == "Dune"
-    assert plan.state["books"][stored["id"]]["updated_at"] == LATER
+    assert len(plan.state["games"]) == 2
+    assert plan.state["games"][stored["id"]]["title"] == "Dune"
+    assert plan.state["games"][stored["id"]]["updated_at"] == LATER
 
 
-def test_two_books_with_one_barcode_in_the_document_make_one_book() -> None:
+def test_two_games_with_one_barcode_in_the_document_make_one_game() -> None:
     document = {
-        "books": [
+        "games": [
             {"title": "Dune", "barcode": "9780441013593"},
             {"title": "Dune (2nd)", "barcode": "9780441013593"},
         ]
     }
     plan = _plan(m.empty_state(), document)
-    assert len(plan.state["books"]) == 1
+    assert len(plan.state["games"]) == 1
     assert [r["action"] for r in plan.records] == ["create", "update"]
-    assert plan.counts["books"] == {"created": 1, "updated": 1, "skipped": 0}
+    assert plan.counts["games"] == {"created": 1, "updated": 1, "skipped": 0}
 
 
 def test_locations_match_by_name_within_the_parent() -> None:
     state = _state()
     document = {
         "rooms": [{"id": "r1", "name": " study "}],
-        "bookcases": [
+        "units": [
             {"id": "c1", "room_id": "r1", "name": "OAK", "note": "Moved"},
             {"id": "c2", "room_id": "r1", "name": "Pine"},
         ],
-        "shelves": [{"id": "s1", "bookcase_id": "c2", "name": "Top"}],
+        "shelves": [{"id": "s1", "unit_id": "c2", "name": "Top"}],
     }
     plan = _plan(state, document)
     assert plan.ok, plan.problems
     by = [(r["section"], r["action"], r["matched_by"]) for r in plan.records]
     assert by == [
         ("rooms", "update", "name"),
-        ("bookcases", "update", "name"),
-        ("bookcases", "create", None),
+        ("units", "update", "name"),
+        ("units", "create", None),
         ("shelves", "create", None),
     ]
-    assert plan.state["bookcases"][CASE]["note"] == "Moved"
+    assert plan.state["units"][CASE]["note"] == "Moved"
     # A new id that is not a record id gets a new id.
-    pine = next(b for b in plan.state["bookcases"].values() if b["name"] == "Pine")
+    pine = next(b for b in plan.state["units"].values() if b["name"] == "Pine")
     assert pine["id"] != "c2"
     assert len(pine["id"]) == 32
     assert pine["order"] == 1
@@ -368,10 +368,10 @@ def test_locations_match_by_name_within_the_parent() -> None:
 
 
 def test_a_missing_parent_is_an_error() -> None:
-    plan = _plan(m.empty_state(), {"bookcases": [{"name": "Oak", "room_id": "nope"}]})
+    plan = _plan(m.empty_state(), {"units": [{"name": "Oak", "room_id": "nope"}]})
     assert not plan.ok
     assert _problems(plan) == [
-        ("error", "bookcases[0].room_id", "import_reference_missing")
+        ("error", "units[0].room_id", "import_reference_missing")
     ]
     assert plan.problems[0].placeholders == {"field": "room_id", "id": "nope"}
 
@@ -395,7 +395,7 @@ def test_unknown_person_warns_and_skips_the_rows() -> None:
     assert plan.ok
     warnings = _problems(plan)
     assert ("warning", "rooms[0].area_id", "import_area_not_found") in warnings
-    assert ("warning", "books[1].wishlist.person_id", "import_person_not_found") in (
+    assert ("warning", "games[1].wishlist.person_id", "import_person_not_found") in (
         warnings
     )
     in_loan = next(i for i, x in enumerate(data["loans"]) if x["id"] == LOAN_IN)
@@ -406,7 +406,7 @@ def test_unknown_person_warns_and_skips_the_rows() -> None:
     assert plan.counts["loans"]["skipped"] == 1
     assert plan.counts["people"]["skipped"] == 1
     assert LOAN_IN not in plan.state["loans"]
-    assert plan.state["books"][EMMA]["wishlist"] is None
+    assert plan.state["games"][EMMA]["wishlist"] is None
     assert plan.state["rooms"][ROOM]["area_id"] is None
     assert BOB not in plan.state["people"]
     message = next(p for p in plan.problems if p.path == "people[1].person_id")
@@ -477,8 +477,8 @@ def test_people_can_clear_the_wishlist_list() -> None:
 
 def test_records_not_in_the_document_stay() -> None:
     state = _state()
-    plan = _plan(state, {"books": [{"title": "New book"}]})
-    assert set(state["books"]) < set(plan.state["books"])
+    plan = _plan(state, {"games": [{"title": "New game"}]})
+    assert set(state["games"]) < set(plan.state["games"])
     assert plan.state["rooms"] == state["rooms"]
     assert plan.state["loans"] == state["loans"]
 
@@ -486,17 +486,17 @@ def test_records_not_in_the_document_stay() -> None:
 def test_wishlist_none_keeps_the_stored_entry() -> None:
     state = _state()
     data, _ = _export(state)
-    data["books"][1]["wishlist"] = None
+    data["games"][1]["wishlist"] = None
     plan = _plan(state, data)
-    assert plan.state["books"][EMMA]["wishlist"] == state["books"][EMMA]["wishlist"]
+    assert plan.state["games"][EMMA]["wishlist"] == state["games"][EMMA]["wishlist"]
 
 
 def test_wishlist_update_keeps_the_todo_binding() -> None:
     state = _state()
     data, _ = _export(state)
-    data["books"][1]["wishlist"]["buy"] = False
+    data["games"][1]["wishlist"]["buy"] = False
     plan = _plan(state, data)
-    entry = plan.state["books"][EMMA]["wishlist"]
+    entry = plan.state["games"][EMMA]["wishlist"]
     assert entry["buy"] is False
     assert entry["todo_uid"] == "uid-1"
 
@@ -504,7 +504,7 @@ def test_wishlist_update_keeps_the_todo_binding() -> None:
 def test_reading_row_update_moves_the_time_stamp() -> None:
     state = _state()
     data, _ = _export(state)
-    row = data["reading"][0]["books"][0]
+    row = data["reading"][0]["games"][0]
     row["rating"] = 3
     del row["updated_at"]
     plan = _plan(state, data)
@@ -516,8 +516,8 @@ def test_reading_row_update_moves_the_time_stamp() -> None:
 
 def test_copy_on_a_missing_shelf_goes_to_no_shelf() -> None:
     document = {
-        "books": [{"id": DUNE, "title": "Dune"}],
-        "copies": [{"id": COPY, "book_id": DUNE, "shelf_id": "gone"}],
+        "games": [{"id": DUNE, "title": "Dune"}],
+        "copies": [{"id": COPY, "game_id": DUNE, "shelf_id": "gone"}],
     }
     plan = _plan(m.empty_state(), document)
     assert plan.ok
@@ -529,7 +529,7 @@ def test_copy_on_a_missing_shelf_goes_to_no_shelf() -> None:
 
 def test_copy_update_by_id() -> None:
     state = _state()
-    document = {"copies": [{"id": COPY, "book_id": DUNE, "format": "ebook"}]}
+    document = {"copies": [{"id": COPY, "game_id": DUNE, "format": "ebook"}]}
     plan = _plan(state, document)
     assert plan.state["copies"][COPY]["format"] == "ebook"
     assert plan.state["copies"][COPY]["shelf_id"] is None
@@ -547,11 +547,11 @@ def test_existing_person_settings_update() -> None:
 
 
 def test_higher_format_is_refused() -> None:
-    plan = _plan(m.empty_state(), {"format": 2, "books": [{"title": "X"}]})
+    plan = _plan(m.empty_state(), {"format": 2, "games": [{"title": "X"}]})
     assert not plan.ok
     assert _problems(plan) == [("error", "format", "import_format_too_new")]
     assert plan.problems[0].placeholders == {"format": "2", "max": "1"}
-    assert plan.state["books"] == {}
+    assert plan.state["games"] == {}
 
 
 def test_whole_section_imports_like_its_data() -> None:
@@ -562,22 +562,22 @@ def test_whole_section_imports_like_its_data() -> None:
     assert by_section.ok
     assert by_section.counts == by_data.counts
     assert by_section.state == by_data.state
-    assert by_section.state["books"] != {}
+    assert by_section.state["games"] != {}
 
 
 def test_whole_section_with_higher_format_is_refused() -> None:
     data, _ = _export(_state())
     plan = _plan(m.empty_state(), {"format": 2, "data": data})
     assert _problems(plan) == [("error", "format", "import_format_too_new")]
-    assert plan.state["books"] == {}
+    assert plan.state["games"] == {}
 
 
 def test_unwrap_keeps_a_data_document() -> None:
-    doc = {"format": 1, "books": [], "data": {"books": [{"title": "X"}]}}
+    doc = {"format": 1, "games": [], "data": {"games": [{"title": "X"}]}}
     assert iex.unwrap_document(doc) is doc
     assert iex.unwrap_document(["x"]) == ["x"]
     assert iex.unwrap_document({"data": "x"}) == {"data": "x"}
-    assert iex.unwrap_document({"data": {"books": []}}) == {"books": []}
+    assert iex.unwrap_document({"data": {"games": []}}) == {"games": []}
 
 
 @pytest.mark.parametrize("fmt", [0, "1", True, None])
@@ -587,34 +587,34 @@ def test_bad_format_is_refused(fmt: object) -> None:
 
 
 def test_document_must_be_an_object() -> None:
-    plan = _plan(m.empty_state(), ["books"])
+    plan = _plan(m.empty_state(), ["games"])
     assert _problems(plan) == [("error", "", "import_not_an_object")]
 
 
 def test_section_and_record_shapes() -> None:
     plan = _plan(
         m.empty_state(),
-        {"rooms": "x", "books": ["x"], "reading": [{"person_id": ALICE, "books": 1}]},
+        {"rooms": "x", "games": ["x"], "reading": [{"person_id": ALICE, "games": 1}]},
     )
     assert _problems(plan) == [
         ("error", "rooms", "import_not_a_list"),
-        ("error", "books[0]", "import_not_an_object"),
-        ("error", "reading[0].books", "import_not_a_list"),
+        ("error", "games[0]", "import_not_an_object"),
+        ("error", "reading[0].games", "import_not_a_list"),
     ]
 
 
 def test_field_errors_name_the_path_and_block_the_import() -> None:
     document = {
         "rooms": [{"name": ""}],
-        "books": [
+        "games": [
             {"title": "Ok"},
             {"title": "Bad", "barcode": "1#3", "pages": -1},
             {"title": ""},
         ],
-        "copies": [{"book_id": "nope", "format": "scroll"}],
-        "loans": [{"direction": "out", "book_id": "nope", "copy_id": "nope"}],
+        "copies": [{"game_id": "nope", "format": "scroll"}],
+        "loans": [{"direction": "out", "game_id": "nope", "copy_id": "nope"}],
         "reading": [
-            {"person_id": ALICE, "books": [{"book_id": "nope", "rating": 9}, "x"]}
+            {"person_id": ALICE, "games": [{"game_id": "nope", "rating": 9}, "x"]}
         ],
         "people": [{"person_id": ALICE, "yearly_goal": 0}],
     }
@@ -622,39 +622,39 @@ def test_field_errors_name_the_path_and_block_the_import() -> None:
     assert not plan.ok
     assert _problems(plan) == [
         ("error", "rooms[0].name", "field_required"),
-        ("error", "books[1].barcode", "invalid_barcode"),
-        ("error", "books[1].pages", "out_of_range"),
-        ("error", "books[2].title", "field_required"),
-        ("error", "copies[0].book_id", "import_reference_missing"),
+        ("error", "games[1].barcode", "invalid_barcode"),
+        ("error", "games[1].pages", "out_of_range"),
+        ("error", "games[2].title", "field_required"),
+        ("error", "copies[0].game_id", "import_reference_missing"),
         ("error", "copies[0].format", "invalid_choice"),
-        ("error", "loans[0].book_id", "import_reference_missing"),
+        ("error", "loans[0].game_id", "import_reference_missing"),
         ("error", "loans[0].copy_id", "import_reference_missing"),
-        ("error", "reading[0].books[0].book_id", "import_reference_missing"),
-        ("error", "reading[0].books[0].rating", "out_of_range"),
-        ("error", "reading[0].books[1]", "import_not_an_object"),
+        ("error", "reading[0].games[0].game_id", "import_reference_missing"),
+        ("error", "reading[0].games[0].rating", "out_of_range"),
+        ("error", "reading[0].games[1]", "import_not_an_object"),
         ("error", "people[0]", "out_of_range"),
     ]
 
 
 def test_bad_loan_and_wishlist_values() -> None:
     document = {
-        "books": [
+        "games": [
             {"id": DUNE, "title": "Dune", "wishlist": {"person_id": ALICE, "buy": 1}},
             {"title": "Emma", "wishlist": "yes"},
         ],
-        "loans": [{"direction": "in", "book_id": DUNE, "person_id": ALICE}],
+        "loans": [{"direction": "in", "game_id": DUNE, "person_id": ALICE}],
     }
     plan = _plan(m.empty_state(), document)
     assert _problems(plan) == [
-        ("error", "books[0].wishlist.buy", "invalid_field"),
-        ("error", "books[1].wishlist", "import_not_an_object"),
+        ("error", "games[0].wishlist.buy", "invalid_field"),
+        ("error", "games[1].wishlist", "import_not_an_object"),
         ("error", "loans[0]", "field_required"),
     ]
 
 
 def test_cover_with_a_bad_path_is_a_warning() -> None:
     document = {
-        "books": [
+        "games": [
             {"title": "A", "cover": {"kind": "custom", "file": "../../secrets.yaml"}},
             {"title": "B", "cover": {"kind": "custom", "file": "covers/b.jpg"}},
             {"title": "E", "cover": {"kind": "openlibrary", "file": "covers/e.jpg"}},
@@ -665,12 +665,12 @@ def test_cover_with_a_bad_path_is_a_warning() -> None:
     plan = _plan(m.empty_state(), document)
     assert plan.ok
     assert _problems(plan) == [
-        ("warning", "books[0].cover.file", "import_cover_unreadable")
+        ("warning", "games[0].cover.file", "import_cover_unreadable")
     ]
     assert [(c.kind, c.file, c.path) for c in plan.covers] == [
-        ("custom", "covers/b.jpg", "books[1].cover.file")
+        ("custom", "covers/b.jpg", "games[1].cover.file")
     ]
-    assert plan.covers[0].book_id in plan.state["books"]
+    assert plan.covers[0].game_id in plan.state["games"]
 
 
 @pytest.mark.parametrize(
@@ -762,7 +762,7 @@ def test_export_orders_locations_by_order_then_name() -> None:
 
 def test_export_skips_no_cover_without_a_file() -> None:
     state = _state()
-    state["books"][DUNE]["cover"] = {"kind": "custom", "file": None}
+    state["games"][DUNE]["cover"] = {"kind": "custom", "file": None}
     _, skipped = _export(state)
     assert skipped == {"covers": 0}
     assert iex.covers_to_copy(state) == []

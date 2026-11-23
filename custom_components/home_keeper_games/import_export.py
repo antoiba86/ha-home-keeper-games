@@ -29,28 +29,28 @@ from dataclasses import dataclass, field
 from pathlib import PurePath
 from typing import Any
 
-from .csv_io import _Index as BookIndex
+from .csv_io import _Index as GameIndex
 from .models import (
-    BOOK_FIELDS,
     COPY_FIELDS,
     COVER_KINDS,
+    GAME_FIELDS,
     MAX_NAME,
     MAX_NOTE,
     READING_FIELDS,
     LibraryError,
     apply_person_settings,
-    book_field,
     boolean,
-    build_book,
-    build_bookcase,
     build_copy,
+    build_game,
     build_loan,
     build_room,
     build_shelf,
+    build_unit,
     clone,
     copy_field,
     empty_reading,
     fold,
+    game_field,
     integer,
     iso_date,
     new_id,
@@ -68,9 +68,9 @@ FORMAT = 1
 #: The sections of the ``data``, in the order of the import.
 SECTIONS = (
     "rooms",
-    "bookcases",
+    "units",
     "shelves",
-    "books",
+    "games",
     "copies",
     "loans",
     "reading",
@@ -78,7 +78,7 @@ SECTIONS = (
 )
 
 #: ``{section: ((key, reason), ...)}``: each stored key that the export drops.
-#: ``wishlist`` is the wishlist entry of a book, and ``document`` is the top
+#: ``wishlist`` is the wishlist entry of a game, and ``document`` is the top
 #: level of the stored document.
 EXCLUDED_KEYS: dict[str, tuple[tuple[str, str], ...]] = {
     "document": (
@@ -152,9 +152,9 @@ def check_files_dir(files_dir: Any, config_dir: str) -> str:
     return path
 
 
-def cover_export_path(book_id: str) -> str:
-    """The relative path of the cover file of a book in ``files_dir``."""
-    return f"{COVERS_SUBDIR}/{book_id}.jpg"
+def cover_export_path(game_id: str) -> str:
+    """The relative path of the cover file of a game in ``files_dir``."""
+    return f"{COVERS_SUBDIR}/{game_id}.jpg"
 
 
 def is_cover_path(value: Any) -> bool:
@@ -166,13 +166,13 @@ def is_cover_path(value: Any) -> bool:
 
 
 def covers_to_copy(state: dict[str, Any]) -> list[tuple[str, str]]:
-    """``(book_id, stored file)`` for each book with a cover file, by book id."""
+    """``(game_id, stored file)`` for each game with a cover file, by game id."""
     out = []
-    for book_id in sorted(state["books"]):
-        cover = state["books"][book_id].get("cover") or {}
+    for game_id in sorted(state["games"]):
+        cover = state["games"][game_id].get("cover") or {}
         file = cover.get("file")
         if cover.get("kind", "none") != "none" and isinstance(file, str) and file:
-            out.append((book_id, file))
+            out.append((game_id, file))
     return out
 
 
@@ -198,8 +198,8 @@ def build_export(
 ) -> tuple[dict[str, Any], dict[str, int]]:
     """Return ``(data, skipped)`` for the library section of the export.
 
-    *cover_files* maps a book id to the relative path of the cover file that
-    the caller copied. A book with a cover file that is not in *cover_files*
+    *cover_files* maps a game id to the relative path of the cover file that
+    the caller copied. A game with a cover file that is not in *cover_files*
     gets ``cover: None`` and is counted in ``skipped["covers"]``.
     """
     skipped = {"covers": 0}
@@ -211,26 +211,26 @@ def build_export(
         record["area_name"] = area_names.get(area_id) if area_id else None
         rooms.append(record)
     data["rooms"] = rooms
-    data["bookcases"] = [_without(b, "bookcases") for b in _ordered(state["bookcases"])]
+    data["units"] = [_without(b, "units") for b in _ordered(state["units"])]
     data["shelves"] = [_without(s, "shelves") for s in _ordered(state["shelves"])]
-    books = []
-    for book_id in sorted(state["books"]):
-        book = state["books"][book_id]
-        record = _without(book, "books")
-        cover = book.get("cover") or {}
-        if book_id in cover_files:
-            record["cover"] = {"kind": cover.get("kind"), "file": cover_files[book_id]}
+    games = []
+    for game_id in sorted(state["games"]):
+        game = state["games"][game_id]
+        record = _without(game, "games")
+        cover = game.get("cover") or {}
+        if game_id in cover_files:
+            record["cover"] = {"kind": cover.get("kind"), "file": cover_files[game_id]}
         else:
             if cover.get("file"):
                 skipped["covers"] += 1
             record["cover"] = None
-        wish = book.get("wishlist")
+        wish = game.get("wishlist")
         if isinstance(wish, dict):
             entry = _without(wish, "wishlist")
             entry["person_name"] = person_names.get(str(wish.get("person_id")))
             record["wishlist"] = entry
-        books.append(record)
-    data["books"] = books
+        games.append(record)
+    data["games"] = games
     data["copies"] = [
         _without(state["copies"][key], "copies") for key in sorted(state["copies"])
     ]
@@ -246,8 +246,8 @@ def build_export(
         {
             "person_id": person_id,
             "person_name": person_names.get(person_id),
-            "books": [
-                {"book_id": book_id, **clone(rows[book_id])} for book_id in sorted(rows)
+            "games": [
+                {"game_id": game_id, **clone(rows[game_id])} for game_id in sorted(rows)
             ],
         }
         for person_id, rows in sorted(state["reading"].items())
@@ -286,7 +286,7 @@ class Problem:
 class CoverJob:
     """A cover file that the caller reads from ``files_dir`` after the write."""
 
-    book_id: str
+    game_id: str
     kind: str
     file: str
     path: str
@@ -465,7 +465,7 @@ class _Planner:
     # ── Locations ────────────────────────────────────────────────────────────
 
     def locations(self, section: str, kind: str, parent: str | None) -> None:
-        parent_section = {"bookcases": "rooms", "shelves": "bookcases"}.get(section)
+        parent_section = {"units": "rooms", "shelves": "units"}.get(section)
         for index, path, record in self.items(section):
             data: dict[str, Any] = {}
             ok, data["name"] = self.check(
@@ -480,7 +480,7 @@ class _Planner:
                     record["order"],
                 )
                 ok = ok and good
-            if section == "bookcases":
+            if section == "units":
                 good, data["note"] = self.check(
                     f"{path}.note",
                     lambda v: text(v, "note", MAX_NOTE),
@@ -539,7 +539,7 @@ class _Planner:
                     target, matched_by = key, "name"
                     break
         if target is None:
-            builders = {"rooms": build_room, "bookcases": build_bookcase}
+            builders = {"rooms": build_room, "units": build_unit}
             builder = builders.get(section, build_shelf)
             siblings = {parent: data[parent]} if parent else {}
             created = builder(data, order=next_order(records, **siblings))
@@ -554,18 +554,18 @@ class _Planner:
             self.maps[section][raw] = target
         self.record(section, index, target, data["name"], action, matched_by)
 
-    # ── Books ────────────────────────────────────────────────────────────────
+    # ── Games ────────────────────────────────────────────────────────────────
 
-    def books(self) -> None:
-        index = BookIndex(self.new["books"])
-        for position, path, record in self.items("books"):
+    def games(self) -> None:
+        index = GameIndex(self.new["games"])
+        for position, path, record in self.items("games"):
             fields: dict[str, Any] = {}
             ok = True
-            for name in BOOK_FIELDS:
+            for name in GAME_FIELDS:
                 if name not in record:
                     continue
                 good, fields[name] = self.check(
-                    f"{path}.{name}", book_field, name, record[name]
+                    f"{path}.{name}", game_field, name, record[name]
                 )
                 ok = ok and good
             if not fields.get("title") and ok:
@@ -587,47 +587,47 @@ class _Planner:
                 continue
             raw = record.get("id")
             key = {
-                "book_id": raw,
+                "game_id": raw,
                 "barcode": fields.get("barcode"),
                 "title": fields["title"],
                 "authors": fields.get("authors") or [],
             }
-            target, matched_by = _match_book(index, key)
+            target, matched_by = _match_game(index, key)
             if target is None:
-                book = self.new_book(raw, fields, record)
-                index.add(book)
-                target = book["id"]
+                game = self.new_game(raw, fields, record)
+                index.add(game)
+                target = game["id"]
                 action = ACTION_CREATE
             else:
-                book = self.new["books"][target]
+                game = self.new["games"][target]
                 changed = False
                 for name, value in fields.items():
-                    if book.get(name) != value:
-                        book[name] = value
+                    if game.get(name) != value:
+                        game[name] = value
                         changed = True
                 if changed:
-                    book["updated_at"] = self.now
+                    game["updated_at"] = self.now
                 action = ACTION_UPDATE
             if isinstance(raw, str) and raw:
-                self.maps["books"][raw] = target
+                self.maps["games"][raw] = target
             if cover is not None:
                 self.plan.covers.append(
                     CoverJob(target, cover[0], cover[1], f"{path}.cover.file")
                 )
             if isinstance(wish, dict):
                 self.wishlist(target, wish, f"{path}.wishlist")
-            self.record("books", position, target, fields["title"], action, matched_by)
+            self.record("games", position, target, fields["title"], action, matched_by)
 
-    def new_book(
+    def new_game(
         self, raw: Any, fields: dict[str, Any], record: dict[str, Any]
     ) -> dict[str, Any]:
-        book = build_book(fields, now=self.now)
-        book["id"] = self.target_id("books", raw)
+        game = build_game(fields, now=self.now)
+        game["id"] = self.target_id("games", raw)
         for stamp in ("created_at", "updated_at"):
             if isinstance(record.get(stamp), str) and record[stamp]:
-                book[stamp] = record[stamp]
-        self.new["books"][book["id"]] = book
-        return book
+                game[stamp] = record[stamp]
+        self.new["games"][game["id"]] = game
+        return game
 
     def cover(self, value: Any, path: str) -> tuple[str, str] | None:
         """``(kind, file)`` of a cover with a file, else None."""
@@ -644,7 +644,7 @@ class _Planner:
             return None
         return str(kind), str(file)
 
-    def wishlist(self, book_id: str, wish: dict[str, Any], path: str) -> None:
+    def wishlist(self, game_id: str, wish: dict[str, Any], path: str) -> None:
         person_id = self.person(wish, path)
         if person_id is None:
             return
@@ -654,8 +654,8 @@ class _Planner:
         )
         if not (ok and good):
             return
-        book = self.new["books"][book_id]
-        entry = dict(book.get("wishlist") or {})
+        game = self.new["games"][game_id]
+        entry = dict(game.get("wishlist") or {})
         added = wish.get("added_at")
         entry.update(
             {
@@ -667,16 +667,16 @@ class _Planner:
         )
         entry.setdefault("todo_uid", None)
         entry.setdefault("todo_entity", None)
-        if entry != book.get("wishlist"):
-            book["wishlist"] = entry
+        if entry != game.get("wishlist"):
+            game["wishlist"] = entry
 
     # ── Copies ───────────────────────────────────────────────────────────────
 
     def copies(self) -> None:
         for index, path, record in self.items("copies"):
-            book_id = self.required_ref("books", record, "book_id", path)
+            game_id = self.required_ref("games", record, "game_id", path)
             data: dict[str, Any] = {}
-            ok = book_id is not None
+            ok = game_id is not None
             for name in COPY_FIELDS:
                 if name == "shelf_id" or name not in record:
                     continue
@@ -697,9 +697,9 @@ class _Planner:
                     id=raw_shelf,
                 )
             data["shelf_id"] = shelf_id
-            data["book_id"] = book_id
+            data["game_id"] = game_id
             raw = record.get("id")
-            title = str(self.new["books"][str(book_id)].get("title", ""))
+            title = str(self.new["games"][str(game_id)].get("title", ""))
             if isinstance(raw, str) and raw in self.new["copies"]:
                 copy = self.new["copies"][raw]
                 copy.update(data)
@@ -719,8 +719,8 @@ class _Planner:
 
     def loans(self) -> None:
         for index, path, record in self.items("loans"):
-            book_id = self.required_ref("books", record, "book_id", path)
-            ok = book_id is not None
+            game_id = self.required_ref("games", record, "game_id", path)
+            ok = game_id is not None
             copy_id = None
             if record.get("direction") == "out":
                 copy_id = self.required_ref("copies", record, "copy_id", path)
@@ -738,13 +738,13 @@ class _Planner:
                 for key in ("direction", "party", "format", "started", "due", "note")
             }
             data.update(
-                {"book_id": book_id, "copy_id": copy_id, "person_id": person_id}
+                {"game_id": game_id, "copy_id": copy_id, "person_id": person_id}
             )
             good, loan = self.check(path, _loan, data, record, self.today)
             if not good:
                 continue
             raw = record.get("id")
-            title = str(self.new["books"][str(book_id)].get("title", ""))
+            title = str(self.new["games"][str(game_id)].get("title", ""))
             if isinstance(raw, str) and raw in self.new["loans"]:
                 current = self.new["loans"][raw]
                 loan["id"] = raw
@@ -761,35 +761,35 @@ class _Planner:
     def reading(self) -> None:
         for _index, path, entry in self.items("reading"):
             person_id = self.person(entry, path)
-            rows = entry.get("books")
+            rows = entry.get("games")
             if not isinstance(rows, list):
                 self.problem(
-                    LEVEL_ERROR, f"{path}.books", "import_not_a_list", field="books"
+                    LEVEL_ERROR, f"{path}.games", "import_not_a_list", field="games"
                 )
                 continue
             if person_id is None:
                 self.plan.counts["reading"]["skipped"] += len(rows)
                 continue
             for position, row in enumerate(rows):
-                self.reading_row(person_id, position, row, f"{path}.books[{position}]")
+                self.reading_row(person_id, position, row, f"{path}.games[{position}]")
 
     def reading_row(self, person_id: str, position: int, row: Any, path: str) -> None:
         if not isinstance(row, dict):
             self.problem(LEVEL_ERROR, path, "import_not_an_object", field=path)
             return
-        book_id = self.required_ref("books", row, "book_id", path)
+        game_id = self.required_ref("games", row, "game_id", path)
         values: dict[str, Any] = {}
-        ok = book_id is not None
+        ok = game_id is not None
         for name in READING_FIELDS:
             if name in row:
                 good, values[name] = self.check(
                     f"{path}.{name}", reading_field, name, row[name]
                 )
                 ok = ok and good
-        if not ok or book_id is None:
+        if not ok or game_id is None:
             return
         rows = self.new["reading"].setdefault(person_id, {})
-        current = rows.get(book_id)
+        current = rows.get(game_id)
         updated = dict(current) if current else empty_reading(now=self.now)
         updated.update(values)
         if current is None or any(
@@ -801,10 +801,10 @@ class _Planner:
             )
         else:
             updated = current
-        rows[book_id] = updated
-        title = str(self.new["books"][book_id].get("title", ""))
+        rows[game_id] = updated
+        title = str(self.new["games"][game_id].get("title", ""))
         action = ACTION_UPDATE if current is not None else ACTION_CREATE
-        self.record("reading", position, book_id, title, action, None)
+        self.record("reading", position, game_id, title, action, None)
 
     # ── People ───────────────────────────────────────────────────────────────
 
@@ -858,9 +858,9 @@ class _Planner:
             )
             return self.plan
         self.locations("rooms", "room", None)
-        self.locations("bookcases", "bookcase", "room_id")
-        self.locations("shelves", "shelf", "bookcase_id")
-        self.books()
+        self.locations("units", "unit", "room_id")
+        self.locations("shelves", "shelf", "unit_id")
+        self.games()
         self.copies()
         self.loans()
         self.reading()
@@ -869,10 +869,10 @@ class _Planner:
         return self.plan
 
 
-def _match_book(index: BookIndex, key: dict[str, Any]) -> tuple[str | None, str | None]:
-    """``(book_id, matched_by)``: by id, barcode, then title and author."""
-    if key["book_id"] in index.by_id:
-        return str(key["book_id"]), "id"
+def _match_game(index: GameIndex, key: dict[str, Any]) -> tuple[str | None, str | None]:
+    """``(game_id, matched_by)``: by id, barcode, then title and author."""
+    if key["game_id"] in index.by_id:
+        return str(key["game_id"]), "id"
     if key["barcode"] and key["barcode"] in index.barcode:
         return index.barcode[key["barcode"]], "barcode"
     found = index.title.get(title_key(key["title"], key["authors"]))
@@ -898,7 +898,7 @@ def unwrap_document(document: Any) -> Any:
     if (
         isinstance(document, dict)
         and isinstance(document.get("data"), dict)
-        and "books" not in document
+        and "games" not in document
     ):
         data = dict(document["data"])
         if "format" in document:

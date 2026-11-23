@@ -1,8 +1,8 @@
 import { library } from '../ha-ws';
-import { adminState, bookByTitle, expect, homeKeeperTasks, openTab, test } from './helpers';
+import { adminState, gameByTitle, expect, homeKeeperTasks, openTab, test } from './helpers';
 
 /**
- * Lend a book and see its task in the real Home Keeper. The loan is deleted after,
+ * Lend a game and see its task in the real Home Keeper. The loan is deleted after,
  * and the library deletes its task.
  */
 const TITLE = 'Station Eleven';
@@ -10,8 +10,8 @@ const PARTY = 'Robin';
 
 async function deleteLoans(): Promise<void> {
   const state = await adminState();
-  const book = state.books.find((b: { title: string }) => b.title === TITLE);
-  for (const loan of state.loans.filter((l: { book_id: string; party: string }) => l.book_id === book.id && l.party === PARTY)) {
+  const game = state.games.find((b: { title: string }) => b.title === TITLE);
+  for (const loan of state.loans.filter((l: { game_id: string; party: string }) => l.game_id === game.id && l.party === PARTY)) {
     await library('delete_loan', { loan_id: loan.id });
   }
 }
@@ -21,8 +21,8 @@ test.describe('Loans', { tag: '@responsive' }, () => {
   test.afterEach(deleteLoans);
 
   test('a loan with a due date adds a Home Keeper task, and the link opens it', async ({ page }) => {
-    const book = await bookByTitle(TITLE);
-    const tab = await openTab(page, `/books/${book.id}`);
+    const game = await gameByTitle(TITLE);
+    const tab = await openTab(page, `/games/${game.id}`);
     await tab.locator('[data-k="lend"]').click();
     const dialog = tab.locator('.hkl-dialog');
     await expect(dialog.locator('h2')).toHaveText('Lend book');
@@ -37,7 +37,7 @@ test.describe('Loans', { tag: '@responsive' }, () => {
     const link = box.locator('a.hkl-task');
     await expect(link).toBeVisible({ timeout: 30_000 });
 
-    const loan = (await adminState()).loans.find((l: { book_id: string; party: string }) => l.book_id === book.id && l.party === PARTY);
+    const loan = (await adminState()).loans.find((l: { game_id: string; party: string }) => l.game_id === game.id && l.party === PARTY);
     expect(loan.hk_task_id).toMatch(/^[0-9a-f]{32}$|^[0-9a-f-]{36}$/);
     const task = (await homeKeeperTasks()).find((t) => t.id === loan.hk_task_id);
     expect(task).toMatchObject({ name: `Get ${TITLE} back from ${PARTY}` });
@@ -52,7 +52,7 @@ test.describe('Loans', { tag: '@responsive' }, () => {
     await expect(page.locator('home-keeper-panel')).toContainText(`Get ${TITLE} back from ${PARTY}`, { timeout: 30_000 });
   });
 
-  test('the Loans view lists the open loans and the borrowed books', async ({ page }) => {
+  test('the Loans view lists the open loans and the borrowed games', async ({ page }) => {
     const tab = await openTab(page, '/loans');
     const state = await adminState();
     const out = state.loans.filter((l: { direction: string; returned: string | null }) => l.direction === 'out' && !l.returned);

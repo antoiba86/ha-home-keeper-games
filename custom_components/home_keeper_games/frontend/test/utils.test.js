@@ -2,7 +2,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vite
 import * as u from '../src/utils.ts';
 
 // Small builders, so each test shows the data it reads.
-const book = (id, extra = {}) => ({
+const game = (id, extra = {}) => ({
   id,
   title: `Title ${id}`,
   subtitle: '',
@@ -38,9 +38,9 @@ const row = (status, extra = {}) => ({
   updated_at: '2026-01-01T00:00:00+00:00',
   ...extra,
 });
-const copy = (id, bookId, shelfId, extra = {}) => ({
+const copy = (id, gameId, shelfId, extra = {}) => ({
   id,
-  book_id: bookId,
+  game_id: gameId,
   shelf_id: shelfId,
   format: 'paperback',
   condition: null,
@@ -55,16 +55,16 @@ const copy = (id, bookId, shelfId, extra = {}) => ({
 function lib(extra = {}) {
   return u.normalizeState({
     rooms: { r1: { id: 'r1', name: 'Living', area_id: null, order: 1 }, r2: { id: 'r2', name: 'Office', area_id: null, order: 2 } },
-    bookcases: {
+    units: {
       c1: { id: 'c1', room_id: 'r1', name: 'Case A', note: '', order: 1 },
       c2: { id: 'c2', room_id: 'r2', name: 'Case B', note: '', order: 1 },
     },
     shelves: {
-      s2: { id: 's2', bookcase_id: 'c1', name: 'Shelf 2', order: 2 },
-      s1: { id: 's1', bookcase_id: 'c1', name: 'Shelf 1', order: 1 },
-      s3: { id: 's3', bookcase_id: 'c2', name: 'Top', order: 1 },
+      s2: { id: 's2', unit_id: 'c1', name: 'Shelf 2', order: 2 },
+      s1: { id: 's1', unit_id: 'c1', name: 'Shelf 1', order: 1 },
+      s3: { id: 's3', unit_id: 'c2', name: 'Top', order: 1 },
     },
-    books: {},
+    games: {},
     copies: {},
     loans: {},
     people: {},
@@ -114,7 +114,7 @@ describe('asList and normalizeState', () => {
     expect(u.asList(undefined)).toEqual([]);
   });
 
-  it('sorts rooms, bookcases and shelves by order, then name', () => {
+  it('sorts rooms, units and shelves by order, then name', () => {
     const l = u.normalizeState({
       rooms: [
         { id: 'b', name: 'B', order: 2 },
@@ -122,11 +122,11 @@ describe('asList and normalizeState', () => {
         { id: 'a', name: 'A', order: 1 },
       ],
       shelves: { x: { id: 'x', name: 'X', order: 3 }, y: { id: 'y', name: 'Y', order: 1 } },
-      bookcases: [{ id: 'q', name: 'Q', order: 5 }, { id: 'p', name: 'P' }],
+      units: [{ id: 'q', name: 'Q', order: 5 }, { id: 'p', name: 'P' }],
     });
     expect(l.rooms.map((r) => r.id)).toEqual(['a', 'z', 'b']);
     expect(l.shelves.map((s) => s.id)).toEqual(['y', 'x']);
-    expect(l.bookcases.map((s) => s.id)).toEqual(['p', 'q']);
+    expect(l.units.map((s) => s.id)).toEqual(['p', 'q']);
   });
 
   it('reads the people map, sorts by name and gives each person the color of its place', () => {
@@ -159,9 +159,9 @@ describe('asList and normalizeState', () => {
     expect(u.normalizePeople(null)).toEqual([]);
   });
 
-  it('fills missing book lists and the defaults of me and currency', () => {
-    const l = u.normalizeState({ books: [{ id: 'b' }] });
-    expect(l.books[0]).toMatchObject({ authors: [], tags: [], subjects: [], reading: {} });
+  it('fills missing game lists and the defaults of me and currency', () => {
+    const l = u.normalizeState({ games: [{ id: 'b' }] });
+    expect(l.games[0]).toMatchObject({ authors: [], tags: [], subjects: [], reading: {} });
     expect(l.me).toEqual({ person_id: null, name: null, is_admin: false });
     expect(u.normalizeState({ me: { person_id: 'p', name: 'P', is_admin: 'yes' } }).me).toEqual({ person_id: 'p', name: 'P', is_admin: false });
     expect(u.normalizeState({ me: { person_id: 'p', name: 'P', is_admin: true } }).me.is_admin).toBe(true);
@@ -170,10 +170,10 @@ describe('asList and normalizeState', () => {
     expect(l.loans).toEqual([]);
   });
 
-  it('keeps the lists that a book has', () => {
-    const l = u.normalizeState({ books: [{ id: 'b', authors: ['A'], tags: ['t'], subjects: ['s'], reading: { p: row('read') } }], currency: 'EUR', me: { person_id: 'p', is_admin: true } });
-    expect(l.books[0]).toMatchObject({ authors: ['A'], tags: ['t'], subjects: ['s'] });
-    expect(l.books[0].reading.p.status).toBe('read');
+  it('keeps the lists that a game has', () => {
+    const l = u.normalizeState({ games: [{ id: 'b', authors: ['A'], tags: ['t'], subjects: ['s'], reading: { p: row('read') } }], currency: 'EUR', me: { person_id: 'p', is_admin: true } });
+    expect(l.games[0]).toMatchObject({ authors: ['A'], tags: ['t'], subjects: ['s'] });
+    expect(l.games[0].reading.p.status).toBe('read');
     expect(l.currency).toBe('EUR');
     expect(l.me.person_id).toBe('p');
   });
@@ -199,24 +199,24 @@ describe('buildIndex, shelfPath and locations', () => {
   let idx;
   beforeAll(() => {
     l = lib({
-      books: { b1: book('b1'), b2: book('b2') },
+      games: { b1: game('b1'), b2: game('b2') },
       copies: { k1: copy('k1', 'b1', 's1'), k2: copy('k2', 'b1', null), k3: copy('k3', 'b2', 's3') },
       loans: {
-        l1: { id: 'l1', direction: 'out', book_id: 'b1', copy_id: 'k1', returned: null },
-        l2: { id: 'l2', direction: 'out', book_id: 'b2', copy_id: 'k3', returned: '2026-01-01' },
-        l3: { id: 'l3', direction: 'in', book_id: 'b2', copy_id: null, returned: null },
-        l4: { id: 'l4', direction: 'out', book_id: 'b2', copy_id: null, returned: null },
+        l1: { id: 'l1', direction: 'out', game_id: 'b1', copy_id: 'k1', returned: null },
+        l2: { id: 'l2', direction: 'out', game_id: 'b2', copy_id: 'k3', returned: '2026-01-01' },
+        l3: { id: 'l3', direction: 'in', game_id: 'b2', copy_id: null, returned: null },
+        l4: { id: 'l4', direction: 'out', game_id: 'b2', copy_id: null, returned: null },
       },
     });
     idx = u.buildIndex(l);
   });
 
-  it('groups copies by book and by shelf, with "" for no shelf', () => {
-    expect(idx.copiesByBook.get('b1').map((c) => c.id)).toEqual(['k1', 'k2']);
+  it('groups copies by game and by shelf, with "" for no shelf', () => {
+    expect(idx.copiesByGame.get('b1').map((c) => c.id)).toEqual(['k1', 'k2']);
     expect(idx.copiesByShelf.get('').map((c) => c.id)).toEqual(['k2']);
     expect(idx.copiesByShelf.get('s3').map((c) => c.id)).toEqual(['k3']);
-    expect(idx.copy.get('k3').book_id).toBe('b2');
-    expect(idx.book.get('b2').id).toBe('b2');
+    expect(idx.copy.get('k3').game_id).toBe('b2');
+    expect(idx.game.get('b2').id).toBe('b2');
   });
 
   it('keeps only open loans and maps an out loan to its copy', () => {
@@ -227,11 +227,11 @@ describe('buildIndex, shelfPath and locations', () => {
     expect([...idx.loanByCopy.keys()]).toEqual(['k1']);
   });
 
-  it('finds the room, bookcase and shelf', () => {
+  it('finds the room, unit and shelf', () => {
     const p = u.shelfPath(idx, 's1');
-    expect([p.room.id, p.bookcase.id, p.shelf.id]).toEqual(['r1', 'c1', 's1']);
-    expect(u.shelfPath(idx, null)).toEqual({ room: null, bookcase: null, shelf: null });
-    expect(u.shelfPath(idx, 'missing')).toEqual({ room: null, bookcase: null, shelf: null });
+    expect([p.room.id, p.unit.id, p.shelf.id]).toEqual(['r1', 'c1', 's1']);
+    expect(u.shelfPath(idx, null)).toEqual({ room: null, unit: null, shelf: null });
+    expect(u.shelfPath(idx, 'missing')).toEqual({ room: null, unit: null, shelf: null });
   });
 
   it('labels a location in full and in short', () => {
@@ -259,15 +259,15 @@ describe('buildIndex, shelfPath and locations', () => {
 });
 
 describe('parseRoute and buildPath', () => {
-  it('parses the default and the book list', () => {
-    expect(u.parseRoute('')).toEqual({ view: 'books', id: null, query: {} });
-    expect(u.parseRoute(undefined)).toEqual({ view: 'books', id: null, query: {} });
-    expect(u.parseRoute('/books')).toEqual({ view: 'books', id: null, query: {} });
-    expect(u.parseRoute('/nope/x')).toEqual({ view: 'books', id: null, query: {} });
+  it('parses the default and the game list', () => {
+    expect(u.parseRoute('')).toEqual({ view: 'games', id: null, query: {} });
+    expect(u.parseRoute(undefined)).toEqual({ view: 'games', id: null, query: {} });
+    expect(u.parseRoute('/games')).toEqual({ view: 'games', id: null, query: {} });
+    expect(u.parseRoute('/nope/x')).toEqual({ view: 'games', id: null, query: {} });
   });
 
   it('parses each view', () => {
-    expect(u.parseRoute('/books/abc')).toEqual({ view: 'book', id: 'abc', query: {} });
+    expect(u.parseRoute('/games/abc')).toEqual({ view: 'game', id: 'abc', query: {} });
     expect(u.parseRoute('/shelves')).toEqual({ view: 'shelves', id: null, query: {} });
     expect(u.parseRoute('/shelves/r1')).toEqual({ view: 'shelves', id: 'r1', query: {} });
     for (const v of ['loans', 'wishlist', 'scan', 'import', 'settings']) {
@@ -276,45 +276,45 @@ describe('parseRoute and buildPath', () => {
   });
 
   it('reads the query from the path or from search', () => {
-    expect(u.parseRoute('/books?q=le%20guin&room=r1').query).toEqual({ q: 'le guin', room: 'r1' });
-    expect(u.parseRoute('/books', '?q=x').query).toEqual({ q: 'x' });
-    expect(u.parseRoute('/books?q=a', '?q=b').query).toEqual({ q: 'a' });
+    expect(u.parseRoute('/games?q=le%20guin&room=r1').query).toEqual({ q: 'le guin', room: 'r1' });
+    expect(u.parseRoute('/games', '?q=x').query).toEqual({ q: 'x' });
+    expect(u.parseRoute('/games?q=a', '?q=b').query).toEqual({ q: 'a' });
   });
 
   it('drops default values and keys of other views', () => {
-    expect(u.parseRoute('/books?status=all&sort=author&view=grid&owned=yes&tab=in').query).toEqual({});
+    expect(u.parseRoute('/games?status=all&sort=author&view=grid&owned=yes&tab=in').query).toEqual({});
     expect(u.parseRoute('/loans?tab=in&q=x').query).toEqual({ tab: 'in' });
     expect(u.parseRoute('/loans?tab=out').query).toEqual({});
     expect(u.parseRoute('/scan?shelf=s1&mode=borrowed&step=camera').query).toEqual({ shelf: 's1', mode: 'borrowed', step: 'camera' });
     expect(u.parseRoute('/scan?step=setup&mode=shelf').query).toEqual({});
     expect(u.parseRoute('/scan;step=camera;debug=1').query).toEqual({ step: 'camera', debug: '1' });
-    expect(u.parseRoute('/books/x?q=a').query).toEqual({});
+    expect(u.parseRoute('/games/x?q=a').query).toEqual({});
   });
 
   it('reads the parameters of the last segment, and they win over a query', () => {
-    expect(u.parseRoute('/books;q=le%20guin;room=r1').query).toEqual({ q: 'le guin', room: 'r1' });
-    expect(u.parseRoute('/books;q=a?q=b&room=r').query).toEqual({ q: 'a', room: 'r' });
-    expect(u.parseRoute('/books;q=a', '?q=b').query).toEqual({ q: 'a' });
-    expect(u.parseRoute('/books;q=a%3Bb%3Dc').query).toEqual({ q: 'a;b=c' });
-    expect(u.parseRoute('/books;=x;q;status=read').query).toEqual({ status: 'read' });
-    expect(u.parseRoute('/books;q=%E0%A4%A').query).toEqual({ q: '%E0%A4%A' });
+    expect(u.parseRoute('/games;q=le%20guin;room=r1').query).toEqual({ q: 'le guin', room: 'r1' });
+    expect(u.parseRoute('/games;q=a?q=b&room=r').query).toEqual({ q: 'a', room: 'r' });
+    expect(u.parseRoute('/games;q=a', '?q=b').query).toEqual({ q: 'a' });
+    expect(u.parseRoute('/games;q=a%3Bb%3Dc').query).toEqual({ q: 'a;b=c' });
+    expect(u.parseRoute('/games;=x;q;status=read').query).toEqual({ status: 'read' });
+    expect(u.parseRoute('/games;q=%E0%A4%A').query).toEqual({ q: '%E0%A4%A' });
     expect(u.parseRoute('/loans;tab=in')).toEqual({ view: 'loans', id: null, query: { tab: 'in' } });
-    expect(u.parseRoute('/books/b1;q=x')).toEqual({ view: 'book', id: 'b1', query: {} });
+    expect(u.parseRoute('/games/b1;q=x')).toEqual({ view: 'game', id: 'b1', query: {} });
     expect(u.parseRoute('/shelves;q=x')).toEqual({ view: 'shelves', id: null, query: {} });
-    expect(u.parseRoute(';q=x')).toEqual({ view: 'books', id: null, query: { q: 'x' } });
-    expect(u.parseRoute('/books/%E0%A4%A').id).toBe('%E0%A4%A');
+    expect(u.parseRoute(';q=x')).toEqual({ view: 'games', id: null, query: { q: 'x' } });
+    expect(u.parseRoute('/games/%E0%A4%A').id).toBe('%E0%A4%A');
   });
 
   it('decodes ids and tolerates extra slashes', () => {
-    expect(u.parseRoute('//books/a%2Fb//').id).toBe('a/b');
+    expect(u.parseRoute('//games/a%2Fb//').id).toBe('a/b');
   });
 
   it('builds paths in a fixed key order with no defaults', () => {
-    expect(u.buildPath({ view: 'books' })).toBe('/books');
-    expect(u.buildPath({ view: 'books', query: { view: 'rows', q: 'x y', sort: 'author' } })).toBe('/books;q=x%20y;view=rows');
-    expect(u.buildPath({ view: 'books', query: { q: 'a;b=c' } })).toBe('/books;q=a%3Bb%3Dc');
-    expect(u.buildPath({ view: 'book', id: 'a/b' })).toBe('/books/a%2Fb');
-    expect(u.buildPath({ view: 'book', id: null })).toBe('/books');
+    expect(u.buildPath({ view: 'games' })).toBe('/games');
+    expect(u.buildPath({ view: 'games', query: { view: 'rows', q: 'x y', sort: 'author' } })).toBe('/games;q=x%20y;view=rows');
+    expect(u.buildPath({ view: 'games', query: { q: 'a;b=c' } })).toBe('/games;q=a%3Bb%3Dc');
+    expect(u.buildPath({ view: 'game', id: 'a/b' })).toBe('/games/a%2Fb');
+    expect(u.buildPath({ view: 'game', id: null })).toBe('/games');
     expect(u.buildPath({ view: 'shelves', id: 'r1' })).toBe('/shelves/r1');
     expect(u.buildPath({ view: 'shelves' })).toBe('/shelves');
     expect(u.buildPath({ view: 'loans', query: { tab: 'returned' } })).toBe('/loans;tab=returned');
@@ -322,7 +322,7 @@ describe('parseRoute and buildPath', () => {
   });
 
   it('round-trips', () => {
-    for (const p of ['/books;q=a%20b;status=read;room=r;shelf=s;reader=p;subject=x;owned=all;sort=title;view=rows', '/books/b1', '/shelves/r', '/loans;tab=in', '/wishlist', '/scan;shelf=s;mode=borrowed;step=summary;debug=1', '/import', '/settings']) {
+    for (const p of ['/games;q=a%20b;status=read;room=r;shelf=s;reader=p;subject=x;owned=all;sort=title;view=rows', '/games/b1', '/shelves/r', '/loans;tab=in', '/wishlist', '/scan;shelf=s;mode=borrowed;step=summary;debug=1', '/import', '/settings']) {
       expect(u.buildPath(u.parseRoute(p))).toBe(p);
     }
   });
@@ -356,13 +356,13 @@ describe('readFilters and hasFilters', () => {
 });
 
 describe('reading helpers and search', () => {
-  const b = book('b', {
+  const b = game('b', {
     title: 'The Left Hand',
     subtitle: 'A novel',
     authors: ['Ursula K. Le Guin'],
     barcode: '9780441478125',
     series: { name: 'Hainish', number: 4 },
-    shared_notes: 'Book club',
+    shared_notes: 'Game club',
     tags: ['hugo'],
     reading: { me: row('read', { private_notes: 'secret word' }), other: row('reading', { private_notes: 'hidden' }) },
   });
@@ -373,7 +373,7 @@ describe('reading helpers and search', () => {
     expect(u.readingOf(b, 'nobody')).toBeNull();
     expect(u.statusOf(b, 'other')).toBe('reading');
     expect(u.statusOf(b, 'nobody')).toBeNull();
-    expect(u.statusOf(book('x', { reading: { p: { status: null } } }), 'p')).toBeNull();
+    expect(u.statusOf(game('x', { reading: { p: { status: null } } }), 'p')).toBeNull();
   });
 
   it('searches each field', () => {
@@ -394,37 +394,37 @@ describe('reading helpers and search', () => {
     expect(u.matchesSearch(b, '0-441-47812-5', 'me')).toBe(true);
     expect(u.matchesSearch(b, '0441478125x', 'me')).toBe(false);
     expect(u.matchesSearch(b, '978-0-441-9', 'me')).toBe(false);
-    expect(u.matchesSearch(book('n', { title: 'a-b' }), 'ab', null)).toBe(false);
+    expect(u.matchesSearch(game('n', { title: 'a-b' }), 'ab', null)).toBe(false);
   });
 
   it('matches accents', () => {
-    expect(u.matchesSearch(book('g', { title: 'Gödel' }), 'godel', null)).toBe(true);
-    expect(u.matchesSearch(book('g', { title: 'Godel' }), 'Gödel', null)).toBe(true);
+    expect(u.matchesSearch(game('g', { title: 'Gödel' }), 'godel', null)).toBe(true);
+    expect(u.matchesSearch(game('g', { title: 'Godel' }), 'Gödel', null)).toBe(true);
   });
 
   it('separates fields so a search does not join 2 fields', () => {
-    expect(u.searchText(book('s', { title: 'ab', subtitle: 'cd' }), null)).not.toContain('abcd');
+    expect(u.searchText(game('s', { title: 'ab', subtitle: 'cd' }), null)).not.toContain('abcd');
   });
 });
 
-describe('filterBooks, statusCounts and sortBooks', () => {
+describe('filterGames, statusCounts and sortGames', () => {
   let l;
   let ctx;
   beforeAll(() => {
     l = lib({
-      books: {
-        a: book('a', { title: 'Alpha', authors: ['Zed Last'], subjects: ['SF'], reading: { me: row('read', { rating: 3 }), p2: row('read') }, created_at: '2026-01-03', published: '1999' }),
-        b: book('b', { title: 'Beta', authors: ['Amy Bee'], reading: { me: row('reading') }, needs_details: true, created_at: '2026-01-02', published: 'May 1970' }),
-        c: book('c', { title: 'Gamma', authors: ['Amy Bee'], owned: false, reading: { me: row('want', { rating: 5 }) }, created_at: '2026-01-01' }),
-        d: book('d', { title: 'Delta', authors: [], subjects: ['SF', 'Art'], created_at: '2026-01-04', published: '2001' }),
+      games: {
+        a: game('a', { title: 'Alpha', authors: ['Zed Last'], subjects: ['SF'], reading: { me: row('read', { rating: 3 }), p2: row('read') }, created_at: '2026-01-03', published: '1999' }),
+        b: game('b', { title: 'Beta', authors: ['Amy Bee'], reading: { me: row('reading') }, needs_details: true, created_at: '2026-01-02', published: 'May 1970' }),
+        c: game('c', { title: 'Gamma', authors: ['Amy Bee'], owned: false, reading: { me: row('want', { rating: 5 }) }, created_at: '2026-01-01' }),
+        d: game('d', { title: 'Delta', authors: [], subjects: ['SF', 'Art'], created_at: '2026-01-04', published: '2001' }),
       },
       copies: { k1: copy('k1', 'a', 's1'), k2: copy('k2', 'b', 's3'), k3: copy('k3', 'd', null) },
     });
     ctx = { idx: u.buildIndex(l), me: 'me' };
   });
-  const ids = (q) => u.filterBooks(l.books, u.readFilters(q), ctx).map((x) => x.id);
+  const ids = (q) => u.filterGames(l.games, u.readFilters(q), ctx).map((x) => x.id);
 
-  it('shows owned books by default, sorted by author', () => {
+  it('shows owned games by default, sorted by author', () => {
     expect(ids({})).toEqual(['b', 'a', 'd']);
     expect(ids({ owned: 'all' })).toEqual(['b', 'c', 'a', 'd']);
     expect(ids({ owned: 'no' })).toEqual(['c']);
@@ -458,34 +458,34 @@ describe('filterBooks, statusCounts and sortBooks', () => {
   });
 
   it('counts each status with the other filters on', () => {
-    expect(u.statusCounts(l.books, u.readFilters({}), ctx)).toEqual({ all: 3, unread: 2, reading: 1, read: 1, needs: 1 });
-    expect(u.statusCounts(l.books, u.readFilters({ status: 'read', owned: 'all' }), ctx)).toEqual({ all: 4, unread: 3, reading: 1, read: 1, needs: 1 });
-    expect(u.statusCounts(l.books, u.readFilters({ room: 'r1' }), ctx)).toEqual({ all: 1, unread: 0, reading: 0, read: 1, needs: 0 });
+    expect(u.statusCounts(l.games, u.readFilters({}), ctx)).toEqual({ all: 3, unread: 2, reading: 1, read: 1, needs: 1 });
+    expect(u.statusCounts(l.games, u.readFilters({ status: 'read', owned: 'all' }), ctx)).toEqual({ all: 4, unread: 3, reading: 1, read: 1, needs: 1 });
+    expect(u.statusCounts(l.games, u.readFilters({ room: 'r1' }), ctx)).toEqual({ all: 1, unread: 0, reading: 0, read: 1, needs: 0 });
   });
 
   it('sorts by each key with the title as the tiebreak', () => {
-    const sort = (k) => u.sortBooks(l.books, k, 'me').map((x) => x.id);
+    const sort = (k) => u.sortGames(l.games, k, 'me').map((x) => x.id);
     expect(sort('author')).toEqual(['b', 'c', 'a', 'd']);
     expect(sort('title')).toEqual(['a', 'b', 'd', 'c']);
     expect(sort('added')).toEqual(['d', 'a', 'b', 'c']);
     expect(sort('published')).toEqual(['b', 'a', 'd', 'c']);
     expect(sort('rating')).toEqual(['c', 'a', 'b', 'd']);
-    expect(l.books.map((x) => x.id)).toEqual(['a', 'b', 'c', 'd']);
+    expect(l.games.map((x) => x.id)).toEqual(['a', 'b', 'c', 'd']);
   });
 
   it('sorts a series by its number inside the same author', () => {
     const s = [
-      book('x3', { title: 'C', authors: ['A B'], series: { name: 'S', number: 3 } }),
-      book('x1', { title: 'Z', authors: ['A B'], series: { name: 'S', number: '1' } }),
-      book('x2', { title: 'A', authors: ['A B'], series: { name: 'S', number: 2 } }),
-      book('x0', { title: 'Y', authors: ['A B'], series: { name: 'S', number: 'x' } }),
-      book('y', { title: 'B', authors: ['A B'], series: { name: 'R', number: 9 } }),
+      game('x3', { title: 'C', authors: ['A B'], series: { name: 'S', number: 3 } }),
+      game('x1', { title: 'Z', authors: ['A B'], series: { name: 'S', number: '1' } }),
+      game('x2', { title: 'A', authors: ['A B'], series: { name: 'S', number: 2 } }),
+      game('x0', { title: 'Y', authors: ['A B'], series: { name: 'S', number: 'x' } }),
+      game('y', { title: 'B', authors: ['A B'], series: { name: 'R', number: 9 } }),
     ];
-    expect(u.sortBooks(s, 'author', null).map((x) => x.id)).toEqual(['y', 'x0', 'x1', 'x2', 'x3']);
+    expect(u.sortGames(s, 'author', null).map((x) => x.id)).toEqual(['y', 'x0', 'x1', 'x2', 'x3']);
   });
 
   it('lists the subjects with no duplicates', () => {
-    expect(u.allSubjects(l.books)).toEqual(['Art', 'SF']);
+    expect(u.allSubjects(l.games)).toEqual(['Art', 'SF']);
   });
 });
 
@@ -605,10 +605,10 @@ describe('drawing', () => {
   });
   it('sizes spines from the page count and the id', () => {
     const [a, b, c, d] = u.spines([
-      book('s1', { pages: 400, title: 'T' }),
-      book('s2', { pages: 10 }),
-      book('s3', { pages: 5000 }),
-      book('s4'),
+      game('s1', { pages: 400, title: 'T' }),
+      game('s2', { pages: 10 }),
+      game('s3', { pages: 5000 }),
+      game('s4'),
     ]);
     expect(a).toMatchObject({ id: 's1', title: 'T', w: 16 });
     expect(b.w).toBe(8);
@@ -617,8 +617,8 @@ describe('drawing', () => {
     expect(d.w).toBe(8 + (h % 10));
     expect(d.h).toBe(56 + ((h >>> 8) % 27));
     expect(d.color).toBe(u.COVER_COLORS[h % u.COVER_COLORS.length][0]);
-    expect(u.spines([book('a'), book('b'), book('c')], 2)).toHaveLength(2);
-    expect(u.spines(Array.from({ length: 70 }, (_, i) => book(`x${i}`)))).toHaveLength(60);
+    expect(u.spines([game('a'), game('b'), game('c')], 2)).toHaveLength(2);
+    expect(u.spines(Array.from({ length: 70 }, (_, i) => game(`x${i}`)))).toHaveLength(60);
   });
   it('has 8 distinct avatar colors', () => {
     expect(u.PERSON_COLORS).toHaveLength(8);
@@ -696,23 +696,23 @@ describe('cardModel and pickRandom', () => {
         sam: { share_reading: true, wishlist_todo: null, yearly_goal: null },
         shy: { share_reading: false, wishlist_todo: null, yearly_goal: null },
       },
-      books: {
-        a: book('a', { pages: 100, reading: { me: row('read', { finished: '2026-02-01' }), sam: row('read', { updated_at: '2026-10-01' }) } }),
-        b: book('b', { pages: 200, reading: { me: row('read', { finished: '2025-12-31' }), shy: row('reading') } }),
-        c: book('c', { reading: { me: row('read', { finished: '2026-05-01' }), sam: row('want') } }),
-        d: book('d', { reading: { me: row('reading', { updated_at: '2026-01-01' }), sam: row('reading', { updated_at: '2026-10-03' }) } }),
-        e: book('e', { reading: { me: row('reading', { updated_at: '2026-03-01' }) } }),
-        f: book('f', { reading: { me: row('want') } }),
+      games: {
+        a: game('a', { pages: 100, reading: { me: row('read', { finished: '2026-02-01' }), sam: row('read', { updated_at: '2026-10-01' }) } }),
+        b: game('b', { pages: 200, reading: { me: row('read', { finished: '2025-12-31' }), shy: row('reading') } }),
+        c: game('c', { reading: { me: row('read', { finished: '2026-05-01' }), sam: row('want') } }),
+        d: game('d', { reading: { me: row('reading', { updated_at: '2026-01-01' }), sam: row('reading', { updated_at: '2026-10-03' }) } }),
+        e: game('e', { reading: { me: row('reading', { updated_at: '2026-03-01' }) } }),
+        f: game('f', { reading: { me: row('want') } }),
       },
     });
   });
 
   it('collects reading, want, the goal and household activity', () => {
     const m = u.cardModel(l, 'me', now);
-    expect(m.reading.map((r) => r.book.id)).toEqual(['e', 'd']);
+    expect(m.reading.map((r) => r.game.id)).toEqual(['e', 'd']);
     expect(m.want.map((b) => b.id)).toEqual(['f']);
     expect(m.goal).toEqual({ done: 2, goal: 10, pages: 100, year: 2026 });
-    expect(m.household.map((a) => `${a.person.id}:${a.book.id}`)).toEqual(['sam:d', 'sam:a']);
+    expect(m.household.map((a) => `${a.person.id}:${a.game.id}`)).toEqual(['sam:d', 'sam:a']);
   });
 
   it('limits the activity and has no goal with no person', () => {
@@ -720,7 +720,7 @@ describe('cardModel and pickRandom', () => {
     const m = u.cardModel(l, null, now);
     expect(m.goal.goal).toBeNull();
     expect(m.reading).toEqual([]);
-    expect(m.household.map((a) => a.book.id).slice(0, 3)).toEqual(['d', 'a', 'e']);
+    expect(m.household.map((a) => a.game.id).slice(0, 3)).toEqual(['d', 'a', 'e']);
     expect(m.household).toHaveLength(5);
     expect(u.cardModel(l, 'sam', now).goal.goal).toBeNull();
   });
@@ -738,28 +738,28 @@ describe('scanTally, loansFor and csvRowCount', () => {
   it('counts scan results', () => {
     expect(
       u.scanTally([
-        { result: 'added', book: { needs_details: false } },
-        { result: 'added', book: { needs_details: true } },
-        { result: 'moved', book: null },
-        { result: 'duplicate', book: null },
-        { result: 'skipped', book: null },
-        { result: 'not_found', book: null },
+        { result: 'added', game: { needs_details: false } },
+        { result: 'added', game: { needs_details: true } },
+        { result: 'moved', game: null },
+        { result: 'duplicate', game: null },
+        { result: 'skipped', game: null },
+        { result: 'not_found', game: null },
       ]),
     ).toEqual({ added: 2, moved: 1, needs: 2, duplicate: 1, skipped: 1 });
     expect(u.scanTally([])).toEqual({ added: 0, moved: 0, needs: 0, duplicate: 0, skipped: 0 });
   });
 
   it('finds the next scan with no match that has no title', () => {
-    const book = { id: 'b1' };
-    const miss = (extra = {}) => ({ res: { result: 'not_found', book }, ...extra });
+    const game = { id: 'b1' };
+    const miss = (extra = {}) => ({ res: { result: 'not_found', game }, ...extra });
     const first = miss();
     const second = miss();
-    expect(u.nextMiss([{ res: null }, { res: { result: 'added', book } }, first, second])).toBe(first);
+    expect(u.nextMiss([{ res: null }, { res: { result: 'added', game } }, first, second])).toBe(first);
     expect(u.nextMiss([miss({ named: true }), second])).toBe(second);
     expect(u.nextMiss([miss({ removed: true }), second])).toBe(second);
-    expect(u.nextMiss([{ res: { result: 'not_found', book: null } }])).toBeNull();
+    expect(u.nextMiss([{ res: { result: 'not_found', game: null } }])).toBeNull();
     expect(u.nextMiss([miss({ named: true }), miss({ removed: true })])).toBeNull();
-    expect(u.nextMiss([{ res: { result: 'duplicate', book } }, { res: { result: 'skipped', book } }])).toBeNull();
+    expect(u.nextMiss([{ res: { result: 'duplicate', game } }, { res: { result: 'skipped', game } }])).toBeNull();
     expect(u.nextMiss([])).toBeNull();
   });
 

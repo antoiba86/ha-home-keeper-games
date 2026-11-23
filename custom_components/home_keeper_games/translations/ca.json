@@ -41,7 +41,7 @@
   },
   "entity": {
     "sensor": {
-      "books": {
+      "games": {
         "name": "Llibres"
       },
       "loans_out": {
@@ -50,7 +50,7 @@
       "loans_overdue": {
         "name": "Préstecs vençuts"
       },
-      "books_read_this_year": {
+      "games_read_this_year": {
         "name": "{person} llibres llegits aquest any"
       },
       "reading_now": {
@@ -132,7 +132,7 @@
         }
       }
     },
-    "add_bookcase": {
+    "add_unit": {
       "name": "Afegeix una llibreria",
       "description": "Afegeix una llibreria a una habitació.",
       "fields": {
@@ -154,11 +154,11 @@
         }
       }
     },
-    "update_bookcase": {
+    "update_unit": {
       "name": "Canvia una llibreria",
       "description": "Canvia una llibreria o mou-la a una altra habitació.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Llibreria",
           "description": "L'ID de la llibreria."
         },
@@ -180,11 +180,11 @@
         }
       }
     },
-    "delete_bookcase": {
+    "delete_unit": {
       "name": "Esborra una llibreria",
       "description": "Esborra una llibreria. Una llibreria amb prestatges necessita force.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Llibreria",
           "description": "L'ID de la llibreria."
         },
@@ -198,7 +198,7 @@
       "name": "Afegeix un prestatge",
       "description": "Afegeix un prestatge a una llibreria.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Llibreria",
           "description": "L'ID de la llibreria."
         },
@@ -220,7 +220,7 @@
           "name": "Prestatge",
           "description": "L'ID del prestatge. Buit per a cap prestatge."
         },
-        "bookcase_id": {
+        "unit_id": {
           "name": "Llibreria",
           "description": "L'ID de la llibreria."
         },
@@ -248,7 +248,7 @@
         }
       }
     },
-    "add_book": {
+    "add_game": {
       "name": "Afegeix un llibre",
       "description": "Afegeix un llibre. Si un llibre té el mateix codi de barres, el servei retorna aquest llibre.",
       "fields": {
@@ -310,11 +310,11 @@
         }
       }
     },
-    "update_book": {
+    "update_game": {
       "name": "Canvia un llibre",
       "description": "Canvia els detalls d'un llibre.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Llibre",
           "description": "L'ID del llibre."
         },
@@ -376,11 +376,11 @@
         }
       }
     },
-    "delete_book": {
+    "delete_game": {
       "name": "Esborra un llibre",
       "description": "Esborra un llibre amb els exemplars, l'estat de lectura, els préstecs i la coberta.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Llibre",
           "description": "L'ID del llibre."
         }
@@ -412,7 +412,7 @@
       "name": "Afegeix un exemplar",
       "description": "Afegeix un exemplar d'un llibre.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Llibre",
           "description": "L'ID del llibre."
         },
@@ -536,7 +536,7 @@
       "name": "Defineix la coberta",
       "description": "Defineix la coberta d'un llibre.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Llibre",
           "description": "L'ID del llibre."
         },
@@ -554,7 +554,7 @@
       "name": "Defineix l'estat de lectura",
       "description": "Defineix l'estat de lectura d'un llibre per a una persona. Un usuari no administrador només pot definir el seu propi estat.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Llibre",
           "description": "L'ID del llibre."
         },
@@ -592,7 +592,7 @@
         }
       }
     },
-    "lend_book": {
+    "lend_game": {
       "name": "Presta un llibre",
       "description": "Presta un exemplar a una altra persona.",
       "fields": {
@@ -622,11 +622,11 @@
         }
       }
     },
-    "borrow_book": {
+    "borrow_game": {
       "name": "Afegeix un llibre manllevat",
       "description": "Registra un llibre que una persona ha manllevat.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Llibre",
           "description": "L'ID del llibre."
         },
@@ -730,7 +730,7 @@
       "name": "Afegeix als desitjos",
       "description": "Posa un llibre a la llista de desitjos d'una persona.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Llibre",
           "description": "L'ID del llibre."
         },
@@ -760,7 +760,7 @@
       "name": "Canvia un desig",
       "description": "Canvia una entrada de la llista de desitjos.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Llibre",
           "description": "L'ID del llibre."
         },
@@ -778,17 +778,17 @@
       "name": "Treu dels desitjos",
       "description": "Treu un llibre de la llista de desitjos.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Llibre",
           "description": "L'ID del llibre."
         }
       }
     },
-    "got_wishlist_book": {
+    "got_wishlist_game": {
       "name": "Llibre desitjat rebut",
       "description": "Afegeix un exemplar d'un llibre desitjat i treu-lo de la llista de desitjos.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Llibre",
           "description": "L'ID del llibre."
         },
@@ -874,7 +874,7 @@
         }
       }
     },
-    "list_books": {
+    "list_games": {
       "name": "Llista els llibres",
       "description": "Retorna els llibres que coincideixen amb els filtres.",
       "fields": {
@@ -908,11 +908,11 @@
         }
       }
     },
-    "get_book": {
+    "get_game": {
       "name": "Obtén un llibre",
       "description": "Retorna un llibre amb els exemplars i els préstecs.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Llibre",
           "description": "L'ID del llibre."
         }
@@ -1000,13 +1000,13 @@
     "room_not_found": {
       "message": "Cap habitació té l'ID {id}."
     },
-    "bookcase_not_found": {
+    "unit_not_found": {
       "message": "Cap llibreria té l'ID {id}."
     },
     "shelf_not_found": {
       "message": "Cap prestatge té l'ID {id}."
     },
-    "book_not_found": {
+    "game_not_found": {
       "message": "Cap llibre té l'ID {id}."
     },
     "copy_not_found": {
@@ -1024,7 +1024,7 @@
     "room_not_empty": {
       "message": "L'habitació té {count} llibreries. Fes servir force per esborrar-les també."
     },
-    "bookcase_not_empty": {
+    "unit_not_empty": {
       "message": "La llibreria té {count} prestatges. Fes servir force per esborrar-los també."
     },
     "shelf_not_empty": {

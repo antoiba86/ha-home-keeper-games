@@ -36,8 +36,8 @@ This file gives the rules for code that changes it.
   the save. A change made while the plan runs stays
   ([csv-import-export](../../docs/design/csv-import-export.md#steps)).
 - A field that only a queue or a sync reads, such as `lookup_tries` or `hk_task_id`, is
-  bookkeeping. It fires no event and is not in the CSV export. A new book gets the start
-  value from `models.build_book`, and `models.normalize_state` gives it to an old book.
+  bookkeeping. It fires no event and is not in the CSV export. A new game gets the start
+  value from `models.build_game`, and `models.normalize_state` gives it to an old game.
 - The store tells its listeners after each save. The coordinator sends the document to
   the entities with `async_set_updated_data`, so an entity never waits for a poll.
 
@@ -65,7 +65,7 @@ The admin and usage split is also the security boundary ([SECURITY.md](../../doc
 ### Read projections
 
 - **A reply never leaks.** Every read goes through `projections.project_state` or
-  `projections.project_book`. A non-admin reads no `price`, `value` or `acquired_from`
+  `projections.project_game`. A non-admin reads no `price`, `value` or `acquired_from`
   of a copy, and no `party` of a loan.
 - A non-admin reads the reading row of another person only if that person has
   `share_reading: true`, and never with `private_notes`.
@@ -80,7 +80,7 @@ result in the plan's Security section ([pr-workflow.md](pr-workflow.md)).
 - **Open, for the caller's own person: reading status, rating, notes and settings.** A
   non-admin user changes only their own rows.
 - **Open: a read that the card or a native entity needs**, through a projection.
-- **Admin-only: the catalog.** Rooms, bookcases, shelves, books, copies, covers, loans
+- **Admin-only: the catalog.** Rooms, units, shelves, games, copies, covers, loans
   and the wishlist.
 - **Admin-only: settings and configuration**, and each operation that can send text to a
   place the caller cannot reach, such as a to-do list or a Home Keeper task.

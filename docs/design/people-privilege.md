@@ -5,7 +5,7 @@ implements:
   - custom_components/home_keeper_games/people.py
   - custom_components/home_keeper_games/projections.py
 related: [events-api, entities, architecture]
-source_hash: 530138d923d9
+source_hash: 7ee7b2c73439
 ---
 
 # People and privilege
@@ -29,7 +29,7 @@ summary for users and integrators is [SECURITY.md](../SECURITY.md).
 ## Non-goals
 
 - Privacy between admins. An admin reads the full document.
-- Per-book access rules. A book, its shared notes and its cover are open to every user.
+- Per-game access rules. A game, its shared notes and its cover are open to every user.
 - Library accounts of their own. The library uses the Home Assistant users and persons.
 
 ## Design
@@ -55,7 +55,7 @@ its name, its entity id and its user id, sorted by name.
   of their own person. `wishlist_todo` is admin-only, because it sends text to a to-do
   list.
 
-The read services `list_books`, `get_book`, `list_locations`, `list_loans` and
+The read services `list_games`, `get_game`, `list_locations`, `list_loans` and
 `list_people` are open and projected. `get_state` and `subscribe` are open.
 `list_todo_entities` and the cover upload are admin-only. The cover view is open to
 each signed-in user, because covers are not private.
@@ -63,7 +63,7 @@ each signed-in user, because covers are not private.
 ### Projections
 
 `projections.project_state` builds the reply of `get_state`, and
-`projections.project_book` builds each book in a service reply. For a non-admin viewer:
+`projections.project_game` builds each game in a service reply. For a non-admin viewer:
 
 - a copy drops `PRIVATE_COPY_FIELDS` (`price`, `value`, `acquired_from`);
 - a loan drops `PRIVATE_LOAN_FIELDS` (`party`);
@@ -76,7 +76,7 @@ each signed-in user, because covers are not private.
 `projections.project_export` drops the same fields from the section of a Home Keeper
 export for a non-admin viewer. `export_data` is admin-only, so an admin reads it full.
 
-The viewer's own rows are full. Each book also gets `owned`, `copy_count` and
+The viewer's own rows are full. Each game also gets `owned`, `copy_count` and
 `cover_url`. The sensors and the card use the count functions at the end of the module.
 
 ### Entities

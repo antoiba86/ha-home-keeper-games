@@ -2,8 +2,8 @@
 
 The cover files are in ``.storage/home_keeper_games_covers/``. The store file is
 ``.storage/home_keeper_games``, so the directory has a name of its own. A file name is
-``<book_id>-<token>.jpg``. The token changes with each new cover, and the
-``cover_url`` of a book carries it as ``?v=<token>``, so a browser cache never
+``<game_id>-<token>.jpg``. The token changes with each new cover, and the
+``cover_url`` of a game carries it as ``?v=<token>``, so a browser cache never
 shows an old cover.
 
 * A cover comes through the upload view: a POST of a multipart body with
@@ -11,8 +11,8 @@ shows an old cover.
   reads the type from the first bytes of the file, never from the header of the
   request. Pillow writes a new JPEG of at most 1200 px in an executor job, so
   the stored file is always a clean JPEG. The view returns a ``file_id``, and
-  the ``set_cover`` service puts that file on a book.
-* The cover view serves the cover of a book to each signed-in user. Covers are
+  the ``set_cover`` service puts that file on a game.
+* The cover view serves the cover of a game to each signed-in user. Covers are
   not private. An ``<img>`` element cannot send a token, so the client signs
   the path with the ``auth/sign_path`` websocket command of Home Assistant, or
   reads the image with ``fetchWithAuth``.
@@ -125,13 +125,13 @@ def covers_dir(hass: HomeAssistant) -> Path:
 
 
 def pending_dir(hass: HomeAssistant) -> Path:
-    """The directory of the uploads that no book uses yet."""
+    """The directory of the uploads that no game uses yet."""
     return covers_dir(hass) / "pending"
 
 
-def new_cover_name(book_id: str) -> str:
-    """A new file name for the cover of a book."""
-    return f"{book_id}-{secrets.token_hex(4)}.jpg"
+def new_cover_name(game_id: str) -> str:
+    """A new file name for the cover of a game."""
+    return f"{game_id}-{secrets.token_hex(4)}.jpg"
 
 
 def cover_path(hass: HomeAssistant, file: str) -> Path | None:
@@ -158,14 +158,14 @@ def _purge_pending(directory: Path, max_age: float) -> None:
 
 
 async def async_cleanup_pending(hass: HomeAssistant) -> None:
-    """Delete the uploads that no book used in 24 hours."""
+    """Delete the uploads that no game used in 24 hours."""
     await hass.async_add_executor_job(
         _purge_pending, pending_dir(hass), _PENDING_MAX_AGE_S
     )
 
 
 def release_cover(hass: HomeAssistant, file: str) -> None:
-    """Delete a cover file that no book uses now."""
+    """Delete a cover file that no game uses now."""
     if (path := cover_path(hass, file)) is not None:
         hass.async_add_executor_job(_unlink, path)
 
@@ -179,21 +179,21 @@ def _take_pending(src: Path, dst: Path) -> bool:
 
 
 async def async_use_upload(
-    hass: HomeAssistant, coordinator: LibraryCoordinator, book_id: str, file_id: str
+    hass: HomeAssistant, coordinator: LibraryCoordinator, game_id: str, file_id: str
 ) -> dict[str, Any]:
-    """Put an uploaded file on a book as its custom cover."""
+    """Put an uploaded file on a game as its custom cover."""
     from .models import LibraryError
 
-    coordinator.store.book(book_id)
+    coordinator.store.game(game_id)
     if not _FILE_ID_RE.match(file_id or ""):
         raise LibraryError("upload_not_found", file_id=file_id)
-    name = new_cover_name(book_id)
+    name = new_cover_name(game_id)
     moved = await hass.async_add_executor_job(
         _take_pending, pending_dir(hass) / f"{file_id}.jpg", covers_dir(hass) / name
     )
     if not moved:
         raise LibraryError("upload_not_found", file_id=file_id)
-    return await coordinator.store.set_cover(book_id, "custom", name)
+    return await coordinator.store.set_cover(game_id, "custom", name)
 
 
 # ── Files of a Home Keeper export bundle ────────────────────────────────────
@@ -202,7 +202,7 @@ async def async_use_upload(
 def copy_covers_out(
     hass_covers: Path, files_dir: Path, covers: list[tuple[str, str]]
 ) -> dict[str, str]:
-    """Copy the cover files into ``files_dir``. Return ``{book_id: relative path}``.
+    """Copy the cover files into ``files_dir``. Return ``{game_id: relative path}``.
 
     *covers* is ``import_export.covers_to_copy``. A missing or bad file is left
     out, and the export counts it as skipped. This call blocks: run it in an
@@ -211,21 +211,21 @@ def copy_covers_out(
     from .import_export import cover_export_path
 
     out: dict[str, str] = {}
-    for book_id, file in covers:
-        if not _FILE_RE.match(file) or not _FILE_ID_RE.match(book_id):
+    for game_id, file in covers:
+        if not _FILE_RE.match(file) or not _FILE_ID_RE.match(game_id):
             continue
         src = hass_covers / file
         if not src.is_file():
             continue
-        relative = cover_export_path(book_id)
+        relative = cover_export_path(game_id)
         dst = files_dir / relative
         try:
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(src, dst)
         except OSError as err:
-            _LOGGER.debug("Cannot copy the cover of %s: %s", book_id, err)
+            _LOGGER.debug("Cannot copy the cover of %s: %s", game_id, err)
             continue
-        out[book_id] = relative
+        out[game_id] = relative
     return out
 
 
@@ -254,7 +254,7 @@ def read_bundle_cover(files_dir: Path, relative: str) -> bytes | None:
 async def async_bundle_cover(
     hass: HomeAssistant,
     files_dir: Path,
-    book_id: str,
+    game_id: str,
     relative: str,
     *,
     write: bool,
@@ -262,12 +262,12 @@ async def async_bundle_cover(
     """Read and check a cover file of a bundle. Return its new file name, or None.
 
     With *write*, Pillow writes a new JPEG in the cover directory, as for an
-    upload. The caller puts the name on the book.
+    upload. The caller puts the name on the game.
     """
     data = await hass.async_add_executor_job(read_bundle_cover, files_dir, relative)
     if data is None:
         return None
-    name = new_cover_name(book_id)
+    name = new_cover_name(game_id)
     if not write:
         return name
     try:
@@ -284,18 +284,18 @@ def _coordinator(hass: HomeAssistant) -> LibraryCoordinator | None:
 
 
 class CoverView(HomeAssistantView):
-    """Serves the cover of a book to each signed-in user."""
+    """Serves the cover of a game to each signed-in user."""
 
-    url = COVER_URL_PREFIX + "/{book_id}"
+    url = COVER_URL_PREFIX + "/{game_id}"
     name = f"api:{DOMAIN}:cover"
     requires_auth = True
 
-    async def get(self, request: web.Request, book_id: str) -> web.StreamResponse:
+    async def get(self, request: web.Request, game_id: str) -> web.StreamResponse:
         """Return the cover file, or 404."""
         hass = request.app["hass"]
         coordinator = _coordinator(hass)
-        book = coordinator.store.state["books"].get(book_id) if coordinator else None
-        file = ((book or {}).get("cover") or {}).get("file")
+        game = coordinator.store.state["games"].get(game_id) if coordinator else None
+        file = ((game or {}).get("cover") or {}).get("file")
         path = cover_path(hass, file) if isinstance(file, str) else None
         if path is None or not await hass.async_add_executor_job(path.is_file):
             return web.Response(status=HTTPStatus.NOT_FOUND)

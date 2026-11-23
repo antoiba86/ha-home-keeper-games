@@ -10,17 +10,17 @@ How the tab and the card work is in [frontend-tab-card](../../docs/design/fronte
 ## Routing
 
 - **The URL is the source of truth.** Every page of the tab maps to a path under
-  `/home-keeper/games`: `/books`, `/books/<id>`, `/shelves`, `/loans`, `/wishlist`,
+  `/home-keeper/games`: `/games`, `/games/<id>`, `/shelves`, `/loans`, `/wishlist`,
   `/scan`, `/import` and `/settings`. The `route` setter is the only place that changes
   the view state.
 - **Navigate only with `host.navigate(path, {replace})`.** The Home Keeper panel owns
   the browser history, so the tab never calls `history.pushState`. Opening a detail
-  pushes. Closing a detail or deleting a book replaces, so Back moves inside the tab.
+  pushes. Closing a detail or deleting a game replaces, so Back moves inside the tab.
 - Keep `parseRoute` and `buildPath` pure in `utils.ts`, so they unit-test and round-trip.
-  An unknown path falls back to the book list. A detail URL for a deleted book shows the
+  An unknown path falls back to the game list. A detail URL for a deleted game shows the
   gone notice.
 - **The filters of a view are `;key=value` parameters on the last path segment**, as in
-  `/books;q=le%20guin;status=read`. The Home Keeper host gives the tab only the path and
+  `/games;q=le%20guin;status=read`. The Home Keeper host gives the tab only the path and
   drops a `?query`. A default value is left out of the URL. `parseRoute` still reads a
   `?query`, so an old link works.
 - **A new URL segment keeps old URLs working.** A user can bookmark any tab URL.

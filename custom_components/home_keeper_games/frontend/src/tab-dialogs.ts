@@ -9,20 +9,20 @@ import type { Copy } from './types';
 import { escapeHTML, locationLabel } from './utils';
 
 export type Dialog =
-  | { kind: 'add-book' }
-  | { kind: 'edit-book'; bookId: string }
-  | { kind: 'copy'; bookId: string; copyId: string | null }
+  | { kind: 'add-game' }
+  | { kind: 'edit-game'; gameId: string }
+  | { kind: 'copy'; gameId: string; copyId: string | null }
   | { kind: 'move'; copyId: string }
   | { kind: 'set-shelf' }
-  /** No book had the scanned barcode: ask for the title before the next scan. */
-  | { kind: 'scan-title'; key: number; bookId: string; copyId: string | null; barcode: string }
-  | { kind: 'lend'; bookId: string | null }
+  /** No game had the scanned barcode: ask for the title before the next scan. */
+  | { kind: 'scan-title'; key: number; gameId: string; copyId: string | null; barcode: string }
+  | { kind: 'lend'; gameId: string | null }
   | { kind: 'borrow' }
-  | { kind: 'wish-add'; bookId: string | null }
-  | { kind: 'got-it'; bookId: string }
+  | { kind: 'wish-add'; gameId: string | null }
+  | { kind: 'got-it'; gameId: string }
   | { kind: 'room'; roomId: string | null }
-  | { kind: 'bookcase'; roomId: string; bookcaseId: string | null }
-  | { kind: 'shelf'; bookcaseId: string; shelfId: string | null }
+  | { kind: 'unit'; roomId: string; unitId: string | null }
+  | { kind: 'shelf'; unitId: string; shelfId: string | null }
   | {
       kind: 'confirm';
       title: string;
@@ -83,16 +83,16 @@ function scanTitleBody(ctx: ViewCtx, d: Extract<Dialog, { kind: 'scan-title' }>)
     title: t('scan.no_match'),
     submit: t('scan.miss_save'),
     sheet: true,
-    html: `<div class="hkl-miss-head"><span class="hkl-cover hkl-cover-thumb miss" aria-hidden="true"></span><span class="hkl-row-main"><span class="hkl-muted" data-k="d-barcode">${escapeHTML(t('book.barcode', { code: d.barcode }))}</span><span class="hkl-muted">${escapeHTML(t('scan.miss_hint'))}</span></span></div>
-      ${field(t('book.title'), text('title', '', `required autocomplete="off" data-input="miss-title" placeholder="${escapeHTML(t('scan.miss_placeholder'))}"`), 'wide')}
+    html: `<div class="hkl-miss-head"><span class="hkl-cover hkl-cover-thumb miss" aria-hidden="true"></span><span class="hkl-row-main"><span class="hkl-muted" data-k="d-barcode">${escapeHTML(t('game.barcode', { code: d.barcode }))}</span><span class="hkl-muted">${escapeHTML(t('scan.miss_hint'))}</span></span></div>
+      ${field(t('game.title'), text('title', '', `required autocomplete="off" data-input="miss-title" placeholder="${escapeHTML(t('scan.miss_placeholder'))}"`), 'wide')}
       <details class="hkl-miss-more" data-k="d-more"><summary data-k="d-more-toggle">${escapeHTML(t('scan.miss_more'))}</summary>
         <div class="hkl-fields">
-          ${field(t('book.subtitle'), text('subtitle'), 'wide')}
-          ${field(t('book.authors'), text('authors'), 'wide')}
-          ${field(t('book.publisher'), text('publisher'))}
-          ${field(t('book.published'), text('published'), 'small')}
+          ${field(t('game.subtitle'), text('subtitle'), 'wide')}
+          ${field(t('game.authors'), text('authors'), 'wide')}
+          ${field(t('game.publisher'), text('publisher'))}
+          ${field(t('game.published'), text('published'), 'small')}
           ${field(t('copy.format'), `<select name="format" data-k="d-format">${formatOptions(copy?.format ?? 'paperback')}</select>`)}
-          ${field(t('book.pages_label'), text('pages', '', 'type="number" min="0"'), 'small')}
+          ${field(t('game.pages_label'), text('pages', '', 'type="number" min="0"'), 'small')}
           <label class="hkl-btn outline hkl-miss-cover">${ICONS.camera}<input class="hkl-sr" type="file" name="cover" accept="image/jpeg,image/png,image/webp" capture="environment" data-chg="miss-cover" data-k="d-cover" /><span data-k="d-cover-name">${escapeHTML(t('scan.miss_cover'))}</span></label>
         </div>
       </details>`,
@@ -101,12 +101,12 @@ function scanTitleBody(ctx: ViewCtx, d: Extract<Dialog, { kind: 'scan-title' }>)
 
 function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBody {
   switch (d.kind) {
-    case 'add-book':
+    case 'add-game':
       return {
-        title: t('dialog.add_book'),
+        title: t('dialog.add_game'),
         submit: t('action.add'),
         html: `${field(t('dialog.barcode_or_title'), text('query', '', 'required autocomplete="off"'), 'wide')}
-          ${field(t('book.authors'), text('authors'), 'wide')}
+          ${field(t('game.authors'), text('authors'), 'wide')}
           ${check('own', t('dialog.own_copy'), true)}
           <div class="hkl-fields">
             ${field(t('copy.shelf'), `<select name="shelf_id" data-k="d-shelf">${shelfOptions(ctx.lib, null)}</select>`)}
@@ -115,26 +115,26 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
       };
     case 'scan-title':
       return scanTitleBody(ctx, d);
-    case 'edit-book': {
-      const b = ctx.idx.book.get(d.bookId);
+    case 'edit-game': {
+      const b = ctx.idx.game.get(d.gameId);
       return {
-        title: t('dialog.edit_book'),
+        title: t('dialog.edit_game'),
         submit: t('action.save'),
         html: `<div class="hkl-fields">
-          ${field(t('book.title'), text('title', b?.title, 'required'), 'wide')}
-          ${field(t('book.subtitle'), text('subtitle', b?.subtitle), 'wide')}
-          ${field(t('book.authors'), text('authors', b?.authors.join(', ')), 'wide')}
-          ${field(t('book.barcode_label'), text('barcode', b?.barcode ?? '', 'autocomplete="off"'))}
-          ${field(t('book.publisher'), text('publisher', b?.publisher))}
-          ${field(t('book.published'), text('published', b?.published), 'small')}
-          ${field(t('book.pages_label'), text('pages', b?.pages, 'type="number" min="0"'), 'small')}
-          ${field(t('book.language'), text('language', b?.language), 'small')}
-          ${field(t('book.series'), text('series_name', b?.series?.name))}
-          ${field(t('book.series_number'), text('series_number', b?.series?.number), 'small')}
-          ${field(t('book.subjects'), text('subjects', b?.subjects.join(', ')), 'wide')}
-          ${field(t('book.tags'), text('tags', b?.tags.join(', ')), 'wide')}
+          ${field(t('game.title'), text('title', b?.title, 'required'), 'wide')}
+          ${field(t('game.subtitle'), text('subtitle', b?.subtitle), 'wide')}
+          ${field(t('game.authors'), text('authors', b?.authors.join(', ')), 'wide')}
+          ${field(t('game.barcode_label'), text('barcode', b?.barcode ?? '', 'autocomplete="off"'))}
+          ${field(t('game.publisher'), text('publisher', b?.publisher))}
+          ${field(t('game.published'), text('published', b?.published), 'small')}
+          ${field(t('game.pages_label'), text('pages', b?.pages, 'type="number" min="0"'), 'small')}
+          ${field(t('game.language'), text('language', b?.language), 'small')}
+          ${field(t('game.series'), text('series_name', b?.series?.name))}
+          ${field(t('game.series_number'), text('series_number', b?.series?.number), 'small')}
+          ${field(t('game.subjects'), text('subjects', b?.subjects.join(', ')), 'wide')}
+          ${field(t('game.tags'), text('tags', b?.tags.join(', ')), 'wide')}
         </div>
-        ${field(t('book.description'), `<textarea name="description" rows="4" data-k="d-description">${escapeHTML(b?.description ?? '')}</textarea>`, 'wide')}
+        ${field(t('game.description'), `<textarea name="description" rows="4" data-k="d-description">${escapeHTML(b?.description ?? '')}</textarea>`, 'wide')}
         ${b?.needs_details ? check('details_done', t('dialog.details_done'), true) : ''}`,
       };
     }
@@ -144,17 +144,17 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
     }
     case 'move': {
       const copy = ctx.idx.copy.get(d.copyId);
-      const book = copy ? ctx.idx.book.get(copy.book_id) : undefined;
+      const game = copy ? ctx.idx.game.get(copy.game_id) : undefined;
       return {
         title: t('dialog.move'),
         submit: t('action.move'),
-        html: `<p class="hkl-muted">${escapeHTML(book?.title ?? '')}</p>${field(t('copy.shelf'), `<select name="shelf_id" data-k="d-shelf">${shelfOptions(ctx.lib, copy?.shelf_id ?? null)}</select>`, 'wide')}`,
+        html: `<p class="hkl-muted">${escapeHTML(game?.title ?? '')}</p>${field(t('copy.shelf'), `<select name="shelf_id" data-k="d-shelf">${shelfOptions(ctx.lib, copy?.shelf_id ?? null)}</select>`, 'wide')}`,
       };
     }
     case 'set-shelf': {
       const loose = ctx.idx.copiesByShelf.get('') ?? [];
       const rows = loose
-        .map((c) => `<label class="hkl-check"><input type="checkbox" name="copy" value="${escapeHTML(c.id)}" checked />${escapeHTML(ctx.idx.book.get(c.book_id)?.title ?? '')} · ${escapeHTML(t(`format.kind_${c.format}`))}</label>`)
+        .map((c) => `<label class="hkl-check"><input type="checkbox" name="copy" value="${escapeHTML(c.id)}" checked />${escapeHTML(ctx.idx.game.get(c.game_id)?.title ?? '')} · ${escapeHTML(t(`format.kind_${c.format}`))}</label>`)
         .join('');
       return {
         title: t('dialog.set_shelf'),
@@ -165,8 +165,8 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
     case 'lend': {
       const avail = ctx.lib.copies
         .filter((c) => !ctx.idx.loanByCopy.has(c.id) && c.format !== 'ebook' && c.format !== 'audiobook')
-        .filter((c) => !d.bookId || c.book_id === d.bookId)
-        .map((c): [string, string] => [c.id, `${ctx.idx.book.get(c.book_id)?.title ?? ''} · ${c.shelf_id ? locationLabel(ctx.idx, c.shelf_id) : t('common.no_shelf')}`])
+        .filter((c) => !d.gameId || c.game_id === d.gameId)
+        .map((c): [string, string] => [c.id, `${ctx.idx.game.get(c.game_id)?.title ?? ''} · ${c.shelf_id ? locationLabel(ctx.idx, c.shelf_id) : t('common.no_shelf')}`])
         .sort((a, b) => a[1].localeCompare(b[1]));
       return {
         title: t('dialog.lend'),
@@ -198,7 +198,7 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
           <p class="hkl-muted small">${escapeHTML(t('loan.borrow_hint'))}</p>`,
       };
     case 'wish-add': {
-      const b = d.bookId ? ctx.idx.book.get(d.bookId) : undefined;
+      const b = d.gameId ? ctx.idx.game.get(d.gameId) : undefined;
       return {
         title: t('dialog.wish_add'),
         submit: t('action.add'),
@@ -208,7 +208,7 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
       };
     }
     case 'got-it': {
-      const b = ctx.idx.book.get(d.bookId);
+      const b = ctx.idx.game.get(d.gameId);
       return {
         title: t('dialog.got_it'),
         submit: t('action.save'),
@@ -228,10 +228,10 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
           <p class="hkl-muted small">${escapeHTML(t('shelves.area_hint'))}</p>`,
       };
     }
-    case 'bookcase': {
-      const c = d.bookcaseId ? ctx.idx.bookcase.get(d.bookcaseId) : undefined;
+    case 'unit': {
+      const c = d.unitId ? ctx.idx.unit.get(d.unitId) : undefined;
       return {
-        title: c ? t('dialog.edit_bookcase') : t('dialog.add_bookcase'),
+        title: c ? t('dialog.edit_unit') : t('dialog.add_unit'),
         submit: c ? t('action.save') : t('action.add'),
         html: `${field(t('dialog.name'), text('name', c?.name, 'required'), 'wide')}${field(t('copy.note'), text('note', c?.note), 'wide')}
           ${c ? '' : field(t('dialog.shelf_count'), text('shelves', 4, 'type="number" min="0" max="20"'), 'small')}`,
@@ -239,7 +239,7 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
     }
     case 'shelf': {
       const s = d.shelfId ? ctx.idx.shelf.get(d.shelfId) : undefined;
-      const count = ctx.lib.shelves.filter((x) => x.bookcase_id === d.bookcaseId).length;
+      const count = ctx.lib.shelves.filter((x) => x.unit_id === d.unitId).length;
       return {
         title: s ? t('dialog.edit_shelf') : t('dialog.add_shelf'),
         submit: s ? t('action.save') : t('action.add'),

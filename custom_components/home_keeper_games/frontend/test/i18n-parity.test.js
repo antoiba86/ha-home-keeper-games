@@ -24,12 +24,12 @@ const COGNATES = {
   ca: ['copy.format'],
   cs: ['settings.export'],
   da: ['action.scan', 'common.person', 'common.version', 'copy.format', 'copy.note', 'filter.status_label', 'format.kind_paperback', 'scan.scan_shelf'],
-  de: ['book.barcode', 'book.barcode_label', 'common.optional', 'common.person', 'common.version', 'copy.format', 'dialog.name', 'filter.status_label', 'scan.barcode', 'settings.export'],
-  fr: ['book.page', 'book.page_n', 'book.pages.one', 'book.pages.other', 'common.version', 'copy.format', 'editor.sections'],
+  de: ['game.barcode', 'game.barcode_label', 'common.optional', 'common.person', 'common.version', 'copy.format', 'dialog.name', 'filter.status_label', 'scan.barcode', 'settings.export'],
+  fr: ['game.page', 'game.page_n', 'game.pages.one', 'game.pages.other', 'common.version', 'copy.format', 'editor.sections'],
   it: ['dialog.area', 'shelves.area'],
   nb: ['common.person', 'copy.format', 'filter.status_label'],
-  nl: ['book.barcode', 'book.barcode_label', 'filter.status_label', 'format.kind_paperback', 'scan.barcode'],
-  pl: ['copy.format', 'format.kind_audiobook'],
+  nl: ['game.barcode', 'game.barcode_label', 'filter.status_label', 'format.kind_paperback', 'scan.barcode'],
+  pl: ['copy.format', 'format.kind_audiogame'],
   sv: ['common.person', 'common.version', 'copy.format', 'filter.status_label', 'settings.export'],
 };
 

@@ -11,9 +11,9 @@ export interface ScanEntry {
   error?: string;
   /** What the user picked for a duplicate. */
   choice?: 'move' | 'add_copy' | 'skip';
-  /** The user gave the title of the new book of a scan. */
+  /** The user gave the title of the new game of a scan. */
   named?: boolean;
-  /** The user removed the new book of a scan. */
+  /** The user removed the new game of a scan. */
   removed?: boolean;
 }
 
@@ -65,8 +65,8 @@ export interface ViewCtx {
   me: string | null;
   today: string;
   ui: UiState;
-  /** The book list path to go back to from a book. */
-  booksPath: string;
+  /** The game list path to go back to from a game. */
+  gamesPath: string;
   taskLink: (id: string) => string;
   areaName: (id: string) => string;
   todoName: (entityId: string) => string;

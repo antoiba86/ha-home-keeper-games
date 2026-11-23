@@ -5,8 +5,8 @@
  *   bash ci/capture-video.sh        # writes docs/videos/walkthrough.{webm,mp4,gif}
  *
  * The tour: open the Library tab in Home Keeper, browse the grid, search, open a
- * book, set the reading status, scan a stored barcode and a new barcode into a shelf,
- * give the title of the new book, lend a book with a Home Keeper task, see the loan, and
+ * game, set the reading status, scan a stored barcode and a new barcode into a shelf,
+ * give the title of the new game, lend a game with a Home Keeper task, see the loan, and
  * open the card on a dashboard. `BEAT` pauses
  * let each step read in the video. The tour puts the seed back at the end.
  *
@@ -15,14 +15,14 @@
 import { expect, test, type Page } from '@playwright/test';
 import { resolve } from 'node:path';
 import { library } from './ha-ws';
-import { adminState, bookByTitle, noServiceWorker, openCard, openTab, restoreReading } from './tests/helpers';
+import { adminState, gameByTitle, noServiceWorker, openCard, openTab, restoreReading } from './tests/helpers';
 import { DESKTOP } from './viewports';
 
 const OUT = process.env.VIDEO_DIR || '/tmp/home-keeper-games-video';
 const BEAT = 900;
-// A seeded book with copies: the scan shows the duplicate choices.
+// A seeded game with copies: the scan shows the duplicate choices.
 const SEEDED_CODE = '9780441478125';
-// No book has this barcode. The scan asks for its title.
+// No game has this barcode. The scan asks for its title.
 const MISS_CODE = '9781402894626';
 const MISS_TITLE = 'Field Notes on Moss';
 const LEND_TITLE = 'Station Eleven';
@@ -35,18 +35,18 @@ async function beat(page: Page, n = 1): Promise<void> {
 
 async function cleanUp(): Promise<void> {
   const state = await adminState();
-  for (const book of state.books.filter((b: { barcode: string }) => b.barcode === MISS_CODE)) {
-    await library('delete_book', { book_id: book.id });
+  for (const game of state.games.filter((b: { barcode: string }) => b.barcode === MISS_CODE)) {
+    await library('delete_game', { game_id: game.id });
   }
-  const lent = state.books.find((b: { title: string }) => b.title === LEND_TITLE);
-  for (const loan of state.loans.filter((l: { book_id: string; party: string }) => l.book_id === lent.id && l.party === PARTY)) {
+  const lent = state.games.find((b: { title: string }) => b.title === LEND_TITLE);
+  for (const loan of state.loans.filter((l: { game_id: string; party: string }) => l.game_id === lent.id && l.party === PARTY)) {
     await library('delete_loan', { loan_id: loan.id });
   }
 }
 
 test('record the Library walkthrough', async ({ browser }) => {
   await cleanUp();
-  const status = await bookByTitle(STATUS_TITLE);
+  const status = await gameByTitle(STATUS_TITLE);
   const seedRow = status.reading.alex;
   const context = await browser.newContext({
     storageState: './.auth/state.json',
@@ -56,14 +56,14 @@ test('record the Library walkthrough', async ({ browser }) => {
   await noServiceWorker(context);
   const page = await context.newPage();
   try {
-    // 1. The Library tab in the Home Keeper panel, with the book grid.
-    const tab = await openTab(page, '/books');
+    // 1. The Library tab in the Home Keeper panel, with the game grid.
+    const tab = await openTab(page, '/games');
     await expect(tab.locator('.hkl-tile').first()).toBeVisible();
     await beat(page, 2);
     await tab.locator('.hkl-grid').evaluate((el) => el.scrollIntoView({ behavior: 'smooth', block: 'start' }));
     await beat(page);
 
-    // 2. Search, then open a book.
+    // 2. Search, then open a game.
     await tab.locator('[data-k="q"]').pressSequentially('lathe', { delay: 90 });
     await expect(tab.locator('.hkl-tile')).toHaveCount(1);
     await beat(page);
@@ -82,8 +82,8 @@ test('record the Library walkthrough', async ({ browser }) => {
     // 4. Scan barcodes into a shelf.
     const state = await adminState();
     const office = state.rooms.find((r: { name: string }) => r.name === 'Office');
-    const tall = state.bookcases.find((c: { room_id: string }) => c.room_id === office.id);
-    const shelf = state.shelves.find((s: { bookcase_id: string; name: string }) => s.bookcase_id === tall.id && s.name === 'Shelf 3');
+    const tall = state.units.find((c: { room_id: string }) => c.room_id === office.id);
+    const shelf = state.shelves.find((s: { unit_id: string; name: string }) => s.unit_id === tall.id && s.name === 'Shelf 3');
     // The scan setup opens by its URL, with the shelf picked.
     await openTab(page, `/scan;shelf=${shelf.id}`);
     await expect(tab.locator('.hkl-scan-head')).toContainText('Scan books');
@@ -94,7 +94,7 @@ test('record the Library walkthrough', async ({ browser }) => {
     await tab.locator('[data-k="scan-start"]').click();
     await expect(tab.locator('[data-k="barcode-input"]')).toBeVisible();
     await beat(page);
-    // A stored book: the scan offers Move here, Add 2nd copy or Skip.
+    // A stored game: the scan offers Move here, Add 2nd copy or Skip.
     await tab.locator('[data-k="barcode-input"]').pressSequentially(SEEDED_CODE, { delay: 60 });
     await tab.locator('[data-k="barcode-add"]').click();
     const dup = tab.locator('.hkl-result.dup');
@@ -123,9 +123,9 @@ test('record the Library walkthrough', async ({ browser }) => {
     await expect(tab.locator('.hkl-room h1')).toHaveText('Office');
     await beat(page, 2);
 
-    // 5. Lend a book. The loan has a due date, so Home Keeper gets a task.
-    const lend = await bookByTitle(LEND_TITLE);
-    await tab.locator('[data-k="nav-books"]').click();
+    // 5. Lend a game. The loan has a due date, so Home Keeper gets a task.
+    const lend = await gameByTitle(LEND_TITLE);
+    await tab.locator('[data-k="nav-games"]').click();
     await tab.locator('[data-k="q"]').fill('');
     await tab.locator('[data-k="q"]').pressSequentially('station', { delay: 90 });
     await expect(tab.locator('.hkl-tile')).toHaveCount(1);

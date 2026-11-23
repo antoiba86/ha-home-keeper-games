@@ -41,7 +41,7 @@
   },
   "entity": {
     "sensor": {
-      "books": {
+      "games": {
         "name": "Böcker"
       },
       "loans_out": {
@@ -50,7 +50,7 @@
       "loans_overdue": {
         "name": "Försenade lån"
       },
-      "books_read_this_year": {
+      "games_read_this_year": {
         "name": "{person} lästa böcker i år"
       },
       "reading_now": {
@@ -132,7 +132,7 @@
         }
       }
     },
-    "add_bookcase": {
+    "add_unit": {
       "name": "Lägg till bokhylla",
       "description": "Lägg till en bokhylla i ett rum.",
       "fields": {
@@ -154,11 +154,11 @@
         }
       }
     },
-    "update_bookcase": {
+    "update_unit": {
       "name": "Ändra bokhylla",
       "description": "Ändra en bokhylla eller flytta den till ett annat rum.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Bokhylla",
           "description": "Bokhyllans ID."
         },
@@ -180,11 +180,11 @@
         }
       }
     },
-    "delete_bookcase": {
+    "delete_unit": {
       "name": "Ta bort bokhylla",
       "description": "Ta bort en bokhylla. En bokhylla med hyllplan behöver force.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Bokhylla",
           "description": "Bokhyllans ID."
         },
@@ -198,7 +198,7 @@
       "name": "Lägg till hyllplan",
       "description": "Lägg till ett hyllplan i en bokhylla.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Bokhylla",
           "description": "Bokhyllans ID."
         },
@@ -220,7 +220,7 @@
           "name": "Hyllplan",
           "description": "Hyllplanets ID. Tomt för inget hyllplan."
         },
-        "bookcase_id": {
+        "unit_id": {
           "name": "Bokhylla",
           "description": "Bokhyllans ID."
         },
@@ -248,7 +248,7 @@
         }
       }
     },
-    "add_book": {
+    "add_game": {
       "name": "Lägg till bok",
       "description": "Lägg till en bok. Om en bok har samma streckkod returnerar tjänsten den boken.",
       "fields": {
@@ -310,11 +310,11 @@
         }
       }
     },
-    "update_book": {
+    "update_game": {
       "name": "Ändra bok",
       "description": "Ändra uppgifterna för en bok.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bok",
           "description": "Bokens ID."
         },
@@ -376,11 +376,11 @@
         }
       }
     },
-    "delete_book": {
+    "delete_game": {
       "name": "Ta bort bok",
       "description": "Ta bort en bok med dess exemplar, lässtatus, lån och omslag.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bok",
           "description": "Bokens ID."
         }
@@ -412,7 +412,7 @@
       "name": "Lägg till exemplar",
       "description": "Lägg till ett exemplar av en bok.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bok",
           "description": "Bokens ID."
         },
@@ -536,7 +536,7 @@
       "name": "Ange omslag",
       "description": "Ange omslaget för en bok.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bok",
           "description": "Bokens ID."
         },
@@ -554,7 +554,7 @@
       "name": "Ange lässtatus",
       "description": "Ange lässtatusen för en bok för en person. En användare som inte är admin kan bara ange sin egen status.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bok",
           "description": "Bokens ID."
         },
@@ -592,7 +592,7 @@
         }
       }
     },
-    "lend_book": {
+    "lend_game": {
       "name": "Låna ut bok",
       "description": "Låna ut ett exemplar till en annan person.",
       "fields": {
@@ -622,11 +622,11 @@
         }
       }
     },
-    "borrow_book": {
+    "borrow_game": {
       "name": "Lägg till lånad bok",
       "description": "Registrera en bok som en person har lånat.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bok",
           "description": "Bokens ID."
         },
@@ -730,7 +730,7 @@
       "name": "Lägg till på önskelistan",
       "description": "Sätt en bok på en persons önskelista.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bok",
           "description": "Bokens ID."
         },
@@ -760,7 +760,7 @@
       "name": "Ändra önskelistan",
       "description": "Ändra en post på önskelistan.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bok",
           "description": "Bokens ID."
         },
@@ -778,17 +778,17 @@
       "name": "Ta bort från önskelistan",
       "description": "Ta bort en bok från önskelistan.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bok",
           "description": "Bokens ID."
         }
       }
     },
-    "got_wishlist_book": {
+    "got_wishlist_game": {
       "name": "Önskad bok mottagen",
       "description": "Lägg till ett exemplar av en önskad bok och ta bort den från önskelistan.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bok",
           "description": "Bokens ID."
         },
@@ -874,7 +874,7 @@
         }
       }
     },
-    "list_books": {
+    "list_games": {
       "name": "Lista böcker",
       "description": "Returnera böckerna som matchar filtren.",
       "fields": {
@@ -908,11 +908,11 @@
         }
       }
     },
-    "get_book": {
+    "get_game": {
       "name": "Hämta bok",
       "description": "Returnera en bok med dess exemplar och lån.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bok",
           "description": "Bokens ID."
         }
@@ -1000,13 +1000,13 @@
     "room_not_found": {
       "message": "Inget rum har ID {id}."
     },
-    "bookcase_not_found": {
+    "unit_not_found": {
       "message": "Ingen bokhylla har ID {id}."
     },
     "shelf_not_found": {
       "message": "Inget hyllplan har ID {id}."
     },
-    "book_not_found": {
+    "game_not_found": {
       "message": "Ingen bok har ID {id}."
     },
     "copy_not_found": {
@@ -1024,7 +1024,7 @@
     "room_not_empty": {
       "message": "Rummet har {count} bokhyllor. Använd force för att ta bort dem också."
     },
-    "bookcase_not_empty": {
+    "unit_not_empty": {
       "message": "Bokhyllan har {count} hyllplan. Använd force för att ta bort dem också."
     },
     "shelf_not_empty": {

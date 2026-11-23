@@ -22,15 +22,15 @@ def _calls(hass, name: str) -> list[dict]:
 
 
 async def _copy(call) -> dict:
-    book = (await call("add_book", {"title": "Dune"}))["book"]
-    return (await call("add_copy", {"book_id": book["id"]}))["copy"]
+    game = (await call("add_game", {"title": "Dune"}))["game"]
+    return (await call("add_copy", {"game_id": game["id"]}))["copy"]
 
 
 async def test_lend_adds_a_home_keeper_task(hass, setup_entry, call) -> None:
     copy = await _copy(call)
     started = async_capture_events(hass, "home_keeper_games_loan_started")
     reply = await call(
-        "lend_book", {"copy_id": copy["id"], "party": "Zed", "due": "2026-12-01"}
+        "lend_game", {"copy_id": copy["id"], "party": "Zed", "due": "2026-12-01"}
     )
     loan = reply["loan"]
     assert loan["direction"] == "out" and loan["hk_task_id"]
@@ -55,7 +55,7 @@ async def test_lend_adds_a_home_keeper_task(hass, setup_entry, call) -> None:
 
 async def test_no_task_without_a_due_date_or_add_task(hass, setup_entry, call) -> None:
     copy = await _copy(call)
-    loan = (await call("lend_book", {"copy_id": copy["id"], "party": "Zed"}))["loan"]
+    loan = (await call("lend_game", {"copy_id": copy["id"], "party": "Zed"}))["loan"]
     assert loan["hk_task_id"] is None and _calls(hass, "add_task") == []
     reply = await call("update_loan", {"loan_id": loan["id"], "due": "2026-12-01"})
     assert reply["loan"]["hk_task_id"]
@@ -67,7 +67,7 @@ async def test_no_task_without_a_due_date_or_add_task(hass, setup_entry, call) -
     await call("return_loan", {"loan_id": loan["id"]})
     second = await _copy(call)
     other = await call(
-        "lend_book",
+        "lend_game",
         {
             "copy_id": second["id"],
             "party": "Al",
@@ -84,7 +84,7 @@ async def test_completion_in_home_keeper_returns_the_loan(
     copy = await _copy(call)
     loan = (
         await call(
-            "lend_book", {"copy_id": copy["id"], "party": "Zed", "due": "2026-12-01"}
+            "lend_game", {"copy_id": copy["id"], "party": "Zed", "due": "2026-12-01"}
         )
     )["loan"]
     await hass.services.async_call(
@@ -102,7 +102,7 @@ async def test_delete_in_home_keeper_and_in_the_library(
     copy = await _copy(call)
     loan = (
         await call(
-            "lend_book", {"copy_id": copy["id"], "party": "Zed", "due": "2026-12-01"}
+            "lend_game", {"copy_id": copy["id"], "party": "Zed", "due": "2026-12-01"}
         )
     )["loan"]
     await hass.services.async_call(
@@ -116,7 +116,7 @@ async def test_delete_in_home_keeper_and_in_the_library(
     second = await _copy(call)
     other = (
         await call(
-            "lend_book", {"copy_id": second["id"], "party": "Al", "due": "2026-12-01"}
+            "lend_game", {"copy_id": second["id"], "party": "Al", "due": "2026-12-01"}
         )
     )["loan"]
     await call("delete_loan", {"loan_id": other["id"]})
@@ -125,9 +125,9 @@ async def test_delete_in_home_keeper_and_in_the_library(
     )
 
 
-async def test_borrow_book_sets_reading(hass, setup_entry, call) -> None:
+async def test_borrow_game_sets_reading(hass, setup_entry, call) -> None:
     reply = await call(
-        "borrow_book",
+        "borrow_game",
         {
             "title": "Emma",
             "authors": ["Jane Austen"],
@@ -140,8 +140,8 @@ async def test_borrow_book_sets_reading(hass, setup_entry, call) -> None:
     loan = reply["loan"]
     assert loan["direction"] == "in" and loan["copy_id"] is None
     assert loan["person_id"] == BOB and loan["format"] == "ebook"
-    assert reply["book"]["owned"] is False
-    assert reply["book"]["reading"][BOB]["status"] == "reading"
+    assert reply["game"]["owned"] is False
+    assert reply["game"]["reading"][BOB]["status"] == "reading"
     add = _calls(hass, "add_task")[0]
     assert add["name"] == "Return Emma to City library"
 
@@ -150,7 +150,7 @@ async def test_reconcile_at_setup(hass, setup_entry, call) -> None:
     copy = await _copy(call)
     loan = (
         await call(
-            "lend_book", {"copy_id": copy["id"], "party": "Zed", "due": "2026-12-01"}
+            "lend_game", {"copy_id": copy["id"], "party": "Zed", "due": "2026-12-01"}
         )
     )["loan"]
     # A task with our source but no loan is deleted. A completed task returns
@@ -176,7 +176,7 @@ async def test_overdue_fires_once(hass, setup_entry, call, freezer) -> None:
     today = dt_util.now().date()
     loan = (
         await call(
-            "lend_book",
+            "lend_game",
             {
                 "copy_id": copy["id"],
                 "party": "Zed",
@@ -208,13 +208,13 @@ async def test_home_keeper_removed_and_back(hass, setup_entry, call, hk_entry) -
     first = await _copy(call)
     kept = (
         await call(
-            "lend_book", {"copy_id": first["id"], "party": "Zed", "due": "2026-12-01"}
+            "lend_game", {"copy_id": first["id"], "party": "Zed", "due": "2026-12-01"}
         )
     )["loan"]
     second = await _copy(call)
     lost = (
         await call(
-            "lend_book", {"copy_id": second["id"], "party": "Al", "due": "2026-12-02"}
+            "lend_game", {"copy_id": second["id"], "party": "Al", "due": "2026-12-02"}
         )
     )["loan"]
     assert await hass.config_entries.async_remove(hk_entry.entry_id)

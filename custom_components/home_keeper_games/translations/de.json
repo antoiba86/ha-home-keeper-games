@@ -41,7 +41,7 @@
   },
   "entity": {
     "sensor": {
-      "books": {
+      "games": {
         "name": "Bücher"
       },
       "loans_out": {
@@ -50,7 +50,7 @@
       "loans_overdue": {
         "name": "Überfällige Ausleihen"
       },
-      "books_read_this_year": {
+      "games_read_this_year": {
         "name": "{person} Bücher gelesen dieses Jahr"
       },
       "reading_now": {
@@ -132,7 +132,7 @@
         }
       }
     },
-    "add_bookcase": {
+    "add_unit": {
       "name": "Bücherregal hinzufügen",
       "description": "Ein Bücherregal zu einem Raum hinzufügen.",
       "fields": {
@@ -154,11 +154,11 @@
         }
       }
     },
-    "update_bookcase": {
+    "update_unit": {
       "name": "Bücherregal ändern",
       "description": "Ein Bücherregal ändern oder in einen anderen Raum verschieben.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Bücherregal",
           "description": "Die ID des Bücherregals."
         },
@@ -180,11 +180,11 @@
         }
       }
     },
-    "delete_bookcase": {
+    "delete_unit": {
       "name": "Bücherregal löschen",
       "description": "Ein Bücherregal löschen. Ein Bücherregal mit Regalböden braucht force.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Bücherregal",
           "description": "Die ID des Bücherregals."
         },
@@ -198,7 +198,7 @@
       "name": "Regalboden hinzufügen",
       "description": "Einen Regalboden zu einem Bücherregal hinzufügen.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Bücherregal",
           "description": "Die ID des Bücherregals."
         },
@@ -220,7 +220,7 @@
           "name": "Regalboden",
           "description": "Die ID des Regalbodens. Leer für keinen Regalboden."
         },
-        "bookcase_id": {
+        "unit_id": {
           "name": "Bücherregal",
           "description": "Die ID des Bücherregals."
         },
@@ -248,7 +248,7 @@
         }
       }
     },
-    "add_book": {
+    "add_game": {
       "name": "Buch hinzufügen",
       "description": "Ein Buch hinzufügen. Hat ein Buch denselben Barcode, gibt der Dienst dieses Buch zurück.",
       "fields": {
@@ -310,11 +310,11 @@
         }
       }
     },
-    "update_book": {
+    "update_game": {
       "name": "Buch ändern",
       "description": "Die Details eines Buchs ändern.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Buch",
           "description": "Die ID des Buchs."
         },
@@ -376,11 +376,11 @@
         }
       }
     },
-    "delete_book": {
+    "delete_game": {
       "name": "Buch löschen",
       "description": "Ein Buch mit seinen Exemplaren, dem Lesestatus, den Ausleihen und dem Cover löschen.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Buch",
           "description": "Die ID des Buchs."
         }
@@ -412,7 +412,7 @@
       "name": "Exemplar hinzufügen",
       "description": "Ein Exemplar eines Buchs hinzufügen.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Buch",
           "description": "Die ID des Buchs."
         },
@@ -536,7 +536,7 @@
       "name": "Cover festlegen",
       "description": "Das Cover eines Buchs festlegen.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Buch",
           "description": "Die ID des Buchs."
         },
@@ -554,7 +554,7 @@
       "name": "Lesestatus festlegen",
       "description": "Den Lesestatus eines Buchs für eine Person festlegen. Ein Benutzer ohne Admin-Rechte kann nur seinen eigenen Status festlegen.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Buch",
           "description": "Die ID des Buchs."
         },
@@ -592,7 +592,7 @@
         }
       }
     },
-    "lend_book": {
+    "lend_game": {
       "name": "Buch verleihen",
       "description": "Ein Exemplar an eine andere Person verleihen.",
       "fields": {
@@ -622,11 +622,11 @@
         }
       }
     },
-    "borrow_book": {
+    "borrow_game": {
       "name": "Geliehenes Buch hinzufügen",
       "description": "Ein Buch erfassen, das eine Person geliehen hat.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Buch",
           "description": "Die ID des Buchs."
         },
@@ -730,7 +730,7 @@
       "name": "Zur Wunschliste hinzufügen",
       "description": "Ein Buch auf die Wunschliste einer Person setzen.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Buch",
           "description": "Die ID des Buchs."
         },
@@ -760,7 +760,7 @@
       "name": "Wunschliste ändern",
       "description": "Einen Eintrag der Wunschliste ändern.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Buch",
           "description": "Die ID des Buchs."
         },
@@ -778,17 +778,17 @@
       "name": "Von der Wunschliste entfernen",
       "description": "Ein Buch von der Wunschliste nehmen.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Buch",
           "description": "Die ID des Buchs."
         }
       }
     },
-    "got_wishlist_book": {
+    "got_wishlist_game": {
       "name": "Wunschbuch erhalten",
       "description": "Ein Exemplar eines Wunschbuchs hinzufügen und das Buch von der Wunschliste nehmen.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Buch",
           "description": "Die ID des Buchs."
         },
@@ -874,7 +874,7 @@
         }
       }
     },
-    "list_books": {
+    "list_games": {
       "name": "Bücher auflisten",
       "description": "Die Bücher zurückgeben, die zu den Filtern passen.",
       "fields": {
@@ -908,11 +908,11 @@
         }
       }
     },
-    "get_book": {
+    "get_game": {
       "name": "Buch abrufen",
       "description": "Ein Buch mit seinen Exemplaren und Ausleihen zurückgeben.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Buch",
           "description": "Die ID des Buchs."
         }
@@ -1000,13 +1000,13 @@
     "room_not_found": {
       "message": "Kein Raum hat die ID {id}."
     },
-    "bookcase_not_found": {
+    "unit_not_found": {
       "message": "Kein Bücherregal hat die ID {id}."
     },
     "shelf_not_found": {
       "message": "Kein Regalboden hat die ID {id}."
     },
-    "book_not_found": {
+    "game_not_found": {
       "message": "Kein Buch hat die ID {id}."
     },
     "copy_not_found": {
@@ -1024,7 +1024,7 @@
     "room_not_empty": {
       "message": "Der Raum hat {count} Bücherregale. Verwenden Sie force, um sie auch zu löschen."
     },
-    "bookcase_not_empty": {
+    "unit_not_empty": {
       "message": "Das Bücherregal hat {count} Regalböden. Verwenden Sie force, um sie auch zu löschen."
     },
     "shelf_not_empty": {

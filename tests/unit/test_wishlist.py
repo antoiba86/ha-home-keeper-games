@@ -11,10 +11,10 @@ LIST = "todo.books"
 
 def _state(**entry) -> dict:
     state = m.empty_state()
-    book = m.build_book({"title": "Dune", "authors": ["Frank Herbert"]}, now=NOW)
-    book["id"] = "dune"
-    book["wishlist"] = {**m.build_wishlist("p", buy=True, now=NOW), **entry}
-    state["books"]["dune"] = book
+    game = m.build_game({"title": "Dune", "authors": ["Frank Herbert"]}, now=NOW)
+    game["id"] = "dune"
+    game["wishlist"] = {**m.build_wishlist("p", buy=True, now=NOW), **entry}
+    state["games"]["dune"] = game
     state["people"]["p"] = {"wishlist_todo": LIST}
     return state
 
@@ -29,14 +29,14 @@ def _item(uid: str, summary: str = "Dune by Frank Herbert", done: bool = False):
 
 def test_target_list() -> None:
     state = _state()
-    assert w.target_list(state, state["books"]["dune"]) == LIST
-    assert w.target_list(_state(buy=False), _state(buy=False)["books"]["dune"]) is None
+    assert w.target_list(state, state["games"]["dune"]) == LIST
+    assert w.target_list(_state(buy=False), _state(buy=False)["games"]["dune"]) is None
     bought = _state(bought=True)
-    assert w.target_list(bought, bought["books"]["dune"]) is None
+    assert w.target_list(bought, bought["games"]["dune"]) is None
     state["people"]["p"] = {"wishlist_todo": None}
-    assert w.target_list(state, state["books"]["dune"]) is None
-    state["books"]["dune"]["wishlist"] = None
-    assert w.target_list(state, state["books"]["dune"]) is None
+    assert w.target_list(state, state["games"]["dune"]) is None
+    state["games"]["dune"]["wishlist"] = None
+    assert w.target_list(state, state["games"]["dune"]) is None
 
 
 def test_lists_to_read() -> None:
@@ -63,14 +63,14 @@ def test_template_changes_the_summary() -> None:
 
 def test_bind_skips_completed_and_claimed_items() -> None:
     state = _state()
-    other = m.build_book({"title": "Dune", "authors": ["Frank Herbert"]}, now=NOW)
+    other = m.build_game({"title": "Dune", "authors": ["Frank Herbert"]}, now=NOW)
     other["id"] = "aaa"
     other["wishlist"] = {
         **m.build_wishlist("p", buy=True, now=NOW),
         "todo_entity": LIST,
         "todo_uid": "u1",
     }
-    state["books"]["aaa"] = other
+    state["games"]["aaa"] = other
     items = [_item("u1"), _item("u0", done=True), {"summary": "Dune by Frank Herbert"}]
     plan = w.plan_sync(state, {LIST: items})
     assert plan.binds == [] and plan.adds == [

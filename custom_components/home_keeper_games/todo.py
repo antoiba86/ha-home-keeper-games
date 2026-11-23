@@ -1,11 +1,11 @@
 """The ``To read`` to-do list of each person.
 
-The items are the books with status ``want`` for the person. The summary is
-``Title by Author`` and the uid is the book id.
+The items are the games with status ``want`` for the person. The summary is
+``Title by Author`` and the uid is the game id.
 
 * Completing an item sets the status to ``read``, with ``finished`` today.
-* Adding an item by name gives a ``want`` row to the book with that title. If no
-  book has that title, a new book with ``needs_details: true`` is added.
+* Adding an item by name gives a ``want`` row to the game with that title. If no
+  game has that title, a new game with ``needs_details: true`` is added.
 * Deleting an item removes the ``want`` row.
 
 Home Assistant lets each user call the ``todo`` services on each list. So a
@@ -33,7 +33,7 @@ from .backend_i18n import resolve_string
 from .const import DOMAIN
 from .coordinator import LibraryCoordinator
 from .entity import PersonEntity, async_track_people
-from .models import LibraryError, book_summary, fold
+from .models import LibraryError, fold, game_summary
 from .projections import want_to_read
 from .services import service_error
 
@@ -55,7 +55,7 @@ async def async_setup_entry(
 
 
 class ToReadList(PersonEntity, TodoListEntity):
-    """The books that a person wants to read."""
+    """The games that a person wants to read."""
 
     _attr_translation_key = "to_read"
     _attr_icon = "mdi:book-heart"
@@ -96,15 +96,15 @@ class ToReadList(PersonEntity, TodoListEntity):
         template = resolve_string(self.hass.config.language, "item.summary")
         return [
             TodoItem(
-                summary=book_summary(book, template),
-                uid=book["id"],
+                summary=game_summary(game, template),
+                uid=game["id"],
                 status=TodoItemStatus.NEEDS_ACTION,
             )
-            for book in want_to_read(self.state_doc, self.person_id)
+            for game in want_to_read(self.state_doc, self.person_id)
         ]
 
     async def async_create_todo_item(self, item: TodoItem) -> None:
-        """Give the book with this title a ``want`` row, or add a new book."""
+        """Give the game with this title a ``want`` row, or add a new game."""
         await self._check_caller()
         summary = (item.summary or "").strip()
         if not summary:
@@ -114,16 +114,16 @@ class ToReadList(PersonEntity, TodoListEntity):
         wanted = fold(summary)
         match = next(
             (
-                book
-                for book in store.state["books"].values()
+                game
+                for game in store.state["games"].values()
                 if wanted
-                in (fold(book.get("title")), fold(book_summary(book, template)))
+                in (fold(game.get("title")), fold(game_summary(game, template)))
             ),
             None,
         )
         try:
             if match is None:
-                match, _ = await store.add_book(
+                match, _ = await store.add_game(
                     {"title": summary, "needs_details": True}
                 )
             await store.set_reading(match["id"], self.person_id, {"status": "want"})

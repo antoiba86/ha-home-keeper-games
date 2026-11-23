@@ -41,7 +41,7 @@
   },
   "entity": {
     "sensor": {
-      "books": {
+      "games": {
         "name": "图书"
       },
       "loans_out": {
@@ -50,7 +50,7 @@
       "loans_overdue": {
         "name": "逾期借阅"
       },
-      "books_read_this_year": {
+      "games_read_this_year": {
         "name": "{person} 今年已读图书"
       },
       "reading_now": {
@@ -132,7 +132,7 @@
         }
       }
     },
-    "add_bookcase": {
+    "add_unit": {
       "name": "添加书柜",
       "description": "向房间添加一个书柜。",
       "fields": {
@@ -154,11 +154,11 @@
         }
       }
     },
-    "update_bookcase": {
+    "update_unit": {
       "name": "修改书柜",
       "description": "修改书柜，或将其移到另一个房间。",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "书柜",
           "description": "书柜的 ID。"
         },
@@ -180,11 +180,11 @@
         }
       }
     },
-    "delete_bookcase": {
+    "delete_unit": {
       "name": "删除书柜",
       "description": "删除一个书柜。有书架层的书柜需要 force。",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "书柜",
           "description": "书柜的 ID。"
         },
@@ -198,7 +198,7 @@
       "name": "添加书架层",
       "description": "向书柜添加一个书架层。",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "书柜",
           "description": "书柜的 ID。"
         },
@@ -220,7 +220,7 @@
           "name": "书架层",
           "description": "书架层的 ID。留空表示没有书架层。"
         },
-        "bookcase_id": {
+        "unit_id": {
           "name": "书柜",
           "description": "书柜的 ID。"
         },
@@ -248,7 +248,7 @@
         }
       }
     },
-    "add_book": {
+    "add_game": {
       "name": "添加图书",
       "description": "添加一本图书。如果已有相同条形码的图书，服务返回那本书。",
       "fields": {
@@ -310,11 +310,11 @@
         }
       }
     },
-    "update_book": {
+    "update_game": {
       "name": "修改图书",
       "description": "修改图书的详情。",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "图书",
           "description": "图书的 ID。"
         },
@@ -376,11 +376,11 @@
         }
       }
     },
-    "delete_book": {
+    "delete_game": {
       "name": "删除图书",
       "description": "删除图书及其藏本、阅读状态、借阅和封面。",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "图书",
           "description": "图书的 ID。"
         }
@@ -412,7 +412,7 @@
       "name": "添加藏本",
       "description": "添加一本图书的藏本。",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "图书",
           "description": "图书的 ID。"
         },
@@ -536,7 +536,7 @@
       "name": "设置封面",
       "description": "设置图书的封面。",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "图书",
           "description": "图书的 ID。"
         },
@@ -554,7 +554,7 @@
       "name": "设置阅读状态",
       "description": "为某人设置图书的阅读状态。非管理员用户只能设置自己的状态。",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "图书",
           "description": "图书的 ID。"
         },
@@ -592,7 +592,7 @@
         }
       }
     },
-    "lend_book": {
+    "lend_game": {
       "name": "借出图书",
       "description": "将藏本借给另一个人。",
       "fields": {
@@ -622,11 +622,11 @@
         }
       }
     },
-    "borrow_book": {
+    "borrow_game": {
       "name": "添加借入的图书",
       "description": "记录某人借入的一本图书。",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "图书",
           "description": "图书的 ID。"
         },
@@ -730,7 +730,7 @@
       "name": "加入心愿单",
       "description": "将图书放入某人的心愿单。",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "图书",
           "description": "图书的 ID。"
         },
@@ -760,7 +760,7 @@
       "name": "修改心愿",
       "description": "修改心愿单中的一项。",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "图书",
           "description": "图书的 ID。"
         },
@@ -778,17 +778,17 @@
       "name": "移出心愿单",
       "description": "将图书移出心愿单。",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "图书",
           "description": "图书的 ID。"
         }
       }
     },
-    "got_wishlist_book": {
+    "got_wishlist_game": {
       "name": "已得到心愿图书",
       "description": "添加心愿图书的藏本，并将其移出心愿单。",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "图书",
           "description": "图书的 ID。"
         },
@@ -874,7 +874,7 @@
         }
       }
     },
-    "list_books": {
+    "list_games": {
       "name": "列出图书",
       "description": "返回符合筛选条件的图书。",
       "fields": {
@@ -908,11 +908,11 @@
         }
       }
     },
-    "get_book": {
+    "get_game": {
       "name": "获取图书",
       "description": "返回一本图书及其藏本和借阅。",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "图书",
           "description": "图书的 ID。"
         }
@@ -1000,13 +1000,13 @@
     "room_not_found": {
       "message": "没有 ID 为 {id} 的房间。"
     },
-    "bookcase_not_found": {
+    "unit_not_found": {
       "message": "没有 ID 为 {id} 的书柜。"
     },
     "shelf_not_found": {
       "message": "没有 ID 为 {id} 的书架层。"
     },
-    "book_not_found": {
+    "game_not_found": {
       "message": "没有 ID 为 {id} 的图书。"
     },
     "copy_not_found": {
@@ -1024,7 +1024,7 @@
     "room_not_empty": {
       "message": "该房间有 {count} 个书柜。使用 force 可一并删除。"
     },
-    "bookcase_not_empty": {
+    "unit_not_empty": {
       "message": "该书柜有 {count} 个书架层。使用 force 可一并删除。"
     },
     "shelf_not_empty": {

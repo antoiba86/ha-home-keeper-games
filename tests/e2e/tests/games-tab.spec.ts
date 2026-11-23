@@ -1,18 +1,18 @@
-import { adminState, bookByTitle, expect, libraryTab, openTab, restoreReading, test, trackErrors } from './helpers';
+import { adminState, gameByTitle, expect, libraryTab, openTab, restoreReading, test, trackErrors } from './helpers';
 
 /**
- * The Games tab in the real Home Keeper panel: the tab bar, the book grid, the
- * search, the covers and the book detail. The data is the committed seed
+ * The Games tab in the real Home Keeper panel: the tab bar, the game grid, the
+ * search, the covers and the game detail. The data is the committed seed
  * (tests/e2e/seed/build_seed.py). A test that changes a reading row puts the seed
  * row back after.
  */
-/** A book with a paper copy that is not lent, so the Lend dialog has a copy. */
-async function lendableBook(): Promise<Record<string, any>> {
+/** A game with a paper copy that is not lent, so the Lend dialog has a copy. */
+async function lendableGame(): Promise<Record<string, any>> {
   const state = await adminState();
   const lent = new Set(state.loans.filter((l: any) => !l.returned).map((l: any) => l.copy_id));
   const copy = state.copies.find((c: any) => !lent.has(c.id) && c.format !== 'ebook' && c.format !== 'audiobook');
   if (!copy) throw new Error('no copy to lend in the seed');
-  return state.books.find((b: any) => b.id === copy.book_id);
+  return state.games.find((b: any) => b.id === copy.game_id);
 }
 
 test.describe('Games tab', { tag: '@responsive' }, () => {
@@ -21,9 +21,9 @@ test.describe('Games tab', { tag: '@responsive' }, () => {
     const tab = await openTab(page);
     const panel = page.locator('home-keeper-panel');
     await expect(panel.locator('#tab-x-games[active]:visible, #mtab-x-games[aria-current="page"]:visible').first()).toBeVisible();
-    await expect(tab.locator('[data-k="nav-books"]')).toHaveAttribute('aria-current', 'page');
+    await expect(tab.locator('[data-k="nav-games"]')).toHaveAttribute('aria-current', 'page');
     const state = await adminState();
-    const owned = state.books.filter((b: { owned: boolean }) => b.owned).length;
+    const owned = state.games.filter((b: { owned: boolean }) => b.owned).length;
     await expect(tab.locator('.hkl-tile')).toHaveCount(owned);
     await expect(tab.locator('[data-k="st-all"]')).toContainText(String(owned));
     expect(errors, errors.join('\n')).toEqual([]);
@@ -32,18 +32,18 @@ test.describe('Games tab', { tag: '@responsive' }, () => {
   test('the search narrows the grid and goes into the URL', async ({ page }) => {
     const tab = await openTab(page);
     await tab.locator('[data-k="q"]').fill('le guin');
-    await expect(page).toHaveURL(/\/home-keeper\/games\/books;q=le%20guin$/);
+    await expect(page).toHaveURL(/\/home-keeper\/games\/games;q=le%20guin$/);
     const state = await adminState();
-    const leGuin = state.books.filter((b: { owned: boolean; authors: string[] }) => b.owned && b.authors.includes('Ursula K. Le Guin'));
+    const leGuin = state.games.filter((b: { owned: boolean; authors: string[] }) => b.owned && b.authors.includes('Ursula K. Le Guin'));
     await expect(tab.locator('.hkl-tile')).toHaveCount(leGuin.length);
     await expect(tab.locator('.hkl-summary')).toContainText(`${leGuin.length} books`);
     await tab.locator('[data-k="clear"]').click();
-    await expect(page).toHaveURL(/\/home-keeper\/games\/books$/);
+    await expect(page).toHaveURL(/\/home-keeper\/games\/games$/);
   });
 
   test('a dialog error keeps the text that the user typed', async ({ page }) => {
-    const book = await lendableBook();
-    const tab = await openTab(page, `/books/${book.id}`);
+    const game = await lendableGame();
+    const tab = await openTab(page, `/games/${game.id}`);
     await tab.locator('[data-k="lend"]').click();
     const dialog = tab.locator('.hkl-dialog');
     await dialog.locator('[name="note"]').fill('Back by the trip');
@@ -56,41 +56,41 @@ test.describe('Games tab', { tag: '@responsive' }, () => {
   });
 
   test('a cover loads through a signed URL', async ({ page }) => {
-    const book = await bookByTitle('Piranesi');
-    expect(book.cover_url).toMatch(/^\/api\/home_keeper_games\/cover\//);
+    const game = await gameByTitle('Piranesi');
+    expect(game.cover_url).toMatch(/^\/api\/home_keeper_games\/cover\//);
     const tab = await openTab(page);
-    const img = tab.locator(`[data-k="b-${book.id}"] img`);
+    const img = tab.locator(`[data-k="b-${game.id}"] img`);
     await expect(img).toHaveAttribute('src', /authSig=/);
     await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth)).toBeGreaterThan(0);
   });
 
   test('the shared notes render as Markdown', async ({ page }) => {
-    const book = await bookByTitle('The Left Hand of Darkness');
-    const tab = await openTab(page, `/books/${book.id}`);
-    await expect(tab.locator('h1')).toHaveText(book.title);
+    const game = await gameByTitle('The Left Hand of Darkness');
+    const tab = await openTab(page, `/games/${game.id}`);
+    await expect(tab.locator('h1')).toHaveText(game.title);
     const md = tab.locator('ha-markdown.hkl-md');
     await expect(md.locator('strong')).toHaveText('Oct 2026');
     await expect(tab.locator('.hkl-md-plain')).toHaveCount(0);
   });
 });
 
-test.describe('Book detail', { tag: '@responsive' }, () => {
+test.describe('Game detail', { tag: '@responsive' }, () => {
   const TITLE = 'The Lathe of Heaven';
   let seedRow: Record<string, unknown> | undefined;
-  let bookId = '';
+  let gameId = '';
 
   test.beforeEach(async () => {
-    const book = await bookByTitle(TITLE);
-    bookId = book.id;
-    seedRow = book.reading.alex;
+    const game = await gameByTitle(TITLE);
+    gameId = game.id;
+    seedRow = game.reading.alex;
   });
 
   test.afterEach(async () => {
-    await restoreReading(bookId, 'alex', seedRow);
+    await restoreReading(gameId, 'alex', seedRow);
   });
 
   test('sets the reading status and the rating', async ({ page }) => {
-    const tab = await openTab(page, `/books/${bookId}`);
+    const tab = await openTab(page, `/games/${gameId}`);
     await expect(tab.locator('[data-k="rs-want"]')).toHaveAttribute('aria-pressed', 'true');
     await tab.locator('[data-k="rs-reading"]').click();
     await expect(tab.locator('[data-k="rs-reading"]')).toHaveAttribute('aria-pressed', 'true');
@@ -98,12 +98,12 @@ test.describe('Book detail', { tag: '@responsive' }, () => {
     await expect(tab.locator('.hkl-star.on')).toHaveCount(4);
     await expect
       .poll(async () => {
-        const row = (await bookByTitle(TITLE)).reading.alex;
+        const row = (await gameByTitle(TITLE)).reading.alex;
         return [row.status, row.rating, Boolean(row.started)];
       })
       .toEqual(['reading', 4, true]);
     // The card status on the grid follows.
     await libraryTab(page).locator('[data-k="back"]').click();
-    await expect(page).toHaveURL(/\/home-keeper\/games\/books$/);
+    await expect(page).toHaveURL(/\/home-keeper\/games\/games$/);
   });
 });

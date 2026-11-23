@@ -23,14 +23,14 @@ keys the same as the English source (see [testing.md](testing.md#translations)).
   "utilize". Write "show", not "surface" or "expose".
 - Do not use slang, idiom, or metaphor. No "side door", "on the floor", "reach for",
   "under the hood".
-- Do not use contractions. Write numbers as numerals ("3 books"), except at the start
+- Do not use contractions. Write numbers as numerals ("3 games"), except at the start
   of a sentence.
 - Use "must" for a requirement. Use "can" for a possibility. Do not use "may",
   "might", "should", or "could".
 - Use "if" for a condition and "when" for a point in time. Write "make sure that", not
   "ensure".
-- Do not put more than 3 nouns in a row. Write "the list of books that are due", not
-  "the due book loan list summary view".
+- Do not put more than 3 nouns in a row. Write "the list of games that are due", not
+  "the due game loan list summary view".
 - **Name the noun.** Do not write "nothing", "anything", or "something" where a real
   noun fits. Write "a record that matches no stored record", not "a record that
   matches nothing".
@@ -73,27 +73,27 @@ keys the same as the English source (see [testing.md](testing.md#translations)).
 ### Voice
 
 - State the fact first. Start a feature section with what the software supports or
-  does: "The library supports a `todo` list of the books to read for each person."
+  does: "The library supports a `todo` list of the games to read for each person."
   Then say what it is useful for. Do not open with a problem statement or a scene from daily life.
 - Write about the software and the configuration, not about people.
 - Do not personify the software. It does not carry, know, want, learn, remember,
   or refuse. It supports, stores, reads, writes, adds, removes, and marks.
 - Do not describe the UI. The user can see it. Do not describe a rail, a dot, a
   color, a layout, or how a page looks on a phone. Write what the user does and
-  what the software does in response: "Select a book in the list."
+  what the software does in response: "Select a game in the list."
 - Do not invent a reason for a behavior. Write why only if the maintainer stated the
   reason. "The card shows no edit button" is a fact. "Because users do not edit on a
   dashboard" is an invented reason.
 - Do not invent context that the software does not have.
-- Use the active voice when the reader is the actor: "select a book". The passive
-  voice is acceptable when the actor is obvious or is the software: "the book is
+- Use the active voice when the reader is the actor: "select a game". The passive
+  voice is acceptable when the actor is obvious or is the software: "the game is
   removed from the wishlist".
 
 ### Tone
 
 - Do not write for effect. Do not use "simply", "just", "note that", or
   "it is important to note".
-- **Cut the empty subject and verb.** Write "No books", not "There are no books".
+- **Cut the empty subject and verb.** Write "No games", not "There are no games".
   Write "Value: 40", not "It has a value of 40". This applies to UI text, help text,
   and a short line that states a value. A full sentence is still correct in
   documentation, where the subject names a real thing.
@@ -128,15 +128,15 @@ Use these names and no others for these things.
 
 | Use this | Not this | Note |
 | --- | --- | --- |
-| book | title, work, edition | The record of a title. A book can have 0 copies. |
-| copy | item, volume, instance | 1 owned book on a shelf, in a format. |
+| game | title, work, edition | The record of a title. A game can have 0 copies. |
+| copy | item, volume, instance | 1 owned game on a shelf, in a format. |
 | room | | A room of the home. It can link to a Home Assistant area. |
-| bookcase | bookshelf, case | A piece of furniture in a room. It holds shelves. |
-| shelf | | 1 shelf of a bookcase. "No shelf" is the place of a copy with no shelf. |
-| location | place, where it is | The room, bookcase and shelf of a copy. |
+| unit | gameshelf, case | A piece of furniture in a room. It holds shelves. |
+| shelf | | 1 shelf of a unit. "No shelf" is the place of a copy with no shelf. |
+| location | place, where it is | The room, unit and shelf of a copy. |
 | reading status | status, progress | Want to read, Reading, Read or Did not finish, for 1 person. |
-| loan | lending, borrow record | A copy that is lent out, or a book that is borrowed. |
-| wishlist | wish list, want list | The books that a person wants to get. |
+| loan | lending, borrow record | A copy that is lent out, or a game that is borrowed. |
+| wishlist | wish list, want list | The games that a person wants to get. |
 | person | member, reader | A Home Assistant `person`. |
 | tab | Library page, admin UI | The Library tab of the Home Keeper panel. |
 | card | dashboard card, Lovelace card | |
@@ -151,7 +151,7 @@ Use these names and no others for these things.
 | config entry | integration entry, entry | |
 | AI agent | assistant, AI assistant, chatbot, LLM, model | Any tool a user asks to write or read data for them. |
 
-Service and code names keep their identifiers. `add_book` stays `add_book` in code and
+Service and code names keep their identifiers. `add_game` stays `add_game` in code and
 in a code span. Add a row when a new name appears. A name in this table is a technical
 name, so it can be a noun or a verb as listed, and it can appear in a heading.
 

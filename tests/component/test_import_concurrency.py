@@ -15,11 +15,11 @@ async def test_import_keeps_changes_made_while_it_runs(
     store = setup_entry.runtime_data.store
     dune = (
         await call(
-            "add_book",
+            "add_game",
             {"title": "Dune", "authors": ["Frank Herbert"]},
         )
-    )["book"]
-    hyperion = (await call("add_book", {"title": "Hyperion"}))["book"]
+    )["game"]
+    hyperion = (await call("add_game", {"title": "Hyperion"}))["game"]
     # The import plan waits in the executor until the test lets it go on.
     started, release = threading.Event(), threading.Event()
     real = csv_io.apply_import
@@ -46,9 +46,9 @@ async def test_import_keeps_changes_made_while_it_runs(
     room = (await call("add_room", {"name": "Attic"}))["room"]
     await call(
         "set_reading",
-        {"book_id": hyperion["id"], "person_id": BOB, "status": "reading"},
+        {"game_id": hyperion["id"], "person_id": BOB, "status": "reading"},
     )
-    await call("update_book", {"book_id": dune["id"], "shared_notes": "Signed."})
+    await call("update_game", {"game_id": dune["id"], "shared_notes": "Signed."})
     release.set()
     reply = await task
     assert reply["counts"]["errors"] == 0 and reply["counts"]["title_match"] == 1
@@ -56,9 +56,9 @@ async def test_import_keeps_changes_made_while_it_runs(
     # The concurrent changes survive.
     assert state["rooms"][room["id"]]["name"] == "Attic"
     assert state["reading"][BOB][hyperion["id"]]["status"] == "reading"
-    assert state["books"][dune["id"]]["shared_notes"] == "Signed."
+    assert state["games"][dune["id"]]["shared_notes"] == "Signed."
     # The import is written too.
-    assert state["books"][dune["id"]]["tags"] == ["classics"]
+    assert state["games"][dune["id"]]["tags"] == ["classics"]
     assert state["reading"][BOB][dune["id"]]["status"] == "read"
-    emma = next(b for b in state["books"].values() if b["title"] == "Emma")
+    emma = next(b for b in state["games"].values() if b["title"] == "Emma")
     assert state["reading"][BOB][emma["id"]]["status"] == "reading"

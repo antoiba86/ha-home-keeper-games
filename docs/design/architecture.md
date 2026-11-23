@@ -9,13 +9,13 @@ implements:
   - custom_components/home_keeper_games/backend_i18n.py
   - custom_components/home_keeper_games/manifest.json
 related: [store-models, people-privilege, events-api, home-keeper-dependency, frontend-tab-card]
-source_hash: 04aa6acde8a3
+source_hash: daeba91e461a
 ---
 
 # Architecture
 
-Home Keeper Games is a Home Assistant integration for the books of a household. It
-records the rooms, bookcases and shelves of the home, the books and their copies, the
+Home Keeper Games is a Home Assistant integration for the games of a household. It
+records the rooms, units and shelves of the home, the games and their copies, the
 reading status of each person, the loans and a wishlist. It is a companion of Home
 Keeper: admins manage the library in a tab of the Home Keeper panel. Every user reads and
 updates their own reading status through a card, native entities and services.
@@ -79,7 +79,7 @@ resource.
 6. Start `home_keeper.HomeKeeperLink`, which adds the tab and the companion or shows a
    repair issue.
 7. Fire the overdue loans, start the hourly overdue check, and delete the old uploads
-   that no book uses.
+   that no game uses.
 
 ### Unload
 
@@ -135,7 +135,7 @@ notes and `acquired_from`.
   the teardown reads the model, so registration and removal cannot disagree. A call
   during a reload gets "action not found".
 - **1 document for the whole library** over **a file for each section**: 1 save is 1
-  consistent state. A library of 5000 books is the design size.
+  consistent state. A library of 5000 games is the design size.
 
 ## One-way doors
 

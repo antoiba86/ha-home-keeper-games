@@ -22,18 +22,15 @@ from homeassistant.util import dt as dt_util
 
 from . import events, models
 from .const import (
-    EVENT_BOOK_ADDED,
-    EVENT_BOOK_FINISHED,
-    EVENT_BOOK_REMOVED,
-    EVENT_BOOK_UPDATED,
-    EVENT_BOOKCASE_ADDED,
-    EVENT_BOOKCASE_REMOVED,
-    EVENT_BOOKCASE_UPDATED,
     EVENT_COPY_ADDED,
     EVENT_COPY_MOVED,
     EVENT_COPY_REMOVED,
     EVENT_COPY_UPDATED,
     EVENT_DATA_IMPORTED,
+    EVENT_GAME_ADDED,
+    EVENT_GAME_FINISHED,
+    EVENT_GAME_REMOVED,
+    EVENT_GAME_UPDATED,
     EVENT_IMPORT_COMPLETED,
     EVENT_LOAN_OVERDUE,
     EVENT_LOAN_REMOVED,
@@ -50,6 +47,9 @@ from .const import (
     EVENT_SHELF_ADDED,
     EVENT_SHELF_REMOVED,
     EVENT_SHELF_UPDATED,
+    EVENT_UNIT_ADDED,
+    EVENT_UNIT_REMOVED,
+    EVENT_UNIT_UPDATED,
     EVENT_WISHLIST_ADDED,
     EVENT_WISHLIST_REMOVED,
     STORAGE_KEY,
@@ -167,17 +167,17 @@ class LibraryStore:
         """The room, or ``room_not_found``."""
         return self._get("rooms", "room", room_id)
 
-    def bookcase(self, bookcase_id: str) -> dict[str, Any]:
-        """The bookcase, or ``bookcase_not_found``."""
-        return self._get("bookcases", "bookcase", bookcase_id)
+    def unit(self, unit_id: str) -> dict[str, Any]:
+        """The unit, or ``unit_not_found``."""
+        return self._get("units", "unit", unit_id)
 
     def shelf(self, shelf_id: str) -> dict[str, Any]:
         """The shelf, or ``shelf_not_found``."""
         return self._get("shelves", "shelf", shelf_id)
 
-    def book(self, book_id: str) -> dict[str, Any]:
-        """The book, or ``book_not_found``."""
-        return self._get("books", "book", book_id)
+    def game(self, game_id: str) -> dict[str, Any]:
+        """The game, or ``game_not_found``."""
+        return self._get("games", "game", game_id)
 
     def copy(self, copy_id: str) -> dict[str, Any]:
         """The copy, or ``copy_not_found``."""
@@ -193,12 +193,12 @@ class LibraryStore:
             self.shelf(shelf_id)
         return shelf_id or None
 
-    def reading_row(self, person_id: str, book_id: str) -> dict[str, Any] | None:
-        """The reading row of a person for a book."""
-        row = (self.state["reading"].get(person_id) or {}).get(book_id)
+    def reading_row(self, person_id: str, game_id: str) -> dict[str, Any] | None:
+        """The reading row of a person for a game."""
+        row = (self.state["reading"].get(person_id) or {}).get(game_id)
         return dict(row) if row else None
 
-    # ── Rooms, bookcases and shelves ─────────────────────────────────────────
+    # ── Rooms, units and shelves ─────────────────────────────────────────
 
     async def add_room(
         self, data: dict[str, Any], *, origin: str | None = None
@@ -223,44 +223,40 @@ class LibraryStore:
         await self._commit([(EVENT_ROOM_UPDATED, payload)])
         return dict(updated)
 
-    async def add_bookcase(
+    async def add_unit(
         self, data: dict[str, Any], *, origin: str | None = None
     ) -> dict[str, Any]:
-        """Add a bookcase to a room."""
+        """Add a unit to a room."""
         self.room(str(data.get("room_id")))
-        order = models.next_order(self.state["bookcases"], room_id=data["room_id"])
-        bookcase = models.build_bookcase(data, order=order)
-        self.state["bookcases"][bookcase["id"]] = bookcase
-        fired = [(EVENT_BOOKCASE_ADDED, events.bookcase_event_data(bookcase, origin))]
+        order = models.next_order(self.state["units"], room_id=data["room_id"])
+        unit = models.build_unit(data, order=order)
+        self.state["units"][unit["id"]] = unit
+        fired = [(EVENT_UNIT_ADDED, events.unit_event_data(unit, origin))]
         await self._commit(fired)
-        return dict(bookcase)
+        return dict(unit)
 
-    async def update_bookcase(
-        self, bookcase_id: str, data: dict[str, Any], *, origin: str | None = None
+    async def update_unit(
+        self, unit_id: str, data: dict[str, Any], *, origin: str | None = None
     ) -> dict[str, Any]:
-        """Change a bookcase. A new ``room_id`` moves it to another room."""
+        """Change a unit. A new ``room_id`` moves it to another room."""
         if "room_id" in data:
             self.room(str(data["room_id"]))
-        updated, changed = models.update_location(
-            "bookcase", self.bookcase(bookcase_id), data
-        )
+        updated, changed = models.update_location("unit", self.unit(unit_id), data)
         if not changed:
             return updated
-        self.state["bookcases"][bookcase_id] = updated
+        self.state["units"][unit_id] = updated
         payload = events.location_changed_data(
-            events.bookcase_event_data(updated, origin), changed
+            events.unit_event_data(updated, origin), changed
         )
-        await self._commit([(EVENT_BOOKCASE_UPDATED, payload)])
+        await self._commit([(EVENT_UNIT_UPDATED, payload)])
         return dict(updated)
 
     async def add_shelf(
         self, data: dict[str, Any], *, origin: str | None = None
     ) -> dict[str, Any]:
-        """Add a shelf to a bookcase."""
-        self.bookcase(str(data.get("bookcase_id")))
-        order = models.next_order(
-            self.state["shelves"], bookcase_id=data["bookcase_id"]
-        )
+        """Add a shelf to a unit."""
+        self.unit(str(data.get("unit_id")))
+        order = models.next_order(self.state["shelves"], unit_id=data["unit_id"])
         shelf = models.build_shelf(data, order=order)
         self.state["shelves"][shelf["id"]] = shelf
         await self._commit(
@@ -271,9 +267,9 @@ class LibraryStore:
     async def update_shelf(
         self, shelf_id: str, data: dict[str, Any], *, origin: str | None = None
     ) -> dict[str, Any]:
-        """Change a shelf. A new ``bookcase_id`` moves it to another bookcase."""
-        if "bookcase_id" in data:
-            self.bookcase(str(data["bookcase_id"]))
+        """Change a shelf. A new ``unit_id`` moves it to another unit."""
+        if "unit_id" in data:
+            self.unit(str(data["unit_id"]))
         updated, changed = models.update_location("shelf", self.shelf(shelf_id), data)
         if not changed:
             return updated
@@ -293,66 +289,60 @@ class LibraryStore:
             if copy.get("shelf_id") != shelf_id:
                 continue
             copy["shelf_id"] = None
-            book = self._book_or_stub(copy["book_id"])
+            game = self._game_or_stub(copy["game_id"])
             fired.append(
                 (
                     EVENT_COPY_MOVED,
-                    events.copy_moved_event_data(book, copy, shelf_id, origin),
+                    events.copy_moved_event_data(game, copy, shelf_id, origin),
                 )
             )
         fired.append((EVENT_SHELF_REMOVED, events.shelf_event_data(shelf, origin)))
 
-    def _remove_bookcase(
-        self, bookcase_id: str, fired: list[Event], origin: str | None
+    def _remove_unit(
+        self, unit_id: str, fired: list[Event], origin: str | None
     ) -> None:
-        """Remove a bookcase with its shelves. No save."""
+        """Remove a unit with its shelves. No save."""
         for shelf_id in [
             s["id"]
             for s in self.state["shelves"].values()
-            if s.get("bookcase_id") == bookcase_id
+            if s.get("unit_id") == unit_id
         ]:
             self._remove_shelf(shelf_id, fired, origin)
-        bookcase = self.state["bookcases"].pop(bookcase_id)
-        fired.append(
-            (EVENT_BOOKCASE_REMOVED, events.bookcase_event_data(bookcase, origin))
-        )
+        unit = self.state["units"].pop(unit_id)
+        fired.append((EVENT_UNIT_REMOVED, events.unit_event_data(unit, origin)))
 
     async def delete_room(
         self, room_id: str, *, force: bool = False, origin: str | None = None
     ) -> dict[str, Any]:
-        """Delete a room. A room with bookcases needs *force*."""
+        """Delete a room. A room with units needs *force*."""
         room = self.room(room_id)
         children = [
-            b["id"]
-            for b in self.state["bookcases"].values()
-            if b.get("room_id") == room_id
+            b["id"] for b in self.state["units"].values() if b.get("room_id") == room_id
         ]
         if children and not force:
             raise LibraryError("room_not_empty", count=len(children))
         fired: list[Event] = []
-        for bookcase_id in children:
-            self._remove_bookcase(bookcase_id, fired, origin)
+        for unit_id in children:
+            self._remove_unit(unit_id, fired, origin)
         del self.state["rooms"][room_id]
         fired.append((EVENT_ROOM_REMOVED, events.room_event_data(room, origin)))
         await self._commit(fired)
         return room
 
-    async def delete_bookcase(
-        self, bookcase_id: str, *, force: bool = False, origin: str | None = None
+    async def delete_unit(
+        self, unit_id: str, *, force: bool = False, origin: str | None = None
     ) -> dict[str, Any]:
-        """Delete a bookcase. A bookcase with shelves needs *force*."""
-        bookcase = self.bookcase(bookcase_id)
+        """Delete a unit. A unit with shelves needs *force*."""
+        unit = self.unit(unit_id)
         count = sum(
-            1
-            for s in self.state["shelves"].values()
-            if s.get("bookcase_id") == bookcase_id
+            1 for s in self.state["shelves"].values() if s.get("unit_id") == unit_id
         )
         if count and not force:
-            raise LibraryError("bookcase_not_empty", count=count)
+            raise LibraryError("unit_not_empty", count=count)
         fired: list[Event] = []
-        self._remove_bookcase(bookcase_id, fired, origin)
+        self._remove_unit(unit_id, fired, origin)
         await self._commit(fired)
-        return bookcase
+        return unit
 
     async def delete_shelf(
         self, shelf_id: str, *, force: bool = False, origin: str | None = None
@@ -369,128 +359,128 @@ class LibraryStore:
         await self._commit(fired)
         return shelf
 
-    # ── Books ────────────────────────────────────────────────────────────────
+    # ── Games ────────────────────────────────────────────────────────────────
 
-    async def add_book(
+    async def add_game(
         self, data: dict[str, Any], *, origin: str | None = None
     ) -> tuple[dict[str, Any], bool]:
-        """Add a book. Return ``(book, existing)``.
+        """Add a game. Return ``(game, existing)``.
 
-        If the barcode of the new book matches a stored book, the store adds no
-        book and returns the stored one with ``existing`` True.
+        If the barcode of the new game matches a stored game, the store adds no
+        game and returns the stored one with ``existing`` True.
         """
-        book = models.build_book(data, now=now())
-        if found := models.find_book_by_barcode(self.state, book["barcode"]):
+        game = models.build_game(data, now=now())
+        if found := models.find_game_by_barcode(self.state, game["barcode"]):
             return dict(found), True
-        self.state["books"][book["id"]] = book
-        await self._commit([(EVENT_BOOK_ADDED, events.book_event_data(book, origin))])
-        return dict(book), False
+        self.state["games"][game["id"]] = game
+        await self._commit([(EVENT_GAME_ADDED, events.game_event_data(game, origin))])
+        return dict(game), False
 
-    async def update_book(
-        self, book_id: str, data: dict[str, Any], *, origin: str | None = None
+    async def update_game(
+        self, game_id: str, data: dict[str, Any], *, origin: str | None = None
     ) -> dict[str, Any]:
-        """Change the fields of a book."""
-        updated, changed = models.update_book(self.book(book_id), data, now=now())
+        """Change the fields of a game."""
+        updated, changed = models.update_game(self.game(game_id), data, now=now())
         if "barcode" in changed and updated["barcode"]:
-            other = models.find_book_by_barcode(self.state, updated["barcode"])
-            if other is not None and other["id"] != book_id:
+            other = models.find_game_by_barcode(self.state, updated["barcode"])
+            if other is not None and other["id"] != game_id:
                 raise LibraryError("duplicate_barcode", barcode=updated["barcode"])
-        return await self._replace_book(updated, changed, origin)
+        return await self._replace_game(updated, changed, origin)
 
-    async def _replace_book(
+    async def _replace_game(
         self, updated: dict[str, Any], changed: list[str], origin: str | None
     ) -> dict[str, Any]:
         if not changed:
             return updated
-        self.state["books"][updated["id"]] = updated
-        payload = events.book_updated_event_data(updated, changed, origin)
-        await self._commit([(EVENT_BOOK_UPDATED, payload)])
+        self.state["games"][updated["id"]] = updated
+        payload = events.game_updated_event_data(updated, changed, origin)
+        await self._commit([(EVENT_GAME_UPDATED, payload)])
         return dict(updated)
 
     async def set_cover(
         self,
-        book_id: str,
+        game_id: str,
         kind: str,
         file: str | None,
         *,
         origin: str | None = None,
     ) -> dict[str, Any]:
-        """Set the cover of a book. The previous file is released."""
-        book = self.book(book_id)
+        """Set the cover of a game. The previous file is released."""
+        game = self.game(game_id)
         models.choice(kind, "kind", models.COVER_KINDS)
         cover = {"kind": kind, "file": file if kind != "none" else None}
-        old = (book.get("cover") or {}).get("file")
-        if cover == book.get("cover"):
-            return book
-        book["cover"] = cover
-        book["updated_at"] = now()
-        self.state["books"][book_id] = book
-        payload = events.book_updated_event_data(book, ["cover"], origin)
-        await self._commit([(EVENT_BOOK_UPDATED, payload)])
+        old = (game.get("cover") or {}).get("file")
+        if cover == game.get("cover"):
+            return game
+        game["cover"] = cover
+        game["updated_at"] = now()
+        self.state["games"][game_id] = game
+        payload = events.game_updated_event_data(game, ["cover"], origin)
+        await self._commit([(EVENT_GAME_UPDATED, payload)])
         if old and old != cover["file"]:
             self._release_cover(old)
-        return dict(book)
+        return dict(game)
 
     def _release_cover(self, file: str) -> None:
         if self.on_cover_released is not None:
             self.on_cover_released(file)
 
-    async def delete_book(
-        self, book_id: str, *, origin: str | None = None
+    async def delete_game(
+        self, game_id: str, *, origin: str | None = None
     ) -> dict[str, Any]:
-        """Delete a book with its copies, reading rows and loans."""
-        book = self.book(book_id)
+        """Delete a game with its copies, reading rows and loans."""
+        game = self.game(game_id)
         fired: list[Event] = []
         for copy_id in [
-            c["id"] for c in self.state["copies"].values() if c["book_id"] == book_id
+            c["id"] for c in self.state["copies"].values() if c["game_id"] == game_id
         ]:
             copy = self.state["copies"].pop(copy_id)
             fired.append(
-                (EVENT_COPY_REMOVED, events.copy_event_data(book, copy, origin))
+                (EVENT_COPY_REMOVED, events.copy_event_data(game, copy, origin))
             )
         for rows in self.state["reading"].values():
-            rows.pop(book_id, None)
+            rows.pop(game_id, None)
         self.state["reading"] = {p: r for p, r in self.state["reading"].items() if r}
         for loan_id in [
-            lo["id"] for lo in self.state["loans"].values() if lo["book_id"] == book_id
+            lo["id"] for lo in self.state["loans"].values() if lo["game_id"] == game_id
         ]:
             del self.state["loans"][loan_id]
-        self._orphan_item(book.get("wishlist"))
-        del self.state["books"][book_id]
-        fired.append((EVENT_BOOK_REMOVED, events.book_event_data(book, origin)))
+        self._orphan_item(game.get("wishlist"))
+        del self.state["games"][game_id]
+        fired.append((EVENT_GAME_REMOVED, events.game_event_data(game, origin)))
         await self._commit(fired)
-        if file := (book.get("cover") or {}).get("file"):
+        if file := (game.get("cover") or {}).get("file"):
             self._release_cover(file)
-        return book
+        return game
 
     # ── Copies ───────────────────────────────────────────────────────────────
 
     def _copy_record(self, data: dict[str, Any]) -> tuple[dict[str, Any], Any]:
-        book = self.book(str(data.get("book_id")))
+        game = self.game(str(data.get("game_id")))
         self.check_shelf(data.get("shelf_id"))
-        return models.build_copy(data, now=now()), book
+        return models.build_copy(data, now=now()), game
 
     async def add_copy(
         self, data: dict[str, Any], *, origin: str | None = None
     ) -> dict[str, Any]:
-        """Add a copy of a book.
+        """Add a copy of a game.
 
-        The first copy of a book on the wishlist takes it off the wishlist, as
-        ``got_wishlist_book`` does. The wishlist sync then removes its to-do
+        The first copy of a game on the wishlist takes it off the wishlist, as
+        ``got_wishlist_game`` does. The wishlist sync then removes its to-do
         item.
         """
-        record, book = self._copy_record(data)
-        clears = models.copy_clears_wishlist(self.state, book["id"])
+        record, game = self._copy_record(data)
+        clears = models.copy_clears_wishlist(self.state, game["id"])
         self.state["copies"][record["id"]] = record
         fired: list[Event] = [
-            (EVENT_COPY_ADDED, events.copy_event_data(book, record, origin))
+            (EVENT_COPY_ADDED, events.copy_event_data(game, record, origin))
         ]
         if clears:
-            entry = book["wishlist"]
+            entry = game["wishlist"]
             self._orphan_item(entry)
-            book["wishlist"] = None
-            self.state["books"][book["id"]] = book
-            payload = events.wishlist_event_data(book, entry, origin)
+            game["wishlist"] = None
+            self.state["games"][game["id"]] = game
+            payload = events.wishlist_event_data(game, entry, origin)
             fired.append((EVENT_WISHLIST_REMOVED, payload))
         await self._commit(fired)
         return dict(record)
@@ -511,18 +501,18 @@ class LibraryStore:
             return updated
         self.state["copies"][copy_id] = updated
         fired: list[Event] = []
-        book = self.book(updated["book_id"])
+        game = self.game(updated["game_id"])
         if "shelf_id" in changed:
             fired.append(
                 (
                     EVENT_COPY_MOVED,
                     events.copy_moved_event_data(
-                        book, updated, record.get("shelf_id"), origin
+                        game, updated, record.get("shelf_id"), origin
                     ),
                 )
             )
         if other := [f for f in changed if f != "shelf_id"]:
-            payload = events.copy_updated_event_data(book, updated, other, origin)
+            payload = events.copy_updated_event_data(game, updated, other, origin)
             fired.append((EVENT_COPY_UPDATED, payload))
         await self._commit(fired)
         return dict(updated)
@@ -541,8 +531,8 @@ class LibraryStore:
         if models.open_loan_of_copy(self.state, copy_id):
             raise LibraryError("copy_on_loan")
         del self.state["copies"][copy_id]
-        book = self.book(record["book_id"])
-        payload = events.copy_event_data(book, record, origin)
+        game = self.game(record["game_id"])
+        payload = events.copy_event_data(game, record, origin)
         await self._commit([(EVENT_COPY_REMOVED, payload)])
         return record
 
@@ -550,7 +540,7 @@ class LibraryStore:
 
     def _reading_events(
         self,
-        book: dict[str, Any],
+        game: dict[str, Any],
         person_id: str,
         row: dict[str, Any] | None,
         previous: str | None,
@@ -561,49 +551,49 @@ class LibraryStore:
             (
                 EVENT_READING_CHANGED,
                 events.reading_changed_event_data(
-                    book, person_id, status, previous, origin
+                    game, person_id, status, previous, origin
                 ),
             )
         ]
         if row is not None and status == "read" and previous != "read":
             fired.append(
                 (
-                    EVENT_BOOK_FINISHED,
-                    events.book_finished_event_data(book, person_id, row, origin),
+                    EVENT_GAME_FINISHED,
+                    events.game_finished_event_data(game, person_id, row, origin),
                 )
             )
         return fired
 
     async def set_reading(
         self,
-        book_id: str,
+        game_id: str,
         person_id: str,
         data: dict[str, Any],
         *,
         origin: str | None = None,
     ) -> dict[str, Any] | None:
         """Set the reading row of a person. Status ``none`` removes the row."""
-        book = self.book(book_id)
-        current = self.reading_row(person_id, book_id)
+        game = self.game(game_id)
+        current = self.reading_row(person_id, game_id)
         previous = current["status"] if current else None
         if data.get("status") == models.STATUS_NONE:
             if current is None:
                 return None
-            del self.state["reading"][person_id][book_id]
+            del self.state["reading"][person_id][game_id]
             if not self.state["reading"][person_id]:
                 del self.state["reading"][person_id]
-            fired = self._reading_events(book, person_id, None, previous, origin)
+            fired = self._reading_events(game, person_id, None, previous, origin)
             await self._commit(fired)
             return None
         row, changed = models.apply_reading(current, data, now=now(), today=today())
         if not changed:
             return row
-        self.state["reading"].setdefault(person_id, {})[book_id] = row
+        self.state["reading"].setdefault(person_id, {})[game_id] = row
         if "status" in changed:
-            fired = self._reading_events(book, person_id, row, previous, origin)
+            fired = self._reading_events(game, person_id, row, previous, origin)
         else:
             payload = events.reading_updated_event_data(
-                book, person_id, row["status"], changed, origin
+                game, person_id, row["status"], changed, origin
             )
             fired = [(EVENT_READING_UPDATED, payload)]
         await self._commit(fired)
@@ -616,7 +606,7 @@ class LibraryStore:
     ) -> dict[str, Any]:
         """Start a loan.
 
-        ``out`` lends a copy, and the copy keeps its shelf. ``in`` borrows a book,
+        ``out`` lends a copy, and the copy keeps its shelf. ``in`` borrows a game,
         and sets the status of the person to ``reading`` if it is ``want`` or
         absent.
         """
@@ -624,24 +614,24 @@ class LibraryStore:
             copy = self.copy(str(data.get("copy_id")))
             if models.open_loan_of_copy(self.state, copy["id"]):
                 raise LibraryError("copy_on_loan")
-            data = {**data, "book_id": copy["book_id"]}
+            data = {**data, "game_id": copy["game_id"]}
         loan = models.build_loan(data, today=today())
-        book = self.book(loan["book_id"])
+        game = self.game(loan["game_id"])
         self.state["loans"][loan["id"]] = loan
         fired: list[Event] = [
-            (EVENT_LOAN_STARTED, events.loan_event_data(book, loan, origin))
+            (EVENT_LOAN_STARTED, events.loan_event_data(game, loan, origin))
         ]
         if loan["direction"] == "in" and loan["person_id"]:
-            current = self.reading_row(loan["person_id"], book["id"])
+            current = self.reading_row(loan["person_id"], game["id"])
             if current is None or current["status"] == "want":
                 row, _ = models.apply_reading(
                     current, {"status": "reading"}, now=now(), today=today()
                 )
-                self.state["reading"].setdefault(loan["person_id"], {})[book["id"]] = (
+                self.state["reading"].setdefault(loan["person_id"], {})[game["id"]] = (
                     row
                 )
                 fired += self._reading_events(
-                    book,
+                    game,
                     loan["person_id"],
                     row,
                     current["status"] if current else None,
@@ -659,8 +649,8 @@ class LibraryStore:
             return loan
         loan["returned"] = models.iso_date(returned, "returned") or today()
         self.state["loans"][loan_id] = loan
-        book = self.book(loan["book_id"])
-        payload = events.loan_event_data(book, loan, origin)
+        game = self.game(loan["game_id"])
+        payload = events.loan_event_data(game, loan, origin)
         await self._commit([(EVENT_LOAN_RETURNED, payload)])
         return dict(loan)
 
@@ -673,7 +663,7 @@ class LibraryStore:
             return updated
         self.state["loans"][loan_id] = updated
         payload = events.loan_updated_event_data(
-            self._book_or_stub(updated["book_id"]), updated, changed, origin
+            self._game_or_stub(updated["game_id"]), updated, changed, origin
         )
         await self._commit([(EVENT_LOAN_UPDATED, payload)])
         return dict(updated)
@@ -685,14 +675,14 @@ class LibraryStore:
         loan = self.loan(loan_id)
         del self.state["loans"][loan_id]
         payload = events.loan_event_data(
-            self._book_or_stub(loan["book_id"]), loan, origin
+            self._game_or_stub(loan["game_id"]), loan, origin
         )
         await self._commit([(EVENT_LOAN_REMOVED, payload)])
         return loan
 
-    def _book_or_stub(self, book_id: str) -> dict[str, Any]:
-        """The book, or a record with only its id, for an event payload."""
-        return self.state["books"].get(book_id) or {"id": book_id}
+    def _game_or_stub(self, game_id: str) -> dict[str, Any]:
+        """The game, or a record with only its id, for an event payload."""
+        return self.state["games"].get(game_id) or {"id": game_id}
 
     async def set_loan_task(self, loan_id: str, task_id: str | None) -> None:
         """Record the Home Keeper task id of a loan."""
@@ -720,8 +710,8 @@ class LibraryStore:
             if not models.is_overdue(loan, today_) or loan.get("overdue_fired"):
                 continue
             loan["overdue_fired"] = True
-            book = self._book_or_stub(loan["book_id"])
-            fired.append((EVENT_LOAN_OVERDUE, events.loan_event_data(book, loan, None)))
+            game = self._game_or_stub(loan["game_id"])
+            fired.append((EVENT_LOAN_OVERDUE, events.loan_event_data(game, loan, None)))
             ids.append(loan["id"])
         if fired:
             await self._commit(fired)
@@ -739,29 +729,29 @@ class LibraryStore:
 
     async def add_to_wishlist(
         self,
-        book_id: str,
+        game_id: str,
         person_id: str,
         *,
         buy: bool = False,
         origin: str | None = None,
     ) -> dict[str, Any]:
-        """Put a book on the wishlist of a person."""
-        book = self.book(book_id)
-        if book.get("wishlist"):
+        """Put a game on the wishlist of a person."""
+        game = self.game(game_id)
+        if game.get("wishlist"):
             raise LibraryError("already_on_wishlist")
         entry = models.build_wishlist(person_id, buy=buy, now=now())
-        book["wishlist"] = entry
-        self.state["books"][book_id] = book
-        payload = events.wishlist_event_data(book, entry, origin)
+        game["wishlist"] = entry
+        self.state["games"][game_id] = game
+        payload = events.wishlist_event_data(game, entry, origin)
         await self._commit([(EVENT_WISHLIST_ADDED, payload)])
-        return dict(book)
+        return dict(game)
 
     async def update_wishlist(
-        self, book_id: str, data: dict[str, Any], *, origin: str | None = None
+        self, game_id: str, data: dict[str, Any], *, origin: str | None = None
     ) -> dict[str, Any]:
         """Change ``buy`` or the person of a wishlist entry."""
-        book = self.book(book_id)
-        entry = dict(book.get("wishlist") or {})
+        game = self.game(game_id)
+        entry = dict(game.get("wishlist") or {})
         if not entry:
             raise LibraryError("not_on_wishlist")
         changed = []
@@ -777,45 +767,45 @@ class LibraryStore:
             )
             changed.append("person_id")
         if not changed:
-            return book
-        book["wishlist"] = entry
-        book["updated_at"] = now()
-        self.state["books"][book_id] = book
-        payload = events.book_updated_event_data(book, ["wishlist"], origin)
-        await self._commit([(EVENT_BOOK_UPDATED, payload)])
-        return dict(book)
+            return game
+        game["wishlist"] = entry
+        game["updated_at"] = now()
+        self.state["games"][game_id] = game
+        payload = events.game_updated_event_data(game, ["wishlist"], origin)
+        await self._commit([(EVENT_GAME_UPDATED, payload)])
+        return dict(game)
 
     async def remove_from_wishlist(
-        self, book_id: str, *, origin: str | None = None
+        self, game_id: str, *, origin: str | None = None
     ) -> dict[str, Any]:
-        """Take a book off the wishlist."""
-        book = self.book(book_id)
-        entry = book.get("wishlist")
+        """Take a game off the wishlist."""
+        game = self.game(game_id)
+        entry = game.get("wishlist")
         if not entry:
             raise LibraryError("not_on_wishlist")
         self._orphan_item(entry)
-        book["wishlist"] = None
-        self.state["books"][book_id] = book
-        payload = events.wishlist_event_data(book, entry, origin)
+        game["wishlist"] = None
+        self.state["games"][game_id] = game
+        payload = events.wishlist_event_data(game, entry, origin)
         await self._commit([(EVENT_WISHLIST_REMOVED, payload)])
-        return dict(book)
+        return dict(game)
 
-    async def got_wishlist_book(
-        self, book_id: str, data: dict[str, Any], *, origin: str | None = None
+    async def got_wishlist_game(
+        self, game_id: str, data: dict[str, Any], *, origin: str | None = None
     ) -> dict[str, Any]:
-        """Add a copy of a wishlist book and take it off the wishlist."""
-        book = self.book(book_id)
-        entry = book.get("wishlist")
+        """Add a copy of a wishlist game and take it off the wishlist."""
+        game = self.game(game_id)
+        entry = game.get("wishlist")
         if not entry:
             raise LibraryError("not_on_wishlist")
-        record, _ = self._copy_record({**data, "book_id": book_id})
+        record, _ = self._copy_record({**data, "game_id": game_id})
         self._orphan_item(entry)
-        book["wishlist"] = None
-        self.state["books"][book_id] = book
+        game["wishlist"] = None
+        self.state["games"][game_id] = game
         self.state["copies"][record["id"]] = record
         fired: list[Event] = [
-            (EVENT_COPY_ADDED, events.copy_event_data(book, record, origin)),
-            (EVENT_WISHLIST_REMOVED, events.wishlist_event_data(book, entry, origin)),
+            (EVENT_COPY_ADDED, events.copy_event_data(game, record, origin)),
+            (EVENT_WISHLIST_REMOVED, events.wishlist_event_data(game, entry, origin)),
         ]
         await self._commit(fired)
         return dict(record)
@@ -823,40 +813,40 @@ class LibraryStore:
     async def apply_wishlist_plan(self, plan: SyncPlan) -> None:
         """Write the store steps of a wishlist sync plan."""
         fired: list[Event] = []
-        books = self.state["books"]
+        games = self.state["games"]
         for bind in plan.binds:
-            entry = (books.get(bind.book_id) or {}).get("wishlist")
+            entry = (games.get(bind.game_id) or {}).get("wishlist")
             if entry:
                 entry["todo_entity"] = bind.entity_id
                 entry["todo_uid"] = bind.uid
         for bought in plan.bought:
-            book = books.get(bought.book_id)
-            entry = (book or {}).get("wishlist")
-            if book and entry:
+            game = games.get(bought.game_id)
+            entry = (game or {}).get("wishlist")
+            if game and entry:
                 entry["bought"] = True
                 entry["buy"] = False
                 entry["todo_uid"] = None
                 entry["todo_entity"] = None
-                book["updated_at"] = now()
+                game["updated_at"] = now()
                 fired.append(
                     (
-                        EVENT_BOOK_UPDATED,
-                        events.book_updated_event_data(book, ["wishlist"], None),
+                        EVENT_GAME_UPDATED,
+                        events.game_updated_event_data(game, ["wishlist"], None),
                     )
                 )
         for unbind in plan.unbinds:
-            book = books.get(unbind.book_id)
-            entry = (book or {}).get("wishlist")
-            if book and entry:
+            game = games.get(unbind.game_id)
+            entry = (game or {}).get("wishlist")
+            if game and entry:
                 entry["todo_uid"] = None
                 entry["todo_entity"] = None
                 if unbind.buy_off and entry.get("buy"):
                     entry["buy"] = False
-                    book["updated_at"] = now()
+                    game["updated_at"] = now()
                     fired.append(
                         (
-                            EVENT_BOOK_UPDATED,
-                            events.book_updated_event_data(book, ["wishlist"], None),
+                            EVENT_GAME_UPDATED,
+                            events.game_updated_event_data(game, ["wishlist"], None),
                         )
                     )
         dropped = {(d.entity_id, d.uid) for d in plan.drop_orphans}

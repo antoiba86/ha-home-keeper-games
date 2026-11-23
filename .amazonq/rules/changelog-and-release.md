@@ -32,7 +32,7 @@ feature PR must follow so that its work ships.
   not `**Values of a copy.**`. If a lead still has "a", "the", "of", "on", or "for",
   try again.
 - A lead that opens `The integration can now…`, `A user can now…`, `The tab now…` or
-  `Give a book…` narrates. Cut it back to the noun.
+  `Give a game…` narrates. Cut it back to the noun.
 - The lead must stand alone. `summarize()` in `ci/release-issues.py` quotes the whole
   bullet into the comment that an issue reporter gets, and the lead comes first.
 - **An `### Added` lead links its documentation**, with the bold outside the link:

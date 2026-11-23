@@ -41,7 +41,7 @@
   },
   "entity": {
     "sensor": {
-      "books": {
+      "games": {
         "name": "Kirjat"
       },
       "loans_out": {
@@ -50,7 +50,7 @@
       "loans_overdue": {
         "name": "Myöhässä olevat lainat"
       },
-      "books_read_this_year": {
+      "games_read_this_year": {
         "name": "{person} luetut kirjat tänä vuonna"
       },
       "reading_now": {
@@ -132,7 +132,7 @@
         }
       }
     },
-    "add_bookcase": {
+    "add_unit": {
       "name": "Lisää kirjahylly",
       "description": "Lisää kirjahylly huoneeseen.",
       "fields": {
@@ -154,11 +154,11 @@
         }
       }
     },
-    "update_bookcase": {
+    "update_unit": {
       "name": "Muuta kirjahyllyä",
       "description": "Muuta kirjahyllyä tai siirrä se toiseen huoneeseen.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Kirjahylly",
           "description": "Kirjahyllyn ID."
         },
@@ -180,11 +180,11 @@
         }
       }
     },
-    "delete_bookcase": {
+    "delete_unit": {
       "name": "Poista kirjahylly",
       "description": "Poista kirjahylly. Kirjahylly, jossa on hyllytasoja, tarvitsee force-arvon.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Kirjahylly",
           "description": "Kirjahyllyn ID."
         },
@@ -198,7 +198,7 @@
       "name": "Lisää hyllytaso",
       "description": "Lisää hyllytaso kirjahyllyyn.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Kirjahylly",
           "description": "Kirjahyllyn ID."
         },
@@ -220,7 +220,7 @@
           "name": "Hyllytaso",
           "description": "Hyllytason ID. Tyhjä, jos hyllytasoa ei ole."
         },
-        "bookcase_id": {
+        "unit_id": {
           "name": "Kirjahylly",
           "description": "Kirjahyllyn ID."
         },
@@ -248,7 +248,7 @@
         }
       }
     },
-    "add_book": {
+    "add_game": {
       "name": "Lisää kirja",
       "description": "Lisää kirja. Jos kirjalla on sama viivakoodi, palvelu palauttaa sen kirjan.",
       "fields": {
@@ -310,11 +310,11 @@
         }
       }
     },
-    "update_book": {
+    "update_game": {
       "name": "Muuta kirjaa",
       "description": "Muuta kirjan tietoja.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Kirja",
           "description": "Kirjan ID."
         },
@@ -376,11 +376,11 @@
         }
       }
     },
-    "delete_book": {
+    "delete_game": {
       "name": "Poista kirja",
       "description": "Poista kirja ja sen kappaleet, lukutila, lainat ja kansikuva.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Kirja",
           "description": "Kirjan ID."
         }
@@ -412,7 +412,7 @@
       "name": "Lisää kappale",
       "description": "Lisää kirjan kappale.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Kirja",
           "description": "Kirjan ID."
         },
@@ -536,7 +536,7 @@
       "name": "Aseta kansikuva",
       "description": "Aseta kirjan kansikuva.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Kirja",
           "description": "Kirjan ID."
         },
@@ -554,7 +554,7 @@
       "name": "Aseta lukutila",
       "description": "Aseta kirjan lukutila henkilölle. Käyttäjä, joka ei ole ylläpitäjä, voi asettaa vain oman tilansa.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Kirja",
           "description": "Kirjan ID."
         },
@@ -592,7 +592,7 @@
         }
       }
     },
-    "lend_book": {
+    "lend_game": {
       "name": "Lainaa kirja",
       "description": "Lainaa kappale toiselle henkilölle.",
       "fields": {
@@ -622,11 +622,11 @@
         }
       }
     },
-    "borrow_book": {
+    "borrow_game": {
       "name": "Lisää lainattu kirja",
       "description": "Kirjaa kirja, jonka henkilö on lainannut.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Kirja",
           "description": "Kirjan ID."
         },
@@ -730,7 +730,7 @@
       "name": "Lisää toivelistalle",
       "description": "Lisää kirja henkilön toivelistalle.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Kirja",
           "description": "Kirjan ID."
         },
@@ -760,7 +760,7 @@
       "name": "Muuta toivelistaa",
       "description": "Muuta toivelistan merkintää.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Kirja",
           "description": "Kirjan ID."
         },
@@ -778,17 +778,17 @@
       "name": "Poista toivelistalta",
       "description": "Poista kirja toivelistalta.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Kirja",
           "description": "Kirjan ID."
         }
       }
     },
-    "got_wishlist_book": {
+    "got_wishlist_game": {
       "name": "Toivekirja saatu",
       "description": "Lisää toivekirjan kappale ja poista kirja toivelistalta.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Kirja",
           "description": "Kirjan ID."
         },
@@ -874,7 +874,7 @@
         }
       }
     },
-    "list_books": {
+    "list_games": {
       "name": "Luettele kirjat",
       "description": "Palauta kirjat, jotka vastaavat suodattimia.",
       "fields": {
@@ -908,11 +908,11 @@
         }
       }
     },
-    "get_book": {
+    "get_game": {
       "name": "Hae kirja",
       "description": "Palauta kirja sen kappaleineen ja lainoineen.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Kirja",
           "description": "Kirjan ID."
         }
@@ -1000,13 +1000,13 @@
     "room_not_found": {
       "message": "Millään huoneella ei ole ID:tä {id}."
     },
-    "bookcase_not_found": {
+    "unit_not_found": {
       "message": "Millään kirjahyllyllä ei ole ID:tä {id}."
     },
     "shelf_not_found": {
       "message": "Millään hyllytasolla ei ole ID:tä {id}."
     },
-    "book_not_found": {
+    "game_not_found": {
       "message": "Millään kirjalla ei ole ID:tä {id}."
     },
     "copy_not_found": {
@@ -1024,7 +1024,7 @@
     "room_not_empty": {
       "message": "Huoneessa on {count} kirjahyllyä. Käytä force-arvoa, jos haluat poistaa myös ne."
     },
-    "bookcase_not_empty": {
+    "unit_not_empty": {
       "message": "Kirjahyllyssä on {count} hyllytasoa. Käytä force-arvoa, jos haluat poistaa myös ne."
     },
     "shelf_not_empty": {

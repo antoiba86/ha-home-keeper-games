@@ -21,27 +21,27 @@ def _state() -> dict:
     state = m.empty_state()
     state["rooms"]["r"] = {"id": "r", "name": "Den", "area_id": None, "order": 1}
     state["rooms"]["q"] = {"id": "q", "name": "Attic", "area_id": None, "order": 0}
-    state["bookcases"]["k"] = {
+    state["units"]["k"] = {
         "id": "k",
         "room_id": "r",
         "name": "Left",
         "note": "",
         "order": 0,
     }
-    state["shelves"]["s"] = {"id": "s", "bookcase_id": "k", "name": "Top", "order": 0}
-    dune = m.build_book(
+    state["shelves"]["s"] = {"id": "s", "unit_id": "k", "name": "Top", "order": 0}
+    dune = m.build_game(
         {"title": "Dune", "authors": ["Frank Herbert"], "tags": ["sf"], "pages": 600},
         now=NOW,
     )
     dune["id"] = "dune"
     dune["barcode"] = "9780441013593"
-    emma = m.build_book({"title": "Emma", "series": "Austen"}, now=NOW)
+    emma = m.build_game({"title": "Emma", "series": "Austen"}, now=NOW)
     emma["id"] = "emma"
     emma["cover"] = {"kind": "custom", "file": "emma-0a1b2c3d.jpg"}
-    state["books"] = {"dune": dune, "emma": emma}
+    state["games"] = {"dune": dune, "emma": emma}
     copy = m.build_copy(
         {
-            "book_id": "dune",
+            "game_id": "dune",
             "shelf_id": "s",
             "price": 10,
             "value": 20,
@@ -52,7 +52,7 @@ def _state() -> dict:
     copy["id"] = "c1"
     state["copies"]["c1"] = copy
     loan = m.build_loan(
-        {"direction": "out", "copy_id": "c1", "book_id": "dune", "party": "Zed"},
+        {"direction": "out", "copy_id": "c1", "game_id": "dune", "party": "Zed"},
         today="2026-10-01",
     )
     loan["id"] = "l1"
@@ -98,13 +98,13 @@ def test_admin_reads_everything() -> None:
     assert [r["id"] for r in reply["rooms"]] == ["q", "r"]
     assert reply["copies"][0]["price"] == 10
     assert reply["loans"][0]["party"] == "Zed"
-    dune = next(b for b in reply["books"] if b["id"] == "dune")
+    dune = next(b for b in reply["games"] if b["id"] == "dune")
     assert set(dune["reading"]) == {"alice", "bob", "carol"}
     assert dune["reading"]["carol"]["private_notes"] == "secret"
     assert dune["owned"] is True and dune["copy_count"] == 1
-    emma = next(b for b in reply["books"] if b["id"] == "emma")
+    emma = next(b for b in reply["games"] if b["id"] == "emma")
     assert emma["owned"] is False and emma["cover_url"].endswith("?v=0a1b2c3d")
-    assert [b["id"] for b in reply["books"]] == ["dune", "emma"]
+    assert [b["id"] for b in reply["games"]] == ["dune", "emma"]
     assert list(reply["people"]) == ["alice", "bob", "carol"]
     carol = reply["people"]["carol"]
     assert carol["share_reading"] is False and "wishlist_todo" in carol
@@ -125,7 +125,7 @@ def test_non_admin_projection_never_leaks() -> None:
     text = json.dumps(reply)
     for secret in ("Zed", "Shop", '"price"', '"value"', '"party"'):
         assert secret not in text, secret
-    dune = next(b for b in reply["books"] if b["id"] == "dune")
+    dune = next(b for b in reply["games"] if b["id"] == "dune")
     assert set(dune["reading"]) == {"alice", "bob"}
     assert dune["reading"]["bob"]["private_notes"] == "secret"
     assert "private_notes" not in dune["reading"]["alice"]
@@ -143,21 +143,21 @@ def test_wishlist_todo_ids_of_another_person_are_hidden() -> None:
     state = _state()
     entry = m.build_wishlist("alice", buy=True, now=NOW)
     entry |= {"todo_entity": "todo.alice", "todo_uid": "u1"}
-    state["books"]["emma"]["wishlist"] = entry
-    emma = state["books"]["emma"]
+    state["games"]["emma"]["wishlist"] = entry
+    emma = state["games"]["emma"]
     for viewer, is_admin, hidden in (
         ("bob", False, True),
         (None, False, True),
         ("alice", False, False),
         ("bob", True, False),
     ):
-        out = pr.project_book(state, emma, viewer=viewer, is_admin=is_admin)
+        out = pr.project_game(state, emma, viewer=viewer, is_admin=is_admin)
         assert out["wishlist"]["person_id"] == "alice" and out["wishlist"]["buy"]
         assert ("todo_entity" in out["wishlist"]) is not hidden
         assert ("todo_uid" in out["wishlist"]) is not hidden
     assert emma["wishlist"]["todo_entity"] == "todo.alice", "the projection must copy"
     assert (
-        pr.project_book(state, state["books"]["dune"], viewer="bob", is_admin=False)[
+        pr.project_game(state, state["games"]["dune"], viewer="bob", is_admin=False)[
             "wishlist"
         ]
         is None
@@ -172,14 +172,14 @@ def test_viewer_with_no_person() -> None:
     assert all("private_notes" not in row for row in rows.values())
 
 
-def test_book_detail() -> None:
+def test_game_detail() -> None:
     state = _state()
-    detail = pr.book_detail(state, "dune", viewer="bob", is_admin=False)
+    detail = pr.game_detail(state, "dune", viewer="bob", is_admin=False)
     assert detail["copies"][0]["location"] == ["Den", "Left", "Top"]
     assert "price" not in detail["copies"][0]
     assert "party" not in detail["loans"][0]
-    assert pr.book_detail(state, "nope", viewer=None, is_admin=True) is None
-    admin = pr.book_detail(state, "dune", viewer=None, is_admin=True)
+    assert pr.game_detail(state, "nope", viewer=None, is_admin=True) is None
+    admin = pr.game_detail(state, "dune", viewer=None, is_admin=True)
     assert admin["copies"][0]["price"] == 10 and admin["loans"][0]["party"] == "Zed"
 
 
@@ -203,8 +203,8 @@ def test_book_detail() -> None:
         ({"limit": 1}, ["dune"]),
     ],
 )
-def test_list_books_filters(filters: dict, ids: list[str]) -> None:
-    rows = pr.list_books(_state(), filters, viewer="alice", is_admin=True)
+def test_list_games_filters(filters: dict, ids: list[str]) -> None:
+    rows = pr.list_games(_state(), filters, viewer="alice", is_admin=True)
     assert [b["id"] for b in rows] == ids
 
 
@@ -228,9 +228,9 @@ def test_stats() -> None:
         "status": "read",
         "finished": "2025-12-31",
     }
-    assert pr.books_read_in_year(state, "alice", 2026) == (1, 600)
-    assert pr.books_read_in_year(state, "alice", 2025) == (1, 0)
-    assert pr.books_read_in_year(state, "nobody", 2026) == (0, 0)
+    assert pr.games_read_in_year(state, "alice", 2026) == (1, 600)
+    assert pr.games_read_in_year(state, "alice", 2025) == (1, 0)
+    assert pr.games_read_in_year(state, "nobody", 2026) == (0, 0)
     state["reading"]["bob"]["emma"] = {
         **m.empty_reading(now="2026-10-06"),
         "status": "reading",
@@ -239,7 +239,7 @@ def test_stats() -> None:
     assert pr.reading_now(state, "bob") == ["Emma", "Dune"]
     state["reading"]["carol"]["emma"] = {**m.empty_reading(now="2026-01-01")}
     assert [b["id"] for b in pr.want_to_read(state, "carol")] == ["emma", "dune"]
-    assert pr.owned_book_count(state) == 1
+    assert pr.owned_game_count(state) == 1
     assert pr.loans_out_count(state) == 1
     state["loans"]["l1"]["due"] = "2026-10-04"
     assert pr.loans_overdue_count(state, "2026-10-05") == 1
@@ -248,14 +248,14 @@ def test_stats() -> None:
     assert pr.loans_out_count(state) == 0
 
 
-def test_project_state_is_fast_for_5000_books() -> None:
+def test_project_state_is_fast_for_5000_games() -> None:
     state = m.empty_state()
     for index in range(5000):
-        book = m.build_book({"title": f"Book {index}", "authors": ["A"]}, now=NOW)
-        state["books"][book["id"]] = book
-        copy = m.build_copy({"book_id": book["id"]}, now=NOW)
+        game = m.build_game({"title": f"Game {index}", "authors": ["A"]}, now=NOW)
+        state["games"][game["id"]] = game
+        copy = m.build_copy({"game_id": game["id"]}, now=NOW)
         state["copies"][copy["id"]] = copy
-        state["reading"].setdefault("alice", {})[book["id"]] = m.empty_reading(now=NOW)
+        state["reading"].setdefault("alice", {})[game["id"]] = m.empty_reading(now=NOW)
     start = time.perf_counter()
     reply = pr.project_state(
         state,
@@ -266,8 +266,8 @@ def test_project_state_is_fast_for_5000_books() -> None:
         tab=True,
         revision=1,
     )
-    pr.list_books(state, {"query": "book 4999"}, viewer="bob", is_admin=False)
-    assert len(reply["books"]) == 5000
+    pr.list_games(state, {"query": "game 4999"}, viewer="bob", is_admin=False)
+    assert len(reply["games"]) == 5000
     assert time.perf_counter() - start < 2.0
 
 
@@ -277,7 +277,7 @@ def _export_section() -> dict:
         "copies": [{"id": "c", "price": 3, "value": 4, "acquired_from": "Shop"}],
         "loans": [{"id": "l", "party": "Sam", "due": None}],
         "reading": [
-            {"person_id": "a", "books": [{"book_id": "b", "private_notes": "x"}]}
+            {"person_id": "a", "games": [{"game_id": "b", "private_notes": "x"}]}
         ],
         "people": [
             {
@@ -303,7 +303,7 @@ def test_project_export_non_admin_never_leaks() -> None:
     out = pr.project_export(section, is_admin=False)
     assert out["copies"] == [{"id": "c"}]
     assert out["loans"] == [{"id": "l", "due": None}]
-    assert out["reading"] == [{"person_id": "a", "books": [{"book_id": "b"}]}]
+    assert out["reading"] == [{"person_id": "a", "games": [{"game_id": "b"}]}]
     assert out["people"] == [{"person_id": "a", "share_reading": True}]
     assert out["format"] == 1
     assert section == _export_section()

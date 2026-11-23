@@ -24,10 +24,10 @@ function handle(msg) {
     case 'list_todo_entities':
       return { entities: [{ entity_id: 'todo.alex_books', name: 'Alex books' }, { entity_id: 'todo.jo_books', name: 'Jo books' }, { entity_id: 'todo.shopping_list', name: 'Shopping list' }] };
     case 'set_reading': {
-      const book = byId(state.books, msg.book_id);
+      const game = byId(state.games, msg.game_id);
       const pid = msg.person_id ?? state.me.person_id;
-      const row = (book.reading[pid] ??= { status: null, rating: null, page: null, started: null, finished: null, read_count: 0, private_notes: '' });
-      for (const [k, v] of Object.entries(msg)) if (!['type', 'id', 'book_id', 'person_id'].includes(k)) row[k] = v;
+      const row = (game.reading[pid] ??= { status: null, rating: null, page: null, started: null, finished: null, read_count: 0, private_notes: '' });
+      for (const [k, v] of Object.entries(msg)) if (!['type', 'id', 'game_id', 'person_id'].includes(k)) row[k] = v;
       row.updated_at = new Date().toISOString();
       push();
       return row;
@@ -37,20 +37,20 @@ function handle(msg) {
       push();
       return { loan: byId(state.loans, msg.loan_id) };
     case 'scan_barcode': {
-      const found = state.books.find((b) => b.barcode === msg.barcode);
+      const found = state.games.find((b) => b.barcode === msg.barcode);
       if (found) {
-        const existing = state.copies.filter((c) => c.book_id === found.id);
-        if (existing.length && (!msg.on_duplicate || msg.on_duplicate === 'ask')) return { result: 'duplicate', book: found, copy: null, existing_copies: existing };
-        return { result: msg.on_duplicate === 'skip' ? 'skipped' : msg.on_duplicate === 'move' ? 'moved' : 'added', book: found, copy: existing[0] ?? null, existing_copies: existing };
+        const existing = state.copies.filter((c) => c.game_id === found.id);
+        if (existing.length && (!msg.on_duplicate || msg.on_duplicate === 'ask')) return { result: 'duplicate', game: found, copy: null, existing_copies: existing };
+        return { result: msg.on_duplicate === 'skip' ? 'skipped' : msg.on_duplicate === 'move' ? 'moved' : 'added', game: found, copy: existing[0] ?? null, existing_copies: existing };
       }
-      return { result: 'not_found', book: { id: 'new', title: msg.barcode, barcode: msg.barcode, authors: [], needs_details: true, reading: {}, cover: { kind: 'none' } }, copy: null, existing_copies: [] };
+      return { result: 'not_found', game: { id: 'new', title: msg.barcode, barcode: msg.barcode, authors: [], needs_details: true, reading: {}, cover: { kind: 'none' } }, copy: null, existing_copies: [] };
     }
     case 'import_csv':
       return {
         dry_run: Boolean(msg.dry_run),
         truncated: false,
         counts: { rows: 318, read: 201, reading: 2, want: 41, wishlist: 74, tags: 9, copies: 57, existing: 187, new: 57, title_match: 12 },
-        rows: [{ line: 2, title: 'Piranesi', authors: ['Susanna Clarke'], barcode: '9781635575637', book_id: null, action: 'existing', message: '' }],
+        rows: [{ line: 2, title: 'Piranesi', authors: ['Susanna Clarke'], barcode: '9781635575637', game_id: null, action: 'existing', message: '' }],
       };
     default:
       return {};
@@ -94,7 +94,7 @@ if (params.get('card') === '1') {
 } else {
   app.innerHTML = '<header>Home Keeper</header><div class="tabs"><span>Tasks</span><span>Appliances</span><span class="on">Library</span><span>Settings</span></div><main></main>';
   const tab = document.createElement('home-keeper-games-tab');
-  let path = params.get('path') || '/books';
+  let path = params.get('path') || '/games';
   const host = {
     apiVersion: 1,
     navigate(next, opts = {}) {
@@ -109,7 +109,7 @@ if (params.get('card') === '1') {
     showToast: toast,
   };
   window.addEventListener('popstate', () => {
-    tab.route = { path: new URLSearchParams(location.search).get('path') || '/books' };
+    tab.route = { path: new URLSearchParams(location.search).get('path') || '/games' };
   });
   tab.host = host;
   tab.narrow = innerWidth < 870;

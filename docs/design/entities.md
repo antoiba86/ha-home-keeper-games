@@ -7,13 +7,13 @@ implements:
   - custom_components/home_keeper_games/sensor.py
   - custom_components/home_keeper_games/todo.py
 related: [store-models, people-privilege, events-api]
-source_hash: 0ff44cfce6d5
+source_hash: 04dbb2b0c916
 ---
 
 # Coordinator and entities
 
 The entities are the usage surface for automations, dashboards and voice: counts of the
-library, the reading of each person, and a native to-do list of the books that each
+library, the reading of each person, and a native to-do list of the games that each
 person wants to read.
 
 ## Goals
@@ -27,7 +27,7 @@ person wants to read.
 
 ## Non-goals
 
-- 1 entity for each book. A library of thousands of books would flood the entity
+- 1 entity for each game. A library of thousands of games would flood the entity
   registry.
 - A calendar of due dates. The loan tasks put due dates in Home Keeper.
 - Device triggers. The events cover the changes ([events-api](events-api.md)).
@@ -58,24 +58,24 @@ person does not share the reading ([people-privilege](people-privilege.md#entiti
 
 | Key | State | Attributes |
 |---|---|---|
-| `books` | Books with 1 copy or more | |
+| `games` | Games with 1 copy or more | |
 | `loans_out` | Open loans that lend a copy out | |
 | `loans_overdue` | Open loans past their due date | |
-| `books_read_this_year` | Books that the person finished this year | `goal`, `pages`, `year` |
-| `reading_now` | Books with status `reading` | `books`: at most 10 titles |
+| `games_read_this_year` | Games that the person finished this year | `goal`, `pages`, `year` |
+| `reading_now` | Games with status `reading` | `games`: at most 10 titles |
 
 The counts come from the pure functions of `projections.py`. The hourly overdue check
 also updates the listeners, so the date-based states change at midnight within 1 hour.
 
 ### To read list
 
-`ToReadList` is a `todo` entity for each person. Its items are the books with status
+`ToReadList` is a `todo` entity for each person. Its items are the games with status
 `want`, oldest first. The summary is "Title by Author" from `backend_strings` and the uid
-is the book id.
+is the game id.
 
 - Completing an item sets the status `read`, and the store sets `finished` to today.
-- Adding an item gives a `want` row to the book with that title, or to the book with that
-  summary. If no book matches, the list adds a book with `needs_details: true`.
+- Adding an item gives a `want` row to the game with that title, or to the game with that
+  summary. If no game matches, the list adds a game with `needs_details: true`.
 - Deleting an item removes the `want` row.
 - Each change checks the caller first ([people-privilege](people-privilege.md#entities)).
 
@@ -92,5 +92,5 @@ is the book id.
 ## One-way doors
 
 - The unique ids `home_keeper_games_<key>` and `home_keeper_games_<person_id>_<key>`.
-- The sensor keys and the attributes `goal`, `pages`, `year`, `books` and `person_id`.
-- The uid of a To read item is the book id.
+- The sensor keys and the attributes `goal`, `pages`, `year`, `games` and `person_id`.
+- The uid of a To read item is the game id.

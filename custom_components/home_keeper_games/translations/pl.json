@@ -41,7 +41,7 @@
   },
   "entity": {
     "sensor": {
-      "books": {
+      "games": {
         "name": "Książki"
       },
       "loans_out": {
@@ -50,7 +50,7 @@
       "loans_overdue": {
         "name": "Zaległe wypożyczenia"
       },
-      "books_read_this_year": {
+      "games_read_this_year": {
         "name": "{person} przeczytane książki w tym roku"
       },
       "reading_now": {
@@ -132,7 +132,7 @@
         }
       }
     },
-    "add_bookcase": {
+    "add_unit": {
       "name": "Dodaj regał",
       "description": "Dodaj regał do pokoju.",
       "fields": {
@@ -154,11 +154,11 @@
         }
       }
     },
-    "update_bookcase": {
+    "update_unit": {
       "name": "Zmień regał",
       "description": "Zmień regał lub przenieś go do innego pokoju.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Regał",
           "description": "ID regału."
         },
@@ -180,11 +180,11 @@
         }
       }
     },
-    "delete_bookcase": {
+    "delete_unit": {
       "name": "Usuń regał",
       "description": "Usuń regał. Regał z półkami wymaga force.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Regał",
           "description": "ID regału."
         },
@@ -198,7 +198,7 @@
       "name": "Dodaj półkę",
       "description": "Dodaj półkę do regału.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Regał",
           "description": "ID regału."
         },
@@ -220,7 +220,7 @@
           "name": "Półka",
           "description": "ID półki. Puste dla braku półki."
         },
-        "bookcase_id": {
+        "unit_id": {
           "name": "Regał",
           "description": "ID regału."
         },
@@ -248,7 +248,7 @@
         }
       }
     },
-    "add_book": {
+    "add_game": {
       "name": "Dodaj książkę",
       "description": "Dodaj książkę. Gdy książka ma ten sam kod kreskowy, usługa zwraca tę książkę.",
       "fields": {
@@ -310,11 +310,11 @@
         }
       }
     },
-    "update_book": {
+    "update_game": {
       "name": "Zmień książkę",
       "description": "Zmień szczegóły książki.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Książka",
           "description": "ID książki."
         },
@@ -376,11 +376,11 @@
         }
       }
     },
-    "delete_book": {
+    "delete_game": {
       "name": "Usuń książkę",
       "description": "Usuń książkę z jej egzemplarzami, stanem czytania, wypożyczeniami i okładką.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Książka",
           "description": "ID książki."
         }
@@ -412,7 +412,7 @@
       "name": "Dodaj egzemplarz",
       "description": "Dodaj egzemplarz książki.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Książka",
           "description": "ID książki."
         },
@@ -536,7 +536,7 @@
       "name": "Ustaw okładkę",
       "description": "Ustaw okładkę książki.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Książka",
           "description": "ID książki."
         },
@@ -554,7 +554,7 @@
       "name": "Ustaw stan czytania",
       "description": "Ustaw stan czytania książki dla osoby. Użytkownik bez uprawnień administratora może ustawić tylko własny stan.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Książka",
           "description": "ID książki."
         },
@@ -592,7 +592,7 @@
         }
       }
     },
-    "lend_book": {
+    "lend_game": {
       "name": "Wypożycz książkę",
       "description": "Wypożycz egzemplarz innej osobie.",
       "fields": {
@@ -622,11 +622,11 @@
         }
       }
     },
-    "borrow_book": {
+    "borrow_game": {
       "name": "Dodaj wypożyczoną książkę",
       "description": "Zapisz książkę, którą osoba wypożyczyła.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Książka",
           "description": "ID książki."
         },
@@ -730,7 +730,7 @@
       "name": "Dodaj do listy życzeń",
       "description": "Umieść książkę na liście życzeń osoby.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Książka",
           "description": "ID książki."
         },
@@ -760,7 +760,7 @@
       "name": "Zmień listę życzeń",
       "description": "Zmień wpis na liście życzeń.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Książka",
           "description": "ID książki."
         },
@@ -778,17 +778,17 @@
       "name": "Usuń z listy życzeń",
       "description": "Zdejmij książkę z listy życzeń.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Książka",
           "description": "ID książki."
         }
       }
     },
-    "got_wishlist_book": {
+    "got_wishlist_game": {
       "name": "Otrzymano książkę z listy życzeń",
       "description": "Dodaj egzemplarz książki z listy życzeń i zdejmij ją z listy.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Książka",
           "description": "ID książki."
         },
@@ -874,7 +874,7 @@
         }
       }
     },
-    "list_books": {
+    "list_games": {
       "name": "Wyświetl książki",
       "description": "Zwróć książki pasujące do filtrów.",
       "fields": {
@@ -908,11 +908,11 @@
         }
       }
     },
-    "get_book": {
+    "get_game": {
       "name": "Pobierz książkę",
       "description": "Zwróć książkę z jej egzemplarzami i wypożyczeniami.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Książka",
           "description": "ID książki."
         }
@@ -1000,13 +1000,13 @@
     "room_not_found": {
       "message": "Żaden pokój nie ma ID {id}."
     },
-    "bookcase_not_found": {
+    "unit_not_found": {
       "message": "Żaden regał nie ma ID {id}."
     },
     "shelf_not_found": {
       "message": "Żadna półka nie ma ID {id}."
     },
-    "book_not_found": {
+    "game_not_found": {
       "message": "Żadna książka nie ma ID {id}."
     },
     "copy_not_found": {
@@ -1024,7 +1024,7 @@
     "room_not_empty": {
       "message": "Pokój ma regały: {count}. Użyj force, aby je też usunąć."
     },
-    "bookcase_not_empty": {
+    "unit_not_empty": {
       "message": "Regał ma półki: {count}. Użyj force, aby je też usunąć."
     },
     "shelf_not_empty": {

@@ -6,7 +6,7 @@ implements:
   - custom_components/home_keeper_games/frontend/src/zxing-decoder.ts
   - custom_components/home_keeper_games/frontend/src/tab-scan.ts
 related: [covers, store-models, frontend-tab-card, loans-home-keeper]
-source_hash: 3989a9778278
+source_hash: b7150541ae02
 ---
 
 # Scan and barcode
@@ -17,11 +17,11 @@ cannot read is typed by hand. Each scan calls the `scan_barcode` service.
 
 ## Goals
 
-- **G1. One barcode for one book.** Every barcode is cleaned to capital letters and
-  digits with no spaces or hyphens, so 2 forms of 1 code find the same book.
+- **G1. One barcode for one game.** Every barcode is cleaned to capital letters and
+  digits with no spaces or hyphens, so 2 forms of 1 code find the same game.
 - **G2. A shelf in 1 pass.** A scan adds the copy to the chosen shelf at once, and the
   next shelf is 1 step away.
-- **G3. Duplicates are a choice.** A book that is already in the library asks for Move
+- **G3. Duplicates are a choice.** A game that is already in the library asks for Move
   here, Add 2nd copy or Skip.
 - **G4. A small bundle.** The barcode decoder loads only on a browser that needs it.
 
@@ -56,7 +56,7 @@ chunk. The decoder imports only the UPC and EAN readers.
   **Enter barcode**.
 - If the browser refuses the camera, the tab shows the reason and offers **Enter barcode**.
 - The torch button shows when the camera track has a torch.
-- The same code is ignored for 3 seconds (`makeCodeGate`), so 1 book is 1 scan.
+- The same code is ignored for 3 seconds (`makeCodeGate`), so 1 game is 1 scan.
 - The camera runs only on the camera step. Home Keeper redraws its panel when the data
   changes, and that moves the tab out of the page and back in. So the tab stops the
   camera only when it is still out of the page after the redraw, and it starts the
@@ -74,51 +74,51 @@ chunk. The decoder imports only the UPC and EAN readers.
 ### Scan flow
 
 The route is `/scan`, with `;shelf=<id>` to preselect the shelf and `;mode=borrowed` for
-borrowed books ([frontend-tab-card](frontend-tab-card.md#the-tab)). The steps are setup
+borrowed games ([frontend-tab-card](frontend-tab-card.md#the-tab)). The steps are setup
 (room, shelf, method), camera or manual entry, and the summary. Each result row shows
-Added, Already in a place, Moved here, Skipped or No book has this barcode. A row also
+Added, Already in a place, Moved here, Skipped or No game has this barcode. A row also
 shows From wishlist when the reply has `from_wishlist: true`. **Next shelf** goes to the
 next shelf in display order. The summary can set the status Read for the caller on each
-book that the session added or moved.
+game that the session added or moved.
 
 ### Title sheet
 
 A `not_found` result opens the title sheet (`scan-title` dialog, `nextMiss` in `utils.ts`).
-The camera reads no code and **Enter barcode** adds no book until the user saves a title or
+The camera reads no code and **Enter barcode** adds no game until the user saves a title or
 selects **Remove this scan**. The sheet has no close button, and Escape and the scrim do
-not close it. Save calls `update_book` with the title and each optional field that has a
+not close it. Save calls `update_game` with the title and each optional field that has a
 value, `update_copy` for a new format, and `set_cover` for a photo. Remove calls
-`delete_book`. A failed call keeps the sheet open with the error. The book keeps
+`delete_game`. A failed call keeps the sheet open with the error. The game keeps
 `needs_details`. A 2nd miss waits until the 1st closes. After the last sheet, the barcode
-field gets the focus. If the user leaves the scan, the sheet closes and the book keeps its
+field gets the focus. If the user leaves the scan, the sheet closes and the game keeps its
 barcode as the title.
 
-In borrowed mode each scan calls `borrow_book` with the barcode, the lender and the due date
+In borrowed mode each scan calls `borrow_game` with the barcode, the lender and the due date
 of the session, and adds no copy ([loans-home-keeper](loans-home-keeper.md)).
 
 ### The `scan_barcode` service
 
 1. Check the shelf. A missing `shelf_id` means no shelf.
 2. Clean the barcode. An empty value raises `field_required`.
-3. If no book has the barcode, add a book with the barcode as its title and
+3. If no game has the barcode, add a game with the barcode as its title and
    `needs_details: true`, and add a copy. The result is `not_found`.
-4. If the book has no copy, add a copy: `added`.
-5. If the book has copies, `on_duplicate` decides: `ask` returns `duplicate` with the
+4. If the game has no copy, add a copy: `added`.
+5. If the game has copies, `on_duplicate` decides: `ask` returns `duplicate` with the
    copies and their locations, `skip` returns `skipped`, `move` moves a copy from
    another shelf and returns `moved`, and `add_copy` adds a copy.
 
-The reply has `from_wishlist: true` when the new copy took its book off the wishlist
+The reply has `from_wishlist: true` when the new copy took its game off the wishlist
 ([store-models](store-models.md#rules)). The service then runs the wishlist sync, so the
 to-do item goes at once.
 
 ## Trade-offs
 
 - **A service call for each scan** over **a batch at the end**: each result shows at once,
-  and an automation can use the same service. The cost is 1 round trip for each book.
+  and an automation can use the same service. The cost is 1 round trip for each game.
 - **The native detector first** over **zxing always**: the native path is faster and
   costs no download. The cost is 2 code paths to test.
 - **A required title** over **a dashed row only**: a row scrolls away as the scan goes
-  on, and the user cannot find the book later. The cost is 1 stop for each miss.
+  on, and the user cannot find the game later. The cost is 1 stop for each miss.
 - **Ask on a duplicate** over **add a copy by default**: a scan of a shelf that is already
   in the library is the most common duplicate, and it means a move.
 

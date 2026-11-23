@@ -2,16 +2,16 @@
 
 Global sensors:
 
-* ``books``: the number of books with 1 copy or more.
+* ``games``: the number of games with 1 copy or more.
 * ``loans_out``: the open loans that lend a copy out.
 * ``loans_overdue``: the open loans past their due date.
 
 Per person (the unique id holds the person id):
 
-* ``books_read_this_year``: the books finished this year, with the attributes
+* ``games_read_this_year``: the games finished this year, with the attributes
   ``goal``, ``pages`` and ``year``.
-* ``reading_now``: the number of books with status ``reading``, with the
-  attribute ``books`` (at most 10 titles).
+* ``reading_now``: the number of games with status ``reading``, with the
+  attribute ``games`` (at most 10 titles).
 """
 
 from __future__ import annotations
@@ -29,10 +29,10 @@ from .coordinator import LibraryCoordinator
 from .entity import LibraryEntity, PersonEntity, async_track_people
 from .models import person_settings
 from .projections import (
-    books_read_in_year,
+    games_read_in_year,
     loans_out_count,
     loans_overdue_count,
-    owned_book_count,
+    owned_game_count,
     reading_now,
 )
 from .store import today
@@ -47,7 +47,7 @@ async def async_setup_entry(
     coordinator = entry.runtime_data
     async_add_entities(
         [
-            BooksSensor(coordinator),
+            GamesSensor(coordinator),
             LoansOutSensor(coordinator),
             LoansOverdueSensor(coordinator),
         ]
@@ -55,7 +55,7 @@ async def async_setup_entry(
 
     def _build(person: dict[str, Any]) -> list[SensorEntity]:
         return [
-            BooksReadThisYearSensor(coordinator, person),
+            GamesReadThisYearSensor(coordinator, person),
             ReadingNowSensor(coordinator, person),
         ]
 
@@ -64,19 +64,19 @@ async def async_setup_entry(
     )
 
 
-class BooksSensor(LibraryEntity, SensorEntity):
-    """The number of books with 1 copy or more."""
+class GamesSensor(LibraryEntity, SensorEntity):
+    """The number of games with 1 copy or more."""
 
-    _attr_translation_key = "books"
+    _attr_translation_key = "games"
     _attr_icon = "mdi:bookshelf"
     _attr_state_class = SensorStateClass.MEASUREMENT
 
     def __init__(self, coordinator: LibraryCoordinator) -> None:
-        super().__init__(coordinator, "books")
+        super().__init__(coordinator, "games")
 
     @property
     def native_value(self) -> int:
-        return owned_book_count(self.state_doc)
+        return owned_game_count(self.state_doc)
 
 
 class LoansOutSensor(LibraryEntity, SensorEntity):
@@ -109,25 +109,25 @@ class LoansOverdueSensor(LibraryEntity, SensorEntity):
         return loans_overdue_count(self.state_doc, today())
 
 
-class BooksReadThisYearSensor(PersonEntity, SensorEntity):
-    """The books that a person finished this year."""
+class GamesReadThisYearSensor(PersonEntity, SensorEntity):
+    """The games that a person finished this year."""
 
-    _attr_translation_key = "books_read_this_year"
+    _attr_translation_key = "games_read_this_year"
     _attr_icon = "mdi:book-check"
     _attr_state_class = SensorStateClass.TOTAL
 
     def __init__(self, coordinator: LibraryCoordinator, person: dict[str, Any]) -> None:
-        super().__init__(coordinator, person, "books_read_this_year")
+        super().__init__(coordinator, person, "games_read_this_year")
 
     @property
     def native_value(self) -> int:
         year = dt_util.now().year
-        return books_read_in_year(self.state_doc, self.person_id, year)[0]
+        return games_read_in_year(self.state_doc, self.person_id, year)[0]
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         year = dt_util.now().year
-        _, pages = books_read_in_year(self.state_doc, self.person_id, year)
+        _, pages = games_read_in_year(self.state_doc, self.person_id, year)
         goal = person_settings(self.state_doc["people"], self.person_id)["yearly_goal"]
         return {
             **super().extra_state_attributes,
@@ -138,7 +138,7 @@ class BooksReadThisYearSensor(PersonEntity, SensorEntity):
 
 
 class ReadingNowSensor(PersonEntity, SensorEntity):
-    """The number of books that a person reads now."""
+    """The number of games that a person reads now."""
 
     _attr_translation_key = "reading_now"
     _attr_icon = "mdi:book-open-page-variant"
@@ -156,5 +156,5 @@ class ReadingNowSensor(PersonEntity, SensorEntity):
         titles = reading_now(self.state_doc, self.person_id)
         return {
             **super().extra_state_attributes,
-            "books": titles[:READING_NOW_MAX_TITLES],
+            "games": titles[:READING_NOW_MAX_TITLES],
         }

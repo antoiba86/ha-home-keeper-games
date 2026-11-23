@@ -6,7 +6,7 @@ import { button, cover, ICONS, personOptions } from './markup';
 import type { ScanEntry, ViewCtx } from './tab-types';
 import { buildPath, escapeHTML, locationLabel, nextMiss, nextShelf, scanTally, shelfPath } from './utils';
 
-/** True when the scan adds borrowed books (`;mode=borrowed`). */
+/** True when the scan adds borrowed games (`;mode=borrowed`). */
 export function isBorrowedMode(ctx: ViewCtx): boolean {
   return ctx.route.query.mode === 'borrowed';
 }
@@ -47,11 +47,11 @@ function setupShelf(ctx: ViewCtx): string {
   const rooms = ctx.lib.rooms
     .map((r) => `<button class="hkl-choice${r.id === roomId ? ' on' : ''}" data-act="scan-room" data-id="${escapeHTML(r.id)}" data-k="sr-${escapeHTML(r.id)}" aria-pressed="${r.id === roomId}">${escapeHTML(r.name)}</button>`)
     .join('');
-  const cases = ctx.lib.bookcases
+  const cases = ctx.lib.units
     .filter((c) => c.room_id === roomId)
     .map((c) => {
       const shelves = ctx.lib.shelves
-        .filter((s) => s.bookcase_id === c.id)
+        .filter((s) => s.unit_id === c.id)
         .map((s) => `<button class="hkl-choice${s.id === shelfId ? ' on' : ''}" data-act="nav" data-replace="1" data-path="${escapeHTML(buildPath({ view: 'scan', query: { shelf: s.id } }))}" data-k="sh-${escapeHTML(s.id)}" aria-pressed="${s.id === shelfId}">${escapeHTML(s.name)}</button>`)
         .join('');
       return `<span class="hkl-sub">${escapeHTML(c.name)}</span><div class="hkl-choices">${shelves || `<span class="hkl-muted small">${escapeHTML(t('shelves.no_shelves'))}</span>`}</div>`;
@@ -88,12 +88,12 @@ function setupBorrowed(ctx: ViewCtx): string {
 }
 
 function resultRow(ctx: ViewCtx, e: ScanEntry): string {
-  // The stored book has the title that the user gave after the scan.
-  const scanned = e.res?.book ?? null;
-  const book = (scanned && ctx.idx.book.get(scanned.id)) || scanned;
-  const thumb = book ? cover(book, 'thumb') : '<span class="hkl-cover hkl-cover-thumb blank" aria-hidden="true"></span>';
-  const title = book?.title ?? e.barcode;
-  const by = book ? [book.authors.join(', '), book.published].filter(Boolean).join(' · ') : '';
+  // The stored game has the title that the user gave after the scan.
+  const scanned = e.res?.game ?? null;
+  const game = (scanned && ctx.idx.game.get(scanned.id)) || scanned;
+  const thumb = game ? cover(game, 'thumb') : '<span class="hkl-cover hkl-cover-thumb blank" aria-hidden="true"></span>';
+  const title = game?.title ?? e.barcode;
+  const by = game ? [game.authors.join(', '), game.published].filter(Boolean).join(' · ') : '';
   const k = `data-key="${e.key}"`;
   let sub = escapeHTML(by);
   let right = '';
@@ -115,7 +115,7 @@ function resultRow(ctx: ViewCtx, e: ScanEntry): string {
     cls = 'dup';
   } else if (e.res?.result === 'not_found') {
     sub = escapeHTML(t('scan.no_match'));
-    right = book ? button(escapeHTML(t('action.add_details')), 'scan-details', 'tonal', `data-id="${escapeHTML(book.id)}" data-k="det-${e.key}"`) : '';
+    right = game ? button(escapeHTML(t('action.add_details')), 'scan-details', 'tonal', `data-id="${escapeHTML(game.id)}" data-k="det-${e.key}"`) : '';
     cls = 'warn';
   } else {
     const label = e.res?.result ? t(`scan.result_${e.res.result}`) : t('scan.result_added');
@@ -134,7 +134,7 @@ function cameraStep(ctx: ViewCtx): string {
   const stalled = s.stalled
     ? `<button class="hkl-cam-restart" data-act="scan-camera" data-k="cam-restart">${escapeHTML(t('scan.camera_paused'))}</button>`
     : '';
-  // A new book waits for its title, and the camera reads no code.
+  // A new game waits for its title, and the camera reads no code.
   const paused = nextMiss(s.results) ? `<span class="hkl-cam-paused" data-k="cam-paused">${escapeHTML(t('scan.paused'))}</span>` : '';
   // The debug view (`;debug=1`) shows the camera state. The tab writes its text.
   const debug = ctx.route.query.debug === '1' ? '<pre class="hkl-cam-debug" data-k="cam-debug"></pre>' : '';
@@ -165,7 +165,7 @@ function summaryStep(ctx: ViewCtx): string {
   const s = ctx.ui.scan;
   const kept = s.results.filter((r) => r.res && !r.removed);
   const resultOf = (r: (typeof kept)[number]) => r.res!.result;
-  const tally = scanTally(kept.map((r) => ({ result: resultOf(r), book: r.res!.book })));
+  const tally = scanTally(kept.map((r) => ({ result: resultOf(r), game: r.res!.game })));
   const shelfId = routeShelf(ctx);
   const where = isBorrowedMode(ctx) ? t('scan.title_borrowed') : shelfId ? locationLabel(ctx.idx, shelfId) : t('common.no_shelf');
   const tiles = [
@@ -177,7 +177,7 @@ function summaryStep(ctx: ViewCtx): string {
     .join('');
   const rows = kept
     .map((r) => {
-      const book = (r.res!.book && ctx.idx.book.get(r.res!.book.id)) || r.res!.book;
+      const game = (r.res!.game && ctx.idx.game.get(r.res!.game.id)) || r.res!.game;
       const res = resultOf(r);
       let label = t(`scan.result_${res}`);
       if (res === 'moved' && r.res!.existing_copies[0]?.shelf_id) {
@@ -185,7 +185,7 @@ function summaryStep(ctx: ViewCtx): string {
         if (from) label = t('scan.moved_from', { place: from });
       }
       if (res === 'not_found') label = t('action.add_details');
-      return `<div class="hkl-result">${book ? cover(book, 'thumb') : '<span class="hkl-cover hkl-cover-thumb blank"></span>'}<span class="hkl-row-main"><b>${escapeHTML(book?.title ?? r.barcode)}</b><span class="hkl-row-sub">${escapeHTML(book && res !== 'not_found' ? book.authors.join(', ') : t('scan.no_match'))}</span></span><span class="hkl-pill ${res === 'not_found' ? 'warn' : 'ok'}">${escapeHTML(label)}</span></div>`;
+      return `<div class="hkl-result">${game ? cover(game, 'thumb') : '<span class="hkl-cover hkl-cover-thumb blank"></span>'}<span class="hkl-row-main"><b>${escapeHTML(game?.title ?? r.barcode)}</b><span class="hkl-row-sub">${escapeHTML(game && res !== 'not_found' ? game.authors.join(', ') : t('scan.no_match'))}</span></span><span class="hkl-pill ${res === 'not_found' ? 'warn' : 'ok'}">${escapeHTML(label)}</span></div>`;
     })
     .join('');
   const next = !isBorrowedMode(ctx) && shelfId ? nextShelf(ctx.lib, shelfId) : null;

@@ -265,23 +265,21 @@ async def test_card_is_a_module_when_resources_are_yaml(
 
 async def test_diagnostics_redact_names_and_notes(hass, setup_entry, call) -> None:
     room = (await call("add_room", {"name": "Den"}))["room"]
-    case = (await call("add_bookcase", {"room_id": room["id"], "name": "L"}))[
-        "bookcase"
+    case = (await call("add_unit", {"room_id": room["id"], "name": "L"}))["unit"]
+    game = (await call("add_game", {"title": "Dune", "shared_notes": "kittens"}))[
+        "game"
     ]
-    book = (await call("add_book", {"title": "Dune", "shared_notes": "kittens"}))[
-        "book"
-    ]
-    copy = (await call("add_copy", {"book_id": book["id"], "acquired_from": "Shop"}))[
+    copy = (await call("add_copy", {"game_id": game["id"], "acquired_from": "Shop"}))[
         "copy"
     ]
-    await call("lend_book", {"copy_id": copy["id"], "party": "Zed", "note": "n"})
+    await call("lend_game", {"copy_id": copy["id"], "party": "Zed", "note": "n"})
     await call(
         "set_reading",
-        {"book_id": book["id"], "person_id": ALICE, "private_notes": "secret"},
+        {"game_id": game["id"], "person_id": ALICE, "private_notes": "secret"},
     )
     data = await async_get_config_entry_diagnostics(hass, setup_entry)
     text = str(data)
     for secret in ("Zed", "Shop", "secret", "kittens"):
         assert secret not in text, secret
-    assert data["counts"]["books"] == 1 and data["tab_registered"] is True
+    assert data["counts"]["games"] == 1 and data["tab_registered"] is True
     assert case["name"] in text

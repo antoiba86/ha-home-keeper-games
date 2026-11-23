@@ -41,7 +41,7 @@
   },
   "entity": {
     "sensor": {
-      "books": {
+      "games": {
         "name": "Bøger"
       },
       "loans_out": {
@@ -50,7 +50,7 @@
       "loans_overdue": {
         "name": "Forsinkede udlån"
       },
-      "books_read_this_year": {
+      "games_read_this_year": {
         "name": "{person} læste bøger i år"
       },
       "reading_now": {
@@ -132,7 +132,7 @@
         }
       }
     },
-    "add_bookcase": {
+    "add_unit": {
       "name": "Tilføj reol",
       "description": "Tilføj en reol til et rum.",
       "fields": {
@@ -154,11 +154,11 @@
         }
       }
     },
-    "update_bookcase": {
+    "update_unit": {
       "name": "Ændr reol",
       "description": "Ændr en reol eller flyt den til et andet rum.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Reol",
           "description": "Reolens ID."
         },
@@ -180,11 +180,11 @@
         }
       }
     },
-    "delete_bookcase": {
+    "delete_unit": {
       "name": "Slet reol",
       "description": "Slet en reol. En reol med hylder kræver force.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Reol",
           "description": "Reolens ID."
         },
@@ -198,7 +198,7 @@
       "name": "Tilføj hylde",
       "description": "Tilføj en hylde til en reol.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Reol",
           "description": "Reolens ID."
         },
@@ -220,7 +220,7 @@
           "name": "Hylde",
           "description": "Hyldens ID. Tom for ingen hylde."
         },
-        "bookcase_id": {
+        "unit_id": {
           "name": "Reol",
           "description": "Reolens ID."
         },
@@ -248,7 +248,7 @@
         }
       }
     },
-    "add_book": {
+    "add_game": {
       "name": "Tilføj bog",
       "description": "Tilføj en bog. Hvis en bog har samme stregkode, returnerer tjenesten den bog.",
       "fields": {
@@ -310,11 +310,11 @@
         }
       }
     },
-    "update_book": {
+    "update_game": {
       "name": "Ændr bog",
       "description": "Ændr detaljerne for en bog.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bog",
           "description": "Bogens ID."
         },
@@ -376,11 +376,11 @@
         }
       }
     },
-    "delete_book": {
+    "delete_game": {
       "name": "Slet bog",
       "description": "Slet en bog med dens eksemplarer, læsestatus, udlån og omslag.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bog",
           "description": "Bogens ID."
         }
@@ -412,7 +412,7 @@
       "name": "Tilføj eksemplar",
       "description": "Tilføj et eksemplar af en bog.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bog",
           "description": "Bogens ID."
         },
@@ -536,7 +536,7 @@
       "name": "Angiv omslag",
       "description": "Angiv omslaget for en bog.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bog",
           "description": "Bogens ID."
         },
@@ -554,7 +554,7 @@
       "name": "Angiv læsestatus",
       "description": "Angiv læsestatussen for en bog for en person. En bruger, der ikke er administrator, kan kun angive sin egen status.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bog",
           "description": "Bogens ID."
         },
@@ -592,7 +592,7 @@
         }
       }
     },
-    "lend_book": {
+    "lend_game": {
       "name": "Lån bog ud",
       "description": "Lån et eksemplar ud til en anden person.",
       "fields": {
@@ -622,11 +622,11 @@
         }
       }
     },
-    "borrow_book": {
+    "borrow_game": {
       "name": "Tilføj lånt bog",
       "description": "Registrér en bog, som en person har lånt.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bog",
           "description": "Bogens ID."
         },
@@ -730,7 +730,7 @@
       "name": "Tilføj til ønskeliste",
       "description": "Sæt en bog på en persons ønskeliste.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bog",
           "description": "Bogens ID."
         },
@@ -760,7 +760,7 @@
       "name": "Ændr ønskeliste",
       "description": "Ændr en post på ønskelisten.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bog",
           "description": "Bogens ID."
         },
@@ -778,17 +778,17 @@
       "name": "Fjern fra ønskeliste",
       "description": "Tag en bog af ønskelisten.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bog",
           "description": "Bogens ID."
         }
       }
     },
-    "got_wishlist_book": {
+    "got_wishlist_game": {
       "name": "Ønsket bog modtaget",
       "description": "Tilføj et eksemplar af en ønsket bog og tag den af ønskelisten.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bog",
           "description": "Bogens ID."
         },
@@ -874,7 +874,7 @@
         }
       }
     },
-    "list_books": {
+    "list_games": {
       "name": "Vis bøger",
       "description": "Returnér de bøger, der passer til filtrene.",
       "fields": {
@@ -908,11 +908,11 @@
         }
       }
     },
-    "get_book": {
+    "get_game": {
       "name": "Hent bog",
       "description": "Returnér en bog med dens eksemplarer og udlån.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Bog",
           "description": "Bogens ID."
         }
@@ -1000,13 +1000,13 @@
     "room_not_found": {
       "message": "Intet rum har ID {id}."
     },
-    "bookcase_not_found": {
+    "unit_not_found": {
       "message": "Ingen reol har ID {id}."
     },
     "shelf_not_found": {
       "message": "Ingen hylde har ID {id}."
     },
-    "book_not_found": {
+    "game_not_found": {
       "message": "Ingen bog har ID {id}."
     },
     "copy_not_found": {
@@ -1024,7 +1024,7 @@
     "room_not_empty": {
       "message": "Rummet har {count} reoler. Brug force for også at slette dem."
     },
-    "bookcase_not_empty": {
+    "unit_not_empty": {
       "message": "Reolen har {count} hylder. Brug force for også at slette dem."
     },
     "shelf_not_empty": {

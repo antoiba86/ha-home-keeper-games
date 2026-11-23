@@ -1,7 +1,7 @@
 """Constants for Home Keeper Games.
 
-Home Keeper Games is a companion of Home Keeper. It stores the books of a
-household: the rooms, bookcases and shelves where the copies are, the reading
+Home Keeper Games is a companion of Home Keeper. It stores the games of a
+household: the rooms, units and shelves where the copies are, the reading
 status of each person, the loans and the wishlist. The admin UI is a tab in the
 Home Keeper panel. The usage surfaces are the card, the per-person entities and
 the services.
@@ -42,7 +42,7 @@ PLATFORMS = ["sensor", "todo"]
 
 # PANEL_VERSION is the same string as the manifest version. release.yml checks it,
 # and rollup.config.mjs reads it.
-PANEL_VERSION = "0.5.0b1"
+PANEL_VERSION = "0.5.0b2"
 
 # The built bundles are in frontend/dist/ and Home Assistant serves them here.
 STATIC_URL = "/home_keeper_games_static"
@@ -96,22 +96,22 @@ ORIGIN = DOMAIN
 EVENT_ROOM_ADDED = f"{DOMAIN}_room_added"
 EVENT_ROOM_UPDATED = f"{DOMAIN}_room_updated"
 EVENT_ROOM_REMOVED = f"{DOMAIN}_room_removed"
-EVENT_BOOKCASE_ADDED = f"{DOMAIN}_bookcase_added"
-EVENT_BOOKCASE_UPDATED = f"{DOMAIN}_bookcase_updated"
-EVENT_BOOKCASE_REMOVED = f"{DOMAIN}_bookcase_removed"
+EVENT_UNIT_ADDED = f"{DOMAIN}_unit_added"
+EVENT_UNIT_UPDATED = f"{DOMAIN}_unit_updated"
+EVENT_UNIT_REMOVED = f"{DOMAIN}_unit_removed"
 EVENT_SHELF_ADDED = f"{DOMAIN}_shelf_added"
 EVENT_SHELF_UPDATED = f"{DOMAIN}_shelf_updated"
 EVENT_SHELF_REMOVED = f"{DOMAIN}_shelf_removed"
-EVENT_BOOK_ADDED = f"{DOMAIN}_book_added"
-EVENT_BOOK_UPDATED = f"{DOMAIN}_book_updated"
-EVENT_BOOK_REMOVED = f"{DOMAIN}_book_removed"
+EVENT_GAME_ADDED = f"{DOMAIN}_game_added"
+EVENT_GAME_UPDATED = f"{DOMAIN}_game_updated"
+EVENT_GAME_REMOVED = f"{DOMAIN}_game_removed"
 EVENT_COPY_ADDED = f"{DOMAIN}_copy_added"
 EVENT_COPY_MOVED = f"{DOMAIN}_copy_moved"
 EVENT_COPY_UPDATED = f"{DOMAIN}_copy_updated"
 EVENT_COPY_REMOVED = f"{DOMAIN}_copy_removed"
 EVENT_READING_CHANGED = f"{DOMAIN}_reading_changed"
 EVENT_READING_UPDATED = f"{DOMAIN}_reading_updated"
-EVENT_BOOK_FINISHED = f"{DOMAIN}_book_finished"
+EVENT_GAME_FINISHED = f"{DOMAIN}_game_finished"
 EVENT_LOAN_STARTED = f"{DOMAIN}_loan_started"
 EVENT_LOAN_RETURNED = f"{DOMAIN}_loan_returned"
 EVENT_LOAN_OVERDUE = f"{DOMAIN}_loan_overdue"

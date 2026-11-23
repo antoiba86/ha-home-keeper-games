@@ -1,10 +1,10 @@
 ---
 title: Covers
-summary: How the integration uploads, stores and serves the cover file of a book.
+summary: How the integration uploads, stores and serves the cover file of a game.
 implements:
   - custom_components/home_keeper_games/covers.py
 related: [scan-and-barcode, store-models, people-privilege, import-export]
-source_hash: b1603f4942c2
+source_hash: 641115d1c7ee
 ---
 
 # Covers
@@ -22,14 +22,14 @@ and an authenticated view serves it.
 ## Non-goals
 
 - A cover from an online catalog. A catalog is later work ([IDEAS](../../IDEAS.md)).
-- A cover gallery with more than 1 cover for each book.
+- A cover gallery with more than 1 cover for each game.
 - Private covers. The cover view serves each signed-in user.
 
 ## Design
 
 ### Cover files
 
-A cover file is `<book_id>-<token>.jpg` in `.storage/home_keeper_games_covers/`. The
+A cover file is `<game_id>-<token>.jpg` in `.storage/home_keeper_games_covers/`. The
 directory is not below `.storage/home_keeper_games`, because that path is the store
 file. The token changes with each new cover. `cover_url` is
 `/api/home_keeper_games/cover/<id>?v=<token>`.
@@ -38,13 +38,13 @@ file. The token changes with each new cover. `cover_url` is
   reads at most 10 MB, reads the type from the first bytes, and accepts JPEG, PNG and
   WebP. `covers.reencode` writes a new JPEG in an executor job, with a limit on the pixel
   count. The reply is a `file_id` in a pending folder. `set_cover` with `kind: custom`
-  moves the file onto the book. A pending file that no book takes is deleted after 24
+  moves the file onto the game. A pending file that no game takes is deleted after 24
   hours, at setup.
-- **Remove.** `set_cover` with `kind: none` removes the cover of a book.
-- **Serve.** `CoverView` returns the file of a book to each signed-in user, with a long
+- **Remove.** `set_cover` with `kind: none` removes the cover of a game.
+- **Serve.** `CoverView` returns the file of a game to each signed-in user, with a long
   private cache time. An `<img>` element cannot send a token, so the client signs the
   path.
-- **Delete.** A new cover or a deleted book releases the old file, and the store deletes
+- **Delete.** A new cover or a deleted game releases the old file, and the store deletes
   it in an executor job.
 - **Bundle.** A Home Keeper export copies the cover files into its bundle, and an import
   writes each file again with `covers.reencode` ([import-export](import-export.md#files)).
@@ -56,7 +56,7 @@ file. The token changes with each new cover. `cover_url` is
 
 ## One-way doors
 
-- The cover URL path `/api/home_keeper_games/cover/{book_id}` and the upload path
+- The cover URL path `/api/home_keeper_games/cover/{game_id}` and the upload path
   `/api/home_keeper_games/upload`.
 - The covers directory `home_keeper_games_covers`.
 - The cover `kind` values `custom` and `none`, and the file name format.

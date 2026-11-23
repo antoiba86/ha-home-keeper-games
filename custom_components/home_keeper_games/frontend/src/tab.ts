@@ -14,14 +14,14 @@ import { ensureMarkdown, wireMarkdown } from './markdown';
 import { wireCovers } from './markup';
 import { camLogLines, logCam, Scanner } from './scanner';
 import { STYLES } from './styles';
-import { booksPath, renderBook, renderBooks } from './tab-books';
+import { gamesPath, renderGame, renderGames } from './tab-games';
 import { renderDialog, type Dialog, type DialogState } from './tab-dialogs';
 import { renderImport } from './tab-import';
 import { renderLoans, renderSettings, renderWishlist } from './tab-lists';
 import { cameraBlocked, isBorrowedMode, renderScan, routeShelf } from './tab-scan';
 import { renderShelves } from './tab-shelves';
 import type { ImportState, ScanEntry, UiState, ViewCtx } from './tab-types';
-import type { Book, HomeAssistant, ImportSummary, Lib, RawState, ReadingStatus, ScanResult, TabHost } from './types';
+import type { Game, HomeAssistant, ImportSummary, Lib, RawState, ReadingStatus, ScanResult, TabHost } from './types';
 import {
   buildIndex,
   buildPath,
@@ -129,7 +129,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
   private _renders = 0;
   private _gate = makeCodeGate(3000);
   private _scanKey = 0;
-  private _booksPath = '/books';
+  private _gamesPath = '/games';
   private _todoLoaded = false;
   private readonly _root: ShadowRoot;
   private readonly _main: HTMLElement;
@@ -185,14 +185,14 @@ export class HomeKeeperGamesTab extends HTMLElement {
     const search = route.path.includes('?') ? '' : (globalThis.location?.search ?? '');
     this._route = parseRoute(route.path, search);
     if (prev.view === 'scan' || this._route.view === 'scan') logCam(`tab ${this._tabId} route ${route.path}`);
-    if (this._route.view === 'books') this._booksPath = buildPath(this._route);
+    if (this._route.view === 'games') this._gamesPath = buildPath(this._route);
     if (prev.view !== this._route.view || prev.id !== this._route.id) {
       this._ui.editNotes = false;
       this._ui.limit = PAGE;
       if (this._route.view === 'import' && prev.view !== 'import') this._ui.import = freshImport(this._lib?.me.person_id ?? null);
     }
-    if (prev.view === 'book' && prev.id !== this._route.id) this._ui.readingPerson = null;
-    // The title sheet belongs to the scan. If the user leaves, the book keeps its barcode as the title.
+    if (prev.view === 'game' && prev.id !== this._route.id) this._ui.readingPerson = null;
+    // The title sheet belongs to the scan. If the user leaves, the game keeps its barcode as the title.
     if (this._route.view !== 'scan' && this._sheetOpen()) this._closeDialog();
     this._syncScanner();
     if (this._route.view === 'settings') void this._loadTodo();
@@ -329,7 +329,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
     if (key === 'room' && value && this._idx && query.shelf && query.shelf !== 'none') {
       if (shelfPath(this._idx, query.shelf).room?.id !== value) query = withQuery(query, 'shelf', '');
     }
-    this._go(booksPath(query), true);
+    this._go(gamesPath(query), true);
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -344,7 +344,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
       me: this._lib.me.person_id,
       today: todayISO(new Date()),
       ui: this._ui,
-      booksPath: this._booksPath,
+      gamesPath: this._gamesPath,
       taskLink: (id) => this._host?.taskLink(id) ?? `/home-keeper/tasks/${encodeURIComponent(id)}`,
       areaName: (id) => this._hass?.areas?.[id]?.name ?? id,
       todoName: (id) => String(states[id]?.attributes?.friendly_name ?? id),
@@ -353,8 +353,8 @@ export class HomeKeeperGamesTab extends HTMLElement {
 
   private _viewHtml(ctx: ViewCtx): string {
     switch (this._route.view) {
-      case 'book':
-        return renderBook(ctx, ctx.idx.book.get(this._route.id ?? ''));
+      case 'game':
+        return renderGame(ctx, ctx.idx.game.get(this._route.id ?? ''));
       case 'shelves':
         return renderShelves(ctx);
       case 'loans':
@@ -366,9 +366,9 @@ export class HomeKeeperGamesTab extends HTMLElement {
       case 'settings':
         return renderSettings(ctx);
       case 'import':
-        return renderBooks({ ...ctx, route: parseRoute(this._booksPath) }) + renderImport(ctx);
+        return renderGames({ ...ctx, route: parseRoute(this._gamesPath) }) + renderImport(ctx);
       default:
-        return renderBooks(ctx);
+        return renderGames(ctx);
     }
   }
 
@@ -541,7 +541,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
         return;
       }
       case 'wish-buy':
-        await this._run('update_wishlist', { book_id: id, buy: Boolean(value) });
+        await this._run('update_wishlist', { game_id: id, buy: Boolean(value) });
         return;
       case 'person': {
         const fields: Fields = { person_id: id };
@@ -603,22 +603,22 @@ export class HomeKeeperGamesTab extends HTMLElement {
     }
   }
 
-  private _book(): Book | undefined {
-    return this._idx?.book.get(this._route.id ?? '');
+  private _game(): Game | undefined {
+    return this._idx?.game.get(this._route.id ?? '');
   }
 
   private async _act(act: string, el: HTMLElement): Promise<void> {
     const id = el.dataset.id ?? '';
     const value = el.dataset.value ?? '';
-    const book = this._book();
+    const game = this._game();
     const lib = this._lib;
     const idx = this._idx;
     switch (act) {
       case 'nav':
-        this._go(el.dataset.path ?? '/books', el.dataset.replace === '1');
+        this._go(el.dataset.path ?? '/games', el.dataset.replace === '1');
         return;
       case 'back':
-        this._go(this._booksPath, true);
+        this._go(this._gamesPath, true);
         return;
       case 'open-task':
         this._host?.openTask?.(id);
@@ -631,7 +631,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
         return;
       case 'clear-filters': {
         const f = readFilters(this._route.query);
-        this._go(booksPath({ sort: f.sort, view: f.view }), true);
+        this._go(gamesPath({ sort: f.sort, view: f.view }), true);
         return;
       }
       case 'more':
@@ -639,10 +639,10 @@ export class HomeKeeperGamesTab extends HTMLElement {
         this._render();
         return;
       case 'set-status':
-        if (book) await this._setStatus(book, value as ReadingStatus);
+        if (game) await this._setStatus(game, value as ReadingStatus);
         return;
       case 'rate': {
-        const row = book ? readingOf(book, this._readingPerson()) : null;
+        const row = game ? readingOf(game, this._readingPerson()) : null;
         const n = Number(value);
         await this._setReading({ rating: row?.rating === n ? null : n });
         return;
@@ -670,49 +670,49 @@ export class HomeKeeperGamesTab extends HTMLElement {
       case 'move-copy':
         this._openDialog({ kind: 'move', copyId: id });
         return;
-      case 'add-book':
-        this._openDialog({ kind: 'add-book' });
+      case 'add-game':
+        this._openDialog({ kind: 'add-game' });
         return;
-      case 'edit-book':
-        if (book) this._openDialog({ kind: 'edit-book', bookId: book.id });
+      case 'edit-game':
+        if (game) this._openDialog({ kind: 'edit-game', gameId: game.id });
         return;
       case 'scan-details':
-        this._openDialog({ kind: 'edit-book', bookId: id });
+        this._openDialog({ kind: 'edit-game', gameId: id });
         return;
       case 'add-copy':
-        if (book) this._openDialog({ kind: 'copy', bookId: book.id, copyId: null });
+        if (game) this._openDialog({ kind: 'copy', gameId: game.id, copyId: null });
         return;
       case 'edit-copy':
-        if (book) this._openDialog({ kind: 'copy', bookId: book.id, copyId: id });
+        if (game) this._openDialog({ kind: 'copy', gameId: game.id, copyId: id });
         return;
       case 'delete-copy':
         this._openDialog({ kind: 'confirm', title: t('dialog.delete_copy'), text: t('dialog.delete_copy_text'), label: t('action.delete'), command: 'delete_copy', fields: { copy_id: id } });
         return;
-      case 'delete-book':
-        if (book) {
-          this._openDialog({ kind: 'confirm', title: t('dialog.delete_book'), text: t('dialog.delete_book_text', { title: book.title }), label: t('action.delete'), command: 'delete_book', fields: { book_id: book.id }, after: this._booksPath });
+      case 'delete-game':
+        if (game) {
+          this._openDialog({ kind: 'confirm', title: t('dialog.delete_game'), text: t('dialog.delete_game_text', { title: game.title }), label: t('action.delete'), command: 'delete_game', fields: { game_id: game.id }, after: this._gamesPath });
         }
         return;
       case 'change-cover':
         this._main.querySelector<HTMLInputElement>('[data-k="cover-file"]')?.click();
         return;
       case 'lend':
-        this._openDialog({ kind: 'lend', bookId: el.dataset.book ?? null });
+        this._openDialog({ kind: 'lend', gameId: el.dataset.game ?? null });
         return;
       case 'borrow':
         this._openDialog({ kind: 'borrow' });
         return;
       case 'wish-add':
-        this._openDialog({ kind: 'wish-add', bookId: null });
+        this._openDialog({ kind: 'wish-add', gameId: null });
         return;
       case 'wish-this':
-        if (book) this._openDialog({ kind: 'wish-add', bookId: book.id });
+        if (game) this._openDialog({ kind: 'wish-add', gameId: game.id });
         return;
       case 'got-it':
-        this._openDialog({ kind: 'got-it', bookId: id });
+        this._openDialog({ kind: 'got-it', gameId: id });
         return;
       case 'wish-remove':
-        await this._run('remove_from_wishlist', { book_id: id }, t('wishlist.removed'));
+        await this._run('remove_from_wishlist', { game_id: id }, t('wishlist.removed'));
         return;
       case 'add-room':
         this._openDialog({ kind: 'room', roomId: null });
@@ -723,23 +723,23 @@ export class HomeKeeperGamesTab extends HTMLElement {
       case 'delete-room':
         this._openDialog({ kind: 'confirm', title: t('dialog.delete_room'), text: t('dialog.delete_place_text', { name: idx?.room.get(id)?.name ?? '' }), label: t('action.delete'), command: 'delete_room', fields: { room_id: id, force: true }, after: '/shelves' });
         return;
-      case 'add-bookcase':
-        this._openDialog({ kind: 'bookcase', roomId: id, bookcaseId: null });
+      case 'add-unit':
+        this._openDialog({ kind: 'unit', roomId: id, unitId: null });
         return;
-      case 'edit-bookcase': {
-        const bc = idx?.bookcase.get(id);
-        if (bc) this._openDialog({ kind: 'bookcase', roomId: bc.room_id, bookcaseId: id });
+      case 'edit-unit': {
+        const bc = idx?.unit.get(id);
+        if (bc) this._openDialog({ kind: 'unit', roomId: bc.room_id, unitId: id });
         return;
       }
-      case 'delete-bookcase':
-        this._openDialog({ kind: 'confirm', title: t('dialog.delete_bookcase'), text: t('dialog.delete_place_text', { name: idx?.bookcase.get(id)?.name ?? '' }), label: t('action.delete'), command: 'delete_bookcase', fields: { bookcase_id: id, force: true } });
+      case 'delete-unit':
+        this._openDialog({ kind: 'confirm', title: t('dialog.delete_unit'), text: t('dialog.delete_place_text', { name: idx?.unit.get(id)?.name ?? '' }), label: t('action.delete'), command: 'delete_unit', fields: { unit_id: id, force: true } });
         return;
       case 'add-shelf':
-        this._openDialog({ kind: 'shelf', bookcaseId: id, shelfId: null });
+        this._openDialog({ kind: 'shelf', unitId: id, shelfId: null });
         return;
       case 'edit-shelf': {
         const sh = idx?.shelf.get(id);
-        if (sh) this._openDialog({ kind: 'shelf', bookcaseId: sh.bookcase_id, shelfId: id });
+        if (sh) this._openDialog({ kind: 'shelf', unitId: sh.unit_id, shelfId: id });
         return;
       }
       case 'delete-shelf':
@@ -767,7 +767,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
       case 'import-close':
       case 'import-close-scrim':
         this._ui.import = freshImport(lib?.me.person_id ?? null);
-        this._go(this._booksPath, true);
+        this._go(this._gamesPath, true);
         return;
       default:
         await this._scanAct(act, el);
@@ -780,18 +780,18 @@ export class HomeKeeperGamesTab extends HTMLElement {
     return this._ui.readingPerson ?? this._lib?.me.person_id ?? null;
   }
 
-  private async _setReading(fields: Fields, bookId?: string, personId?: string | null): Promise<boolean> {
-    const id = bookId ?? this._route.id;
+  private async _setReading(fields: Fields, gameId?: string, personId?: string | null): Promise<boolean> {
+    const id = gameId ?? this._route.id;
     const pid = personId ?? this._readingPerson();
     if (!id || !pid) {
       this._toast(t('common.no_person'));
       return false;
     }
-    return this._run('set_reading', { book_id: id, person_id: pid, ...fields });
+    return this._run('set_reading', { game_id: id, person_id: pid, ...fields });
   }
 
-  private async _setStatus(book: Book, status: ReadingStatus): Promise<void> {
-    const row = readingOf(book, this._readingPerson());
+  private async _setStatus(game: Game, status: ReadingStatus): Promise<void> {
+    const row = readingOf(game, this._readingPerson());
     const today = todayISO(new Date());
     const fields: Fields = { status };
     if (status === 'reading' && !row?.started) fields.started = today;
@@ -799,16 +799,16 @@ export class HomeKeeperGamesTab extends HTMLElement {
       fields.finished = today;
       fields.read_count = (row?.read_count ?? 0) + 1;
     }
-    await this._setReading(fields, book.id);
+    await this._setReading(fields, game.id);
   }
 
   private async _saveNotes(form: HTMLFormElement): Promise<void> {
-    const book = this._book();
-    if (!book) return;
+    const game = this._game();
+    if (!game) return;
     const text = (form.elements.namedItem('text') as HTMLTextAreaElement).value;
     const saved =
       this._ui.notesTab === 'shared'
-        ? await this._run('update_book', { book_id: book.id, shared_notes: text })
+        ? await this._run('update_game', { game_id: game.id, shared_notes: text })
         : await this._setReading({ private_notes: text });
     // If the save fails, the editor stays open with the text.
     if (saved) this._ui.editNotes = false;
@@ -827,17 +827,17 @@ export class HomeKeeperGamesTab extends HTMLElement {
   }
 
   private async _uploadCover(input: HTMLInputElement): Promise<void> {
-    const book = this._book();
+    const game = this._game();
     const file = input.files?.[0];
     input.value = '';
-    if (!book || !file) return;
+    if (!game || !file) return;
     if (file.size > MAX_COVER_BYTES) {
-      this._toast(t('book.cover_too_big'));
+      this._toast(t('game.cover_too_big'));
       return;
     }
     try {
       const fileId = await this._api!.uploadCover(file);
-      await this._run('set_cover', { book_id: book.id, kind: 'custom', file_id: fileId }, t('book.cover_saved'));
+      await this._run('set_cover', { game_id: game.id, kind: 'custom', file_id: fileId }, t('game.cover_saved'));
     } catch (err) {
       this._toast(errorText(err));
     }
@@ -859,25 +859,25 @@ export class HomeKeeperGamesTab extends HTMLElement {
       const api = this._api!;
       let after: string | undefined;
       switch (d.kind) {
-        case 'add-book': {
+        case 'add-game': {
           const query = str('query');
           if (!query) throw new Error(t('dialog.need_title'));
           const code = retailBarcode(query);
-          const res = await api.call<Record<string, unknown>>('add_book', {
+          const res = await api.call<Record<string, unknown>>('add_game', {
             ...(code ? { barcode: code } : { title: query }),
             authors: splitList(str('authors')),
           });
-          const bookId = replyId(res, 'book');
-          const existing = Boolean(res?.existing ?? (res?.book as Record<string, unknown> | undefined)?.existing);
+          const gameId = replyId(res, 'game');
+          const existing = Boolean(res?.existing ?? (res?.game as Record<string, unknown> | undefined)?.existing);
           if (existing) this._toast(t('dialog.existing'));
-          else if (bookId && on('own')) await api.call('add_copy', { book_id: bookId, shelf_id: str('shelf_id') || null, format: str('format') });
-          if (bookId) after = `/books/${encodeURIComponent(bookId)}`;
+          else if (gameId && on('own')) await api.call('add_copy', { game_id: gameId, shelf_id: str('shelf_id') || null, format: str('format') });
+          if (gameId) after = `/games/${encodeURIComponent(gameId)}`;
           break;
         }
-        case 'edit-book': {
+        case 'edit-game': {
           const series = str('series_name');
           const fields: Fields = {
-            book_id: d.bookId,
+            game_id: d.gameId,
             title: str('title'),
             subtitle: str('subtitle'),
             authors: splitList(str('authors')),
@@ -897,7 +897,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
             fields.barcode = code;
           }
           if (on('details_done')) fields.needs_details = false;
-          await api.call('update_book', fields);
+          await api.call('update_game', fields);
           break;
         }
         case 'scan-title': {
@@ -905,22 +905,22 @@ export class HomeKeeperGamesTab extends HTMLElement {
           if (!title) throw new Error(t('scan.miss_need_title'));
           const cover = data.get('cover');
           const photo = cover instanceof File && cover.size > 0 ? cover : null;
-          if (photo && photo.size > MAX_COVER_BYTES) throw new Error(t('book.cover_too_big'));
+          if (photo && photo.size > MAX_COVER_BYTES) throw new Error(t('game.cover_too_big'));
           // Send only what the user typed. An empty field keeps the stored value.
-          const fields: Fields = { book_id: d.bookId, title };
+          const fields: Fields = { game_id: d.gameId, title };
           for (const name of ['subtitle', 'publisher', 'published']) if (str(name)) fields[name] = str(name);
           const authors = splitList(str('authors'));
           if (authors.length) fields.authors = authors;
           const pages = intOrNull(str('pages'));
           if (pages !== null) fields.pages = pages;
-          await api.call('update_book', fields);
+          await api.call('update_game', fields);
           const format = str('format');
           if (d.copyId && format && format !== this._idx?.copy.get(d.copyId)?.format) {
             await api.call('update_copy', { copy_id: d.copyId, format });
           }
           if (photo) {
             const fileId = await api.uploadCover(photo);
-            await api.call('set_cover', { book_id: d.bookId, kind: 'custom', file_id: fileId });
+            await api.call('set_cover', { game_id: d.gameId, kind: 'custom', file_id: fileId });
           }
           this._markMiss(d.key, 'named');
           break;
@@ -942,7 +942,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
             await api.call('update_copy', { copy_id: d.copyId, ...fields });
             if ((this._idx?.copy.get(d.copyId)?.shelf_id ?? null) !== shelf) await api.call('move_copy', { copy_id: d.copyId, shelf_id: shelf });
           } else {
-            await api.call('add_copy', { book_id: d.bookId, shelf_id: shelf, ...fields });
+            await api.call('add_copy', { game_id: d.gameId, shelf_id: shelf, ...fields });
           }
           break;
         }
@@ -956,7 +956,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
         }
         case 'lend':
           if (!str('copy_id') || !str('party')) throw new Error(t('dialog.need_party'));
-          await api.call('lend_book', {
+          await api.call('lend_game', {
             copy_id: str('copy_id'),
             party: str('party'),
             started: str('started') || undefined,
@@ -970,7 +970,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
           const query = str('query');
           if (!query || !str('party')) throw new Error(t('dialog.need_party'));
           const code = retailBarcode(query);
-          await api.call('borrow_book', {
+          await api.call('borrow_game', {
             ...(code ? { barcode: code } : { title: query }),
             party: str('party'),
             person_id: str('person_id'),
@@ -985,9 +985,9 @@ export class HomeKeeperGamesTab extends HTMLElement {
         case 'wish-add': {
           const query = str('query');
           const code = query ? retailBarcode(query) : null;
-          if (!d.bookId && !query) throw new Error(t('dialog.need_title'));
+          if (!d.gameId && !query) throw new Error(t('dialog.need_title'));
           await api.call('add_to_wishlist', {
-            ...(d.bookId ? { book_id: d.bookId } : code ? { barcode: code } : { title: query }),
+            ...(d.gameId ? { game_id: d.gameId } : code ? { barcode: code } : { title: query }),
             person_id: str('person_id'),
             buy: on('buy'),
           });
@@ -995,7 +995,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
           break;
         }
         case 'got-it':
-          await api.call('got_wishlist_book', { book_id: d.bookId, shelf_id: str('shelf_id') || null, format: str('format') });
+          await api.call('got_wishlist_game', { game_id: d.gameId, shelf_id: str('shelf_id') || null, format: str('format') });
           break;
         case 'room': {
           const fields = { name: str('name'), area_id: str('area_id') || null };
@@ -1008,16 +1008,16 @@ export class HomeKeeperGamesTab extends HTMLElement {
           }
           break;
         }
-        case 'bookcase': {
+        case 'unit': {
           const fields = { name: str('name'), note: str('note') };
           if (!fields.name) throw new Error(t('dialog.need_name'));
-          if (d.bookcaseId) await api.call('update_bookcase', { bookcase_id: d.bookcaseId, ...fields });
+          if (d.unitId) await api.call('update_unit', { unit_id: d.unitId, ...fields });
           else {
-            const res = await api.call('add_bookcase', { room_id: d.roomId, ...fields });
-            const caseId = replyId(res, 'bookcase');
+            const res = await api.call('add_unit', { room_id: d.roomId, ...fields });
+            const caseId = replyId(res, 'unit');
             const n = Math.min(20, intOrNull(str('shelves')) ?? 0);
             for (let i = 1; caseId && i <= n; i++) {
-              await api.call('add_shelf', { bookcase_id: caseId, name: t('dialog.shelf_default', { n: i }), order: i });
+              await api.call('add_shelf', { unit_id: caseId, name: t('dialog.shelf_default', { n: i }), order: i });
             }
           }
           break;
@@ -1027,8 +1027,8 @@ export class HomeKeeperGamesTab extends HTMLElement {
           if (!name) throw new Error(t('dialog.need_name'));
           if (d.shelfId) await api.call('update_shelf', { shelf_id: d.shelfId, name });
           else {
-            const order = (this._lib?.shelves.filter((s) => s.bookcase_id === d.bookcaseId).length ?? 0) + 1;
-            await api.call('add_shelf', { bookcase_id: d.bookcaseId, name, order });
+            const order = (this._lib?.shelves.filter((s) => s.unit_id === d.unitId).length ?? 0) + 1;
+            await api.call('add_shelf', { unit_id: d.unitId, name, order });
           }
           break;
         }
@@ -1226,7 +1226,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
     this._render();
     try {
       if (this._route.query.mode === 'borrowed') {
-        const res = await this._api!.call<Record<string, unknown>>('borrow_book', {
+        const res = await this._api!.call<Record<string, unknown>>('borrow_game', {
           barcode,
           party: s.party || t('loan.unknown_party'),
           person_id: s.personId ?? this._lib?.me.person_id ?? undefined,
@@ -1234,8 +1234,8 @@ export class HomeKeeperGamesTab extends HTMLElement {
           started: todayISO(new Date()),
           add_task: s.addTask,
         });
-        const book = (res?.book as Book | undefined) ?? null;
-        entry.res = { result: 'added', book, copy: null, existing_copies: [] };
+        const game = (res?.game as Game | undefined) ?? null;
+        entry.res = { result: 'added', game, copy: null, existing_copies: [] };
       } else {
         entry.res = await this._api!.scanBarcode({ barcode, shelf_id: routeShelf(this._ctx()!), on_duplicate: 'ask' });
       }
@@ -1248,18 +1248,18 @@ export class HomeKeeperGamesTab extends HTMLElement {
     void this._refresh();
   }
 
-  /** True when the scan takes no code: a dialog is open, or a new book has no title yet. */
+  /** True when the scan takes no code: a dialog is open, or a new game has no title yet. */
   private _scanPaused(): boolean {
     return Boolean(this._dialog || nextMiss(this._ui.scan.results));
   }
 
-  /** Open the title sheet for the next scan of a new book, if no dialog is open. */
+  /** Open the title sheet for the next scan of a new game, if no dialog is open. */
   private _askMiss(): void {
     if (this._dialog || this._route.view !== 'scan') return;
     const miss = nextMiss(this._ui.scan.results);
-    const book = miss?.res?.book;
-    if (!miss || !book) return;
-    this._openDialog({ kind: 'scan-title', key: miss.key, bookId: book.id, copyId: miss.res?.copy?.id ?? null, barcode: miss.barcode });
+    const game = miss?.res?.game;
+    if (!miss || !game) return;
+    this._openDialog({ kind: 'scan-title', key: miss.key, gameId: game.id, copyId: miss.res?.copy?.id ?? null, barcode: miss.barcode });
     this._render();
   }
 
@@ -1268,7 +1268,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
     if (entry) entry[flag] = true;
   }
 
-  /** Delete the book of the open title sheet, with its copy. */
+  /** Delete the game of the open title sheet, with its copy. */
   private async _removeMiss(): Promise<void> {
     const state = this._dialog;
     const d = state?.dialog;
@@ -1277,7 +1277,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
     state.error = '';
     this._showDialogStatus();
     try {
-      await this._api!.call('delete_book', { book_id: d.bookId });
+      await this._api!.call('delete_game', { game_id: d.gameId });
       this._markMiss(d.key, 'removed');
       if (this._dialog === state) this._closeDialog();
       this._render();
@@ -1303,21 +1303,21 @@ export class HomeKeeperGamesTab extends HTMLElement {
     void this._refresh();
   }
 
-  /** Set "Read" for me on each book that the session added or moved. */
+  /** Set "Read" for me on each game that the session added or moved. */
   private async _applyMarkRead(): Promise<void> {
     const s = this._ui.scan;
     const me = this._lib?.me.person_id;
     if (!s.markRead || !me || isBorrowedMode(this._ctx()!)) return;
-    const books = new Set(
+    const games = new Set(
       s.results
-        .filter((r) => r.res && (r.res.result === 'added' || r.res.result === 'moved') && r.res.book)
-        .map((r) => (r.res as ScanResult).book!.id),
+        .filter((r) => r.res && (r.res.result === 'added' || r.res.result === 'moved') && r.res.game)
+        .map((r) => (r.res as ScanResult).game!.id),
     );
     const today = todayISO(new Date());
-    for (const bookId of books) {
-      await this._run('set_reading', { book_id: bookId, person_id: me, status: 'read', finished: today });
+    for (const gameId of games) {
+      await this._run('set_reading', { game_id: gameId, person_id: me, status: 'read', finished: today });
     }
-    if (books.size) this._toast(tn('scan.marked_read', books.size));
+    if (games.size) this._toast(tn('scan.marked_read', games.size));
   }
 
   private async _scanAct(act: string, el: HTMLElement): Promise<void> {
@@ -1370,14 +1370,14 @@ export class HomeKeeperGamesTab extends HTMLElement {
         await this._applyMarkRead();
         s.results = [];
         const room = this._idx ? shelfPath(this._idx, routeShelf(this._ctx()!)).room : null;
-        this._go(q.mode === 'borrowed' ? buildPath({ view: 'loans', query: { tab: 'in' } }) : room ? `/shelves/${encodeURIComponent(room.id)}` : '/books', true);
+        this._go(q.mode === 'borrowed' ? buildPath({ view: 'loans', query: { tab: 'in' } }) : room ? `/shelves/${encodeURIComponent(room.id)}` : '/games', true);
         return;
       }
       case 'scan-setup':
         this._go(this._scanPath({ ...q, step: '' }), true);
         return;
       case 'scan-exit':
-        this._go(q.mode === 'borrowed' ? '/loans' : this._booksPath, true);
+        this._go(q.mode === 'borrowed' ? '/loans' : this._gamesPath, true);
         return;
     }
   }

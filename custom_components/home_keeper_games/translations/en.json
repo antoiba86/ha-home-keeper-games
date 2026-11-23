@@ -41,7 +41,7 @@
   },
   "entity": {
     "sensor": {
-      "books": {
+      "games": {
         "name": "Books"
       },
       "loans_out": {
@@ -50,7 +50,7 @@
       "loans_overdue": {
         "name": "Loans overdue"
       },
-      "books_read_this_year": {
+      "games_read_this_year": {
         "name": "{person} books read this year"
       },
       "reading_now": {
@@ -132,7 +132,7 @@
         }
       }
     },
-    "add_bookcase": {
+    "add_unit": {
       "name": "Add bookcase",
       "description": "Add a bookcase to a room.",
       "fields": {
@@ -154,11 +154,11 @@
         }
       }
     },
-    "update_bookcase": {
+    "update_unit": {
       "name": "Update bookcase",
       "description": "Change a bookcase or move it to another room.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Bookcase",
           "description": "The ID of the bookcase."
         },
@@ -180,11 +180,11 @@
         }
       }
     },
-    "delete_bookcase": {
+    "delete_unit": {
       "name": "Delete bookcase",
       "description": "Delete a bookcase. A bookcase with shelves needs force.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Bookcase",
           "description": "The ID of the bookcase."
         },
@@ -198,7 +198,7 @@
       "name": "Add shelf",
       "description": "Add a shelf to a bookcase.",
       "fields": {
-        "bookcase_id": {
+        "unit_id": {
           "name": "Bookcase",
           "description": "The ID of the bookcase."
         },
@@ -220,7 +220,7 @@
           "name": "Shelf",
           "description": "The ID of the shelf. Empty for no shelf."
         },
-        "bookcase_id": {
+        "unit_id": {
           "name": "Bookcase",
           "description": "The ID of the bookcase."
         },
@@ -248,7 +248,7 @@
         }
       }
     },
-    "add_book": {
+    "add_game": {
       "name": "Add book",
       "description": "Add a book. If a book has the same barcode, the service returns that book.",
       "fields": {
@@ -310,11 +310,11 @@
         }
       }
     },
-    "update_book": {
+    "update_game": {
       "name": "Update book",
       "description": "Change the details of a book.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Book",
           "description": "The ID of the book."
         },
@@ -376,11 +376,11 @@
         }
       }
     },
-    "delete_book": {
+    "delete_game": {
       "name": "Delete book",
       "description": "Delete a book with its copies, reading status, loans and cover.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Book",
           "description": "The ID of the book."
         }
@@ -412,7 +412,7 @@
       "name": "Add copy",
       "description": "Add a copy of a book.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Book",
           "description": "The ID of the book."
         },
@@ -536,7 +536,7 @@
       "name": "Set cover",
       "description": "Set the cover of a book.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Book",
           "description": "The ID of the book."
         },
@@ -554,7 +554,7 @@
       "name": "Set reading status",
       "description": "Set the reading status of a book for a person. A non-admin user can set only their own status.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Book",
           "description": "The ID of the book."
         },
@@ -592,7 +592,7 @@
         }
       }
     },
-    "lend_book": {
+    "lend_game": {
       "name": "Lend book",
       "description": "Lend a copy to another person.",
       "fields": {
@@ -622,11 +622,11 @@
         }
       }
     },
-    "borrow_book": {
+    "borrow_game": {
       "name": "Add borrowed book",
       "description": "Record a book that a person borrowed.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Book",
           "description": "The ID of the book."
         },
@@ -730,7 +730,7 @@
       "name": "Add to wishlist",
       "description": "Put a book on the wishlist of a person.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Book",
           "description": "The ID of the book."
         },
@@ -760,7 +760,7 @@
       "name": "Update wishlist",
       "description": "Change a wishlist entry.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Book",
           "description": "The ID of the book."
         },
@@ -778,17 +778,17 @@
       "name": "Remove from wishlist",
       "description": "Take a book off the wishlist.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Book",
           "description": "The ID of the book."
         }
       }
     },
-    "got_wishlist_book": {
+    "got_wishlist_game": {
       "name": "Got wishlist book",
       "description": "Add a copy of a wishlist book and take it off the wishlist.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Book",
           "description": "The ID of the book."
         },
@@ -874,7 +874,7 @@
         }
       }
     },
-    "list_books": {
+    "list_games": {
       "name": "List books",
       "description": "Return the books that match the filters.",
       "fields": {
@@ -908,11 +908,11 @@
         }
       }
     },
-    "get_book": {
+    "get_game": {
       "name": "Get book",
       "description": "Return a book with its copies and loans.",
       "fields": {
-        "book_id": {
+        "game_id": {
           "name": "Book",
           "description": "The ID of the book."
         }
@@ -1000,13 +1000,13 @@
     "room_not_found": {
       "message": "No room has the ID {id}."
     },
-    "bookcase_not_found": {
+    "unit_not_found": {
       "message": "No bookcase has the ID {id}."
     },
     "shelf_not_found": {
       "message": "No shelf has the ID {id}."
     },
-    "book_not_found": {
+    "game_not_found": {
       "message": "No book has the ID {id}."
     },
     "copy_not_found": {
@@ -1024,7 +1024,7 @@
     "room_not_empty": {
       "message": "The room has {count} bookcases. Use force to delete them too."
     },
-    "bookcase_not_empty": {
+    "unit_not_empty": {
       "message": "The bookcase has {count} shelves. Use force to delete them too."
     },
     "shelf_not_empty": {
