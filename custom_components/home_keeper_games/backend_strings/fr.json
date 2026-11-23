@@ -3,6 +3,5 @@
   "companion.description": "Livres, étagères, prêts et état de lecture.",
   "loan_task.name_out": "Récupérer {title} auprès de {party}",
   "loan_task.name_in": "Rendre {title} à {party}",
-  "loan_task.completion_prompt": "Terminer la tâche rend le prêt.",
-  "item.summary": "{title} de {author}"
+  "loan_task.completion_prompt": "Terminer la tâche rend le prêt."
 }

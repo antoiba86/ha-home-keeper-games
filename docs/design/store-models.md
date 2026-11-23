@@ -5,7 +5,7 @@ implements:
   - custom_components/home_keeper_games/store.py
   - custom_components/home_keeper_games/models.py
 related: [architecture, events-api, people-privilege, csv-import-export]
-source_hash: 71206e39c843
+source_hash: a92d187f3c88
 ---
 
 # Store and models
@@ -61,7 +61,8 @@ storage version stays 1.1.
   `strings.json` `exceptions`.
 - A barcode goes through `models.barcode`
   ([scan-and-barcode](scan-and-barcode.md#barcode-rules)).
-- `models.title_key` folds a title and its first author for a match with no barcode.
+- `models.title_key` folds the whole title for a match with no barcode. The part after
+  `:` counts, because it often names another game of 1 franchise.
 
 ### The write path
 

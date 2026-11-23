@@ -29,11 +29,10 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from . import LibraryConfigEntry, people
-from .backend_i18n import resolve_string
 from .const import DOMAIN
 from .coordinator import LibraryCoordinator
 from .entity import PersonEntity, async_track_people
-from .models import LibraryError, fold, game_summary
+from .models import LibraryError, fold
 from .projections import want_to_read
 from .services import service_error
 
@@ -93,10 +92,9 @@ class ToReadList(PersonEntity, TodoListEntity):
     def todo_items(self) -> list[TodoItem]:
         if not self.available:
             return []
-        template = resolve_string(self.hass.config.language, "item.summary")
         return [
             TodoItem(
-                summary=game_summary(game, template),
+                summary=str(game.get("title") or ""),
                 uid=game["id"],
                 status=TodoItemStatus.NEEDS_ACTION,
             )
@@ -110,14 +108,12 @@ class ToReadList(PersonEntity, TodoListEntity):
         if not summary:
             return
         store = self.coordinator.store
-        template = resolve_string(self.hass.config.language, "item.summary")
         wanted = fold(summary)
         match = next(
             (
                 game
                 for game in store.state["games"].values()
-                if wanted
-                in (fold(game.get("title")), fold(game_summary(game, template)))
+                if wanted and wanted == fold(game.get("title"))
             ),
             None,
         )

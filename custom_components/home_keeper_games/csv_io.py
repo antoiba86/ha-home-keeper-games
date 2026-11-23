@@ -43,17 +43,12 @@ from .models import (
 LIBRARY_COLUMNS = (
     "game_id",
     "title",
-    "subtitle",
-    "authors",
+    "summary",
+    "genres",
+    "release_date",
+    "franchise",
+    "igdb_id",
     "barcode",
-    "publisher",
-    "published",
-    "pages",
-    "language",
-    "subjects",
-    "series",
-    "series_number",
-    "description",
     "tags",
     "shared_notes",
     "copy_id",
@@ -101,16 +96,12 @@ def empty_row(line: int) -> dict[str, Any]:
         "line": line,
         "game_id": None,
         "title": "",
-        "subtitle": "",
-        "authors": [],
+        "summary": "",
+        "genres": [],
+        "release_date": "",
+        "franchise": None,
+        "igdb_id": None,
         "barcode": None,
-        "publisher": "",
-        "published": "",
-        "pages": None,
-        "language": None,
-        "subjects": [],
-        "series": None,
-        "description": "",
         "tags": [],
         "shared_notes": "",
         "owned": 0,
@@ -224,20 +215,13 @@ def parse_library(text: str) -> list[dict[str, Any]]:
     for index, raw in enumerate(_rows(text, "title"), start=1):
         row = empty_row(index)
         row["game_id"] = _record_id(_cell(raw, "game_id"))
-        for field in ("title", "subtitle", "publisher", "published", "description"):
+        for field in ("title", "summary", "release_date", "shared_notes"):
             row[field] = _cell(raw, field)
-        row["shared_notes"] = _cell(raw, "shared_notes")
-        row["authors"] = _split(_cell(raw, "authors"), LIST_SEP.strip())
-        row["subjects"] = _split(_cell(raw, "subjects"), LIST_SEP.strip())
+        row["genres"] = _split(_cell(raw, "genres"), LIST_SEP.strip())
         row["tags"] = _split(_cell(raw, "tags"), LIST_SEP.strip())
+        row["franchise"] = _cell(raw, "franchise") or None
+        row["igdb_id"] = _int(_cell(raw, "igdb_id")) or None
         row["barcode"] = clean_barcode(_cell(raw, "barcode")) or None
-        row["pages"] = _int(_cell(raw, "pages")) or None
-        row["language"] = _cell(raw, "language") or None
-        if series := _cell(raw, "series"):
-            row["series"] = {
-                "name": series,
-                "number": _cell(raw, "series_number") or None,
-            }
         fmt = _cell(raw, "format")
         if fmt in FORMATS:
             copy: dict[str, Any] = {"id": _record_id(_cell(raw, "copy_id"))}
@@ -299,8 +283,8 @@ class _Index:
         self.by_id.add(game["id"])
         if game["barcode"]:
             self.barcode.setdefault(game["barcode"], game["id"])
-        key = title_key(game["title"], game["authors"])
-        if key.split("|", 1)[0]:
+        key = title_key(game["title"])
+        if key:
             self.title.setdefault(key, game["id"])
 
     def match(self, row: dict[str, Any]) -> tuple[str | None, str]:
@@ -309,23 +293,19 @@ class _Index:
             return str(row["game_id"]), ACTION_EXISTING
         if row["barcode"] and row["barcode"] in self.barcode:
             return self.barcode[row["barcode"]], ACTION_EXISTING
-        found = self.title.get(title_key(row["title"], row["authors"]))
+        found = self.title.get(title_key(row["title"]))
         return found, ACTION_TITLE_MATCH if found else ACTION_NEW
 
 
 # The game fields of an import row.
 _ROW_GAME_FIELDS = (
     "title",
-    "subtitle",
-    "authors",
+    "summary",
+    "genres",
+    "release_date",
+    "franchise",
+    "igdb_id",
     "barcode",
-    "publisher",
-    "published",
-    "pages",
-    "language",
-    "subjects",
-    "series",
-    "description",
     "tags",
     "shared_notes",
 )
@@ -395,7 +375,7 @@ def apply_import(
 
     Return ``(new_state, counts, results)``. ``counts`` has the keys of
     :data:`COUNT_KEYS` and ``reading_kept``. Each result has ``line``, ``title``,
-    ``authors``, ``barcode``, ``game_id`` and ``action`` (``new``, ``existing``,
+    ``barcode``, ``game_id`` and ``action`` (``new``, ``existing``,
     ``title_match`` or ``error``). An error result also has ``error`` (a
     translation key) and ``placeholders``.
     """
@@ -413,7 +393,6 @@ def apply_import(
         result: dict[str, Any] = {
             "line": row["line"],
             "title": row["title"],
-            "authors": list(row["authors"]),
             "barcode": row["barcode"],
             "game_id": None,
             "action": ACTION_NEW,
@@ -596,22 +575,16 @@ def _bool_text(value: Any) -> str:
 
 
 def _library_cells(row: dict[str, Any]) -> dict[str, str]:
-    series = row["series"] or {}
     copy = row["copy"] or {}
     return {
         "game_id": row["game_id"] or "",
         "title": row["title"],
-        "subtitle": row["subtitle"],
-        "authors": LIST_SEP.join(row["authors"] or []),
+        "summary": row["summary"],
+        "genres": LIST_SEP.join(row["genres"] or []),
+        "release_date": row["release_date"],
+        "franchise": row["franchise"] or "",
+        "igdb_id": _num(row["igdb_id"]),
         "barcode": row["barcode"] or "",
-        "publisher": row["publisher"],
-        "published": row["published"],
-        "pages": _num(row["pages"]),
-        "language": row["language"] or "",
-        "subjects": LIST_SEP.join(row["subjects"] or []),
-        "series": series.get("name", ""),
-        "series_number": series.get("number") or "",
-        "description": row["description"],
         "tags": LIST_SEP.join(row["tags"] or []),
         "shared_notes": row["shared_notes"],
         "copy_id": copy.get("id") or "",

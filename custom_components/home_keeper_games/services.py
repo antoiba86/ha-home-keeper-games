@@ -96,16 +96,12 @@ _ORDER = vol.All(vol.Coerce(int), vol.Range(min=0))
 
 _GAME_FIELDS = {
     vol.Optional("title"): cv.string,
-    vol.Optional("subtitle"): _OPT_STR,
-    vol.Optional("authors"): _STR_LIST,
+    vol.Optional("summary"): _OPT_STR,
+    vol.Optional("genres"): _STR_LIST,
+    vol.Optional("release_date"): vol.Any(None, cv.string, vol.Coerce(str)),
+    vol.Optional("franchise"): _OPT_STR,
+    vol.Optional("igdb_id"): _OPT_INT,
     vol.Optional("barcode"): _OPT_STR,
-    vol.Optional("publisher"): _OPT_STR,
-    vol.Optional("published"): vol.Any(None, cv.string, vol.Coerce(str)),
-    vol.Optional("pages"): _OPT_INT,
-    vol.Optional("language"): _OPT_STR,
-    vol.Optional("subjects"): _STR_LIST,
-    vol.Optional("series"): vol.Any(None, cv.string, dict),
-    vol.Optional("description"): _OPT_STR,
     vol.Optional("tags"): _STR_LIST,
     vol.Optional("shared_notes"): _OPT_STR,
     vol.Optional("needs_details"): cv.boolean,
@@ -126,7 +122,6 @@ _GAME_REF = {
     vol.Optional("game_id"): cv.string,
     vol.Optional("barcode"): cv.string,
     vol.Optional("title"): cv.string,
-    vol.Optional("authors"): _STR_LIST,
 }
 _LOAN_FIELDS = {
     vol.Required("party"): cv.string,
@@ -348,13 +343,11 @@ async def _resolve_game(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
         game, _ = await _add_game(ctx, {"barcode": data["barcode"]})
         return game
     if data.get("title"):
-        key = models.title_key(data["title"], data.get("authors") or [])
+        key = models.title_key(data["title"])
         for game in ctx.store.state["games"].values():
-            if models.title_key(game.get("title"), game.get("authors")) == key:
+            if models.title_key(game.get("title")) == key:
                 return dict(game)
-        game, _ = await _add_game(
-            ctx, {"title": data["title"], "authors": data.get("authors") or []}
-        )
+        game, _ = await _add_game(ctx, {"title": data["title"]})
         return game
     raise LibraryError("barcode_or_title_required")
 
@@ -567,7 +560,7 @@ async def _borrow_game(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
     game = await _resolve_game(ctx, data)
     loan = await ctx.store.add_loan(
         {
-            **_clean(data, "game_id", "barcode", "title", "authors"),
+            **_clean(data, "game_id", "barcode", "title"),
             "direction": "in",
             "game_id": game["id"],
             "person_id": person_id,

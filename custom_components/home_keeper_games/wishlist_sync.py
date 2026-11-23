@@ -24,7 +24,6 @@ from homeassistant.helpers.event import (
     async_track_time_interval,
 )
 
-from .backend_i18n import resolve_string
 from .wishlist import lists_to_read, plan_sync
 
 if TYPE_CHECKING:
@@ -139,8 +138,7 @@ class WishlistSync:
         if not wanted:
             return False
         lists = {entity_id: await self._read(entity_id) for entity_id in wanted}
-        template = resolve_string(self._hass.config.language, "item.summary")
-        plan = plan_sync(self._coordinator.store.state, lists, template)
+        plan = plan_sync(self._coordinator.store.state, lists)
         if plan.empty:
             return False
         for remove in plan.removes:

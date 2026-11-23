@@ -91,8 +91,8 @@ async function scanSession(page: Page, missShot: string, detailsShot?: string): 
   await sheet.locator('[name="title"]').fill(MISS_TITLE);
   if (detailsShot) {
     await sheet.locator('[data-k="d-more-toggle"]').click();
-    await sheet.locator('[name="authors"]').fill('A. Hollins');
-    await sheet.locator('[name="published"]').fill('2004');
+    await sheet.locator('[name="franchise"]').fill('Moss');
+    await sheet.locator('[name="release_date"]').fill('2004');
     await shot(page, detailsShot);
   }
   await sheet.locator('[data-k="d-submit"]').click();

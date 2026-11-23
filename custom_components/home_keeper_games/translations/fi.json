@@ -256,45 +256,29 @@
           "name": "Nimeke",
           "description": "Kirjan nimeke."
         },
-        "subtitle": {
-          "name": "Alaotsikko",
-          "description": "Kirjan alaotsikko."
+        "summary": {
+          "name": "Yhteenveto",
+          "description": "Lyhyt yhteenveto pelistä."
         },
-        "authors": {
-          "name": "Tekijät",
-          "description": "Tekijät järjestyksessä."
+        "genres": {
+          "name": "Lajityypit",
+          "description": "Pelin lajityypit."
+        },
+        "release_date": {
+          "name": "Julkaisupäivä",
+          "description": "Julkaisupäivä, esimerkiksi 2017-03-03 tai 2017."
+        },
+        "franchise": {
+          "name": "Pelisarja",
+          "description": "Pelin pelisarja, esimerkiksi The Legend of Zelda."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "Pelin ID IGDB:ssä."
         },
         "barcode": {
           "name": "Viivakoodi",
           "description": "Viivakoodin numero, esimerkiksi EAN-13."
-        },
-        "publisher": {
-          "name": "Kustantaja",
-          "description": "Kirjan kustantaja."
-        },
-        "published": {
-          "name": "Julkaistu",
-          "description": "Julkaisupäivä, yleensä vuosi."
-        },
-        "pages": {
-          "name": "Sivut",
-          "description": "Sivujen määrä."
-        },
-        "language": {
-          "name": "Kieli",
-          "description": "Kielikoodi, esimerkiksi en."
-        },
-        "subjects": {
-          "name": "Aiheet",
-          "description": "Kirjan aiheet."
-        },
-        "series": {
-          "name": "Sarja",
-          "description": "Sarjan nimi tai nimi ja numero."
-        },
-        "description": {
-          "name": "Kuvaus",
-          "description": "Kirjan kuvaus."
         },
         "tags": {
           "name": "Tunnisteet",
@@ -322,45 +306,29 @@
           "name": "Nimeke",
           "description": "Kirjan nimeke."
         },
-        "subtitle": {
-          "name": "Alaotsikko",
-          "description": "Kirjan alaotsikko."
+        "summary": {
+          "name": "Yhteenveto",
+          "description": "Lyhyt yhteenveto pelistä."
         },
-        "authors": {
-          "name": "Tekijät",
-          "description": "Tekijät järjestyksessä."
+        "genres": {
+          "name": "Lajityypit",
+          "description": "Pelin lajityypit."
+        },
+        "release_date": {
+          "name": "Julkaisupäivä",
+          "description": "Julkaisupäivä, esimerkiksi 2017-03-03 tai 2017."
+        },
+        "franchise": {
+          "name": "Pelisarja",
+          "description": "Pelin pelisarja, esimerkiksi The Legend of Zelda."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "Pelin ID IGDB:ssä."
         },
         "barcode": {
           "name": "Viivakoodi",
           "description": "Viivakoodin numero, esimerkiksi EAN-13."
-        },
-        "publisher": {
-          "name": "Kustantaja",
-          "description": "Kirjan kustantaja."
-        },
-        "published": {
-          "name": "Julkaistu",
-          "description": "Julkaisupäivä, yleensä vuosi."
-        },
-        "pages": {
-          "name": "Sivut",
-          "description": "Sivujen määrä."
-        },
-        "language": {
-          "name": "Kieli",
-          "description": "Kielikoodi, esimerkiksi en."
-        },
-        "subjects": {
-          "name": "Aiheet",
-          "description": "Kirjan aiheet."
-        },
-        "series": {
-          "name": "Sarja",
-          "description": "Sarjan nimi tai nimi ja numero."
-        },
-        "description": {
-          "name": "Kuvaus",
-          "description": "Kirjan kuvaus."
         },
         "tags": {
           "name": "Tunnisteet",
@@ -638,10 +606,6 @@
           "name": "Nimeke",
           "description": "Kirjan nimeke."
         },
-        "authors": {
-          "name": "Tekijät",
-          "description": "Tekijät järjestyksessä."
-        },
         "party": {
           "name": "Toinen henkilö",
           "description": "Lainan toisen henkilön nimi."
@@ -741,10 +705,6 @@
         "title": {
           "name": "Nimeke",
           "description": "Kirjan nimeke."
-        },
-        "authors": {
-          "name": "Tekijät",
-          "description": "Tekijät järjestyksessä."
         },
         "person_id": {
           "name": "Henkilö",
@@ -880,7 +840,7 @@
       "fields": {
         "query": {
           "name": "Haku",
-          "description": "Teksti nimekkeessä, tekijöissä, viivakoodissa tai tunnisteissa."
+          "description": "Teksti nimessä, viivakoodissa, pelisarjassa, lajityypeissä tai tunnisteissa."
         },
         "room_id": {
           "name": "Huone",

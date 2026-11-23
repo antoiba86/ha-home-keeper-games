@@ -25,16 +25,12 @@ def test_empty_row() -> None:
         "line": 7,
         "game_id": None,
         "title": "",
-        "subtitle": "",
-        "authors": [],
+        "summary": "",
+        "genres": [],
+        "release_date": "",
+        "franchise": None,
+        "igdb_id": None,
         "barcode": None,
-        "publisher": "",
-        "published": "",
-        "pages": None,
-        "language": None,
-        "subjects": [],
-        "series": None,
-        "description": "",
         "tags": [],
         "shared_notes": "",
         "owned": 0,
@@ -58,16 +54,12 @@ def test_build_game_shape() -> None:
     assert game == {
         "id": game["id"],
         "title": "Dune",
-        "subtitle": "",
-        "authors": [],
+        "summary": "",
+        "genres": [],
+        "release_date": "",
+        "franchise": None,
+        "igdb_id": None,
         "barcode": None,
-        "publisher": "",
-        "published": "",
-        "pages": None,
-        "language": None,
-        "subjects": [],
-        "series": None,
-        "description": "",
         "tags": [],
         "shared_notes": "",
         "cover": {"kind": "none", "file": None},
@@ -197,10 +189,13 @@ def test_field_names_in_errors() -> None:
     assert key(m.game_field, "barcode", True)[1] == {"field": "barcode"}
     assert key(m.game_field, "barcode", "a b#")[1] == {"barcode": "AB#"}
     assert key(m.game_field, "catalogs", {})[1] == {"field": "catalogs"}
-    assert key(m.game_field, "series", [1])[1] == {"field": "series"}
-    assert key(m.game_field, "language", [])[1] == {"field": "language"}
+    assert key(m.game_field, "franchise", [1])[1] == {"field": "franchise"}
+    assert key(m.game_field, "igdb_id", "x")[1] == {"field": "igdb_id"}
+    assert key(m.game_field, "summary", [])[1] == {"field": "summary"}
     assert key(m.game_field, "needs_details", "yes")[1] == {"field": "needs_details"}
-    assert key(m.game_field, "authors", 3)[1] == {"field": "authors"}
+    assert key(m.game_field, "genres", 3)[1] == {"field": "genres"}
+    for gone in ("authors", "pages", "series", "subtitle", "description"):
+        assert key(m.game_field, gone, None)[1] == {"field": gone}
     assert key(m.reading_field, "started", "x")[1] == {"field": "started"}
     assert key(m.reading_field, "page", -1)[1]["field"] == "page"
     assert key(m.reading_field, "private_notes", [])[1] == {"field": "private_notes"}
@@ -241,10 +236,16 @@ def test_barcode_field() -> None:
     assert (err.key, err.placeholders) == ("invalid_barcode", {"barcode": "9" * 50})
     err = _raises(m.game_field, "barcode", " - ")
     assert (err.key, err.placeholders) == ("invalid_barcode", {"barcode": ""})
-    assert m.game_field("series", {"name": "D", "number": 2.5}) == {
-        "name": "D",
-        "number": "2.5",
-    }
+    assert m.game_field("franchise", " Zelda ") == "Zelda"
+    assert m.game_field("franchise", "") is None
+    assert m.game_field("igdb_id", "7346") == 7346
+    assert m.game_field("igdb_id", None) is None
+    assert m.game_field("igdb_id", 2**53) == 2**53
+    err = _raises(m.game_field, "igdb_id", 0)
+    assert err.key == "out_of_range" and err.placeholders["field"] == "igdb_id"
+    assert _raises(m.game_field, "igdb_id", 2**53 + 1).key == "out_of_range"
+    assert m.game_field("genres", ["RPG", "RPG", "Action"]) == ["RPG", "Action"]
+    assert m.game_field("release_date", 2017) == "2017"
 
 
 def _two_games() -> dict:
@@ -279,7 +280,6 @@ def test_cells() -> None:
     row = cio.empty_row(1)
     row.update(
         title="T",
-        authors=["Ann Lee", "Bo"],
         barcode="9780441478125",
         status="read",
         rating=4,
@@ -289,13 +289,11 @@ def test_cells() -> None:
         owned=1,
         copy={"format": "ebook"},
         notes="n",
-        pages=5,
-        publisher="P",
-        published="2001",
     )
     row.update(
         game_id="b",
-        series={"name": "S", "number": "2"},
+        franchise="F",
+        igdb_id=7346,
         copy={
             "id": "c",
             "format": "ebook",
@@ -313,26 +311,20 @@ def test_cells() -> None:
         started="2025-12-01",
         wishlist=True,
         wishlist_buy=False,
-        language="en",
-        subjects=["x", "y"],
-        subtitle="Sub",
-        description="D",
+        genres=["x", "y"],
+        release_date="2001",
+        summary="D",
         shared_notes="sn",
     )
     assert cio._library_cells(row) == {
         "game_id": "b",
         "title": "T",
-        "subtitle": "Sub",
-        "authors": "Ann Lee; Bo",
+        "summary": "D",
+        "genres": "x; y",
+        "release_date": "2001",
+        "franchise": "F",
+        "igdb_id": "7346",
         "barcode": "9780441478125",
-        "publisher": "P",
-        "published": "2001",
-        "pages": "5",
-        "language": "en",
-        "subjects": "x; y",
-        "series": "S",
-        "series_number": "2",
-        "description": "D",
         "tags": "fav",
         "shared_notes": "sn",
         "copy_id": "c",
@@ -358,7 +350,8 @@ def test_cells() -> None:
     }
     empty = cio._library_cells(cio.empty_row(1))
     assert empty["signed"] == "" and empty["first_edition"] == ""
-    assert empty["game_id"] == "" and empty["series"] == ""
+    assert empty["game_id"] == "" and empty["franchise"] == ""
+    assert empty["igdb_id"] == "" and empty["genres"] == ""
     assert empty["barcode"] == ""
     assert empty["wishlist"] == "false" and empty["format"] == ""
 
@@ -393,12 +386,14 @@ def test_project_state_counts_and_order() -> None:
 
 def test_game_matches_joins_fields_with_a_space() -> None:
     state = m.empty_state()
-    game = m.build_game({"title": "Dune", "subtitle": "Deluxe"}, now=NOW)
+    game = m.build_game({"title": "Dune", "barcode": "123"}, now=NOW)
     state["games"][game["id"]] = game
-    assert pr.game_matches(state, game, {"query": "dune deluxe"})
-    assert not pr.game_matches(state, game, {"query": "dunedeluxe"})
-    game["series"] = {"name": "Chronicles", "number": None}
+    assert pr.game_matches(state, game, {"query": "dune 123"})
+    assert not pr.game_matches(state, game, {"query": "dune123"})
+    game["franchise"] = "Chronicles"
     assert pr.game_matches(state, game, {"query": "chronicles"})
+    game["genres"] = ["Strategy"]
+    assert pr.game_matches(state, game, {"query": "strategy"})
 
 
 def test_game_detail_order_and_projection() -> None:

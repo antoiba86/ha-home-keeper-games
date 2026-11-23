@@ -430,7 +430,6 @@ ENTITY_PLATFORMS: tuple[EntityPlatformSpec, ...] = (
         ),
         attributes=(
             Field("goal", "int | None", "Games read this year: the yearly goal."),
-            Field("pages", "int", "Games read this year: the pages read."),
             Field("year", "int", "Games read this year: the year."),
             Field("games", "list[str]", "Reading now: at most 10 titles."),
             Field("person_id", "str", "The person of a per-person sensor."),
@@ -522,7 +521,7 @@ SURFACE_KINDS: tuple[SurfaceKind, ...] = (
     SurfaceKind(
         "Entity attributes",
         "published",
-        "The per-person sensors give the yearly goal, the pages and the titles.",
+        "The per-person sensors give the yearly goal and the titles.",
     ),
     SurfaceKind(
         "Config entry options",

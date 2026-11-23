@@ -256,45 +256,29 @@
           "name": "Títol",
           "description": "El títol del llibre."
         },
-        "subtitle": {
-          "name": "Subtítol",
-          "description": "El subtítol del llibre."
+        "summary": {
+          "name": "Resum",
+          "description": "Un resum breu del joc."
         },
-        "authors": {
-          "name": "Autors",
-          "description": "Els autors, en ordre."
+        "genres": {
+          "name": "Gèneres",
+          "description": "Els gèneres del joc."
+        },
+        "release_date": {
+          "name": "Data de llançament",
+          "description": "La data de llançament, com 2017-03-03 o 2017."
+        },
+        "franchise": {
+          "name": "Franquícia",
+          "description": "La franquícia del joc, com The Legend of Zelda."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "L'ID del joc a IGDB."
         },
         "barcode": {
           "name": "Codi de barres",
           "description": "El número del codi de barres, com un EAN-13."
-        },
-        "publisher": {
-          "name": "Editorial",
-          "description": "L'editorial del llibre."
-        },
-        "published": {
-          "name": "Publicat",
-          "description": "La data de publicació, normalment un any."
-        },
-        "pages": {
-          "name": "Pàgines",
-          "description": "El nombre de pàgines."
-        },
-        "language": {
-          "name": "Idioma",
-          "description": "El codi d'idioma, per exemple en."
-        },
-        "subjects": {
-          "name": "Temes",
-          "description": "Els temes del llibre."
-        },
-        "series": {
-          "name": "Sèrie",
-          "description": "El nom de la sèrie, o un nom i un número."
-        },
-        "description": {
-          "name": "Descripció",
-          "description": "La descripció del llibre."
         },
         "tags": {
           "name": "Etiquetes",
@@ -322,45 +306,29 @@
           "name": "Títol",
           "description": "El títol del llibre."
         },
-        "subtitle": {
-          "name": "Subtítol",
-          "description": "El subtítol del llibre."
+        "summary": {
+          "name": "Resum",
+          "description": "Un resum breu del joc."
         },
-        "authors": {
-          "name": "Autors",
-          "description": "Els autors, en ordre."
+        "genres": {
+          "name": "Gèneres",
+          "description": "Els gèneres del joc."
+        },
+        "release_date": {
+          "name": "Data de llançament",
+          "description": "La data de llançament, com 2017-03-03 o 2017."
+        },
+        "franchise": {
+          "name": "Franquícia",
+          "description": "La franquícia del joc, com The Legend of Zelda."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "L'ID del joc a IGDB."
         },
         "barcode": {
           "name": "Codi de barres",
           "description": "El número del codi de barres, com un EAN-13."
-        },
-        "publisher": {
-          "name": "Editorial",
-          "description": "L'editorial del llibre."
-        },
-        "published": {
-          "name": "Publicat",
-          "description": "La data de publicació, normalment un any."
-        },
-        "pages": {
-          "name": "Pàgines",
-          "description": "El nombre de pàgines."
-        },
-        "language": {
-          "name": "Idioma",
-          "description": "El codi d'idioma, per exemple en."
-        },
-        "subjects": {
-          "name": "Temes",
-          "description": "Els temes del llibre."
-        },
-        "series": {
-          "name": "Sèrie",
-          "description": "El nom de la sèrie, o un nom i un número."
-        },
-        "description": {
-          "name": "Descripció",
-          "description": "La descripció del llibre."
         },
         "tags": {
           "name": "Etiquetes",
@@ -638,10 +606,6 @@
           "name": "Títol",
           "description": "El títol del llibre."
         },
-        "authors": {
-          "name": "Autors",
-          "description": "Els autors, en ordre."
-        },
         "party": {
           "name": "Altra persona",
           "description": "El nom de l'altra persona del préstec."
@@ -741,10 +705,6 @@
         "title": {
           "name": "Títol",
           "description": "El títol del llibre."
-        },
-        "authors": {
-          "name": "Autors",
-          "description": "Els autors, en ordre."
         },
         "person_id": {
           "name": "Persona",
@@ -880,7 +840,7 @@
       "fields": {
         "query": {
           "name": "Cerca de text",
-          "description": "Text al títol, als autors, al codi de barres o a les etiquetes."
+          "description": "Text al títol, al codi de barres, a la franquícia, als gèneres o a les etiquetes."
         },
         "room_id": {
           "name": "Habitació",

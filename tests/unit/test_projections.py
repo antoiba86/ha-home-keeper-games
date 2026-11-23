@@ -30,12 +30,17 @@ def _state() -> dict:
     }
     state["shelves"]["s"] = {"id": "s", "unit_id": "k", "name": "Top", "order": 0}
     dune = m.build_game(
-        {"title": "Dune", "authors": ["Frank Herbert"], "tags": ["sf"], "pages": 600},
+        {
+            "title": "Dune",
+            "genres": ["Strategy"],
+            "tags": ["sf"],
+            "franchise": "Herbert",
+        },
         now=NOW,
     )
     dune["id"] = "dune"
     dune["barcode"] = "9780441013593"
-    emma = m.build_game({"title": "Emma", "series": "Austen"}, now=NOW)
+    emma = m.build_game({"title": "Emma", "franchise": "Austen"}, now=NOW)
     emma["id"] = "emma"
     emma["cover"] = {"kind": "custom", "file": "emma-0a1b2c3d.jpg"}
     state["games"] = {"dune": dune, "emma": emma}
@@ -228,9 +233,9 @@ def test_stats() -> None:
         "status": "read",
         "finished": "2025-12-31",
     }
-    assert pr.games_read_in_year(state, "alice", 2026) == (1, 600)
-    assert pr.games_read_in_year(state, "alice", 2025) == (1, 0)
-    assert pr.games_read_in_year(state, "nobody", 2026) == (0, 0)
+    assert pr.games_read_in_year(state, "alice", 2026) == 1
+    assert pr.games_read_in_year(state, "alice", 2025) == 1
+    assert pr.games_read_in_year(state, "nobody", 2026) == 0
     state["reading"]["bob"]["emma"] = {
         **m.empty_reading(now="2026-10-06"),
         "status": "reading",
@@ -251,7 +256,7 @@ def test_stats() -> None:
 def test_project_state_is_fast_for_5000_games() -> None:
     state = m.empty_state()
     for index in range(5000):
-        game = m.build_game({"title": f"Game {index}", "authors": ["A"]}, now=NOW)
+        game = m.build_game({"title": f"Game {index}", "genres": ["A"]}, now=NOW)
         state["games"][game["id"]] = game
         copy = m.build_copy({"game_id": game["id"]}, now=NOW)
         state["copies"][copy["id"]] = copy

@@ -12,7 +12,7 @@ test.describe('Card for a user who is not an admin', { tag: '@responsive' }, () 
     const card = await openCard(page);
     await expect(card.locator('.head h2')).toHaveText('Library: Sam');
     await expect(card).toContainText('The Left Hand of Darkness');
-    await expect(card).toContainText('Page 112 of 304');
+    await expect(card).toContainText('Page 112');
     await expect(card).toContainText('Tomorrow, and Tomorrow, and Tomorrow');
     // The reading of Alex shows only as household activity, never as Sam's.
     await expect(card.locator('.sec').filter({ hasText: 'Reading' }).first()).not.toContainText('Project Hail Mary');

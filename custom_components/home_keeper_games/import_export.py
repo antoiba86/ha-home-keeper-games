@@ -590,7 +590,6 @@ class _Planner:
                 "game_id": raw,
                 "barcode": fields.get("barcode"),
                 "title": fields["title"],
-                "authors": fields.get("authors") or [],
             }
             target, matched_by = _match_game(index, key)
             if target is None:
@@ -870,12 +869,12 @@ class _Planner:
 
 
 def _match_game(index: GameIndex, key: dict[str, Any]) -> tuple[str | None, str | None]:
-    """``(game_id, matched_by)``: by id, barcode, then title and author."""
+    """``(game_id, matched_by)``: by id, barcode, then title."""
     if key["game_id"] in index.by_id:
         return str(key["game_id"]), "id"
     if key["barcode"] and key["barcode"] in index.barcode:
         return index.barcode[key["barcode"]], "barcode"
-    found = index.title.get(title_key(key["title"], key["authors"]))
+    found = index.title.get(title_key(key["title"]))
     return (found, "title") if found else (None, None)
 
 

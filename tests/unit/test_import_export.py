@@ -50,12 +50,12 @@ def _state() -> dict:
         "order": 0,
     }
     dune = m.build_game(
-        {"title": "Dune", "authors": ["Frank Herbert"], "barcode": "9780441013593"},
+        {"title": "Dune", "genres": ["Strategy"], "barcode": "9780441013593"},
         now=NOW,
     )
     dune["id"] = DUNE
     dune["cover"] = {"kind": "custom", "file": f"{DUNE}-0a1b2c3d.jpg"}
-    emma = m.build_game({"title": "Emma", "authors": ["Jane Austen"]}, now=NOW)
+    emma = m.build_game({"title": "Emma", "genres": ["Puzzle"]}, now=NOW)
     emma["id"] = EMMA
     emma["wishlist"] = {
         "person_id": BOB,
@@ -303,12 +303,12 @@ def test_records_report_names_and_matches() -> None:
 def test_games_match_by_barcode_then_title() -> None:
     state = m.empty_state()
     stored = m.build_game({"title": "Dune", "barcode": "9780441013593"}, now=NOW)
-    other = m.build_game({"title": "Emma", "authors": ["Jane Austen"]}, now=NOW)
+    other = m.build_game({"title": "Emma", "genres": ["Puzzle"]}, now=NOW)
     state["games"] = {b["id"]: b for b in (stored, other)}
     document = {
         "games": [
             {"id": "x" * 32, "title": "Dune Messiah", "barcode": "9780441013593"},
-            {"title": "Emma: A Novel", "authors": ["Austen"]},
+            {"title": "EMMA!", "genres": ["Puzzle"]},
             {"title": "Dune", "barcode": "978-0441013593"},
         ]
     }
@@ -608,7 +608,7 @@ def test_field_errors_name_the_path_and_block_the_import() -> None:
         "rooms": [{"name": ""}],
         "games": [
             {"title": "Ok"},
-            {"title": "Bad", "barcode": "1#3", "pages": -1},
+            {"title": "Bad", "barcode": "1#3", "igdb_id": -1},
             {"title": ""},
         ],
         "copies": [{"game_id": "nope", "format": "scroll"}],
@@ -622,8 +622,8 @@ def test_field_errors_name_the_path_and_block_the_import() -> None:
     assert not plan.ok
     assert _problems(plan) == [
         ("error", "rooms[0].name", "field_required"),
+        ("error", "games[1].igdb_id", "out_of_range"),
         ("error", "games[1].barcode", "invalid_barcode"),
-        ("error", "games[1].pages", "out_of_range"),
         ("error", "games[2].title", "field_required"),
         ("error", "copies[0].game_id", "import_reference_missing"),
         ("error", "copies[0].format", "invalid_choice"),

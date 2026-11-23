@@ -53,16 +53,14 @@ export interface Wishlist {
 export interface Game {
   id: string;
   title: string;
-  subtitle: string;
-  authors: string[];
+  summary: string;
+  genres: string[];
+  /** Free text, such as 2017-03-03 or 2017. */
+  release_date: string;
+  franchise: string | null;
+  /** The game in IGDB, or null. */
+  igdb_id: number | null;
   barcode: string | null;
-  publisher: string;
-  published: string;
-  pages: number | null;
-  language: string | null;
-  subjects: string[];
-  series: { name: string; number: number | string | null } | null;
-  description: string;
   tags: string[];
   shared_notes: string;
   cover: { kind: 'custom' | 'none'; file: string | null };
@@ -218,7 +216,6 @@ export interface ScanResult {
 export interface ImportRow {
   line: number;
   title: string;
-  authors: string[];
   barcode: string | null;
   game_id: string | null;
   action: 'new' | 'existing' | 'title_match' | 'error';

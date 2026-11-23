@@ -173,7 +173,6 @@ button { font: inherit; color: inherit; }
 .hkl-detail-cover { display: flex; flex-direction: column; gap: 8px; }
 .hkl-cover-actions { display: flex; flex-wrap: wrap; gap: 4px; }
 .hkl-detail-info { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.hkl-subtitle { font-size: 16px; color: var(--hkl-muted); }
 .hkl-byline { font-size: 15px; }
 .hkl-desc { color: var(--hkl-muted); line-height: 1.5; max-width: 70ch; }
 .hkl-boxes { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }

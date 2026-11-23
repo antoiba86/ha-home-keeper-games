@@ -40,10 +40,11 @@ describe('card', () => {
     expect($('h2').textContent).toBe('Library: Alex');
     expect(text()).toContain('38 books');
     expect(text()).toContain('Project Hail Mary');
-    expect(text()).toContain('Page 210 of 476');
+    expect(text()).toContain('Page 210');
     expect(text()).toContain('Want to read · 2');
     expect(text()).toContain('6 of 24 books in 2026');
-    expect(text()).toContain('Goal: 24 · 2,124 pages');
+    expect(text()).toContain('Goal: 24');
+    expect(text()).not.toContain('pages');
     expect(text()).toContain('Sam: reading The Left Hand of Darkness');
     expect(text()).toContain('2 days ago');
   });

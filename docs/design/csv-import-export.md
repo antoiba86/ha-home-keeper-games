@@ -5,7 +5,7 @@ implements:
   - custom_components/home_keeper_games/csv_io.py
   - custom_components/home_keeper_games/frontend/src/tab-import.ts
 related: [store-models, events-api, import-export]
-source_hash: cbbce532f8cc
+source_hash: 8200333250c6
 ---
 
 # CSV import and export
@@ -18,8 +18,7 @@ the admin sees the counts before a write.
 
 - **G1. Preview before write.** A dry run is the same pure call as the import, with the
   result thrown away. The preview and the import cannot disagree.
-- **G2. No second game.** A row matches a stored game by id, then barcode, then title
-  and first author.
+- **G2. No second game.** A row matches a stored game by id, then barcode, then title.
 - **G3. Keep what is there.** A reading row that the person has now stays, unless the
   admin asks to replace it. A copy id that is already stored is not added again.
 - **G4. Round trips.** `parse(write(rows))` gives the rows back.
@@ -85,8 +84,8 @@ the reply of the latest preview.
   an import of thousands of rows. The cost is the merge, which compares 3 documents.
 - **Text in a service field** over **a file upload**: an automation can call the import.
   The limit is 5 MB.
-- **Match by title and first author** after the barcode: a row that a user typed often
-  has no barcode. A wrong match is possible for 2 games with the same title by 1 author.
+- **Match by title** after the barcode: a row that a user typed often has no barcode. A
+  wrong match is possible for 2 games with the same title.
 
 ## One-way doors
 

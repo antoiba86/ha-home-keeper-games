@@ -6,7 +6,7 @@ implements:
   - custom_components/home_keeper_games/frontend/src/zxing-decoder.ts
   - custom_components/home_keeper_games/frontend/src/tab-scan.ts
 related: [covers, store-models, frontend-tab-card, loans-home-keeper]
-source_hash: b7150541ae02
+source_hash: 274c18dd9302
 ---
 
 # Scan and barcode

@@ -91,7 +91,7 @@ async def test_add_game_by_barcode(hass, setup_entry, call) -> None:
     bare = (await call("add_game", {"barcode": "4006381333931"}))["game"]
     assert bare["title"] == "4006381333931" and bare["needs_details"] is True
     with pytest.raises(ServiceValidationError) as info:
-        await call("add_game", {"authors": ["Nobody"]})
+        await call("add_game", {"genres": ["Puzzle"]})
     assert info.value.translation_key == "barcode_or_title_required"
     with pytest.raises(ServiceValidationError) as info:
         await call("update_game", {"game_id": bare["id"], "barcode": EAN})

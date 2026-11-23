@@ -5,7 +5,7 @@ import { button, cover, navBar, options, personDot, statusLabel, taskLinkHtml } 
 import { navCounts } from './tab-games';
 import type { ViewCtx } from './tab-types';
 import type { Game, Loan } from './types';
-import { buildPath, dueState, escapeHTML, loansFor, readingOf, type LoanTab } from './utils';
+import { buildPath, dueState, escapeHTML, gameByline, loansFor, readingOf, type LoanTab } from './utils';
 
 const LOAN_TABS: LoanTab[] = ['out', 'in', 'returned'];
 
@@ -77,8 +77,7 @@ export function renderLoans(ctx: ViewCtx): string {
 function wishRow(ctx: ViewCtx, game: Game): string {
   const w = game.wishlist!;
   const person = ctx.idx.person.get(w.person_id);
-  const series = game.series?.name ? (game.series.number != null ? t('game.series_n', { name: game.series.name, n: game.series.number }) : game.series.name) : '';
-  const meta = [game.authors.join(', '), series, w.bought ? t('wishlist.bought') : ''].filter(Boolean).join(' · ');
+  const meta = [gameByline(game), w.bought ? t('wishlist.bought') : ''].filter(Boolean).join(' · ');
   const id = escapeHTML(game.id);
   return `<div class="hkl-listrow">
     ${cover(game, 'thumb')}

@@ -6,7 +6,7 @@
 
 import { errorText, LibraryApi } from './api';
 import { renderKeepFocus } from './dom';
-import { formatAgo, formatNumber, setLanguage, t, tn } from './i18n';
+import { formatAgo, setLanguage, t, tn } from './i18n';
 import { cover, personDot, statusLabel, wireCovers } from './markup';
 import { TOKENS } from './styles';
 import type { Game, HomeAssistant, Lib } from './types';
@@ -19,9 +19,9 @@ import {
   locationLabel,
   matchesSearch,
   normalizeState,
+  gameByline,
   personNames,
   pickRandom,
-  progress,
   readingOf,
   todayISO,
   type Index,
@@ -247,13 +247,12 @@ export class HomeKeeperGamesCard extends HTMLElement {
     if (on.reading) {
       const rows = model.reading
         .map(({ game, row }) => {
-          const pr = progress(row.page, game.pages);
-          const page = row.page != null ? (game.pages ? t('game.page_of', { page: row.page, pages: game.pages }) : t('game.page_n', { page: row.page })) : '';
+          const page = row.page != null ? t('game.page_n', { page: row.page }) : '';
           const id = escapeHTML(game.id);
           const pageForm = this._pageFor === game.id
             ? `<form class="page" data-game="${id}"><input name="page" type="number" min="0" inputmode="numeric" data-k="page-${id}" value="${escapeHTML(row.page ?? '')}" aria-label="${escapeHTML(t('game.page'))}" /><button class="btn" type="submit">${escapeHTML(t('action.save'))}</button></form>`
             : `<div class="btns"><button class="btn" data-act="page" data-id="${id}" data-k="sp-${id}">${escapeHTML(t('card.set_page'))}</button><button class="btn" data-act="read" data-id="${id}" data-k="rd-${id}">${escapeHTML(t('status.read'))}</button></div>`;
-          return `<div class="item big">${cover(game, 'thumb')}<div class="main"><b>${escapeHTML(game.title)}</b><span class="muted small">${escapeHTML(game.authors.join(', '))}</span>${pr != null ? `<span class="bar" role="img" aria-label="${pr}%"><span style="width:${pr}%"></span></span>` : ''}${page ? `<span class="muted small">${escapeHTML(page)}</span>` : ''}${pageForm}</div></div>`;
+          return `<div class="item big">${cover(game, 'thumb')}<div class="main"><b>${escapeHTML(game.title)}</b><span class="muted small">${escapeHTML(gameByline(game))}</span>${page ? `<span class="muted small">${escapeHTML(page)}</span>` : ''}${pageForm}</div></div>`;
         })
         .join('');
       parts.push(`<div class="sec"><span class="eyebrow">${escapeHTML(t('status.reading'))}</span>${rows || `<span class="muted">${escapeHTML(t('card.no_reading'))}</span>`}</div>`);
@@ -271,12 +270,12 @@ export class HomeKeeperGamesCard extends HTMLElement {
       parts.push(`<div class="sec"><span class="eyebrow">${escapeHTML(t('status.want'))} · ${model.want.length}</span>${covers ? `<div class="covers">${covers}</div>` : `<span class="muted">${escapeHTML(t('card.no_want'))}</span>`}${model.want.length ? `<div class="btns"><button class="btn" data-act="random" data-k="random">${escapeHTML(t('card.random'))}</button></div>${pickLine}` : ''}</div>`);
     }
     if (on.goal) {
-      const { done, goal, pages, year } = model.goal;
+      const { done, goal, year } = model.goal;
       const pct = goal ? Math.min(1, done / goal) : 0;
       const c = 2 * Math.PI * 26;
       const ring = `<svg class="ring" width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle class="bg" cx="32" cy="32" r="26"/><circle class="fg" cx="32" cy="32" r="26" stroke-dasharray="${(c * pct).toFixed(1)} ${c.toFixed(1)}"/><text x="32" y="38" text-anchor="middle">${done}</text></svg>`;
       const line = goal ? t('card.goal_of', { done, goal, year }) : tn('card.goal_none', done, { year });
-      const sub = [goal ? t('card.goal', { goal }) : '', tn('game.pages', pages, { n: formatNumber(pages) })].filter(Boolean).join(' · ');
+      const sub = goal ? t('card.goal', { goal }) : '';
       parts.push(`<div class="goal">${ring}<div class="main"><b>${escapeHTML(line)}</b><span class="muted small">${escapeHTML(sub)}</span></div></div>`);
     }
     if (on.household) {

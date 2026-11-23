@@ -100,24 +100,15 @@
    "58247cad1ced46248fefe4d2b0db71b5": {
     "id": "58247cad1ced46248fefe4d2b0db71b5",
     "title": "The Left Hand of Darkness",
-    "subtitle": "",
-    "authors": [
-     "Ursula K. Le Guin"
-    ],
-    "barcode": "9780441478125",
-    "publisher": "Ace Games",
-    "published": "1969",
-    "pages": 304,
-    "language": "en",
-    "subjects": [
+    "summary": "A science fiction title by Ursula K. Le Guin.",
+    "genres": [
      "Science fiction",
      "Gender"
     ],
-    "series": {
-     "name": "Hainish Cycle",
-     "number": "4"
-    },
-    "description": "",
+    "release_date": "1969",
+    "franchise": "Hainish Cycle",
+    "igdb_id": null,
+    "barcode": "9780441478125",
     "tags": [
      "Hugo winner"
     ],
@@ -134,23 +125,14 @@
    "e4b7df5e6eef4483b1751162204397b8": {
     "id": "e4b7df5e6eef4483b1751162204397b8",
     "title": "A Wizard of Earthsea",
-    "subtitle": "",
-    "authors": [
-     "Ursula K. Le Guin"
-    ],
-    "barcode": "9780547773742",
-    "publisher": "Clarion Games",
-    "published": "1968",
-    "pages": 183,
-    "language": "en",
-    "subjects": [
+    "summary": "A fantasy title by Ursula K. Le Guin.",
+    "genres": [
      "Fantasy"
     ],
-    "series": {
-     "name": "Earthsea",
-     "number": "1"
-    },
-    "description": "",
+    "release_date": "1968",
+    "franchise": "Earthsea",
+    "igdb_id": null,
+    "barcode": "9780547773742",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -165,24 +147,15 @@
    "13be6b0e5c354e1981a89fe2766196e0": {
     "id": "13be6b0e5c354e1981a89fe2766196e0",
     "title": "The Dispossessed",
-    "subtitle": "",
-    "authors": [
-     "Ursula K. Le Guin"
-    ],
-    "barcode": "9780061054884",
-    "publisher": "Harper Voyager",
-    "published": "1974",
-    "pages": 387,
-    "language": "en",
-    "subjects": [
+    "summary": "A science fiction title by Ursula K. Le Guin.",
+    "genres": [
      "Science fiction",
      "Utopias"
     ],
-    "series": {
-     "name": "Hainish Cycle",
-     "number": "6"
-    },
-    "description": "",
+    "release_date": "1974",
+    "franchise": "Hainish Cycle",
+    "igdb_id": null,
+    "barcode": "9780061054884",
     "tags": [
      "Hugo winner"
     ],
@@ -199,20 +172,14 @@
    "db815384ca094b1ca4cc5b9a7e437b86": {
     "id": "db815384ca094b1ca4cc5b9a7e437b86",
     "title": "The Lathe of Heaven",
-    "subtitle": "",
-    "authors": [
-     "Ursula K. Le Guin"
-    ],
-    "barcode": "9781416556961",
-    "publisher": "Scribner",
-    "published": "1971",
-    "pages": 184,
-    "language": "en",
-    "subjects": [
+    "summary": "A science fiction title by Ursula K. Le Guin.",
+    "genres": [
      "Science fiction"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "1971",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9781416556961",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -227,23 +194,14 @@
    "fb4f591ff96c45e5abc0fa81325c564c": {
     "id": "fb4f591ff96c45e5abc0fa81325c564c",
     "title": "The Tombs of Atuan",
-    "subtitle": "",
-    "authors": [
-     "Ursula K. Le Guin"
-    ],
-    "barcode": "9781416509608",
-    "publisher": "Atheneum",
-    "published": "1970",
-    "pages": 180,
-    "language": "en",
-    "subjects": [
+    "summary": "A fantasy title by Ursula K. Le Guin.",
+    "genres": [
      "Fantasy"
     ],
-    "series": {
-     "name": "Earthsea",
-     "number": "2"
-    },
-    "description": "",
+    "release_date": "1970",
+    "franchise": "Earthsea",
+    "igdb_id": null,
+    "barcode": "9781416509608",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -258,23 +216,14 @@
    "ba6076bfc6414e079514e8559c452e7f": {
     "id": "ba6076bfc6414e079514e8559c452e7f",
     "title": "The Farthest Shore",
-    "subtitle": "",
-    "authors": [
-     "Ursula K. Le Guin"
-    ],
-    "barcode": "9781416509639",
-    "publisher": "Atheneum",
-    "published": "1972",
-    "pages": 223,
-    "language": "en",
-    "subjects": [
+    "summary": "A fantasy title by Ursula K. Le Guin.",
+    "genres": [
      "Fantasy"
     ],
-    "series": {
-     "name": "Earthsea",
-     "number": "3"
-    },
-    "description": "",
+    "release_date": "1972",
+    "franchise": "Earthsea",
+    "igdb_id": null,
+    "barcode": "9781416509639",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -289,23 +238,14 @@
    "c8a701c41eb84f78949683fc37d29497": {
     "id": "c8a701c41eb84f78949683fc37d29497",
     "title": "Tehanu",
-    "subtitle": "",
-    "authors": [
-     "Ursula K. Le Guin"
-    ],
-    "barcode": "9780689315954",
-    "publisher": "Atheneum",
-    "published": "1990",
-    "pages": 252,
-    "language": "en",
-    "subjects": [
+    "summary": "A fantasy title by Ursula K. Le Guin.",
+    "genres": [
      "Fantasy"
     ],
-    "series": {
-     "name": "Earthsea",
-     "number": "4"
-    },
-    "description": "",
+    "release_date": "1990",
+    "franchise": "Earthsea",
+    "igdb_id": null,
+    "barcode": "9780689315954",
     "tags": [
      "Nebula winner"
     ],
@@ -322,20 +262,14 @@
    "360738e00aa246d38aab80792e9087fb": {
     "id": "360738e00aa246d38aab80792e9087fb",
     "title": "Always Coming Home",
-    "subtitle": "",
-    "authors": [
-     "Ursula K. Le Guin"
-    ],
-    "barcode": "9781598537055",
-    "publisher": "Library of America",
-    "published": "1985",
-    "pages": 523,
-    "language": "en",
-    "subjects": [
+    "summary": "A science fiction title by Ursula K. Le Guin.",
+    "genres": [
      "Science fiction"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "1985",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9781598537055",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -350,23 +284,14 @@
    "d4a98396d9f9490bb2371d3bfa27b476": {
     "id": "d4a98396d9f9490bb2371d3bfa27b476",
     "title": "The Word for World Is Forest",
-    "subtitle": "",
-    "authors": [
-     "Ursula K. Le Guin"
-    ],
-    "barcode": "9780765323453",
-    "publisher": "Tor Games",
-    "published": "1972",
-    "pages": 189,
-    "language": "en",
-    "subjects": [
+    "summary": "A science fiction title by Ursula K. Le Guin.",
+    "genres": [
      "Science fiction"
     ],
-    "series": {
-     "name": "Hainish Cycle",
-     "number": "5"
-    },
-    "description": "",
+    "release_date": "1972",
+    "franchise": "Hainish Cycle",
+    "igdb_id": null,
+    "barcode": "9780765323453",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -381,20 +306,14 @@
    "3bd29a2113cc46c08d7ff1eaf7c68307": {
     "id": "3bd29a2113cc46c08d7ff1eaf7c68307",
     "title": "Lavinia",
-    "subtitle": "",
-    "authors": [
-     "Ursula K. Le Guin"
-    ],
-    "barcode": "9780156033688",
-    "publisher": "Mariner Games",
-    "published": "2008",
-    "pages": 279,
-    "language": "en",
-    "subjects": [
+    "summary": "A historical fiction title by Ursula K. Le Guin.",
+    "genres": [
      "Historical fiction"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2008",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780156033688",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -409,20 +328,14 @@
    "e50273c278814a57b97033997476c0df": {
     "id": "e50273c278814a57b97033997476c0df",
     "title": "Piranesi",
-    "subtitle": "",
-    "authors": [
-     "Susanna Clarke"
-    ],
-    "barcode": "9781635575637",
-    "publisher": "Bloomsbury",
-    "published": "2020",
-    "pages": 272,
-    "language": "en",
-    "subjects": [
+    "summary": "A fantasy title by Susanna Clarke.",
+    "genres": [
      "Fantasy"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2020",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9781635575637",
     "tags": [
      "Game club"
     ],
@@ -439,20 +352,14 @@
    "d4c37434a7ea4a8e860517cd82ccc32b": {
     "id": "d4c37434a7ea4a8e860517cd82ccc32b",
     "title": "Project Hail Mary",
-    "subtitle": "",
-    "authors": [
-     "Andy Weir"
-    ],
-    "barcode": "9780593135204",
-    "publisher": "Ballantine Games",
-    "published": "2021",
-    "pages": 476,
-    "language": "en",
-    "subjects": [
+    "summary": "A science fiction title by Andy Weir.",
+    "genres": [
      "Science fiction"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2021",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780593135204",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -467,24 +374,15 @@
    "8ffa744031884f64a2b39c35342641c1": {
     "id": "8ffa744031884f64a2b39c35342641c1",
     "title": "The Fifth Season",
-    "subtitle": "",
-    "authors": [
-     "N. K. Jemisin"
-    ],
-    "barcode": "9780316229296",
-    "publisher": "Orbit",
-    "published": "2015",
-    "pages": 468,
-    "language": "en",
-    "subjects": [
+    "summary": "A fantasy title by N. K. Jemisin.",
+    "genres": [
      "Fantasy",
      "Science fiction"
     ],
-    "series": {
-     "name": "The Broken Earth",
-     "number": "1"
-    },
-    "description": "",
+    "release_date": "2015",
+    "franchise": "The Broken Earth",
+    "igdb_id": null,
+    "barcode": "9780316229296",
     "tags": [
      "Hugo winner"
     ],
@@ -501,23 +399,14 @@
    "eed5dacf0ada41059efc64fdefd6dfa9": {
     "id": "eed5dacf0ada41059efc64fdefd6dfa9",
     "title": "Dune",
-    "subtitle": "",
-    "authors": [
-     "Frank Herbert"
-    ],
-    "barcode": "9780441013593",
-    "publisher": "Ace Games",
-    "published": "1965",
-    "pages": 688,
-    "language": "en",
-    "subjects": [
+    "summary": "A science fiction title by Frank Herbert.",
+    "genres": [
      "Science fiction"
     ],
-    "series": {
-     "name": "Dune",
-     "number": "1"
-    },
-    "description": "",
+    "release_date": "1965",
+    "franchise": "Dune",
+    "igdb_id": null,
+    "barcode": "9780441013593",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -532,23 +421,14 @@
    "f308096519994fb78d16e480b16b71aa": {
     "id": "f308096519994fb78d16e480b16b71aa",
     "title": "The Name of the Wind",
-    "subtitle": "",
-    "authors": [
-     "Patrick Rothfuss"
-    ],
-    "barcode": "9780756404741",
-    "publisher": "DAW Games",
-    "published": "2007",
-    "pages": 662,
-    "language": "en",
-    "subjects": [
+    "summary": "A fantasy title by Patrick Rothfuss.",
+    "genres": [
      "Fantasy"
     ],
-    "series": {
-     "name": "The Kingkiller Chronicle",
-     "number": "1"
-    },
-    "description": "",
+    "release_date": "2007",
+    "franchise": "The Kingkiller Chronicle",
+    "igdb_id": null,
+    "barcode": "9780756404741",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -563,20 +443,14 @@
    "af804c5b7f944aabb9462c114fab95d0": {
     "id": "af804c5b7f944aabb9462c114fab95d0",
     "title": "Klara and the Sun",
-    "subtitle": "",
-    "authors": [
-     "Kazuo Ishiguro"
-    ],
-    "barcode": "9780593318171",
-    "publisher": "Knopf",
-    "published": "2021",
-    "pages": 303,
-    "language": "en",
-    "subjects": [
+    "summary": "A science fiction title by Kazuo Ishiguro.",
+    "genres": [
      "Science fiction"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2021",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780593318171",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -591,21 +465,15 @@
    "e888e36a88504536bd6a87fd7c4aafe1": {
     "id": "e888e36a88504536bd6a87fd7c4aafe1",
     "title": "Every Grain of Rice",
-    "subtitle": "",
-    "authors": [
-     "Fuchsia Dunlop"
-    ],
-    "barcode": "9780393089288",
-    "publisher": "W. W. Norton",
-    "published": "2012",
-    "pages": 352,
-    "language": "en",
-    "subjects": [
+    "summary": "A cooking title by Fuchsia Dunlop.",
+    "genres": [
      "Cooking",
      "Chinese cooking"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2012",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780393089288",
     "tags": [
      "Kitchen"
     ],
@@ -622,20 +490,14 @@
    "2ff469fc40f54abfbb1a50274f264dae": {
     "id": "2ff469fc40f54abfbb1a50274f264dae",
     "title": "Salt, Fat, Acid, Heat",
-    "subtitle": "",
-    "authors": [
-     "Samin Nosrat"
-    ],
-    "barcode": "9781476753836",
-    "publisher": "Simon & Schuster",
-    "published": "2017",
-    "pages": 480,
-    "language": "en",
-    "subjects": [
+    "summary": "A cooking title by Samin Nosrat.",
+    "genres": [
      "Cooking"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2017",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9781476753836",
     "tags": [
      "Kitchen"
     ],
@@ -652,21 +514,15 @@
    "9cbb153d8b0046dc81ceedd95bf92aaf": {
     "id": "9cbb153d8b0046dc81ceedd95bf92aaf",
     "title": "The Food Lab",
-    "subtitle": "",
-    "authors": [
-     "J. Kenji López-Alt"
-    ],
-    "barcode": "9780393081084",
-    "publisher": "W. W. Norton",
-    "published": "2015",
-    "pages": 958,
-    "language": "en",
-    "subjects": [
+    "summary": "A cooking title by J. Kenji López-Alt.",
+    "genres": [
      "Cooking",
      "Science"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2015",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780393081084",
     "tags": [
      "Kitchen"
     ],
@@ -683,21 +539,15 @@
    "93ff2f45f4464b0d836a5c3d8cc5e33d": {
     "id": "93ff2f45f4464b0d836a5c3d8cc5e33d",
     "title": "Atlas of Remote Islands",
-    "subtitle": "",
-    "authors": [
-     "Judith Schalansky"
-    ],
-    "barcode": "9780143118206",
-    "publisher": "Penguin Games",
-    "published": "2009",
-    "pages": 144,
-    "language": "en",
-    "subjects": [
+    "summary": "A travel title by Judith Schalansky.",
+    "genres": [
      "Travel",
      "Maps"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2009",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780143118206",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -712,21 +562,15 @@
    "84cbfdd27dcf4439a1fa041c32d955fc": {
     "id": "84cbfdd27dcf4439a1fa041c32d955fc",
     "title": "Gödel, Escher, Bach",
-    "subtitle": "",
-    "authors": [
-     "Douglas Hofstadter"
-    ],
-    "barcode": "9780465026562",
-    "publisher": "Basic Games",
-    "published": "1979",
-    "pages": 777,
-    "language": "en",
-    "subjects": [
+    "summary": "A mathematics title by Douglas Hofstadter.",
+    "genres": [
      "Mathematics",
      "Philosophy"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "1979",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780465026562",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -741,21 +585,15 @@
    "9d5b05a55a2d4f4297abee49d4b7981b": {
     "id": "9d5b05a55a2d4f4297abee49d4b7981b",
     "title": "The Overstory",
-    "subtitle": "",
-    "authors": [
-     "Richard Powers"
-    ],
-    "barcode": "9780393635522",
-    "publisher": "W. W. Norton",
-    "published": "2018",
-    "pages": 502,
-    "language": "en",
-    "subjects": [
+    "summary": "A literary fiction title by Richard Powers.",
+    "genres": [
      "Literary fiction",
      "Trees"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2018",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780393635522",
     "tags": [
      "Pulitzer winner"
     ],
@@ -772,21 +610,15 @@
    "117b1aed4a5547c39b9627cbb9d71506": {
     "id": "117b1aed4a5547c39b9627cbb9d71506",
     "title": "Braiding Sweetgrass",
-    "subtitle": "",
-    "authors": [
-     "Robin Wall Kimmerer"
-    ],
-    "barcode": "9781571313560",
-    "publisher": "Milkweed Editions",
-    "published": "2013",
-    "pages": 391,
-    "language": "en",
-    "subjects": [
+    "summary": "A nature title by Robin Wall Kimmerer.",
+    "genres": [
      "Nature",
      "Botany"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2013",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9781571313560",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -801,20 +633,14 @@
    "fd086096a83f483ab7219f131e678534": {
     "id": "fd086096a83f483ab7219f131e678534",
     "title": "The Hobbit",
-    "subtitle": "",
-    "authors": [
-     "J. R. R. Tolkien"
-    ],
-    "barcode": "9780547928227",
-    "publisher": "Mariner Games",
-    "published": "1937",
-    "pages": 310,
-    "language": "en",
-    "subjects": [
+    "summary": "A fantasy title by J. R. R. Tolkien.",
+    "genres": [
      "Fantasy"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "1937",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780547928227",
     "tags": [
      "Family"
     ],
@@ -831,20 +657,14 @@
    "dbcf7eb0b9f14491ba5bcde27e29a967": {
     "id": "dbcf7eb0b9f14491ba5bcde27e29a967",
     "title": "Where the Wild Things Are",
-    "subtitle": "",
-    "authors": [
-     "Maurice Sendak"
-    ],
-    "barcode": "9780060254926",
-    "publisher": "HarperCollins",
-    "published": "1963",
-    "pages": 48,
-    "language": "en",
-    "subjects": [
+    "summary": "A picture games title by Maurice Sendak.",
+    "genres": [
      "Picture games"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "1963",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780060254926",
     "tags": [
      "Family"
     ],
@@ -861,24 +681,14 @@
    "ad5098f6bd434ad8af9c3e8307d5724c": {
     "id": "ad5098f6bd434ad8af9c3e8307d5724c",
     "title": "Integrated Chinese 1",
-    "subtitle": "",
-    "authors": [
-     "Yuehua Liu",
-     "Tao-chung Yao"
-    ],
-    "barcode": "9781622911356",
-    "publisher": "Cheng & Tsui",
-    "published": "2017",
-    "pages": 420,
-    "language": "en",
-    "subjects": [
+    "summary": "A chinese language title by Yuehua Liu.",
+    "genres": [
      "Chinese language"
     ],
-    "series": {
-     "name": "Integrated Chinese",
-     "number": "1"
-    },
-    "description": "",
+    "release_date": "2017",
+    "franchise": "Integrated Chinese",
+    "igdb_id": null,
+    "barcode": "9781622911356",
     "tags": [
      "Study"
     ],
@@ -895,21 +705,14 @@
    "d8d911387500471c9736a6a204509f73": {
     "id": "d8d911387500471c9736a6a204509f73",
     "title": "Structure and Interpretation of Computer Programs",
-    "subtitle": "",
-    "authors": [
-     "Harold Abelson",
-     "Gerald Jay Sussman"
-    ],
-    "barcode": "9780262510875",
-    "publisher": "MIT Press",
-    "published": "1996",
-    "pages": 657,
-    "language": "en",
-    "subjects": [
+    "summary": "A computer science title by Harold Abelson.",
+    "genres": [
      "Computer science"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "1996",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780262510875",
     "tags": [
      "Study"
     ],
@@ -926,21 +729,14 @@
    "06210f4a2c25422c83f65a12663ab1b1": {
     "id": "06210f4a2c25422c83f65a12663ab1b1",
     "title": "The Pragmatic Programmer",
-    "subtitle": "",
-    "authors": [
-     "Andrew Hunt",
-     "David Thomas"
-    ],
-    "barcode": "9780201616224",
-    "publisher": "Addison-Wesley",
-    "published": "1999",
-    "pages": 352,
-    "language": "en",
-    "subjects": [
+    "summary": "A computer science title by Andrew Hunt.",
+    "genres": [
      "Computer science"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "1999",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780201616224",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -955,20 +751,14 @@
    "a662b1be82664e1790a514c31fa97558": {
     "id": "a662b1be82664e1790a514c31fa97558",
     "title": "Thinking, Fast and Slow",
-    "subtitle": "",
-    "authors": [
-     "Daniel Kahneman"
-    ],
-    "barcode": "9780374533557",
-    "publisher": "Farrar, Straus and Giroux",
-    "published": "2011",
-    "pages": 499,
-    "language": "en",
-    "subjects": [
+    "summary": "A psychology title by Daniel Kahneman.",
+    "genres": [
      "Psychology"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2011",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780374533557",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -983,20 +773,14 @@
    "7961cdfbeccb4c9c85ed872f0d50319c": {
     "id": "7961cdfbeccb4c9c85ed872f0d50319c",
     "title": "Sapiens",
-    "subtitle": "",
-    "authors": [
-     "Yuval Noah Harari"
-    ],
-    "barcode": "9780062316097",
-    "publisher": "Harper",
-    "published": "2011",
-    "pages": 443,
-    "language": "en",
-    "subjects": [
+    "summary": "A history title by Yuval Noah Harari.",
+    "genres": [
      "History"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2011",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780062316097",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -1011,23 +795,14 @@
    "06618efb9962471d992ba150a7d619b6": {
     "id": "06618efb9962471d992ba150a7d619b6",
     "title": "A Memory Called Empire",
-    "subtitle": "",
-    "authors": [
-     "Arkady Martine"
-    ],
-    "barcode": "9781250186430",
-    "publisher": "Tor Games",
-    "published": "2019",
-    "pages": 462,
-    "language": "en",
-    "subjects": [
+    "summary": "A science fiction title by Arkady Martine.",
+    "genres": [
      "Science fiction"
     ],
-    "series": {
-     "name": "Teixcalaan",
-     "number": "1"
-    },
-    "description": "",
+    "release_date": "2019",
+    "franchise": "Teixcalaan",
+    "igdb_id": null,
+    "barcode": "9781250186430",
     "tags": [
      "Hugo winner"
     ],
@@ -1044,20 +819,14 @@
    "b30885c12d524a63b858d237b5353dc2": {
     "id": "b30885c12d524a63b858d237b5353dc2",
     "title": "Station Eleven",
-    "subtitle": "",
-    "authors": [
-     "Emily St. John Mandel"
-    ],
-    "barcode": "9780804172448",
-    "publisher": "Vintage",
-    "published": "2014",
-    "pages": 333,
-    "language": "en",
-    "subjects": [
+    "summary": "A literary fiction title by Emily St. John Mandel.",
+    "genres": [
      "Literary fiction"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2014",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780804172448",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -1072,20 +841,14 @@
    "e82369ba83ea4f0f8cafe3229fb3c669": {
     "id": "e82369ba83ea4f0f8cafe3229fb3c669",
     "title": "The Unreal and the Real",
-    "subtitle": "",
-    "authors": [
-     "Ursula K. Le Guin"
-    ],
-    "barcode": "9781618730794",
-    "publisher": "Saga Press",
-    "published": "2012",
-    "pages": 320,
-    "language": "en",
-    "subjects": [
+    "summary": "A short stories title by Ursula K. Le Guin.",
+    "genres": [
      "Short stories"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2012",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9781618730794",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -1100,16 +863,12 @@
    "65821c98c7fd417b88431ca2948bab28": {
     "id": "65821c98c7fd417b88431ca2948bab28",
     "title": "Untitled paperback",
-    "subtitle": "",
-    "authors": [],
+    "summary": "",
+    "genres": [],
+    "release_date": "",
+    "franchise": null,
+    "igdb_id": null,
     "barcode": "9780980123456",
-    "publisher": "",
-    "published": "",
-    "pages": null,
-    "language": null,
-    "subjects": [],
-    "series": null,
-    "description": "",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -1124,16 +883,12 @@
    "b3ea7f88089c4b1fa3bfbcde8d2c1696": {
     "id": "b3ea7f88089c4b1fa3bfbcde8d2c1696",
     "title": "9780980123468",
-    "subtitle": "",
-    "authors": [],
+    "summary": "",
+    "genres": [],
+    "release_date": "",
+    "franchise": null,
+    "igdb_id": null,
     "barcode": "9780980123463",
-    "publisher": "",
-    "published": "",
-    "pages": null,
-    "language": null,
-    "subjects": [],
-    "series": null,
-    "description": "",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -1148,20 +903,14 @@
    "b796ea67f1b14d51a21aea93829a5f3d": {
     "id": "b796ea67f1b14d51a21aea93829a5f3d",
     "title": "Steering the Craft",
-    "subtitle": "",
-    "authors": [
-     "Ursula K. Le Guin"
-    ],
-    "barcode": "9780544611610",
-    "publisher": "Mariner Games",
-    "published": "1998",
-    "pages": 176,
-    "language": "en",
-    "subjects": [
+    "summary": "A writing title by Ursula K. Le Guin.",
+    "genres": [
      "Writing"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "1998",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780544611610",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -1176,20 +925,14 @@
    "ae18ed68fc3445f484544a09c13ece47": {
     "id": "ae18ed68fc3445f484544a09c13ece47",
     "title": "The Ministry for the Future",
-    "subtitle": "",
-    "authors": [
-     "Kim Stanley Robinson"
-    ],
-    "barcode": "9780316300131",
-    "publisher": "Orbit",
-    "published": "2020",
-    "pages": 563,
-    "language": "en",
-    "subjects": [
+    "summary": "A science fiction title by Kim Stanley Robinson.",
+    "genres": [
      "Science fiction"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2020",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780316300131",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -1204,20 +947,14 @@
    "3d2bac374c67488480cf6c8511eb0411": {
     "id": "3d2bac374c67488480cf6c8511eb0411",
     "title": "Tomorrow, and Tomorrow, and Tomorrow",
-    "subtitle": "",
-    "authors": [
-     "Gabrielle Zevin"
-    ],
-    "barcode": "9780593321201",
-    "publisher": "Knopf",
-    "published": "2022",
-    "pages": 401,
-    "language": "en",
-    "subjects": [
+    "summary": "A literary fiction title by Gabrielle Zevin.",
+    "genres": [
      "Literary fiction"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2022",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780593321201",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -1232,20 +969,14 @@
    "0a6099a9263f4b709ee6b01c2d7e9506": {
     "id": "0a6099a9263f4b709ee6b01c2d7e9506",
     "title": "Spinning Silver",
-    "subtitle": "",
-    "authors": [
-     "Naomi Novik"
-    ],
-    "barcode": "9780399581038",
-    "publisher": "Del Rey",
-    "published": "2018",
-    "pages": 466,
-    "language": "en",
-    "subjects": [
+    "summary": "A fantasy title by Naomi Novik.",
+    "genres": [
      "Fantasy"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2018",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780399581038",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -1260,20 +991,14 @@
    "518cc58e5bbe485d8b8a241e59e56f2f": {
     "id": "518cc58e5bbe485d8b8a241e59e56f2f",
     "title": "Sea of Tranquility",
-    "subtitle": "",
-    "authors": [
-     "Emily St. John Mandel"
-    ],
-    "barcode": "9780593321447",
-    "publisher": "Knopf",
-    "published": "2022",
-    "pages": 255,
-    "language": "en",
-    "subjects": [
+    "summary": "A science fiction title by Emily St. John Mandel.",
+    "genres": [
      "Science fiction"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2022",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780593321447",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -1288,23 +1013,14 @@
    "3c13e288a2d24a49a7464566679c565c": {
     "id": "3c13e288a2d24a49a7464566679c565c",
     "title": "The Other Wind",
-    "subtitle": "",
-    "authors": [
-     "Ursula K. Le Guin"
-    ],
-    "barcode": "9780547773766",
-    "publisher": "Clarion Games",
-    "published": "2001",
-    "pages": 246,
-    "language": "en",
-    "subjects": [
+    "summary": "A fantasy title by Ursula K. Le Guin.",
+    "genres": [
      "Fantasy"
     ],
-    "series": {
-     "name": "Earthsea",
-     "number": "6"
-    },
-    "description": "",
+    "release_date": "2001",
+    "franchise": "Earthsea",
+    "igdb_id": null,
+    "barcode": "9780547773766",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -1326,23 +1042,14 @@
    "46027ede85e54b56a1da501c26b7eee7": {
     "id": "46027ede85e54b56a1da501c26b7eee7",
     "title": "The Obelisk Gate",
-    "subtitle": "",
-    "authors": [
-     "N. K. Jemisin"
-    ],
-    "barcode": "9780316229265",
-    "publisher": "Orbit",
-    "published": "2016",
-    "pages": 448,
-    "language": "en",
-    "subjects": [
+    "summary": "A fantasy title by N. K. Jemisin.",
+    "genres": [
      "Fantasy"
     ],
-    "series": {
-     "name": "The Broken Earth",
-     "number": "2"
-    },
-    "description": "",
+    "release_date": "2016",
+    "franchise": "The Broken Earth",
+    "igdb_id": null,
+    "barcode": "9780316229265",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -1364,21 +1071,15 @@
    "0079317c9882402e93c2fdfa755ebffb": {
     "id": "0079317c9882402e93c2fdfa755ebffb",
     "title": "Land of Fish and Rice",
-    "subtitle": "",
-    "authors": [
-     "Fuchsia Dunlop"
-    ],
-    "barcode": "9780393254389",
-    "publisher": "W. W. Norton",
-    "published": "2016",
-    "pages": 368,
-    "language": "en",
-    "subjects": [
+    "summary": "A cooking title by Fuchsia Dunlop.",
+    "genres": [
      "Cooking",
      "Chinese cooking"
     ],
-    "series": null,
-    "description": "",
+    "release_date": "2016",
+    "franchise": null,
+    "igdb_id": null,
+    "barcode": "9780393254389",
     "tags": [],
     "shared_notes": "",
     "cover": {
@@ -1400,24 +1101,14 @@
    "6d4bd3ff12e9445ca851b230b527ce18": {
     "id": "6d4bd3ff12e9445ca851b230b527ce18",
     "title": "Integrated Chinese 2",
-    "subtitle": "",
-    "authors": [
-     "Yuehua Liu",
-     "Tao-chung Yao"
-    ],
-    "barcode": "9781622911400",
-    "publisher": "Cheng & Tsui",
-    "published": "2018",
-    "pages": 412,
-    "language": "en",
-    "subjects": [
+    "summary": "A chinese language title by Yuehua Liu.",
+    "genres": [
      "Chinese language"
     ],
-    "series": {
-     "name": "Integrated Chinese",
-     "number": "2"
-    },
-    "description": "",
+    "release_date": "2018",
+    "franchise": "Integrated Chinese",
+    "igdb_id": null,
+    "barcode": "9781622911400",
     "tags": [],
     "shared_notes": "",
     "cover": {

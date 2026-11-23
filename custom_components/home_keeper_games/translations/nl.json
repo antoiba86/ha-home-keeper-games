@@ -256,45 +256,29 @@
           "name": "Titel van het boek",
           "description": "De titel van het boek."
         },
-        "subtitle": {
-          "name": "Ondertitel",
-          "description": "De ondertitel van het boek."
+        "summary": {
+          "name": "Samenvatting",
+          "description": "Een korte samenvatting van het spel."
         },
-        "authors": {
-          "name": "Auteurs",
-          "description": "De auteurs, op volgorde."
+        "genres": {
+          "name": "Genres",
+          "description": "De genres van het spel."
+        },
+        "release_date": {
+          "name": "Releasedatum",
+          "description": "De releasedatum, bijvoorbeeld 2017-03-03 of 2017."
+        },
+        "franchise": {
+          "name": "Franchise",
+          "description": "De franchise van het spel, bijvoorbeeld The Legend of Zelda."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "Het ID van het spel in IGDB."
         },
         "barcode": {
           "name": "Barcode",
           "description": "Het nummer van de barcode, bijvoorbeeld een EAN-13."
-        },
-        "publisher": {
-          "name": "Uitgever",
-          "description": "De uitgever van het boek."
-        },
-        "published": {
-          "name": "Verschenen",
-          "description": "De datum van verschijnen, meestal een jaar."
-        },
-        "pages": {
-          "name": "Pagina's",
-          "description": "Het aantal pagina's."
-        },
-        "language": {
-          "name": "Taal",
-          "description": "De taalcode, bijvoorbeeld en."
-        },
-        "subjects": {
-          "name": "Onderwerpen",
-          "description": "De onderwerpen van het boek."
-        },
-        "series": {
-          "name": "Reeks",
-          "description": "De naam van de reeks, of een naam en een nummer."
-        },
-        "description": {
-          "name": "Beschrijving",
-          "description": "De beschrijving van het boek."
         },
         "tags": {
           "name": "Labels",
@@ -322,45 +306,29 @@
           "name": "Titel van het boek",
           "description": "De titel van het boek."
         },
-        "subtitle": {
-          "name": "Ondertitel",
-          "description": "De ondertitel van het boek."
+        "summary": {
+          "name": "Samenvatting",
+          "description": "Een korte samenvatting van het spel."
         },
-        "authors": {
-          "name": "Auteurs",
-          "description": "De auteurs, op volgorde."
+        "genres": {
+          "name": "Genres",
+          "description": "De genres van het spel."
+        },
+        "release_date": {
+          "name": "Releasedatum",
+          "description": "De releasedatum, bijvoorbeeld 2017-03-03 of 2017."
+        },
+        "franchise": {
+          "name": "Franchise",
+          "description": "De franchise van het spel, bijvoorbeeld The Legend of Zelda."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "Het ID van het spel in IGDB."
         },
         "barcode": {
           "name": "Barcode",
           "description": "Het nummer van de barcode, bijvoorbeeld een EAN-13."
-        },
-        "publisher": {
-          "name": "Uitgever",
-          "description": "De uitgever van het boek."
-        },
-        "published": {
-          "name": "Verschenen",
-          "description": "De datum van verschijnen, meestal een jaar."
-        },
-        "pages": {
-          "name": "Pagina's",
-          "description": "Het aantal pagina's."
-        },
-        "language": {
-          "name": "Taal",
-          "description": "De taalcode, bijvoorbeeld en."
-        },
-        "subjects": {
-          "name": "Onderwerpen",
-          "description": "De onderwerpen van het boek."
-        },
-        "series": {
-          "name": "Reeks",
-          "description": "De naam van de reeks, of een naam en een nummer."
-        },
-        "description": {
-          "name": "Beschrijving",
-          "description": "De beschrijving van het boek."
         },
         "tags": {
           "name": "Labels",
@@ -638,10 +606,6 @@
           "name": "Titel van het boek",
           "description": "De titel van het boek."
         },
-        "authors": {
-          "name": "Auteurs",
-          "description": "De auteurs, op volgorde."
-        },
         "party": {
           "name": "Andere persoon",
           "description": "De naam van de andere persoon van de uitlening."
@@ -741,10 +705,6 @@
         "title": {
           "name": "Titel van het boek",
           "description": "De titel van het boek."
-        },
-        "authors": {
-          "name": "Auteurs",
-          "description": "De auteurs, op volgorde."
         },
         "person_id": {
           "name": "Persoon",
@@ -880,7 +840,7 @@
       "fields": {
         "query": {
           "name": "Zoeken",
-          "description": "Tekst in de titel, de auteurs, de barcode of de labels."
+          "description": "Tekst in de titel, de barcode, de franchise, de genres of de labels."
         },
         "room_id": {
           "name": "Kamer",

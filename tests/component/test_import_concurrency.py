@@ -16,7 +16,7 @@ async def test_import_keeps_changes_made_while_it_runs(
     dune = (
         await call(
             "add_game",
-            {"title": "Dune", "authors": ["Frank Herbert"]},
+            {"title": "Dune"},
         )
     )["game"]
     hyperion = (await call("add_game", {"title": "Hyperion"}))["game"]
@@ -31,9 +31,9 @@ async def test_import_keeps_changes_made_while_it_runs(
 
     monkeypatch.setattr(csv_io, "apply_import", slow_plan)
     csv_text = (
-        "title,authors,rating,status,tags\n"
-        "Dune,Frank Herbert,4,read,classics\n"
-        "Emma,Jane Austen,,reading,\n"
+        "title,genres,rating,status,tags\n"
+        "Dune,Strategy,4,read,classics\n"
+        "Emma,Puzzle,,reading,\n"
     )
     task = hass.async_create_task(
         call(

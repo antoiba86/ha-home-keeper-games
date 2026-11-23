@@ -88,9 +88,8 @@ export function normalizePeople(raw: Record<string, RawPerson> | null | undefine
 export function normalizeState(raw: Partial<RawState>): Lib {
   const games = asList(raw.games).map((b) => ({
     ...b,
-    authors: b.authors ?? [],
     tags: b.tags ?? [],
-    subjects: b.subjects ?? [],
+    genres: b.genres ?? [],
     reading: b.reading ?? {},
   }));
   return {
@@ -236,7 +235,7 @@ export interface TabRoute {
 export const QUERY_DEFAULTS: Record<string, string> = {
   status: 'all',
   owned: 'yes',
-  sort: 'author',
+  sort: 'title',
   view: 'grid',
   tab: 'out',
   mode: 'shelf',
@@ -245,7 +244,7 @@ export const QUERY_DEFAULTS: Record<string, string> = {
 
 /** The query keys that each view keeps, in URL order. */
 const VIEW_QUERY: Record<View, string[]> = {
-  games: ['q', 'status', 'room', 'shelf', 'reader', 'subject', 'owned', 'sort', 'view'],
+  games: ['q', 'status', 'room', 'shelf', 'reader', 'genre', 'owned', 'sort', 'view'],
   game: [],
   shelves: [],
   loans: ['tab'],
@@ -353,8 +352,8 @@ export function withQuery(
 
 export type StatusFilter = 'all' | 'unread' | 'reading' | 'read' | 'needs';
 export const STATUS_FILTERS: StatusFilter[] = ['all', 'unread', 'reading', 'read', 'needs'];
-export type SortKey = 'author' | 'title' | 'added' | 'published' | 'rating';
-export const SORT_KEYS: SortKey[] = ['author', 'title', 'added', 'published', 'rating'];
+export type SortKey = 'title' | 'franchise' | 'added' | 'released' | 'rating';
+export const SORT_KEYS: SortKey[] = ['title', 'franchise', 'added', 'released', 'rating'];
 
 export interface GameFilters {
   q: string;
@@ -362,7 +361,7 @@ export interface GameFilters {
   room: string;
   shelf: string;
   reader: string;
-  subject: string;
+  genre: string;
   owned: 'yes' | 'no' | 'all';
   sort: SortKey;
   view: 'grid' | 'rows';
@@ -380,16 +379,16 @@ export function readFilters(query: Record<string, string>): GameFilters {
     room: query.room ?? '',
     shelf: query.shelf ?? '',
     reader: query.reader ?? '',
-    subject: query.subject ?? '',
+    genre: query.genre ?? '',
     owned: oneOf(query.owned, ['yes', 'no', 'all'] as const, 'yes'),
-    sort: oneOf(query.sort, SORT_KEYS, 'author'),
+    sort: oneOf(query.sort, SORT_KEYS, 'title'),
     view: oneOf(query.view, ['grid', 'rows'] as const, 'grid'),
   };
 }
 
 /** True if a filter other than sort, layout and the owned default narrows the list. */
 export function hasFilters(f: GameFilters): boolean {
-  return Boolean(f.q || f.room || f.shelf || f.reader || f.subject || f.status !== 'all' || f.owned !== 'yes');
+  return Boolean(f.q || f.room || f.shelf || f.reader || f.genre || f.status !== 'all' || f.owned !== 'yes');
 }
 
 /** The reading row of *personId* for *game*, or null. */
@@ -407,10 +406,9 @@ export function statusOf(game: Game, personId: string | null | undefined): Readi
 export function searchText(game: Game, personId: string | null): string {
   const parts = [
     game.title,
-    game.subtitle,
-    ...game.authors,
     game.barcode,
-    game.series?.name,
+    game.franchise,
+    ...game.genres,
     game.shared_notes,
     ...game.tags,
     readingOf(game, personId)?.private_notes,
@@ -463,7 +461,7 @@ function matchesStatus(game: Game, status: StatusFilter, me: string | null): boo
 export function matchesBase(game: Game, f: GameFilters, ctx: FilterContext): boolean {
   if (f.owned === 'yes' && !game.owned) return false;
   if (f.owned === 'no' && game.owned) return false;
-  if (f.subject && !game.subjects.includes(f.subject)) return false;
+  if (f.genre && !game.genres.includes(f.genre)) return false;
   if (f.reader && statusOf(game, f.reader) !== 'read') return false;
   if (!inPlace(game, f, ctx)) return false;
   return matchesSearch(game, f.q, ctx.me);
@@ -485,44 +483,34 @@ export function statusCounts(games: Game[], f: GameFilters, ctx: FilterContext):
   return counts;
 }
 
-/** The sort key of an author name: the last word, then the full name. */
-export function authorKey(name: string | undefined): string {
-  const words = fold(name).trim().split(/\s+/).filter(Boolean);
-  // A game with no author sorts after every game with an author.
-  if (!words.length) return '\uffff';
-  return `${words[words.length - 1]} ${words.join(' ')}`;
-}
-
 /** The year in a free text date such as "1969" or "March 2001", or null. */
 export function yearOf(value: string | null | undefined): number | null {
   const m = String(value ?? '').match(/\b(\d{4})\b/);
   return m ? Number(m[1]) : null;
 }
 
-function seriesNumber(game: Game): number {
-  const n = Number(game.series?.number);
-  return Number.isFinite(n) ? n : 0;
-}
-
 /** Sort games by *key*. Title is the tiebreak for every key. */
 export function sortGames(games: Game[], key: SortKey, me: string | null): Game[] {
   const byTitle = (a: Game, b: Game) => fold(a.title).localeCompare(fold(b.title));
   const cmp: Record<SortKey, (a: Game, b: Game) => number> = {
-    author: (a, b) =>
-      authorKey(a.authors[0]).localeCompare(authorKey(b.authors[0])) ||
-      fold(a.series?.name).localeCompare(fold(b.series?.name)) ||
-      seriesNumber(a) - seriesNumber(b),
     title: () => 0,
+    // A game with no franchise sorts after every game with a franchise.
+    franchise: (a, b) => (fold(a.franchise) || '\uffff').localeCompare(fold(b.franchise) || '\uffff'),
     added: (a, b) => String(b.created_at).localeCompare(String(a.created_at)),
-    published: (a, b) => (yearOf(a.published) ?? 99999) - (yearOf(b.published) ?? 99999),
+    released: (a, b) => (yearOf(a.release_date) ?? 99999) - (yearOf(b.release_date) ?? 99999),
     rating: (a, b) => (readingOf(b, me)?.rating ?? 0) - (readingOf(a, me)?.rating ?? 0),
   };
   return [...games].sort((a, b) => cmp[key](a, b) || byTitle(a, b));
 }
 
-/** The subjects of all games, sorted, with no duplicates. */
-export function allSubjects(games: Game[]): string[] {
-  return [...new Set(games.flatMap((b) => b.subjects))].sort((a, b) => a.localeCompare(b));
+/** The genres of all games, sorted, with no duplicates. */
+export function allGenres(games: Game[]): string[] {
+  return [...new Set(games.flatMap((b) => b.genres))].sort((a, b) => a.localeCompare(b));
+}
+
+/** The second line of a game: its franchise, else its genres. */
+export function gameByline(game: Game): string {
+  return game.franchise || game.genres.join(', ');
 }
 
 // ── Barcodes ─────────────────────────────────────────────────────────────────
@@ -642,13 +630,13 @@ export interface Spine {
 }
 
 /**
- * The spines to draw for the games on a shelf. Width comes from the page count,
- * height and color from the game id.
+ * The spines to draw for the games on a shelf. Width, height and color come from
+ * the game id.
  */
 export function spines(games: Game[], max = 60): Spine[] {
   return games.slice(0, max).map((b) => {
     const h = hash(b.id);
-    const w = b.pages ? Math.min(22, Math.max(8, Math.round(6 + b.pages / 40))) : 8 + (h % 10);
+    const w = 8 + (h % 10);
     return {
       id: b.id,
       title: b.title,
@@ -728,7 +716,7 @@ export interface Activity {
 export interface CardModel {
   reading: Array<{ game: Game; row: ReadingRow }>;
   want: Game[];
-  goal: { done: number; goal: number | null; pages: number; year: number };
+  goal: { done: number; goal: number | null; year: number };
   household: Activity[];
 }
 
@@ -738,7 +726,6 @@ export function cardModel(lib: Lib, personId: string | null, now: Date, maxActiv
   const reading: CardModel['reading'] = [];
   const want: Game[] = [];
   let done = 0;
-  let pages = 0;
   const household: Activity[] = [];
   const person = new Map(lib.people.map((p) => [p.id, p]));
   for (const game of lib.games) {
@@ -746,10 +733,7 @@ export function cardModel(lib: Lib, personId: string | null, now: Date, maxActiv
       if (pid === personId) {
         if (row.status === 'reading') reading.push({ game, row });
         if (row.status === 'want') want.push(game);
-        if (row.status === 'read' && yearOf(row.finished) === year) {
-          done += 1;
-          pages += game.pages ?? 0;
-        }
+        if (row.status === 'read' && yearOf(row.finished) === year) done += 1;
       } else if (row.status && row.status !== 'want' && person.get(pid)?.share_reading) {
         household.push({ person: person.get(pid)!, game, row });
       }
@@ -760,7 +744,7 @@ export function cardModel(lib: Lib, personId: string | null, now: Date, maxActiv
   return {
     reading,
     want,
-    goal: { done, goal: personId ? (person.get(personId)?.yearly_goal ?? null) : null, pages, year },
+    goal: { done, goal: personId ? (person.get(personId)?.yearly_goal ?? null) : null, year },
     household: household.slice(0, maxActivity),
   };
 }

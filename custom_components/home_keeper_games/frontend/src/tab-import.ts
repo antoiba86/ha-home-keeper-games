@@ -33,7 +33,7 @@ export function renderImport(ctx: ViewCtx): string {
         <tbody>${PREVIEW_KEYS.filter((k) => counts[k]).map((k) => `<tr><td>${escapeHTML(t(`import.row_${k}`))}</td><td class="num">${formatNumber(counts[k])}</td></tr>`).join('') || `<tr><td colspan="2" class="hkl-muted">${escapeHTML(t('import.no_changes'))}</td></tr>`}</tbody>
       </table></div>
       <div class="hkl-chips">${MATCH_KEYS.map((k) => `<span class="hkl-chip">${escapeHTML(t(`import.match_${k}`, { n: formatNumber(counts[k] ?? 0) }))}</span>`).join('')}</div>
-      ${s.summary.rows.length ? `<details class="hkl-details"><summary>${escapeHTML(tn('import.rows_shown', Math.min(PREVIEW_ROWS, s.summary.rows.length)))}</summary><div class="hkl-tablewrap"><table class="hkl-table small"><tbody>${s.summary.rows.slice(0, PREVIEW_ROWS).map((r) => `<tr class="${r.action === 'error' ? 'err' : ''}"><td>${escapeHTML(r.line)}</td><td>${escapeHTML(r.title || r.barcode || '')}</td><td>${escapeHTML(r.authors.join(', '))}</td><td>${escapeHTML(rowResult(r))}</td></tr>`).join('')}</tbody></table></div></details>` : ''}
+      ${s.summary.rows.length ? `<details class="hkl-details"><summary>${escapeHTML(tn('import.rows_shown', Math.min(PREVIEW_ROWS, s.summary.rows.length)))}</summary><div class="hkl-tablewrap"><table class="hkl-table small"><tbody>${s.summary.rows.slice(0, PREVIEW_ROWS).map((r) => `<tr class="${r.action === 'error' ? 'err' : ''}"><td>${escapeHTML(r.line)}</td><td>${escapeHTML(r.title || r.barcode || '')}</td><td>${escapeHTML(rowResult(r))}</td></tr>`).join('')}</tbody></table></div></details>` : ''}
       ${s.summary.truncated ? `<p class="hkl-muted small" data-k="import-truncated">${escapeHTML(t('import.truncated'))}</p>` : ''}`
     : '';
   const file = s.fileName

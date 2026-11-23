@@ -5,6 +5,14 @@ Each change that a user can see is in this file. The format is based on
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). `manifest.json` `version`
 is the single source of truth (see `RELEASE.md`).
 
+## [0.5.0b3] - 2026-11-23
+
+### Changed
+
+- **Game details.** A game has a summary, genres, a release date and a franchise, and it
+  keeps its tags and notes. The authors, subtitle, publisher, page count, language,
+  subjects and series of a book are gone, and the to-do items show only the title.
+
 ## [0.5.0b2] - 2026-11-21
 
 ### Changed

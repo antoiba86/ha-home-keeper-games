@@ -7,7 +7,7 @@ implements:
   - custom_components/home_keeper_games/sensor.py
   - custom_components/home_keeper_games/todo.py
 related: [store-models, people-privilege, events-api]
-source_hash: 04dbb2b0c916
+source_hash: 4a0f6e96a5bc
 ---
 
 # Coordinator and entities
@@ -61,7 +61,7 @@ person does not share the reading ([people-privilege](people-privilege.md#entiti
 | `games` | Games with 1 copy or more | |
 | `loans_out` | Open loans that lend a copy out | |
 | `loans_overdue` | Open loans past their due date | |
-| `games_read_this_year` | Games that the person finished this year | `goal`, `pages`, `year` |
+| `games_read_this_year` | Games that the person finished this year | `goal`, `year` |
 | `reading_now` | Games with status `reading` | `games`: at most 10 titles |
 
 The counts come from the pure functions of `projections.py`. The hourly overdue check
@@ -70,8 +70,7 @@ also updates the listeners, so the date-based states change at midnight within 1
 ### To read list
 
 `ToReadList` is a `todo` entity for each person. Its items are the games with status
-`want`, oldest first. The summary is "Title by Author" from `backend_strings` and the uid
-is the game id.
+`want`, oldest first. The summary is the title and the uid is the game id.
 
 - Completing an item sets the status `read`, and the store sets `finished` to today.
 - Adding an item gives a `want` row to the game with that title, or to the game with that
@@ -92,5 +91,5 @@ is the game id.
 ## One-way doors
 
 - The unique ids `home_keeper_games_<key>` and `home_keeper_games_<person_id>_<key>`.
-- The sensor keys and the attributes `goal`, `pages`, `year`, `games` and `person_id`.
+- The sensor keys and the attributes `goal`, `year`, `games` and `person_id`.
 - The uid of a To read item is the game id.

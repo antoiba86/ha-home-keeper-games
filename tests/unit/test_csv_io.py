@@ -16,15 +16,15 @@ NOW = "2026-10-05T12:00:00+00:00"
 LEFT = "9780441478125"
 
 LIB = (
-    "\ufefftitle,authors,barcode,publisher,pages,format,status,rating,finished,"
+    "\ufefftitle,franchise,barcode,genres,release_date,format,status,rating,finished,"
     "read_count,private_notes,tags,wishlist\n"
-    f"The Left Hand of Darkness,Ursula K. Le Guin,{LEFT},Ace,304,paperback,read,5,"
+    f"The Left Hand of Darkness,Hainish,{LEFT},Science fiction,1969,paperback,read,5,"
     '2024-03-05,2,"Great\ngame",favorites,false\n'
-    "Dune,Frank Herbert; Kevin J. Anderson,,,,,reading,,,,,,false\n"
-    "Emma,Jane Austen,,,,,,,,,,,true\n"
-    "Persuasion,Jane Austen,,,,hardcover,want,,,,,,false\n"
-    "Ulysses,James Joyce,,,,,dnf,,,,,,false\n"
-    "Notes,Me,,,,,,,,,,,false\n"
+    "Dune,,,Science fiction; Classic,,,reading,,,,,,false\n"
+    "Emma,,,,,,,,,,,,true\n"
+    "Persuasion,,,,,hardcover,want,,,,,,false\n"
+    "Ulysses,,,,,,dnf,,,,,,false\n"
+    "Notes,,,,,,,,,,,,false\n"
 )
 
 
@@ -33,15 +33,17 @@ def test_parse() -> None:
     assert [r["line"] for r in rows] == [1, 2, 3, 4, 5, 6]
     left = rows[0]
     assert left["title"] == "The Left Hand of Darkness"
-    assert left["authors"] == ["Ursula K. Le Guin"]
+    assert left["franchise"] == "Hainish" and left["genres"] == ["Science fiction"]
     assert left["barcode"] == LEFT
     assert left["status"] == "read" and left["rating"] == 5
     assert left["finished"] == "2024-03-05" and left["read_count"] == 2
     assert left["owned"] == 1 and left["copy"]["format"] == "paperback"
     assert left["tags"] == ["favorites"] and left["notes"] == "Great\ngame"
-    assert left["publisher"] == "Ace" and left["pages"] == 304
+    assert left["release_date"] == "1969"
     dune = rows[1]
-    assert dune["authors"] == ["Frank Herbert", "Kevin J. Anderson"]
+    assert (
+        dune["genres"] == ["Science fiction", "Classic"] and dune["franchise"] is None
+    )
     assert dune["barcode"] is None and dune["status"] == "reading"
     assert dune["rating"] is None and dune["copy"] is None and dune["owned"] == 0
     assert rows[2]["wishlist"] is True and rows[2]["status"] is None
@@ -105,7 +107,7 @@ def _library() -> dict:
     state["rooms"]["r"] = {"id": "r", "name": "Den", "order": 0}
     state["units"]["k"] = {"id": "k", "room_id": "r", "name": "Left", "order": 0}
     state["shelves"]["s"] = {"id": "s", "unit_id": "k", "name": "Top", "order": 0}
-    game = m.build_game({"title": "Persuasion", "authors": ["Jane Austen"]}, now=NOW)
+    game = m.build_game({"title": "Persuasion", "genres": ["Romance"]}, now=NOW)
     game["id"] = "persuasion"
     state["games"]["persuasion"] = game
     return state
@@ -151,7 +153,6 @@ def test_apply_import() -> None:
     assert results[0] == {
         "line": 1,
         "title": "The Left Hand of Darkness",
-        "authors": ["Ursula K. Le Guin"],
         "barcode": LEFT,
         "game_id": results[0]["game_id"],
         "action": "new",
@@ -358,7 +359,7 @@ def test_export_header_and_cells() -> None:
     reader = csv.DictReader(io.StringIO(text, newline=""))
     assert tuple(reader.fieldnames or ()) == cio.LIBRARY_COLUMNS
     row = next(reader)
-    assert row["barcode"] == LEFT and row["authors"] == "Jane Austen"
+    assert row["barcode"] == LEFT and row["genres"] == "Romance"
     assert row["status"] == "read" and row["rating"] == "4"
     assert row["finished"] == "2024-01-02" and row["format"] == "audiobook"
     assert row["copy_id"] == copy["id"]
@@ -414,17 +415,14 @@ def _library_row(draw) -> dict:
     row["needs_details"] = False
     row["game_id"] = draw(st.uuids()).hex
     row["title"] = draw(_TEXT.filter(bool))
-    for field in ("subtitle", "publisher", "description", "shared_notes"):
+    for field in ("summary", "shared_notes"):
         row[field] = draw(_TEXT)
-    row["published"] = draw(st.sampled_from(["", "1969", "c. 1900"]))
-    row["authors"] = draw(st.lists(_NAME, max_size=3, unique=True))
-    row["subjects"] = draw(st.lists(_NAME, max_size=3, unique=True))
+    row["release_date"] = draw(st.sampled_from(["", "1969", "2017-03-03"]))
+    row["genres"] = draw(st.lists(_NAME, max_size=3, unique=True))
     row["tags"] = draw(st.lists(_TAG, max_size=3, unique=True))
     row["barcode"] = draw(st.none() | _BARCODE)
-    row["pages"] = draw(st.none() | st.integers(min_value=1, max_value=5000))
-    row["language"] = draw(st.sampled_from([None, "en", "de"]))
-    if draw(st.booleans()):
-        row["series"] = {"name": draw(_NAME), "number": draw(st.none() | st.just("2"))}
+    row["franchise"] = draw(st.none() | _NAME)
+    row["igdb_id"] = draw(st.none() | st.integers(min_value=1, max_value=999999))
     if draw(st.booleans()):
         row["copy"] = {
             "id": draw(st.uuids()).hex,
@@ -470,7 +468,7 @@ def test_library_round_trip(rows: list[dict]) -> None:
         min_size=1,
         max_size=5,
         unique_by=(
-            lambda r: m.title_key(r["title"], r["authors"]),
+            lambda r: m.title_key(r["title"]),
             lambda r: r["barcode"] or r["game_id"],
         ),
     )

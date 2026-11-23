@@ -95,8 +95,8 @@ describe('games view', () => {
     expect($$('.hkl-row').map((r) => r.querySelector('.hkl-row-title').textContent)).toEqual([
       'Every Grain of Rice',
       'Integrated Chinese 1',
-      'The Ministry for the Future',
       'Project Hail Mary',
+      'The Ministry for the Future',
     ]);
     expect($('[data-k="st-reading"]').getAttribute('aria-pressed')).toBe('true');
   });
@@ -110,10 +110,10 @@ describe('games view', () => {
     await mount();
     $('[data-k="st-read"]').click();
     expect(host.navigate).toHaveBeenLastCalledWith('/games;status=read', { replace: true });
-    change($('[data-k="f-sort"]'), 'title');
-    expect(host.navigate).toHaveBeenLastCalledWith('/games;status=read;sort=title', { replace: true });
+    change($('[data-k="f-sort"]'), 'franchise');
+    expect(host.navigate).toHaveBeenLastCalledWith('/games;status=read;sort=franchise', { replace: true });
     $('[data-k="clear"]').click();
-    expect(host.navigate).toHaveBeenLastCalledWith('/games;sort=title', { replace: true });
+    expect(host.navigate).toHaveBeenLastCalledWith('/games;sort=franchise', { replace: true });
   });
 
   it('clears a shelf that is not in the new room', async () => {
@@ -130,13 +130,13 @@ describe('games view', () => {
     vi.useFakeTimers();
     const input = $('[data-k="q"]');
     input.focus();
-    input.value = 'le guin';
+    input.value = 'science fiction';
     input.dispatchEvent(new Event('input', { bubbles: true }));
     expect(host.navigate).not.toHaveBeenCalled();
     vi.advanceTimersByTime(260);
-    expect(host.navigate).toHaveBeenCalledWith('/games;q=le%20guin', { replace: true });
+    expect(host.navigate).toHaveBeenCalledWith('/games;q=science%20fiction', { replace: true });
     expect(el.shadowRoot.activeElement?.dataset.k).toBe('q');
-    expect($$('.hkl-tile').length).toBe(12);
+    expect($$('.hkl-tile').length).toBe(11);
   });
 
   it('opens a game with a push', async () => {
@@ -216,7 +216,8 @@ describe('game detail', () => {
     expect($('.hkl-task').getAttribute('href')).toBe(`/home-keeper/tasks/${task}`);
     expect(host.taskLink).toHaveBeenCalledWith(task);
     expect(text()).toContain('Read on Mar 2, 2025 · Read 2 times');
-    expect(text()).toContain('Page 112 of 304');
+    expect(text()).toContain('Page 112');
+    expect(text()).toContain('Hainish Cycle');
     expect($('[data-k="rs-read"]').getAttribute('aria-pressed')).toBe('true');
     expect($$('.hkl-star.on')).toHaveLength(4);
   });
@@ -306,19 +307,17 @@ describe('game detail', () => {
     const fake = await mount(`/games/${id}`);
     $('[data-k="edit-game"]').click();
     const dlg = el.shadowRoot.getElementById('dlg');
-    dlg.querySelector('[name="authors"]').value = 'Frank Herbert, Someone Else';
+    dlg.querySelector('[name="genres"]').value = 'Strategy, Classic';
     dlg.querySelector('[name="barcode"]').value = 'ab-12';
-    dlg.querySelector('[name="series_name"]').value = 'Dune';
-    dlg.querySelector('[name="series_number"]').value = '1';
+    dlg.querySelector('[name="franchise"]').value = 'Dune';
     dlg.querySelector('[data-k="d-submit"]').click();
     await flush();
     expect(fake.calls('update_game')[0]).toMatchObject({
       game_id: id,
       title: 'Dune',
-      authors: ['Frank Herbert', 'Someone Else'],
+      genres: ['Strategy', 'Classic'],
       barcode: 'AB12',
-      series: { name: 'Dune', number: 1 },
-      pages: 688,
+      franchise: 'Dune',
     });
     expect(dlg.innerHTML).toBe('');
   });
@@ -329,12 +328,12 @@ describe('game detail', () => {
     await mount(`/games/${gameId(state, 'Dune')}`, { replies: { update_game: () => Promise.reject({ message: `Not allowed ${++n}` }) } });
     $('[data-k="edit-game"]').click();
     const dlg = el.shadowRoot.getElementById('dlg');
-    dlg.querySelector('[name="subtitle"]').value = 'Typed text';
+    dlg.querySelector('[name="franchise"]').value = 'Typed text';
     dlg.querySelector('[data-k="d-submit"]').click();
     await flush();
     expect(dlg.querySelectorAll('.hkl-error')).toHaveLength(1);
     expect(dlg.querySelector('.hkl-error').textContent).toBe('Not allowed 1');
-    expect(dlg.querySelector('[name="subtitle"]').value).toBe('Typed text');
+    expect(dlg.querySelector('[name="franchise"]').value).toBe('Typed text');
     expect(dlg.querySelector('[data-k="d-submit"]').disabled).toBe(false);
     dlg.querySelector('[data-k="d-submit"]').click();
     await flush();
@@ -624,7 +623,7 @@ describe('scan with no match', () => {
   /** A game that a scan of a new barcode saved: its barcode is its title. */
   function missing(state, code, id) {
     const shelf = state.shelves[0].id;
-    const game = { ...state.games[0], id, title: code, subtitle: '', authors: [], barcode: code, publisher: '', published: '', pages: null, needs_details: true, cover: null };
+    const game = { ...state.games[0], id, title: code, franchise: null, genres: [], barcode: code, release_date: '', needs_details: true, cover: null };
     const copy = { ...state.copies[0], id: `c-${id}`, game_id: id, shelf_id: shelf, format: 'paperback' };
     state.games.push(game);
     state.copies.push(copy);
@@ -751,9 +750,9 @@ describe('scan with no match', () => {
     expect(sheet().querySelector('[data-k="d-cover"]').getAttribute('capture')).toBe('environment');
     typeTitle('Field Notes on Moss');
     const set = (name, value) => (sheet().querySelector(`[name="${name}"]`).value = value);
-    set('authors', 'A. Hollins, B. Reed');
-    set('published', '2004');
-    set('pages', '120');
+    set('franchise', 'Moss');
+    set('genres', 'Puzzle, Casual');
+    set('release_date', '2004');
     set('format', 'hardcover');
     sheet().querySelector('[data-k="d-submit"]').click();
     await flush();
@@ -761,9 +760,9 @@ describe('scan with no match', () => {
       type: 'home_keeper_games/update_game',
       game_id: 'new',
       title: 'Field Notes on Moss',
-      authors: ['A. Hollins', 'B. Reed'],
-      published: '2004',
-      pages: 120,
+      franchise: 'Moss',
+      release_date: '2004',
+      genres: ['Puzzle', 'Casual'],
     });
     expect(fake.calls('update_copy')[0]).toEqual({ type: 'home_keeper_games/update_copy', copy_id: 'c-new', format: 'hardcover' });
     expect(sheet()).toBeNull();
