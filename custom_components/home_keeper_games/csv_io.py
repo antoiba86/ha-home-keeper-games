@@ -48,18 +48,21 @@ LIBRARY_COLUMNS = (
     "release_date",
     "franchise",
     "igdb_id",
-    "barcode",
     "tags",
     "shared_notes",
     "copy_id",
+    "platform",
     "format",
+    "storefront",
+    "region",
+    "edition",
+    "steelbook",
+    "barcode",
     "condition",
     "acquired",
     "acquired_from",
     "price",
     "value",
-    "signed",
-    "first_edition",
     "copy_note",
     "location",
     "status",
@@ -78,14 +81,17 @@ PATH_SEP = " / "
 
 # The copy fields of a library row, and their CSV column.
 _COPY_COLUMNS = {
+    "platform": "platform",
     "format": "format",
+    "storefront": "storefront",
+    "region": "region",
+    "edition": "edition",
+    "steelbook": "steelbook",
     "condition": "condition",
     "acquired": "acquired",
     "acquired_from": "acquired_from",
     "price": "price",
     "value": "value",
-    "signed": "signed",
-    "first_edition": "first_edition",
     "note": "copy_note",
 }
 
@@ -226,13 +232,15 @@ def parse_library(text: str) -> list[dict[str, Any]]:
         if fmt in FORMATS:
             copy: dict[str, Any] = {"id": _record_id(_cell(raw, "copy_id"))}
             copy["format"] = fmt
+            copy["platform"] = _cell(raw, "platform") or None
+            for field in ("storefront", "region", "edition"):
+                copy[field] = _cell(raw, field)
+            copy["steelbook"] = _bool_cell(_cell(raw, "steelbook"))
             copy["condition"] = _cell(raw, "condition") or None
             copy["acquired"] = _date(_cell(raw, "acquired"))
             copy["acquired_from"] = _cell(raw, "acquired_from")
             copy["price"] = _money_cell(_cell(raw, "price"))
             copy["value"] = _money_cell(_cell(raw, "value"))
-            copy["signed"] = _bool_cell(_cell(raw, "signed"))
-            copy["first_edition"] = _bool_cell(_cell(raw, "first_edition"))
             copy["note"] = _cell(raw, "copy_note")
             row["copy"] = copy
             row["owned"] = 1
@@ -272,17 +280,22 @@ def parse(text: str) -> list[dict[str, Any]]:
 class _Index:
     """The match keys of the games: barcode, then title and author."""
 
-    def __init__(self, games: dict[str, dict[str, Any]]) -> None:
+    def __init__(self, games: dict[str, dict[str, Any]], copies: Any = ()) -> None:
         self.by_id: set[str] = set()
         self.barcode: dict[str, str] = {}
         self.title: dict[str, str] = {}
         for game in games.values():
             self.add(game)
+        for copy in copies:
+            self.add_barcode(copy.get("barcode"), copy.get("game_id"))
+
+    def add_barcode(self, code: Any, game_id: Any) -> None:
+        """Map the barcode of a copy to its game. The first copy wins."""
+        if code and game_id:
+            self.barcode.setdefault(str(code), str(game_id))
 
     def add(self, game: dict[str, Any]) -> None:
         self.by_id.add(game["id"])
-        if game["barcode"]:
-            self.barcode.setdefault(game["barcode"], game["id"])
         key = title_key(game["title"])
         if key:
             self.title.setdefault(key, game["id"])
@@ -305,7 +318,6 @@ _ROW_GAME_FIELDS = (
     "release_date",
     "franchise",
     "igdb_id",
-    "barcode",
     "tags",
     "shared_notes",
 )
@@ -380,7 +392,7 @@ def apply_import(
     translation key) and ``placeholders``.
     """
     new = clone(state)
-    index = _Index(new["games"])
+    index = _Index(new["games"], new["copies"].values())
     reading = new["reading"].setdefault(person_id, {})
     copy_ids = set(new["copies"])
     owned_games = {c.get("game_id") for c in new["copies"].values()}
@@ -417,11 +429,15 @@ def apply_import(
                 if extra:
                     game["tags"] = [*game["tags"], *extra]
                     counts["tags"] += 1
+            owner = index.barcode.get(row["barcode"] or "")
+            if row["copy"] is not None and owner not in (None, game_id):
+                raise LibraryError("duplicate_barcode", barcode=row["barcode"])
             counts[action] += 1
             result["action"] = action
             result["game_id"] = game_id
             if _import_copy(new, row, game_id, shelf_id, copy_ids, owned_games, now):
                 counts["copies"] += 1
+                index.add_barcode(row["barcode"], game_id)
             # A library file has 1 row for each copy. The first row of a game
             # sets its reading status.
             if row["status"] and game_id not in reading_done:
@@ -479,6 +495,7 @@ def _import_copy(
     location = row.get("location") or []
     target = find_shelf_by_path(new, location) if location else None
     data = {k: v for k, v in copy.items() if k != "id" and v is not None}
+    data["barcode"] = row.get("barcode")
     data["game_id"] = game_id
     data["shelf_id"] = target or (shelf_id if shelf_id in new["shelves"] else None)
     record = build_copy(data, now=now)
@@ -553,6 +570,7 @@ def rows_from_state(
                 "id": copy["id"],
                 **{field: copy.get(field) for field in _COPY_COLUMNS},
             }
+            row["barcode"] = copy.get("barcode")
             row["location"] = location_path(state, copy.get("shelf_id"))
             rows.append(row)
     return rows
@@ -584,18 +602,21 @@ def _library_cells(row: dict[str, Any]) -> dict[str, str]:
         "release_date": row["release_date"],
         "franchise": row["franchise"] or "",
         "igdb_id": _num(row["igdb_id"]),
-        "barcode": row["barcode"] or "",
         "tags": LIST_SEP.join(row["tags"] or []),
         "shared_notes": row["shared_notes"],
         "copy_id": copy.get("id") or "",
+        "platform": copy.get("platform") or "",
         "format": copy.get("format") or "",
+        "storefront": copy.get("storefront") or "",
+        "region": copy.get("region") or "",
+        "edition": copy.get("edition") or "",
+        "steelbook": _bool_text(copy.get("steelbook")) if copy else "",
+        "barcode": row["barcode"] or "",
         "condition": copy.get("condition") or "",
         "acquired": copy.get("acquired") or "",
         "acquired_from": copy.get("acquired_from") or "",
         "price": _num(copy.get("price")),
         "value": _num(copy.get("value")),
-        "signed": _bool_text(copy.get("signed")) if copy else "",
-        "first_edition": _bool_text(copy.get("first_edition")) if copy else "",
         "copy_note": copy.get("note") or "",
         "location": PATH_SEP.join(row["location"] or []),
         "status": row["status"] or "",

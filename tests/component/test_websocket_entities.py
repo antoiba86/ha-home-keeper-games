@@ -260,14 +260,15 @@ async def test_first_copy_of_a_wishlist_game_clears_the_wishlist(
     removed = async_capture_events(hass, "home_keeper_games_wishlist_removed")
     added = async_capture_events(hass, "home_keeper_games_copy_added")
     await call("set_person_settings", {"person_id": BOB, "wishlist_todo": todo_list})
-    game = await _game(call, title="Emma", barcode="9780441478125")
+    game = await _game(call, title="Emma")
     await call(
         "add_to_wishlist", {"game_id": game["id"], "person_id": BOB, "buy": True}
     )
     await hass.async_block_till_done(wait_background_tasks=True)
     assert len(await _todo_items(hass, todo_list)) == 1
-    reply = await call("scan_barcode", {"barcode": "9780441478125"})
-    assert reply["result"] == "added" and reply["from_wishlist"] is True
+    # The first copy, with the barcode of its case, comes from the wishlist.
+    reply = await call("add_copy", {"game_id": game["id"], "barcode": "9780441478125"})
+    assert reply["from_wishlist"] is True
     await hass.async_block_till_done(wait_background_tasks=True)
     store = setup_entry.runtime_data.store
     assert store.state["games"][game["id"]]["wishlist"] is None

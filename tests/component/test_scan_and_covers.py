@@ -23,12 +23,16 @@ def _jpeg(size=(1600, 2400), color="red", fmt="JPEG") -> bytes:
 async def test_scan_of_a_new_barcode_adds_a_game_that_needs_details(
     hass, setup_entry, call
 ) -> None:
-    reply = await call("scan_barcode", {"barcode": " 0711-7195 05012 "})
+    reply = await call(
+        "scan_barcode",
+        {"barcode": " 0711-7195 05012 ", "platform": "switch", "format": "physical"},
+    )
     assert reply["result"] == "not_found"
     game = reply["game"]
-    assert game["barcode"] == EAN and game["title"] == EAN
+    assert "barcode" not in game and game["title"] == EAN
     assert game["needs_details"] is True and game["owned"] is True
     assert reply["copy"]["game_id"] == game["id"]
+    assert reply["copy"]["barcode"] == EAN and reply["copy"]["platform"] == "switch"
     assert reply["existing_copies"] == [] and reply["from_wishlist"] is False
 
 
@@ -59,11 +63,28 @@ async def test_scan_of_a_known_barcode_follows_on_duplicate(
     assert list(games) == [game_id], "a scan of a known barcode adds no game"
 
 
-async def test_scan_of_a_game_with_no_copy_adds_a_copy(hass, setup_entry, call) -> None:
-    game = (await call("add_game", {"title": "Wanted", "barcode": EAN}))["game"]
-    reply = await call("scan_barcode", {"barcode": EAN})
-    assert reply["result"] == "added" and reply["game"]["id"] == game["id"]
-    assert reply["game"]["title"] == "Wanted"
+async def test_scan_moves_only_a_physical_copy(hass, setup_entry, call) -> None:
+    first = await call("scan_barcode", {"barcode": EAN, "format": "digital"})
+    assert first["copy"]["shelf_id"] is None
+    room = (await call("add_room", {"name": "Den"}))["room"]
+    unit = (await call("add_unit", {"room_id": room["id"], "name": "U"}))["unit"]
+    shelf = (await call("add_shelf", {"unit_id": unit["id"], "name": "S"}))["shelf"]
+    with pytest.raises(ServiceValidationError) as info:
+        await call(
+            "scan_barcode",
+            {"barcode": EAN, "on_duplicate": "move", "shelf_id": shelf["id"]},
+        )
+    assert info.value.translation_key == "digital_copy_no_shelf"
+    await call(
+        "scan_barcode",
+        {"barcode": EAN, "on_duplicate": "add_copy", "format": "physical"},
+    )
+    moved = await call(
+        "scan_barcode",
+        {"barcode": EAN, "on_duplicate": "move", "shelf_id": shelf["id"]},
+    )
+    assert moved["result"] == "moved" and moved["copy"]["format"] == "physical"
+    assert moved["copy"]["shelf_id"] == shelf["id"]
 
 
 async def test_scan_refuses_a_bad_barcode(hass, setup_entry, call) -> None:
@@ -82,21 +103,28 @@ async def test_scan_refuses_a_bad_barcode(hass, setup_entry, call) -> None:
     assert setup_entry.runtime_data.store.state["games"] == {}
 
 
-async def test_add_game_by_barcode(hass, setup_entry, call) -> None:
+async def test_add_game_by_barcode_looks_up_a_copy(hass, setup_entry, call) -> None:
     added = await call("add_game", {"barcode": EAN, "title": "Dune"})
-    assert added["existing"] is False
-    assert added["game"]["barcode"] == EAN and added["game"]["needs_details"] is False
-    again = await call("add_game", {"barcode": EAN})
-    assert again == {"game": added["game"], "existing": True}
+    assert added["existing"] is False and "barcode" not in added["game"]
+    # The barcode is on no copy yet, so a second call adds a second game.
+    again = await call("add_game", {"barcode": EAN, "title": "Dune 2"})
+    assert again["existing"] is False
+    await call("add_copy", {"game_id": added["game"]["id"], "barcode": EAN})
+    found = await call("add_game", {"barcode": EAN})
+    assert found["existing"] is True and found["game"]["id"] == added["game"]["id"]
     bare = (await call("add_game", {"barcode": "4006381333931"}))["game"]
     assert bare["title"] == "4006381333931" and bare["needs_details"] is True
     with pytest.raises(ServiceValidationError) as info:
         await call("add_game", {"genres": ["Puzzle"]})
     assert info.value.translation_key == "barcode_or_title_required"
     with pytest.raises(ServiceValidationError) as info:
-        await call("update_game", {"game_id": bare["id"], "barcode": EAN})
+        await call("add_copy", {"game_id": bare["id"], "barcode": EAN})
     assert info.value.translation_key == "duplicate_barcode"
     assert info.value.translation_placeholders == {"barcode": EAN}
+    copy = (await call("add_copy", {"game_id": bare["id"]}))["copy"]
+    with pytest.raises(ServiceValidationError) as info:
+        await call("update_copy", {"copy_id": copy["id"], "barcode": EAN})
+    assert info.value.translation_key == "duplicate_barcode"
 
 
 async def _upload(hass_client, data: bytes, name: str = "c.png"):

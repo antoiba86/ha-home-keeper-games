@@ -37,8 +37,21 @@ STATE_SECTIONS = (
     "people",
 )
 
-FORMATS = ("hardcover", "paperback", "ebook", "audiobook", "other")
-DEFAULT_FORMAT = "paperback"
+FORMATS = ("physical", "digital", "other")
+DEFAULT_FORMAT = "physical"
+# The consoles of a copy. ``other`` is any platform that is not in the list.
+PLATFORMS = (
+    "ps5",
+    "ps4",
+    "ps3",
+    "switch2",
+    "switch",
+    "xbox_series",
+    "xbox_one",
+    "pc",
+    "other",
+)
+DEFAULT_PLATFORM = "other"
 CONDITIONS = ("new", "fine", "good", "fair", "poor")
 STATUSES = ("want", "reading", "read", "dnf")
 # The ``status`` value of ``set_reading`` that removes the reading row.
@@ -76,7 +89,6 @@ GAME_FIELDS = (
     "release_date",
     "franchise",
     "igdb_id",
-    "barcode",
     "tags",
     "shared_notes",
     "needs_details",
@@ -85,14 +97,18 @@ GAME_FIELDS = (
 MAX_IGDB_ID = 2**53
 COPY_FIELDS = (
     "shelf_id",
+    "platform",
     "format",
+    "storefront",
+    "region",
+    "edition",
+    "steelbook",
+    "barcode",
     "condition",
     "acquired",
     "acquired_from",
     "price",
     "value",
-    "signed",
-    "first_edition",
     "note",
 )
 READING_FIELDS = (
@@ -477,8 +493,6 @@ def game_field(field: str, value: Any) -> Any:
         return text(value, field, GAME_TEXT_FIELDS[field], required=field == "title")
     if field in ("genres", "tags"):
         return str_list(value, field)
-    if field == "barcode":
-        return barcode(value)
     if field == "franchise":
         return optional_text(value, field, MAX_SHORT) or None
     if field == "igdb_id":
@@ -498,7 +512,6 @@ def build_game(data: dict[str, Any], *, now: str) -> dict[str, Any]:
         "release_date": "",
         "franchise": None,
         "igdb_id": None,
-        "barcode": None,
         "tags": [],
         "shared_notes": "",
         "cover": {"kind": "none", "file": None},
@@ -558,8 +571,18 @@ def copy_field(field: str, value: Any) -> Any:
     """Check one caller-set copy field and return its stored value."""
     if field == "shelf_id":
         return optional_text(value, field, MAX_SHORT)
+    if field == "platform":
+        return choice(value, field, PLATFORMS)
     if field == "format":
         return choice(value, field, FORMATS)
+    if field in ("storefront", "edition"):
+        return text(value, field, MAX_SHORT)
+    if field == "region":
+        return text(value, field, 20)
+    if field == "steelbook":
+        return boolean(value, field)
+    if field == "barcode":
+        return barcode(value)
     if field == "condition":
         return None if value in (None, "") else choice(value, field, CONDITIONS)
     if field == "acquired":
@@ -568,40 +591,50 @@ def copy_field(field: str, value: Any) -> Any:
         return text(value, field, MAX_SHORT)
     if field in ("price", "value"):
         return money(value, field)
-    if field in ("signed", "first_edition"):
-        return boolean(value, field)
     if field == "note":
         return text(value, field, MAX_NOTE)
     raise LibraryError("invalid_field", field=field)
 
 
 def build_copy(data: dict[str, Any], *, now: str) -> dict[str, Any]:
-    """A new copy. The caller checks that the game and the shelf exist."""
+    """A new copy. The caller checks that the game and the shelf exist.
+
+    A digital copy is on no shelf.
+    """
     record: dict[str, Any] = {
         "id": new_id(),
         "game_id": text(data.get("game_id"), "game_id", MAX_SHORT, required=True),
         "shelf_id": None,
+        "platform": DEFAULT_PLATFORM,
         "format": DEFAULT_FORMAT,
+        "storefront": "",
+        "region": "",
+        "edition": "",
+        "steelbook": False,
+        "barcode": None,
         "condition": None,
         "acquired": None,
         "acquired_from": "",
         "price": None,
         "value": None,
-        "signed": False,
-        "first_edition": False,
         "note": "",
         "created_at": now,
     }
     for field in COPY_FIELDS:
         if field in data:
             record[field] = copy_field(field, data[field])
+    if record["format"] == "digital":
+        record["shelf_id"] = None
     return record
 
 
 def update_copy(
     record: dict[str, Any], data: dict[str, Any]
 ) -> tuple[dict[str, Any], list[str]]:
-    """Return ``(updated, changed_fields)`` for a copy."""
+    """Return ``(updated, changed_fields)`` for a copy.
+
+    A digital copy leaves its shelf.
+    """
     updated = dict(record)
     changed: list[str] = []
     for field in COPY_FIELDS:
@@ -611,6 +644,11 @@ def update_copy(
         if value != updated.get(field):
             updated[field] = value
             changed.append(field)
+    if updated.get("format") == "digital":
+        updated["shelf_id"] = None
+        changed = [f for f in changed if f != "shelf_id"]
+        if record.get("shelf_id") is not None:
+            changed.append("shelf_id")
     return updated, changed
 
 
@@ -868,11 +906,17 @@ def find_shelf_by_path(state: dict[str, Any], path: list[str]) -> str | None:
 def find_game_by_barcode(
     state: dict[str, Any], code: str | None
 ) -> dict[str, Any] | None:
-    """The game with this barcode, or None."""
-    if code:
-        for game in state["games"].values():
-            if game.get("barcode") == code:
-                return game
+    """The game of the oldest copy with this barcode, or None."""
+    if not code:
+        return None
+    copies = sorted(
+        (c for c in state["copies"].values() if c.get("barcode") == code),
+        key=lambda c: (str(c.get("created_at", "")), c["id"]),
+    )
+    for copy in copies:
+        game = state["games"].get(copy.get("game_id"))
+        if game is not None:
+            return game
     return None
 
 
@@ -883,6 +927,7 @@ __all__ = [
     "DIRECTIONS",
     "FORMATS",
     "GAME_FIELDS",
+    "PLATFORMS",
     "STATUSES",
     "STATUS_NONE",
     "LibraryError",

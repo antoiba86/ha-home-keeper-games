@@ -326,10 +326,6 @@
           "name": "IGDB ID",
           "description": "Pelin ID IGDB:ssä."
         },
-        "barcode": {
-          "name": "Viivakoodi",
-          "description": "Viivakoodin numero, esimerkiksi EAN-13."
-        },
         "tags": {
           "name": "Tunnisteet",
           "description": "Kirjan tunnisteet."
@@ -366,6 +362,10 @@
           "name": "Hyllytaso",
           "description": "Hyllytason ID. Tyhjä, jos hyllytasoa ei ole."
         },
+        "platform": {
+          "name": "Alusta",
+          "description": "Kappaleen konsoli, esimerkiksi ps5 tai switch."
+        },
         "format": {
           "name": "Muoto",
           "description": "Kappaleen muoto."
@@ -388,9 +388,33 @@
           "name": "Hyllytaso",
           "description": "Hyllytason ID. Tyhjä, jos hyllytasoa ei ole."
         },
+        "platform": {
+          "name": "Alusta",
+          "description": "Kappaleen konsoli, esimerkiksi ps5 tai switch."
+        },
         "format": {
           "name": "Muoto",
           "description": "Kappaleen muoto."
+        },
+        "storefront": {
+          "name": "Kauppa",
+          "description": "Digitaalisen kappaleen kauppa, esimerkiksi PlayStation Store."
+        },
+        "region": {
+          "name": "Alue",
+          "description": "Kappaleen alue, esimerkiksi PAL."
+        },
+        "edition": {
+          "name": "Painos",
+          "description": "Painos, esimerkiksi Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "Kappale on steelbook-kotelossa."
+        },
+        "barcode": {
+          "name": "Viivakoodi",
+          "description": "Viivakoodin numero, esimerkiksi EAN-13."
         },
         "condition": {
           "name": "Kunto",
@@ -411,14 +435,6 @@
         "value": {
           "name": "Arvo",
           "description": "Kappaleen nykyinen arvo."
-        },
-        "signed": {
-          "name": "Signeerattu",
-          "description": "Kappale on signeerattu."
-        },
-        "first_edition": {
-          "name": "Ensipainos",
-          "description": "Kappale on ensipainos."
         },
         "note": {
           "name": "Muistiinpano",
@@ -438,9 +454,33 @@
           "name": "Hyllytaso",
           "description": "Hyllytason ID. Tyhjä, jos hyllytasoa ei ole."
         },
+        "platform": {
+          "name": "Alusta",
+          "description": "Kappaleen konsoli, esimerkiksi ps5 tai switch."
+        },
         "format": {
           "name": "Muoto",
           "description": "Kappaleen muoto."
+        },
+        "storefront": {
+          "name": "Kauppa",
+          "description": "Digitaalisen kappaleen kauppa, esimerkiksi PlayStation Store."
+        },
+        "region": {
+          "name": "Alue",
+          "description": "Kappaleen alue, esimerkiksi PAL."
+        },
+        "edition": {
+          "name": "Painos",
+          "description": "Painos, esimerkiksi Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "Kappale on steelbook-kotelossa."
+        },
+        "barcode": {
+          "name": "Viivakoodi",
+          "description": "Viivakoodin numero, esimerkiksi EAN-13."
         },
         "condition": {
           "name": "Kunto",
@@ -461,14 +501,6 @@
         "value": {
           "name": "Arvo",
           "description": "Kappaleen nykyinen arvo."
-        },
-        "signed": {
-          "name": "Signeerattu",
-          "description": "Kappale on signeerattu."
-        },
-        "first_edition": {
-          "name": "Ensipainos",
-          "description": "Kappale on ensipainos."
         },
         "note": {
           "name": "Muistiinpano",
@@ -755,6 +787,10 @@
         "shelf_id": {
           "name": "Hyllytaso",
           "description": "Hyllytason ID. Tyhjä, jos hyllytasoa ei ole."
+        },
+        "platform": {
+          "name": "Alusta",
+          "description": "Kappaleen konsoli, esimerkiksi ps5 tai switch."
         },
         "format": {
           "name": "Muoto",
@@ -1070,6 +1106,9 @@
     },
     "import_cover_unreadable": {
       "message": "Kansikuvatiedosto {file} ei ole kelvollinen kuva."
+    },
+    "digital_copy_no_shelf": {
+      "message": "Digitaalisella kappaleella ei ole hyllytasoa."
     }
   }
 }

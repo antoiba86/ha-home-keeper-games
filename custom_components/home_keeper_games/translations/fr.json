@@ -326,10 +326,6 @@
           "name": "IGDB ID",
           "description": "L'ID du jeu dans IGDB."
         },
-        "barcode": {
-          "name": "Code-barres",
-          "description": "Le numéro du code-barres, par exemple un EAN-13."
-        },
         "tags": {
           "name": "Étiquettes",
           "description": "Les étiquettes du livre."
@@ -366,6 +362,10 @@
           "name": "Étagère",
           "description": "L'ID de l'étagère. Vide pour aucune étagère."
         },
+        "platform": {
+          "name": "Plateforme",
+          "description": "La console de l'exemplaire, par exemple ps5 ou switch."
+        },
         "format": {
           "name": "Format du livre",
           "description": "Le format de l'exemplaire."
@@ -388,9 +388,33 @@
           "name": "Étagère",
           "description": "L'ID de l'étagère. Vide pour aucune étagère."
         },
+        "platform": {
+          "name": "Plateforme",
+          "description": "La console de l'exemplaire, par exemple ps5 ou switch."
+        },
         "format": {
           "name": "Format du livre",
           "description": "Le format de l'exemplaire."
+        },
+        "storefront": {
+          "name": "Boutique",
+          "description": "La boutique d'un exemplaire numérique, par exemple PlayStation Store."
+        },
+        "region": {
+          "name": "Région",
+          "description": "La région de l'exemplaire, par exemple PAL."
+        },
+        "edition": {
+          "name": "Édition",
+          "description": "L'édition, par exemple Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "L'exemplaire est dans un boîtier steelbook."
+        },
+        "barcode": {
+          "name": "Code-barres",
+          "description": "Le numéro du code-barres, par exemple un EAN-13."
         },
         "condition": {
           "name": "État",
@@ -411,14 +435,6 @@
         "value": {
           "name": "Valeur",
           "description": "La valeur actuelle de l'exemplaire."
-        },
-        "signed": {
-          "name": "Dédicacé",
-          "description": "L'exemplaire est dédicacé."
-        },
-        "first_edition": {
-          "name": "Première édition",
-          "description": "L'exemplaire est une première édition."
         },
         "note": {
           "name": "Note",
@@ -438,9 +454,33 @@
           "name": "Étagère",
           "description": "L'ID de l'étagère. Vide pour aucune étagère."
         },
+        "platform": {
+          "name": "Plateforme",
+          "description": "La console de l'exemplaire, par exemple ps5 ou switch."
+        },
         "format": {
           "name": "Format du livre",
           "description": "Le format de l'exemplaire."
+        },
+        "storefront": {
+          "name": "Boutique",
+          "description": "La boutique d'un exemplaire numérique, par exemple PlayStation Store."
+        },
+        "region": {
+          "name": "Région",
+          "description": "La région de l'exemplaire, par exemple PAL."
+        },
+        "edition": {
+          "name": "Édition",
+          "description": "L'édition, par exemple Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "L'exemplaire est dans un boîtier steelbook."
+        },
+        "barcode": {
+          "name": "Code-barres",
+          "description": "Le numéro du code-barres, par exemple un EAN-13."
         },
         "condition": {
           "name": "État",
@@ -461,14 +501,6 @@
         "value": {
           "name": "Valeur",
           "description": "La valeur actuelle de l'exemplaire."
-        },
-        "signed": {
-          "name": "Dédicacé",
-          "description": "L'exemplaire est dédicacé."
-        },
-        "first_edition": {
-          "name": "Première édition",
-          "description": "L'exemplaire est une première édition."
         },
         "note": {
           "name": "Note",
@@ -755,6 +787,10 @@
         "shelf_id": {
           "name": "Étagère",
           "description": "L'ID de l'étagère. Vide pour aucune étagère."
+        },
+        "platform": {
+          "name": "Plateforme",
+          "description": "La console de l'exemplaire, par exemple ps5 ou switch."
         },
         "format": {
           "name": "Format du livre",
@@ -1070,6 +1106,9 @@
     },
     "import_cover_unreadable": {
       "message": "Le fichier de couverture {file} n'est pas une image valide."
+    },
+    "digital_copy_no_shelf": {
+      "message": "Un exemplaire numérique n'a pas d'étagère."
     }
   }
 }

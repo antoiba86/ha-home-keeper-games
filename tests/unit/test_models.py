@@ -32,7 +32,7 @@ def test_normalize_state_fills_and_filters() -> None:
     raw = {
         "games": {
             "b": {"id": "b"},
-            "t": {"id": "t", "barcode": "1"},
+            "t": {"id": "t", "franchise": "F"},
             "x": "not a game",
         },
         "rooms": [],
@@ -46,7 +46,7 @@ def test_normalize_state_fills_and_filters() -> None:
     state = m.normalize_state(raw)
     assert state["games"] == {
         "b": {"id": "b"},
-        "t": {"id": "t", "barcode": "1"},
+        "t": {"id": "t", "franchise": "F"},
         "x": "not a game",
     }
     assert state["rooms"] == {}
@@ -323,22 +323,11 @@ def test_build_game_defaults() -> None:
     assert game["cover"] == {"kind": "none", "file": None}
     assert game["created_at"] == game["updated_at"] == NOW
     assert game["needs_details"] is False
-    assert m.build_game({"title": "Dune", "barcode": ""}, now=NOW)["barcode"] is None
-    assert game["wishlist"] is None and game["barcode"] is None
+    assert game["wishlist"] is None and "barcode" not in game
     assert _err(m.build_game, {}, now=NOW).key == "field_required"
 
 
-def test_build_game_barcode() -> None:
-    game = m.build_game({"title": "x", "barcode": "0711 7195-05012"}, now=NOW)
-    assert game["barcode"] == "0711719505012"
-    err = _err(m.build_game, {"title": "x", "barcode": "12/3"}, now=NOW)
-    assert err.key == "invalid_barcode" and err.placeholders == {"barcode": "12/3"}
-    old = m.build_game({"title": "x", "isbn": "0441478123"}, now=NOW)
-    assert "isbn" not in old and old["barcode"] is None
-
-
 def test_game_fields() -> None:
-    assert m.game_field("barcode", "") is None
     assert m.game_field("igdb_id", 7346) == 7346
     assert _err(m.game_field, "igdb_id", 0).key == "out_of_range"
     assert m.game_field("franchise", " Zelda ") == "Zelda"
@@ -346,7 +335,7 @@ def test_game_fields() -> None:
     assert m.game_field("genres", ["RPG"]) == ["RPG"]
     assert m.game_field("release_date", " 2017-03-03 ") == "2017-03-03"
     assert m.game_field("summary", "") == ""
-    for gone in ("catalogs", "isbn13", "isbn10", "series", "pages", "language"):
+    for gone in ("catalogs", "isbn13", "barcode", "series", "pages", "language"):
         err = _err(m.game_field, gone, None)
         assert (err.key, err.placeholders) == ("invalid_field", {"field": gone})
     assert m.game_field("needs_details", True) is True
@@ -365,18 +354,10 @@ def test_update_game() -> None:
     )
     assert changed == ["summary", "igdb_id"]
     assert updated["updated_at"] == "t1" and updated["id"] == game["id"]
-    updated, changed = m.update_game(game, {"barcode": "ab-12"}, now="t1")
-    assert changed == ["barcode"] and updated["barcode"] == "AB12"
-    same, changed = m.update_game(updated, {"barcode": "AB 12"}, now="t2")
-    assert changed == [] and same["updated_at"] == "t1"
-    cleared, changed = m.update_game(updated, {"barcode": None}, now="t2")
-    assert changed == ["barcode"] and cleared["barcode"] is None
-    # The old ISBN keys are not game fields now, so an update ignores them.
-    _, changed = m.update_game(game, {"isbn": "0441478123"}, now="t1")
+    # The old book keys and the barcode are not game fields now, so an update
+    # ignores them.
+    _, changed = m.update_game(game, {"isbn": "0441478123", "barcode": "1"}, now="t1")
     assert changed == []
-    assert _err(m.update_game, updated, {"barcode": "#"}, now="t2").key == (
-        "invalid_barcode"
-    )
 
 
 def test_fold_and_title_key() -> None:
@@ -394,26 +375,44 @@ def test_fold_and_title_key() -> None:
 def test_build_and_update_copy() -> None:
     copy = m.build_copy({"game_id": "b"}, now=NOW)
     assert copy["format"] == m.DEFAULT_FORMAT and copy["shelf_id"] is None
-    assert copy["signed"] is False and copy["created_at"] == NOW
+    assert copy["steelbook"] is False and copy["created_at"] == NOW
+    assert copy["platform"] == m.DEFAULT_PLATFORM == "other"
     assert _err(m.build_copy, {}, now=NOW).key == "field_required"
     full = m.build_copy(
         {
             "game_id": "b",
             "shelf_id": "s",
-            "format": "hardcover",
+            "format": "physical",
             "condition": "fine",
             "acquired": "2020-01-01",
             "acquired_from": "Shop",
             "price": 10,
             "value": 12.5,
-            "signed": True,
-            "first_edition": True,
+            "platform": "switch2",
+            "storefront": "Nintendo eShop",
+            "region": "PAL",
+            "edition": "Deluxe",
+            "steelbook": True,
+            "barcode": "0711 7195-05012",
             "note": "n",
         },
         now=NOW,
     )
     assert full["condition"] == "fine" and full["value"] == 12.5
-    _same, changed = m.update_copy(full, {"format": "hardcover"})
+    assert full["platform"] == "switch2" and full["barcode"] == "0711719505012"
+    assert full["steelbook"] is True and full["edition"] == "Deluxe"
+    err = _err(m.build_copy, {"game_id": "b", "barcode": "12/3"}, now=NOW)
+    assert err.key == "invalid_barcode" and err.placeholders == {"barcode": "12/3"}
+    # A digital copy is on no shelf.
+    digital = m.build_copy(
+        {"game_id": "b", "shelf_id": "s", "format": "digital"}, now=NOW
+    )
+    assert digital["shelf_id"] is None
+    moved, changed = m.update_copy(full, {"format": "digital"})
+    assert moved["shelf_id"] is None and changed == ["format", "shelf_id"]
+    moved, changed = m.update_copy(digital, {"format": "digital", "shelf_id": "s"})
+    assert moved["shelf_id"] is None and changed == []
+    _same, changed = m.update_copy(full, {"format": "physical"})
     assert changed == []
     updated, changed = m.update_copy(full, {"shelf_id": None, "condition": ""})
     assert changed == ["shelf_id", "condition"] and updated["condition"] is None
@@ -489,7 +488,7 @@ def test_build_loan() -> None:
     assert loan["add_task"] is True and loan["overdue_fired"] is False
     assert loan["returned"] is None and loan["hk_task_id"] is None
     assert _loan(add_task=False)["add_task"] is False
-    assert _loan(format="ebook")["format"] == "ebook"
+    assert _loan(format="digital")["format"] == "digital"
     assert _loan(format="")["format"] is None
     assert _err(_loan, copy_id=None).placeholders == {"field": "copy_id"}
     assert _err(_loan, party="").key == "field_required"
@@ -512,7 +511,7 @@ def test_update_loan() -> None:
     )
     assert changed == ["party", "due", "note"]
     assert updated["overdue_fired"] is False
-    updated, changed = m.update_loan(loan, {"started": None, "format": "ebook"})
+    updated, changed = m.update_loan(loan, {"started": None, "format": "digital"})
     assert updated["started"] == loan["started"] and changed == ["format"]
     assert _err(m.update_loan, loan, {"due": "2020-01-01"}).key == "due_before_start"
     cleared, changed = m.update_loan(loan, {"due": None})
@@ -591,10 +590,22 @@ def _state():
     state["rooms"]["r"] = {"id": "r", "name": "Den"}
     state["units"]["k"] = {"id": "k", "room_id": "r", "name": "Left"}
     state["shelves"]["s"] = {"id": "s", "unit_id": "k", "name": "Top"}
-    state["games"]["b"] = {"id": "b", "barcode": "9780441478125"}
-    state["games"]["c"] = {"id": "c", "barcode": None}
-    state["copies"]["x2"] = {"id": "x2", "game_id": "b", "created_at": "2"}
+    state["games"]["b"] = {"id": "b"}
+    state["games"]["c"] = {"id": "c"}
+    state["copies"]["x2"] = {
+        "id": "x2",
+        "game_id": "b",
+        "created_at": "2",
+        "barcode": "9780441478125",
+    }
     state["copies"]["x1"] = {"id": "x1", "game_id": "b", "created_at": "1"}
+    # A copy of a game that is gone does not count.
+    state["copies"]["z"] = {
+        "id": "z",
+        "game_id": "gone",
+        "created_at": "0",
+        "barcode": "9780441478125",
+    }
     state["copies"]["y"] = {"id": "y", "game_id": "c", "created_at": "0"}
     state["loans"]["l"] = {"id": "l", "copy_id": "x1", "returned": None}
     state["loans"]["old"] = {"id": "old", "copy_id": "y", "returned": "2020-01-01"}

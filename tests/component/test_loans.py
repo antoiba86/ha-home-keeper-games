@@ -133,12 +133,12 @@ async def test_borrow_game_sets_reading(hass, setup_entry, call) -> None:
             "party": "City library",
             "person_id": BOB,
             "due": "2030-11-01",
-            "format": "ebook",
+            "format": "digital",
         },
     )
     loan = reply["loan"]
     assert loan["direction"] == "in" and loan["copy_id"] is None
-    assert loan["person_id"] == BOB and loan["format"] == "ebook"
+    assert loan["person_id"] == BOB and loan["format"] == "digital"
     assert reply["game"]["owned"] is False
     assert reply["game"]["reading"][BOB]["status"] == "reading"
     add = _calls(hass, "add_task")[0]

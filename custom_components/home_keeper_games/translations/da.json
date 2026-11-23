@@ -326,10 +326,6 @@
           "name": "IGDB ID",
           "description": "Spillets ID i IGDB."
         },
-        "barcode": {
-          "name": "Stregkode",
-          "description": "Stregkodens nummer, f.eks. en EAN-13."
-        },
         "tags": {
           "name": "Mærker",
           "description": "Bogens mærker."
@@ -366,6 +362,10 @@
           "name": "Hylde",
           "description": "Hyldens ID. Tom for ingen hylde."
         },
+        "platform": {
+          "name": "Platform",
+          "description": "Kopiens konsol, f.eks. ps5 eller switch."
+        },
         "format": {
           "name": "Format",
           "description": "Eksemplarets format."
@@ -388,9 +388,33 @@
           "name": "Hylde",
           "description": "Hyldens ID. Tom for ingen hylde."
         },
+        "platform": {
+          "name": "Platform",
+          "description": "Kopiens konsol, f.eks. ps5 eller switch."
+        },
         "format": {
           "name": "Format",
           "description": "Eksemplarets format."
+        },
+        "storefront": {
+          "name": "Butik",
+          "description": "Butikken for en digital kopi, f.eks. PlayStation Store."
+        },
+        "region": {
+          "name": "Region",
+          "description": "Kopiens region, f.eks. PAL."
+        },
+        "edition": {
+          "name": "Udgave",
+          "description": "Udgaven, f.eks. Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "Kopien er i et steelbook-cover."
+        },
+        "barcode": {
+          "name": "Stregkode",
+          "description": "Stregkodens nummer, f.eks. en EAN-13."
         },
         "condition": {
           "name": "Stand",
@@ -411,14 +435,6 @@
         "value": {
           "name": "Værdi",
           "description": "Eksemplarets nuværende værdi."
-        },
-        "signed": {
-          "name": "Signeret",
-          "description": "Eksemplaret er signeret."
-        },
-        "first_edition": {
-          "name": "Førsteudgave",
-          "description": "Eksemplaret er en førsteudgave."
         },
         "note": {
           "name": "Note",
@@ -438,9 +454,33 @@
           "name": "Hylde",
           "description": "Hyldens ID. Tom for ingen hylde."
         },
+        "platform": {
+          "name": "Platform",
+          "description": "Kopiens konsol, f.eks. ps5 eller switch."
+        },
         "format": {
           "name": "Format",
           "description": "Eksemplarets format."
+        },
+        "storefront": {
+          "name": "Butik",
+          "description": "Butikken for en digital kopi, f.eks. PlayStation Store."
+        },
+        "region": {
+          "name": "Region",
+          "description": "Kopiens region, f.eks. PAL."
+        },
+        "edition": {
+          "name": "Udgave",
+          "description": "Udgaven, f.eks. Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "Kopien er i et steelbook-cover."
+        },
+        "barcode": {
+          "name": "Stregkode",
+          "description": "Stregkodens nummer, f.eks. en EAN-13."
         },
         "condition": {
           "name": "Stand",
@@ -461,14 +501,6 @@
         "value": {
           "name": "Værdi",
           "description": "Eksemplarets nuværende værdi."
-        },
-        "signed": {
-          "name": "Signeret",
-          "description": "Eksemplaret er signeret."
-        },
-        "first_edition": {
-          "name": "Førsteudgave",
-          "description": "Eksemplaret er en førsteudgave."
         },
         "note": {
           "name": "Note",
@@ -755,6 +787,10 @@
         "shelf_id": {
           "name": "Hylde",
           "description": "Hyldens ID. Tom for ingen hylde."
+        },
+        "platform": {
+          "name": "Platform",
+          "description": "Kopiens konsol, f.eks. ps5 eller switch."
         },
         "format": {
           "name": "Format",
@@ -1070,6 +1106,9 @@
     },
     "import_cover_unreadable": {
       "message": "Omslagsfilen {file} er ikke et gyldigt billede."
+    },
+    "digital_copy_no_shelf": {
+      "message": "En digital kopi har ingen hylde."
     }
   }
 }

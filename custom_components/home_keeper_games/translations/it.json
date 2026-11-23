@@ -326,10 +326,6 @@
           "name": "IGDB ID",
           "description": "L'ID del gioco in IGDB."
         },
-        "barcode": {
-          "name": "Codice a barre",
-          "description": "Il numero del codice a barre, per esempio un EAN-13."
-        },
         "tags": {
           "name": "Etichette",
           "description": "Le etichette del libro."
@@ -366,6 +362,10 @@
           "name": "Ripiano",
           "description": "L'ID del ripiano. Vuoto per nessun ripiano."
         },
+        "platform": {
+          "name": "Piattaforma",
+          "description": "La console della copia, per esempio ps5 o switch."
+        },
         "format": {
           "name": "Formato",
           "description": "Il formato della copia."
@@ -388,9 +388,33 @@
           "name": "Ripiano",
           "description": "L'ID del ripiano. Vuoto per nessun ripiano."
         },
+        "platform": {
+          "name": "Piattaforma",
+          "description": "La console della copia, per esempio ps5 o switch."
+        },
         "format": {
           "name": "Formato",
           "description": "Il formato della copia."
+        },
+        "storefront": {
+          "name": "Negozio",
+          "description": "Il negozio di una copia digitale, per esempio PlayStation Store."
+        },
+        "region": {
+          "name": "Regione",
+          "description": "La regione della copia, per esempio PAL."
+        },
+        "edition": {
+          "name": "Edizione",
+          "description": "L'edizione, per esempio Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "La copia è in una custodia steelbook."
+        },
+        "barcode": {
+          "name": "Codice a barre",
+          "description": "Il numero del codice a barre, per esempio un EAN-13."
         },
         "condition": {
           "name": "Condizione",
@@ -411,14 +435,6 @@
         "value": {
           "name": "Valore",
           "description": "Il valore attuale della copia."
-        },
-        "signed": {
-          "name": "Autografato",
-          "description": "La copia è autografata."
-        },
-        "first_edition": {
-          "name": "Prima edizione",
-          "description": "La copia è una prima edizione."
         },
         "note": {
           "name": "Nota",
@@ -438,9 +454,33 @@
           "name": "Ripiano",
           "description": "L'ID del ripiano. Vuoto per nessun ripiano."
         },
+        "platform": {
+          "name": "Piattaforma",
+          "description": "La console della copia, per esempio ps5 o switch."
+        },
         "format": {
           "name": "Formato",
           "description": "Il formato della copia."
+        },
+        "storefront": {
+          "name": "Negozio",
+          "description": "Il negozio di una copia digitale, per esempio PlayStation Store."
+        },
+        "region": {
+          "name": "Regione",
+          "description": "La regione della copia, per esempio PAL."
+        },
+        "edition": {
+          "name": "Edizione",
+          "description": "L'edizione, per esempio Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "La copia è in una custodia steelbook."
+        },
+        "barcode": {
+          "name": "Codice a barre",
+          "description": "Il numero del codice a barre, per esempio un EAN-13."
         },
         "condition": {
           "name": "Condizione",
@@ -461,14 +501,6 @@
         "value": {
           "name": "Valore",
           "description": "Il valore attuale della copia."
-        },
-        "signed": {
-          "name": "Autografato",
-          "description": "La copia è autografata."
-        },
-        "first_edition": {
-          "name": "Prima edizione",
-          "description": "La copia è una prima edizione."
         },
         "note": {
           "name": "Nota",
@@ -755,6 +787,10 @@
         "shelf_id": {
           "name": "Ripiano",
           "description": "L'ID del ripiano. Vuoto per nessun ripiano."
+        },
+        "platform": {
+          "name": "Piattaforma",
+          "description": "La console della copia, per esempio ps5 o switch."
         },
         "format": {
           "name": "Formato",
@@ -1070,6 +1106,9 @@
     },
     "import_cover_unreadable": {
       "message": "Il file di copertina {file} non è un'immagine valida."
+    },
+    "digital_copy_no_shelf": {
+      "message": "Una copia digitale non ha un ripiano."
     }
   }
 }

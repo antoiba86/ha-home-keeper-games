@@ -59,7 +59,6 @@ def test_build_game_shape() -> None:
         "release_date": "",
         "franchise": None,
         "igdb_id": None,
-        "barcode": None,
         "tags": [],
         "shared_notes": "",
         "cover": {"kind": "none", "file": None},
@@ -91,14 +90,18 @@ def test_copy_and_loan_shapes() -> None:
         "id": copy["id"],
         "game_id": "b",
         "shelf_id": None,
-        "format": "paperback",
+        "platform": "other",
+        "format": "physical",
+        "storefront": "",
+        "region": "",
+        "edition": "",
+        "steelbook": False,
+        "barcode": None,
         "condition": None,
         "acquired": None,
         "acquired_from": "",
         "price": None,
         "value": None,
-        "signed": False,
-        "first_edition": False,
         "note": "",
         "created_at": NOW,
     }
@@ -182,12 +185,18 @@ def test_field_names_in_errors() -> None:
     }
     assert key(m.copy_field, "condition", "mint")[1]["field"] == "condition"
     assert key(m.copy_field, "acquired", "soon")[1] == {"field": "acquired"}
-    assert key(m.copy_field, "signed", 1)[1] == {"field": "signed"}
+    assert key(m.copy_field, "steelbook", 1)[1] == {"field": "steelbook"}
+    assert key(m.copy_field, "platform", "wii")[1]["field"] == "platform"
+    assert key(m.copy_field, "storefront", [])[1] == {"field": "storefront"}
+    assert key(m.copy_field, "region", "x" * 21)[1]["field"] == "region"
+    for gone in ("signed", "first_edition"):
+        assert key(m.copy_field, gone, True)[1] == {"field": gone}
     assert key(m.copy_field, "note", [])[1] == {"field": "note"}
     assert key(m.copy_field, "acquired_from", [])[1] == {"field": "acquired_from"}
-    assert key(m.game_field, "barcode", [])[1] == {"field": "barcode"}
+    assert key(m.copy_field, "barcode", [])[1] == {"field": "barcode"}
+    assert key(m.game_field, "barcode", "1")[1] == {"field": "barcode"}
     assert key(m.game_field, "barcode", True)[1] == {"field": "barcode"}
-    assert key(m.game_field, "barcode", "a b#")[1] == {"barcode": "AB#"}
+    assert key(m.copy_field, "barcode", "a b#")[1] == {"barcode": "AB#"}
     assert key(m.game_field, "catalogs", {})[1] == {"field": "catalogs"}
     assert key(m.game_field, "franchise", [1])[1] == {"field": "franchise"}
     assert key(m.game_field, "igdb_id", "x")[1] == {"field": "igdb_id"}
@@ -226,15 +235,15 @@ def test_field_names_in_errors() -> None:
 
 
 def test_barcode_field() -> None:
-    assert m.game_field("barcode", " 978-0441 478125 ") == "9780441478125"
-    assert m.game_field("barcode", "abc123") == "ABC123"
-    assert m.game_field("barcode", 4006381333931) == "4006381333931"
-    assert m.game_field("barcode", "") is None
-    assert m.game_field("barcode", None) is None
-    assert m.game_field("barcode", "9" * 50) == "9" * 50
-    err = _raises(m.game_field, "barcode", "9" * 51)
+    assert m.copy_field("barcode", " 978-0441 478125 ") == "9780441478125"
+    assert m.copy_field("barcode", "abc123") == "ABC123"
+    assert m.copy_field("barcode", 4006381333931) == "4006381333931"
+    assert m.copy_field("barcode", "") is None
+    assert m.copy_field("barcode", None) is None
+    assert m.copy_field("barcode", "9" * 50) == "9" * 50
+    err = _raises(m.copy_field, "barcode", "9" * 51)
     assert (err.key, err.placeholders) == ("invalid_barcode", {"barcode": "9" * 50})
-    err = _raises(m.game_field, "barcode", " - ")
+    err = _raises(m.copy_field, "barcode", " - ")
     assert (err.key, err.placeholders) == ("invalid_barcode", {"barcode": ""})
     assert m.game_field("franchise", " Zelda ") == "Zelda"
     assert m.game_field("franchise", "") is None
@@ -287,7 +296,7 @@ def test_cells() -> None:
         read_count=2,
         tags=["fav"],
         owned=1,
-        copy={"format": "ebook"},
+        copy={"format": "digital"},
         notes="n",
     )
     row.update(
@@ -296,14 +305,17 @@ def test_cells() -> None:
         igdb_id=7346,
         copy={
             "id": "c",
-            "format": "ebook",
+            "format": "digital",
             "condition": "good",
             "acquired": "2020-01-01",
             "acquired_from": "Shop",
             "price": 3,
             "value": None,
-            "signed": True,
-            "first_edition": False,
+            "platform": "ps5",
+            "storefront": "PlayStation Store",
+            "region": "PAL",
+            "edition": "Deluxe",
+            "steelbook": True,
             "note": "cn",
         },
         location=["R", "B", "S"],
@@ -324,18 +336,21 @@ def test_cells() -> None:
         "release_date": "2001",
         "franchise": "F",
         "igdb_id": "7346",
-        "barcode": "9780441478125",
         "tags": "fav",
         "shared_notes": "sn",
         "copy_id": "c",
-        "format": "ebook",
+        "platform": "ps5",
+        "format": "digital",
+        "storefront": "PlayStation Store",
+        "region": "PAL",
+        "edition": "Deluxe",
+        "steelbook": "true",
+        "barcode": "9780441478125",
         "condition": "good",
         "acquired": "2020-01-01",
         "acquired_from": "Shop",
         "price": "3",
         "value": "",
-        "signed": "true",
-        "first_edition": "false",
         "copy_note": "cn",
         "location": "R / B / S",
         "status": "read",
@@ -349,7 +364,7 @@ def test_cells() -> None:
         "wishlist_buy": "false",
     }
     empty = cio._library_cells(cio.empty_row(1))
-    assert empty["signed"] == "" and empty["first_edition"] == ""
+    assert empty["steelbook"] == "" and empty["platform"] == ""
     assert empty["game_id"] == "" and empty["franchise"] == ""
     assert empty["igdb_id"] == "" and empty["genres"] == ""
     assert empty["barcode"] == ""
@@ -386,8 +401,10 @@ def test_project_state_counts_and_order() -> None:
 
 def test_game_matches_joins_fields_with_a_space() -> None:
     state = m.empty_state()
-    game = m.build_game({"title": "Dune", "barcode": "123"}, now=NOW)
+    game = m.build_game({"title": "Dune"}, now=NOW)
     state["games"][game["id"]] = game
+    copy = m.build_copy({"game_id": game["id"], "barcode": "123"}, now=NOW)
+    state["copies"][copy["id"]] = copy
     assert pr.game_matches(state, game, {"query": "dune 123"})
     assert not pr.game_matches(state, game, {"query": "dune123"})
     game["franchise"] = "Chronicles"

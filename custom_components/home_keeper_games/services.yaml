@@ -227,10 +227,6 @@ update_game:
         number:
           min: 1
           mode: "box"
-    barcode:
-      example: "0711719505012"
-      selector:
-        text:
     tags:
       selector:
         text:
@@ -260,14 +256,25 @@ scan_barcode:
     shelf_id:
       selector:
         text:
+    platform:
+      selector:
+        select:
+          options:
+            - ps5
+            - ps4
+            - ps3
+            - switch2
+            - switch
+            - xbox_series
+            - xbox_one
+            - pc
+            - other
     format:
       selector:
         select:
           options:
-            - hardcover
-            - paperback
-            - ebook
-            - audiobook
+            - physical
+            - digital
             - other
     on_duplicate:
       selector:
@@ -287,15 +294,45 @@ add_copy:
     shelf_id:
       selector:
         text:
+    platform:
+      selector:
+        select:
+          options:
+            - ps5
+            - ps4
+            - ps3
+            - switch2
+            - switch
+            - xbox_series
+            - xbox_one
+            - pc
+            - other
     format:
       selector:
         select:
           options:
-            - hardcover
-            - paperback
-            - ebook
-            - audiobook
+            - physical
+            - digital
             - other
+    storefront:
+      example: "PlayStation Store"
+      selector:
+        text:
+    region:
+      example: "PAL"
+      selector:
+        text:
+    edition:
+      example: "Collector's Edition"
+      selector:
+        text:
+    steelbook:
+      selector:
+        boolean:
+    barcode:
+      example: "0711719505012"
+      selector:
+        text:
     condition:
       selector:
         select:
@@ -325,12 +362,6 @@ add_copy:
           max: 1000000000
           step: 0.01
           mode: "box"
-    signed:
-      selector:
-        boolean:
-    first_edition:
-      selector:
-        boolean:
     note:
       selector:
         text:
@@ -345,15 +376,45 @@ update_copy:
     shelf_id:
       selector:
         text:
+    platform:
+      selector:
+        select:
+          options:
+            - ps5
+            - ps4
+            - ps3
+            - switch2
+            - switch
+            - xbox_series
+            - xbox_one
+            - pc
+            - other
     format:
       selector:
         select:
           options:
-            - hardcover
-            - paperback
-            - ebook
-            - audiobook
+            - physical
+            - digital
             - other
+    storefront:
+      example: "PlayStation Store"
+      selector:
+        text:
+    region:
+      example: "PAL"
+      selector:
+        text:
+    edition:
+      example: "Collector's Edition"
+      selector:
+        text:
+    steelbook:
+      selector:
+        boolean:
+    barcode:
+      example: "0711719505012"
+      selector:
+        text:
     condition:
       selector:
         select:
@@ -383,12 +444,6 @@ update_copy:
           max: 1000000000
           step: 0.01
           mode: "box"
-    signed:
-      selector:
-        boolean:
-    first_edition:
-      selector:
-        boolean:
     note:
       selector:
         text:
@@ -541,10 +596,8 @@ borrow_game:
       selector:
         select:
           options:
-            - hardcover
-            - paperback
-            - ebook
-            - audiobook
+            - physical
+            - digital
             - other
 
 return_loan:
@@ -582,10 +635,8 @@ update_loan:
       selector:
         select:
           options:
-            - hardcover
-            - paperback
-            - ebook
-            - audiobook
+            - physical
+            - digital
             - other
 
 delete_loan:
@@ -645,14 +696,25 @@ got_wishlist_game:
     shelf_id:
       selector:
         text:
+    platform:
+      selector:
+        select:
+          options:
+            - ps5
+            - ps4
+            - ps3
+            - switch2
+            - switch
+            - xbox_series
+            - xbox_one
+            - pc
+            - other
     format:
       selector:
         select:
           options:
-            - hardcover
-            - paperback
-            - ebook
-            - audiobook
+            - physical
+            - digital
             - other
 
 set_person_settings:

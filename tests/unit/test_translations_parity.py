@@ -27,20 +27,26 @@ _TRANSLATIONS = _COMPONENT / "translations"
 # Keys whose value is the same word in English and in the language (reviewed
 # cognates). Keyed by locale, as ``fnmatch`` patterns of dotted key paths.
 _COGNATE_IDENTICAL: dict[str, set[str]] = {
+    "pl": {"services.*.fields.region.name"},
+    "cs": {"services.*.fields.region.name"},
     "ca": {"services.*.fields.format.name"},
     "da": {
         "services.*.fields.format.name",
         "services.*.fields.franchise.name",
         "services.*.fields.note.name",
         "services.*.fields.person_id.name",
+        "services.*.fields.platform.name",
+        "services.*.fields.region.name",
     },
     "de": {
         "services.*.fields.barcode.name",
+        "services.*.fields.edition.name",
         "services.*.fields.format.name",
         "services.*.fields.franchise.name",
         "services.*.fields.genres.name",
         "services.*.fields.name.name",
         "services.*.fields.person_id.name",
+        "services.*.fields.region.name",
     },
     "fr": {
         "services.*.fields.franchise.name",
@@ -52,22 +58,27 @@ _COGNATE_IDENTICAL: dict[str, set[str]] = {
         "services.*.fields.barcode.name",
         "services.*.fields.franchise.name",
         "services.*.fields.genres.name",
+        "services.*.fields.platform.name",
     },
     "nb": {
         "services.*.fields.format.name",
         "services.*.fields.franchise.name",
         "services.*.fields.person_id.name",
+        "services.*.fields.region.name",
     },
     "sv": {
         "services.*.fields.format.name",
         "services.*.fields.franchise.name",
         "services.*.fields.person_id.name",
+        "services.*.fields.region.name",
     },
 }
-# Values that are the same in each language: the product name and the IGDB ID label.
+# Values that are the same in each language: the product name, the IGDB ID label and
+# the steelbook case.
 _INTENTIONALLY_IDENTICAL: set[str] = {
     "config.step.user.title",
     "services.*.fields.igdb_id.name",
+    "services.*.fields.steelbook.name",
 }
 
 

@@ -326,10 +326,6 @@
           "name": "IGDB ID",
           "description": "ID игры в IGDB."
         },
-        "barcode": {
-          "name": "Штрихкод",
-          "description": "Номер штрихкода, например EAN-13."
-        },
         "tags": {
           "name": "Метки",
           "description": "Метки книги."
@@ -366,6 +362,10 @@
           "name": "Полка",
           "description": "ID полки. Пусто, если полки нет."
         },
+        "platform": {
+          "name": "Платформа",
+          "description": "Консоль экземпляра, например ps5 или switch."
+        },
         "format": {
           "name": "Формат",
           "description": "Формат экземпляра."
@@ -388,9 +388,33 @@
           "name": "Полка",
           "description": "ID полки. Пусто, если полки нет."
         },
+        "platform": {
+          "name": "Платформа",
+          "description": "Консоль экземпляра, например ps5 или switch."
+        },
         "format": {
           "name": "Формат",
           "description": "Формат экземпляра."
+        },
+        "storefront": {
+          "name": "Магазин",
+          "description": "Магазин цифрового экземпляра, например PlayStation Store."
+        },
+        "region": {
+          "name": "Регион",
+          "description": "Регион экземпляра, например PAL."
+        },
+        "edition": {
+          "name": "Издание",
+          "description": "Издание, например Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Стилбук",
+          "description": "Экземпляр в коробке стилбук."
+        },
+        "barcode": {
+          "name": "Штрихкод",
+          "description": "Номер штрихкода, например EAN-13."
         },
         "condition": {
           "name": "Состояние",
@@ -411,14 +435,6 @@
         "value": {
           "name": "Стоимость",
           "description": "Текущая стоимость экземпляра."
-        },
-        "signed": {
-          "name": "С автографом",
-          "description": "Экземпляр с автографом."
-        },
-        "first_edition": {
-          "name": "Первое издание",
-          "description": "Экземпляр первого издания."
         },
         "note": {
           "name": "Заметка",
@@ -438,9 +454,33 @@
           "name": "Полка",
           "description": "ID полки. Пусто, если полки нет."
         },
+        "platform": {
+          "name": "Платформа",
+          "description": "Консоль экземпляра, например ps5 или switch."
+        },
         "format": {
           "name": "Формат",
           "description": "Формат экземпляра."
+        },
+        "storefront": {
+          "name": "Магазин",
+          "description": "Магазин цифрового экземпляра, например PlayStation Store."
+        },
+        "region": {
+          "name": "Регион",
+          "description": "Регион экземпляра, например PAL."
+        },
+        "edition": {
+          "name": "Издание",
+          "description": "Издание, например Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Стилбук",
+          "description": "Экземпляр в коробке стилбук."
+        },
+        "barcode": {
+          "name": "Штрихкод",
+          "description": "Номер штрихкода, например EAN-13."
         },
         "condition": {
           "name": "Состояние",
@@ -461,14 +501,6 @@
         "value": {
           "name": "Стоимость",
           "description": "Текущая стоимость экземпляра."
-        },
-        "signed": {
-          "name": "С автографом",
-          "description": "Экземпляр с автографом."
-        },
-        "first_edition": {
-          "name": "Первое издание",
-          "description": "Экземпляр первого издания."
         },
         "note": {
           "name": "Заметка",
@@ -755,6 +787,10 @@
         "shelf_id": {
           "name": "Полка",
           "description": "ID полки. Пусто, если полки нет."
+        },
+        "platform": {
+          "name": "Платформа",
+          "description": "Консоль экземпляра, например ps5 или switch."
         },
         "format": {
           "name": "Формат",
@@ -1070,6 +1106,9 @@
     },
     "import_cover_unreadable": {
       "message": "Файл обложки {file} не является допустимым изображением."
+    },
+    "digital_copy_no_shelf": {
+      "message": "У цифрового экземпляра нет полки."
     }
   }
 }

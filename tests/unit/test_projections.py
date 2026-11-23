@@ -39,7 +39,6 @@ def _state() -> dict:
         now=NOW,
     )
     dune["id"] = "dune"
-    dune["barcode"] = "9780441013593"
     emma = m.build_game({"title": "Emma", "franchise": "Austen"}, now=NOW)
     emma["id"] = "emma"
     emma["cover"] = {"kind": "custom", "file": "emma-0a1b2c3d.jpg"}
@@ -55,6 +54,7 @@ def _state() -> dict:
         now=NOW,
     )
     copy["id"] = "c1"
+    copy["barcode"] = "9780441013593"
     state["copies"]["c1"] = copy
     loan = m.build_loan(
         {"direction": "out", "copy_id": "c1", "game_id": "dune", "party": "Zed"},

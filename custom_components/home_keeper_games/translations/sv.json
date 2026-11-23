@@ -326,10 +326,6 @@
           "name": "IGDB ID",
           "description": "Spelets ID i IGDB."
         },
-        "barcode": {
-          "name": "Streckkod",
-          "description": "Streckkodens nummer, till exempel en EAN-13."
-        },
         "tags": {
           "name": "Taggar",
           "description": "Bokens taggar."
@@ -366,6 +362,10 @@
           "name": "Hyllplan",
           "description": "Hyllplanets ID. Tomt för inget hyllplan."
         },
+        "platform": {
+          "name": "Plattform",
+          "description": "Exemplarets konsol, till exempel ps5 eller switch."
+        },
         "format": {
           "name": "Format",
           "description": "Exemplarets format."
@@ -388,9 +388,33 @@
           "name": "Hyllplan",
           "description": "Hyllplanets ID. Tomt för inget hyllplan."
         },
+        "platform": {
+          "name": "Plattform",
+          "description": "Exemplarets konsol, till exempel ps5 eller switch."
+        },
         "format": {
           "name": "Format",
           "description": "Exemplarets format."
+        },
+        "storefront": {
+          "name": "Butik",
+          "description": "Butiken för ett digitalt exemplar, till exempel PlayStation Store."
+        },
+        "region": {
+          "name": "Region",
+          "description": "Exemplarets region, till exempel PAL."
+        },
+        "edition": {
+          "name": "Utgåva",
+          "description": "Utgåvan, till exempel Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "Exemplaret ligger i ett steelbook-fodral."
+        },
+        "barcode": {
+          "name": "Streckkod",
+          "description": "Streckkodens nummer, till exempel en EAN-13."
         },
         "condition": {
           "name": "Skick",
@@ -411,14 +435,6 @@
         "value": {
           "name": "Värde",
           "description": "Exemplarets nuvarande värde."
-        },
-        "signed": {
-          "name": "Signerad",
-          "description": "Exemplaret är signerat."
-        },
-        "first_edition": {
-          "name": "Förstautgåva",
-          "description": "Exemplaret är en förstautgåva."
         },
         "note": {
           "name": "Anteckning",
@@ -438,9 +454,33 @@
           "name": "Hyllplan",
           "description": "Hyllplanets ID. Tomt för inget hyllplan."
         },
+        "platform": {
+          "name": "Plattform",
+          "description": "Exemplarets konsol, till exempel ps5 eller switch."
+        },
         "format": {
           "name": "Format",
           "description": "Exemplarets format."
+        },
+        "storefront": {
+          "name": "Butik",
+          "description": "Butiken för ett digitalt exemplar, till exempel PlayStation Store."
+        },
+        "region": {
+          "name": "Region",
+          "description": "Exemplarets region, till exempel PAL."
+        },
+        "edition": {
+          "name": "Utgåva",
+          "description": "Utgåvan, till exempel Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "Exemplaret ligger i ett steelbook-fodral."
+        },
+        "barcode": {
+          "name": "Streckkod",
+          "description": "Streckkodens nummer, till exempel en EAN-13."
         },
         "condition": {
           "name": "Skick",
@@ -461,14 +501,6 @@
         "value": {
           "name": "Värde",
           "description": "Exemplarets nuvarande värde."
-        },
-        "signed": {
-          "name": "Signerad",
-          "description": "Exemplaret är signerat."
-        },
-        "first_edition": {
-          "name": "Förstautgåva",
-          "description": "Exemplaret är en förstautgåva."
         },
         "note": {
           "name": "Anteckning",
@@ -755,6 +787,10 @@
         "shelf_id": {
           "name": "Hyllplan",
           "description": "Hyllplanets ID. Tomt för inget hyllplan."
+        },
+        "platform": {
+          "name": "Plattform",
+          "description": "Exemplarets konsol, till exempel ps5 eller switch."
         },
         "format": {
           "name": "Format",
@@ -1070,6 +1106,9 @@
     },
     "import_cover_unreadable": {
       "message": "Omslagsfilen {file} är inte en giltig bild."
+    },
+    "digital_copy_no_shelf": {
+      "message": "Ett digitalt exemplar har inget hyllplan."
     }
   }
 }

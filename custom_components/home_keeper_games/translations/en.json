@@ -326,10 +326,6 @@
           "name": "IGDB ID",
           "description": "The ID of the game in IGDB."
         },
-        "barcode": {
-          "name": "Barcode",
-          "description": "The barcode number, such as an EAN-13."
-        },
         "tags": {
           "name": "Tags",
           "description": "The tags of the book."
@@ -366,6 +362,10 @@
           "name": "Shelf",
           "description": "The ID of the shelf. Empty for no shelf."
         },
+        "platform": {
+          "name": "Platform",
+          "description": "The console of the copy, such as ps5 or switch."
+        },
         "format": {
           "name": "Format",
           "description": "The format of the copy."
@@ -388,9 +388,33 @@
           "name": "Shelf",
           "description": "The ID of the shelf. Empty for no shelf."
         },
+        "platform": {
+          "name": "Platform",
+          "description": "The console of the copy, such as ps5 or switch."
+        },
         "format": {
           "name": "Format",
           "description": "The format of the copy."
+        },
+        "storefront": {
+          "name": "Storefront",
+          "description": "The store of a digital copy, such as PlayStation Store."
+        },
+        "region": {
+          "name": "Region",
+          "description": "The region of the copy, such as PAL."
+        },
+        "edition": {
+          "name": "Edition",
+          "description": "The edition, such as Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "The copy is in a steelbook case."
+        },
+        "barcode": {
+          "name": "Barcode",
+          "description": "The barcode number, such as an EAN-13."
         },
         "condition": {
           "name": "Condition",
@@ -411,14 +435,6 @@
         "value": {
           "name": "Value",
           "description": "The value of the copy now."
-        },
-        "signed": {
-          "name": "Signed",
-          "description": "The copy is signed."
-        },
-        "first_edition": {
-          "name": "First edition",
-          "description": "The copy is a first edition."
         },
         "note": {
           "name": "Note",
@@ -438,9 +454,33 @@
           "name": "Shelf",
           "description": "The ID of the shelf. Empty for no shelf."
         },
+        "platform": {
+          "name": "Platform",
+          "description": "The console of the copy, such as ps5 or switch."
+        },
         "format": {
           "name": "Format",
           "description": "The format of the copy."
+        },
+        "storefront": {
+          "name": "Storefront",
+          "description": "The store of a digital copy, such as PlayStation Store."
+        },
+        "region": {
+          "name": "Region",
+          "description": "The region of the copy, such as PAL."
+        },
+        "edition": {
+          "name": "Edition",
+          "description": "The edition, such as Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "The copy is in a steelbook case."
+        },
+        "barcode": {
+          "name": "Barcode",
+          "description": "The barcode number, such as an EAN-13."
         },
         "condition": {
           "name": "Condition",
@@ -461,14 +501,6 @@
         "value": {
           "name": "Value",
           "description": "The value of the copy now."
-        },
-        "signed": {
-          "name": "Signed",
-          "description": "The copy is signed."
-        },
-        "first_edition": {
-          "name": "First edition",
-          "description": "The copy is a first edition."
         },
         "note": {
           "name": "Note",
@@ -755,6 +787,10 @@
         "shelf_id": {
           "name": "Shelf",
           "description": "The ID of the shelf. Empty for no shelf."
+        },
+        "platform": {
+          "name": "Platform",
+          "description": "The console of the copy, such as ps5 or switch."
         },
         "format": {
           "name": "Format",
@@ -1070,6 +1106,9 @@
     },
     "import_cover_unreadable": {
       "message": "The cover file {file} is not a valid image."
+    },
+    "digital_copy_no_shelf": {
+      "message": "A digital copy has no shelf."
     }
   }
 }

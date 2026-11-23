@@ -326,10 +326,6 @@
           "name": "IGDB ID",
           "description": "L'ID del joc a IGDB."
         },
-        "barcode": {
-          "name": "Codi de barres",
-          "description": "El número del codi de barres, com un EAN-13."
-        },
         "tags": {
           "name": "Etiquetes",
           "description": "Les etiquetes del llibre."
@@ -366,6 +362,10 @@
           "name": "Prestatge",
           "description": "L'ID del prestatge. Buit per a cap prestatge."
         },
+        "platform": {
+          "name": "Plataforma",
+          "description": "La consola de la còpia, com ps5 o switch."
+        },
         "format": {
           "name": "Format",
           "description": "El format de l'exemplar."
@@ -388,9 +388,33 @@
           "name": "Prestatge",
           "description": "L'ID del prestatge. Buit per a cap prestatge."
         },
+        "platform": {
+          "name": "Plataforma",
+          "description": "La consola de la còpia, com ps5 o switch."
+        },
         "format": {
           "name": "Format",
           "description": "El format de l'exemplar."
+        },
+        "storefront": {
+          "name": "Botiga",
+          "description": "La botiga d'una còpia digital, com PlayStation Store."
+        },
+        "region": {
+          "name": "Regió",
+          "description": "La regió de la còpia, com PAL."
+        },
+        "edition": {
+          "name": "Edició",
+          "description": "L'edició, com Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "La còpia té una caixa steelbook."
+        },
+        "barcode": {
+          "name": "Codi de barres",
+          "description": "El número del codi de barres, com un EAN-13."
         },
         "condition": {
           "name": "Estat",
@@ -411,14 +435,6 @@
         "value": {
           "name": "Valor",
           "description": "El valor actual de l'exemplar."
-        },
-        "signed": {
-          "name": "Signat",
-          "description": "L'exemplar està signat."
-        },
-        "first_edition": {
-          "name": "Primera edició",
-          "description": "L'exemplar és una primera edició."
         },
         "note": {
           "name": "Nota",
@@ -438,9 +454,33 @@
           "name": "Prestatge",
           "description": "L'ID del prestatge. Buit per a cap prestatge."
         },
+        "platform": {
+          "name": "Plataforma",
+          "description": "La consola de la còpia, com ps5 o switch."
+        },
         "format": {
           "name": "Format",
           "description": "El format de l'exemplar."
+        },
+        "storefront": {
+          "name": "Botiga",
+          "description": "La botiga d'una còpia digital, com PlayStation Store."
+        },
+        "region": {
+          "name": "Regió",
+          "description": "La regió de la còpia, com PAL."
+        },
+        "edition": {
+          "name": "Edició",
+          "description": "L'edició, com Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "La còpia té una caixa steelbook."
+        },
+        "barcode": {
+          "name": "Codi de barres",
+          "description": "El número del codi de barres, com un EAN-13."
         },
         "condition": {
           "name": "Estat",
@@ -461,14 +501,6 @@
         "value": {
           "name": "Valor",
           "description": "El valor actual de l'exemplar."
-        },
-        "signed": {
-          "name": "Signat",
-          "description": "L'exemplar està signat."
-        },
-        "first_edition": {
-          "name": "Primera edició",
-          "description": "L'exemplar és una primera edició."
         },
         "note": {
           "name": "Nota",
@@ -755,6 +787,10 @@
         "shelf_id": {
           "name": "Prestatge",
           "description": "L'ID del prestatge. Buit per a cap prestatge."
+        },
+        "platform": {
+          "name": "Plataforma",
+          "description": "La consola de la còpia, com ps5 o switch."
         },
         "format": {
           "name": "Format",
@@ -1070,6 +1106,9 @@
     },
     "import_cover_unreadable": {
       "message": "El fitxer de portada {file} no és una imatge vàlida."
+    },
+    "digital_copy_no_shelf": {
+      "message": "Una còpia digital no té prestatge."
     }
   }
 }
