@@ -48,7 +48,8 @@ action:
       barcode: "0711719505012"
       title: "Sky Garden"
     response_variable: result
-  # result.game.id is the game id. result.existing is true if the barcode was stored.
+  # result.game.id is the game id. result.existing is true if a copy has the barcode.
+  # The barcode is a copy field: add_copy with barcode puts it on the copy.
 ```
 
 ### Mark a game as read

@@ -5,7 +5,8 @@
 // which has arrays in display order.
 
 export type ReadingStatus = 'want' | 'reading' | 'read' | 'dnf';
-export type CopyFormat = 'hardcover' | 'paperback' | 'ebook' | 'audiobook' | 'other';
+export type CopyFormat = 'physical' | 'digital' | 'other';
+export type Platform = 'ps5' | 'ps4' | 'ps3' | 'switch2' | 'switch' | 'xbox_series' | 'xbox_one' | 'pc' | 'other';
 export type CopyCondition = 'new' | 'fine' | 'good' | 'fair' | 'poor';
 
 export interface Room {
@@ -60,7 +61,6 @@ export interface Game {
   franchise: string | null;
   /** The game in IGDB, or null. */
   igdb_id: number | null;
-  barcode: string | null;
   tags: string[];
   shared_notes: string;
   cover: { kind: 'custom' | 'none'; file: string | null };
@@ -78,14 +78,18 @@ export interface Copy {
   id: string;
   game_id: string;
   shelf_id: string | null;
+  platform: Platform;
   format: CopyFormat;
+  storefront: string;
+  region: string;
+  edition: string;
+  steelbook: boolean;
+  barcode: string | null;
   condition: CopyCondition | null;
   acquired: string | null;
   acquired_from?: string;
   price?: number | null;
   value?: number | null;
-  signed: boolean;
-  first_edition: boolean;
   note: string;
   created_at: string;
 }

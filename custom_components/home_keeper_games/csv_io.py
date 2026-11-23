@@ -278,7 +278,7 @@ def parse(text: str) -> list[dict[str, Any]]:
 
 
 class _Index:
-    """The match keys of the games: barcode, then title and author."""
+    """The match keys of the games: id, the barcode of a copy, then title."""
 
     def __init__(self, games: dict[str, dict[str, Any]], copies: Any = ()) -> None:
         self.by_id: set[str] = set()

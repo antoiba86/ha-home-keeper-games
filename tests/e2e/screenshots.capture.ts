@@ -12,7 +12,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { resolve } from 'node:path';
 import { library } from './ha-ws';
-import { adminState, gameByTitle, fakeCamera, libraryTab, noServiceWorker, openCard, openTab } from './tests/helpers';
+import { adminState, gameByTitle, gamesWithCode, fakeCamera, libraryTab, noServiceWorker, openCard, openTab } from './tests/helpers';
 import { PHONE } from './viewports';
 
 const SHOT_DIR = resolve(__dirname, process.env.SHOT_DIR || '../../docs/images');
@@ -57,12 +57,17 @@ async function coversLoaded(page: Page): Promise<void> {
     .toBe(true);
 }
 
+/** Open the Edit copy dialog of the first copy on the game detail that shows. */
+async function openCopyDialog(page: Page): Promise<void> {
+  const tab = libraryTab(page);
+  await tab.locator('[data-k^="ec-"]').first().click();
+  await expect(tab.locator('.hkl-dialog [name="platform"]')).toBeVisible();
+}
+
 async function deleteScanned(): Promise<void> {
   const state = await adminState();
-  for (const game of state.games) {
-    if (NEW_CODES.includes(game.barcode)) {
-      await library('delete_game', { game_id: game.id });
-    }
+  for (const game of gamesWithCode(state, NEW_CODES)) {
+    await library('delete_game', { game_id: game.id });
   }
 }
 
@@ -70,7 +75,7 @@ async function deleteScanned(): Promise<void> {
  * Scan the 2 barcodes into Shelf 3. No game has the 2nd one, so the title sheet opens: shoot it as *missShot*, and with its details open as
  * *detailsShot*. Then give the title, so the scan goes on.
  */
-async function scanSession(page: Page, missShot: string, detailsShot?: string): Promise<void> {
+async function scanSession(page: Page, missShot: string, detailsShot?: string, setupShot?: string): Promise<void> {
   const state = await adminState();
   const office = state.rooms.find((r: { name: string }) => r.name === 'Office');
   const tall = state.units.find((c: { room_id: string }) => c.room_id === office.id);
@@ -78,6 +83,9 @@ async function scanSession(page: Page, missShot: string, detailsShot?: string): 
   const tab = await openTab(page, `/scan;shelf=${shelf.id}`);
   await tab.locator('[data-k="m-manual"]').check();
   await expect(tab.locator('[data-k="m-manual"]')).toBeChecked();
+  // Each copy that the scan adds gets the platform and the format of the setup.
+  await tab.locator('[data-k="sc-platform"]').selectOption('switch');
+  if (setupShot) await shot(page, setupShot);
   await tab.locator('[data-k="scan-start"]').click();
   for (const code of SCAN_CODES) {
     await tab.locator('[data-k="barcode-input"]').fill(code);
@@ -105,7 +113,7 @@ async function scanSession(page: Page, missShot: string, detailsShot?: string): 
 async function openLendError(page: Page): Promise<void> {
   const state = await adminState();
   const lent = new Set(state.loans.filter((l: any) => !l.returned).map((l: any) => l.copy_id));
-  const copy = state.copies.find((c: any) => !lent.has(c.id) && c.format !== 'ebook' && c.format !== 'audiobook');
+  const copy = state.copies.find((c: any) => !lent.has(c.id) && c.format !== 'digital');
   if (!copy) throw new Error('no copy to lend in the seed');
   const tab = await openTab(page, `/games/${copy.game_id}`);
   await coversLoaded(page);
@@ -137,6 +145,10 @@ test('capture the Library screenshots', async ({ page, browser }) => {
   await expect(tab.locator('ha-markdown strong')).toHaveText('Oct 2026');
   await coversLoaded(page);
   await shot(page, 'game-detail-desktop');
+
+  // The copy dialog: the platform, the format, the store, the region, the edition and the barcode.
+  await openCopyDialog(page);
+  await shot(page, 'copy-dialog-desktop');
 
   // The Lend dialog after an error: the error line shows and the typed text stays.
   await page.setViewportSize(DESKTOP_SHOT);
@@ -172,7 +184,7 @@ test('capture the Library screenshots', async ({ page, browser }) => {
   await shot(page, 'settings-desktop');
 
   // A scan of a new barcode: the title sheet as a dialog.
-  await scanSession(page, 'scan-miss-desktop');
+  await scanSession(page, 'scan-miss-desktop', undefined, 'scan-setup-desktop');
   await deleteScanned();
 
   // The card on a dashboard, as Alex. The window is tall enough for the whole card.
@@ -191,6 +203,9 @@ test('capture the Library screenshots', async ({ page, browser }) => {
   await coversLoaded(page);
   await shot(page, 'game-detail-mobile');
 
+  await openCopyDialog(page);
+  await shot(page, 'copy-dialog-mobile');
+
   await openLendError(page);
   await shot(page, 'dialog-error-mobile');
 
@@ -201,7 +216,7 @@ test('capture the Library screenshots', async ({ page, browser }) => {
   await expect(tab.locator('a.hkl-task').first()).toBeVisible({ timeout: 30_000 });
   await shot(page, 'loans-mobile');
 
-  await scanSession(page, 'scan-miss-mobile', 'scan-miss-details-mobile');
+  await scanSession(page, 'scan-miss-mobile', 'scan-miss-details-mobile', 'scan-setup-mobile');
   await shot(page, 'scan-mobile');
   // Skip the duplicate, so the seed keeps its copies.
   await libraryTab(page).locator('.hkl-result.dup').getByRole('button', { name: 'Skip' }).click();

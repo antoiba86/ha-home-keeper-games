@@ -20,6 +20,7 @@ import type { Game, Copy, Loan, ReadingStatus } from './types';
 import {
   allGenres,
   gameByline,
+  platformLabel,
   buildPath,
   dueState,
   escapeHTML,
@@ -211,7 +212,7 @@ function copyBox(ctx: ViewCtx, copy: Copy, index: number, total: number): string
   return `<div class="hkl-box">
     <span class="hkl-eyebrow">${escapeHTML(label)}</span>
     <span class="hkl-box-main">${escapeHTML(loc)}</span>
-    <span class="hkl-box-sub">${escapeHTML(t(`format.kind_${copy.format}`))}${lent ? ` · ${escapeHTML(t('loan.lent_pill', { party: lent.party ?? '' }))}` : ''}</span>
+    <span class="hkl-box-sub">${escapeHTML(`${platformLabel(copy.platform)} · ${t(`format.kind_${copy.format}`)}`)}${lent ? ` · ${escapeHTML(t('loan.lent_pill', { party: lent.party ?? '' }))}` : ''}</span>
     <span class="hkl-box-actions">${button(escapeHTML(t('action.move')), 'move-copy', 'tonal', `data-id="${escapeHTML(copy.id)}" data-k="mv-${escapeHTML(copy.id)}"`)}${room ? button(escapeHTML(t('action.open_shelf')), 'nav', 'text', `data-path="/shelves/${escapeHTML(encodeURIComponent(room.id))}" data-k="os-${escapeHTML(copy.id)}"`) : ''}</span>
   </div>`;
 }
@@ -225,10 +226,15 @@ function copyDetails(ctx: ViewCtx, copies: Copy[]): string {
     .map((c) => {
       const kv = (k: string, v: string) => (v ? `<span class="hkl-kv"><span>${escapeHTML(k)}</span><span>${escapeHTML(v)}</span></span>` : '');
       const bought = [c.acquired ? formatDate(c.acquired) : '', c.acquired_from ?? ''].filter(Boolean).join(' · ');
-      const flags = [c.signed ? t('copy.signed') : '', c.first_edition ? t('copy.first_edition') : ''].filter(Boolean);
+      const flags = [c.steelbook ? t('copy.steelbook') : ''].filter(Boolean);
       return `<div class="hkl-copy">
         ${copies.length > 1 ? `<span class="hkl-eyebrow">${escapeHTML(locationLabel(ctx.idx, c.shelf_id) || t('common.no_shelf'))}</span>` : ''}
+        ${kv(t('copy.platform'), platformLabel(c.platform))}
         ${kv(t('copy.format'), t(`format.kind_${c.format}`))}
+        ${kv(t('copy.storefront'), c.storefront)}
+        ${kv(t('copy.region'), c.region)}
+        ${kv(t('copy.edition'), c.edition)}
+        ${kv(t('game.barcode_label'), c.barcode ?? '')}
         ${kv(t('copy.condition'), c.condition ? t(`condition.${c.condition}`) : '')}
         ${kv(t('copy.bought'), bought)}
         ${kv(t('copy.price'), formatMoney(c.price, cur))}
@@ -305,7 +311,6 @@ export function renderGame(ctx: ViewCtx, game: Game | undefined): string {
   const franchise = game.franchise ? link(gamesPath({ q: game.franchise }), escapeHTML(game.franchise)) : '';
   const meta = [
     game.release_date,
-    game.barcode ? t('game.barcode', { code: game.barcode }) : '',
   ].filter(Boolean).map((x) => escapeHTML(x));
   const tags = [...game.genres, ...game.tags]
     .map((x) => `<span class="hkl-chip">${escapeHTML(x)}</span>`)

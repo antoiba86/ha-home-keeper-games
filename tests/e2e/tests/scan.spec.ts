@@ -1,7 +1,7 @@
 import { library } from '../ha-ws';
 import type { Locator, Page } from '@playwright/test';
 import { resolve } from 'node:path';
-import { adminState, gameByTitle, expect, fakeCamera, openTab, test } from './helpers';
+import { adminState, gameByTitle, gamesWithCode, expect, fakeCamera, openTab, test } from './helpers';
 
 /**
  * The Scan flow with Enter barcode. A new barcode adds a game that the test deletes after
@@ -24,7 +24,7 @@ async function shelfId(room: string, unit: string, shelf: string): Promise<strin
 
 async function deleteNewGame(): Promise<void> {
   const state = await adminState();
-  for (const game of state.games.filter((b: { barcode: string }) => [NEW_CODE, MISS_CODE].includes(b.barcode))) {
+  for (const game of gamesWithCode(state, [NEW_CODE, MISS_CODE])) {
     await library('delete_game', { game_id: game.id });
   }
 }
@@ -56,7 +56,7 @@ test.describe('Scan', { tag: '@responsive' }, () => {
     await expect(submit).toBeEnabled();
     await sheet.locator('[data-k="d-more-toggle"]').click();
     await sheet.locator('[name="franchise"]').fill('Moss');
-    await sheet.locator('[name="format"]').selectOption('hardcover');
+    await sheet.locator('[name="format"]').selectOption('digital');
     await sheet.locator('[data-k="d-cover"]').setInputFiles(COVER);
     await expect(sheet.locator('[data-k="d-cover-name"]')).toHaveText('13be6b0e5c354e1981a89fe2766196e0-552257a9.jpg');
     await submit.click();
@@ -64,11 +64,11 @@ test.describe('Scan', { tag: '@responsive' }, () => {
     await expect(tab.locator('.hkl-result').filter({ hasText: MISS_TITLE })).toContainText('No book has this barcode');
 
     const state = await adminState();
-    const game = state.games.find((b: { barcode: string }) => b.barcode === MISS_CODE);
+    const [game] = gamesWithCode(state, [MISS_CODE]);
     expect(game).toMatchObject({ title: MISS_TITLE, franchise: 'Moss', needs_details: true });
     expect(game.cover.kind).toBe('custom');
     const copies = state.copies.filter((c: { game_id: string }) => c.game_id === game.id);
-    expect(copies.map((c: { shelf_id: string; format: string }) => [c.shelf_id, c.format])).toEqual([[shelf, 'hardcover']]);
+    expect(copies.map((c: { shelf_id: string; format: string }) => [c.shelf_id, c.format])).toEqual([[null, 'digital']]);
   });
 
   test('Remove this scan deletes the new game', async ({ page }) => {
@@ -83,12 +83,12 @@ test.describe('Scan', { tag: '@responsive' }, () => {
     await expect(sheet).toHaveCount(0);
     await expect(tab.locator('[data-k^="removed-"]')).toHaveText('Removed');
     const state = await adminState();
-    expect(state.games.filter((b: { barcode: string }) => b.barcode === MISS_CODE)).toEqual([]);
+    expect(gamesWithCode(state, [MISS_CODE])).toEqual([]);
   });
 
   test('a duplicate shows its actions and Skip changes nothing', async ({ page }) => {
     const seeded = await gameByTitle(SEEDED_TITLE);
-    expect(seeded.barcode).toBe(SEEDED_CODE);
+    expect(gamesWithCode(await adminState(), [SEEDED_CODE]).map((g) => g.id)).toEqual([seeded.id]);
     const before = (await adminState()).copies.filter((c: { game_id: string }) => c.game_id === seeded.id);
     const shelf = await shelfId('Office', 'Tall unit', 'Shelf 3');
     const tab = await openTab(page, `/scan;shelf=${shelf};step=camera`);
@@ -182,7 +182,7 @@ test.describe('Scan camera with a new barcode', { tag: '@responsive' }, () => {
     await expect(tab.locator('[data-k="cam-paused"]')).toHaveCount(0);
     expect(await playing(video)).toBe(true);
     const state = await adminState();
-    expect(state.games.filter((b: { barcode: string }) => b.barcode === NEW_CODE)).toEqual([]);
+    expect(gamesWithCode(state, [NEW_CODE])).toEqual([]);
   });
 });
 

@@ -5,7 +5,7 @@ implements:
   - custom_components/home_keeper_games/people.py
   - custom_components/home_keeper_games/projections.py
 related: [events-api, entities, architecture]
-source_hash: ef238ec8208e
+source_hash: e3209a916f2a
 ---
 
 # People and privilege

@@ -20,6 +20,9 @@ export interface ScanEntry {
 export interface ScanSession {
   method: 'camera' | 'manual';
   roomId: string | null;
+  /** The platform and the format of each copy that the scan adds. */
+  platform: string;
+  format: string;
   results: ScanEntry[];
   manualOpen: boolean;
   markRead: boolean;

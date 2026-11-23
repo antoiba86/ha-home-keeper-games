@@ -15,7 +15,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { resolve } from 'node:path';
 import { library } from './ha-ws';
-import { adminState, gameByTitle, noServiceWorker, openCard, openTab, restoreReading } from './tests/helpers';
+import { adminState, gameByTitle, gamesWithCode, noServiceWorker, openCard, openTab, restoreReading } from './tests/helpers';
 import { DESKTOP } from './viewports';
 
 const OUT = process.env.VIDEO_DIR || '/tmp/home-keeper-games-video';
@@ -35,7 +35,7 @@ async function beat(page: Page, n = 1): Promise<void> {
 
 async function cleanUp(): Promise<void> {
   const state = await adminState();
-  for (const game of state.games.filter((b: { barcode: string }) => b.barcode === MISS_CODE)) {
+  for (const game of gamesWithCode(state, [MISS_CODE])) {
     await library('delete_game', { game_id: game.id });
   }
   const lent = state.games.find((b: { title: string }) => b.title === LEND_TITLE);

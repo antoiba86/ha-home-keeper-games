@@ -4,6 +4,7 @@
 // current time and the data. The mutation gate runs on this file, so each
 // function has direct tests in `test/utils.test.js`.
 
+import { t } from './i18n';
 import type {
   Game,
   Unit,
@@ -403,10 +404,10 @@ export function statusOf(game: Game, personId: string | null | undefined): Readi
 }
 
 /** The text that a search reads for a game. */
-export function searchText(game: Game, personId: string | null): string {
+export function searchText(game: Game, personId: string | null, extra: Array<string | null> = []): string {
   const parts = [
+    ...extra,
     game.title,
-    game.barcode,
     game.franchise,
     ...game.genres,
     game.shared_notes,
@@ -417,10 +418,10 @@ export function searchText(game: Game, personId: string | null): string {
 }
 
 /** True if every word of *q* is in the search text of *game*. */
-export function matchesSearch(game: Game, q: string, personId: string | null): boolean {
+export function matchesSearch(game: Game, q: string, personId: string | null, extra: Array<string | null> = []): boolean {
   const words = fold(q).split(/\s+/).filter(Boolean);
   if (!words.length) return true;
-  const text = searchText(game, personId);
+  const text = searchText(game, personId, extra);
   const digits = text.replace(/-/g, '');
   return words.every((w) => text.includes(w) || (/^[\d-]+$/.test(w) && digits.includes(w.replace(/-/g, ''))));
 }
@@ -464,7 +465,8 @@ export function matchesBase(game: Game, f: GameFilters, ctx: FilterContext): boo
   if (f.genre && !game.genres.includes(f.genre)) return false;
   if (f.reader && statusOf(game, f.reader) !== 'read') return false;
   if (!inPlace(game, f, ctx)) return false;
-  return matchesSearch(game, f.q, ctx.me);
+  const codes = (ctx.idx.copiesByGame.get(game.id) ?? []).map((c) => c.barcode);
+  return matchesSearch(game, f.q, ctx.me, codes);
 }
 
 /** The games that pass all the filters, sorted. */
@@ -511,6 +513,31 @@ export function allGenres(games: Game[]): string[] {
 /** The second line of a game: its franchise, else its genres. */
 export function gameByline(game: Game): string {
   return game.franchise || game.genres.join(', ');
+}
+
+// ── Copies ───────────────────────────────────────────────────────────────────
+
+/** The formats of a copy, in display order. */
+export const FORMATS = ['physical', 'digital', 'other'] as const;
+
+/** The platforms of a copy, in display order. */
+export const PLATFORMS = ['ps5', 'ps4', 'ps3', 'switch2', 'switch', 'xbox_series', 'xbox_one', 'pc', 'other'] as const;
+
+/** The names of the platforms. They are product names, the same in each language. */
+export const PLATFORM_NAMES: Record<string, string> = {
+  ps5: 'PS5',
+  ps4: 'PS4',
+  ps3: 'PS3',
+  switch2: 'Switch 2',
+  switch: 'Switch',
+  xbox_series: 'Xbox Series',
+  xbox_one: 'Xbox One',
+  pc: 'PC',
+};
+
+/** The name of a platform. `other` and an unknown value read as "Other platform". */
+export function platformLabel(platform: string | null | undefined): string {
+  return PLATFORM_NAMES[platform ?? ''] ?? t('copy.platform_other');
 }
 
 // ── Barcodes ─────────────────────────────────────────────────────────────────

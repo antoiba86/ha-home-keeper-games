@@ -2,7 +2,7 @@
 
 import { t, tn } from './i18n';
 import { cameraNeedsHttps } from './scanner';
-import { button, cover, ICONS, personOptions } from './markup';
+import { button, cover, formatOptions, ICONS, personOptions, platformOptions } from './markup';
 import type { ScanEntry, ViewCtx } from './tab-types';
 import { buildPath, escapeHTML, gameByline, locationLabel, nextMiss, nextShelf, scanTally, shelfPath } from './utils';
 
@@ -41,6 +41,15 @@ function startButton(ctx: ViewCtx, label: string): string {
   return button(escapeHTML(label), 'scan-start', 'primary', `data-k="scan-start"${cameraBlocked(ctx) ? ' disabled aria-describedby="scan-https"' : ''}`);
 }
 
+/** The platform and the format of each copy that the scan adds. */
+function copyStep(ctx: ViewCtx): string {
+  const s = ctx.ui.scan;
+  return `<div class="hkl-step"><div class="hkl-fields">
+    <label class="hkl-field">${escapeHTML(t('copy.platform'))}<select data-chg="scan-field" data-key="platform" data-k="sc-platform">${platformOptions(s.platform)}</select></label>
+    <label class="hkl-field">${escapeHTML(t('copy.format'))}<select data-chg="scan-field" data-key="format" data-k="sc-format">${formatOptions(s.format)}</select></label>
+  </div></div>`;
+}
+
 function setupShelf(ctx: ViewCtx): string {
   const shelfId = routeShelf(ctx);
   const roomId = ctx.ui.scan.roomId ?? shelfPath(ctx.idx, shelfId).room?.id ?? ctx.lib.rooms[0]?.id ?? null;
@@ -64,6 +73,7 @@ function setupShelf(ctx: ViewCtx): string {
     <div class="hkl-scan-body">
       ${rooms ? `<div class="hkl-step"><span class="hkl-eyebrow">${escapeHTML(t('scan.room'))}</span><div class="hkl-choices">${rooms}</div></div>` : ''}
       <div class="hkl-step"><span class="hkl-eyebrow">${escapeHTML(t('scan.shelf'))}</span>${cases}${none}</div>
+      ${copyStep(ctx)}
       ${methodStep(ctx)}
     </div>
     <div class="hkl-scan-foot">${startButton(ctx, t('scan.start_into', { shelf: target }))}</div>

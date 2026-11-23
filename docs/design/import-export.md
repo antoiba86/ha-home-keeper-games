@@ -4,7 +4,7 @@ summary: How the library joins the combined export and import of Home Keeper, wh
 implements:
   - custom_components/home_keeper_games/import_export.py
 related: [csv-import-export, home-keeper-dependency, store-models, events-api]
-source_hash: 0d1729063362
+source_hash: bc1e99ef4337
 ---
 
 # Home Keeper export and import
@@ -63,8 +63,9 @@ that is only `data` also imports.
 1. Refuse a `format` above `import_export.FORMAT`.
 2. Match a room by id, then by name. Match a unit or a shelf by id, then by name in
    its parent.
-3. Match a game by id, barcode, then title, with the index of
-   `csv_io`.
+3. Match a game by id, then title, with the index of `csv_io`. A copy with a barcode
+   that a copy of another game has gives an `error` and is not imported. A digital copy
+   goes on no shelf.
 4. Match a copy or a loan by id. Else add it. A loan that exists keeps its task id.
 5. Find a person, an area or a to-do entity by id on this install, then by name. 2
    records with 1 name match neither. A person that matches neither gives a `warning`,

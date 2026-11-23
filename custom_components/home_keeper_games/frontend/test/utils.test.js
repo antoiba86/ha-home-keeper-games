@@ -38,11 +38,15 @@ const copy = (id, gameId, shelfId, extra = {}) => ({
   id,
   game_id: gameId,
   shelf_id: shelfId,
-  format: 'paperback',
+  platform: 'other',
+  format: 'physical',
+  storefront: '',
+  region: '',
+  edition: '',
+  steelbook: false,
+  barcode: null,
   condition: null,
   acquired: null,
-  signed: false,
-  first_edition: false,
   note: '',
   created_at: '',
   ...extra,
@@ -355,7 +359,6 @@ describe('reading helpers and search', () => {
   const b = game('b', {
     title: 'The Left Hand',
     genres: ['Strategy game'],
-    barcode: '9780441478125',
     franchise: 'Hainish',
     shared_notes: 'Game club',
     tags: ['hugo'],
@@ -372,8 +375,13 @@ describe('reading helpers and search', () => {
   });
 
   it('searches each field', () => {
-    for (const q of ['left hand', 'STRATEGY', 'game', '9780441478125', '978-0-441-47812-5', '0441478125', 'hainish', 'club', 'hugo', 'secret']) {
+    for (const q of ['left hand', 'STRATEGY', 'game', 'hainish', 'club', 'hugo', 'secret']) {
       expect(u.matchesSearch(b, q, 'me'), q).toBe(true);
+    }
+    // The barcode is on a copy. The caller passes the codes of the copies.
+    for (const q of ['9780441478125', '978-0-441-47812-5', '0441478125']) {
+      expect(u.matchesSearch(b, q, 'me', [null, '9780441478125']), q).toBe(true);
+      expect(u.matchesSearch(b, q, 'me'), q).toBe(false);
     }
   });
 
@@ -386,9 +394,10 @@ describe('reading helpers and search', () => {
   });
 
   it('matches a hyphenated barcode only as digits', () => {
-    expect(u.matchesSearch(b, '0-441-47812-5', 'me')).toBe(true);
-    expect(u.matchesSearch(b, '0441478125x', 'me')).toBe(false);
-    expect(u.matchesSearch(b, '978-0-441-9', 'me')).toBe(false);
+    const codes = ['9780441478125'];
+    expect(u.matchesSearch(b, '0-441-47812-5', 'me', codes)).toBe(true);
+    expect(u.matchesSearch(b, '0441478125x', 'me', codes)).toBe(false);
+    expect(u.matchesSearch(b, '978-0-441-9', 'me', codes)).toBe(false);
     expect(u.matchesSearch(game('n', { title: 'a-b' }), 'ab', null)).toBe(false);
   });
 

@@ -78,6 +78,8 @@ function freshUi(): UiState {
     scan: {
       method: 'camera',
       roomId: null,
+      platform: 'other',
+      format: 'physical',
       results: [],
       manualOpen: false,
       markRead: false,
@@ -869,7 +871,16 @@ export class HomeKeeperGamesTab extends HTMLElement {
           const gameId = replyId(res, 'game');
           const existing = Boolean(res?.existing ?? (res?.game as Record<string, unknown> | undefined)?.existing);
           if (existing) this._toast(t('dialog.existing'));
-          else if (gameId && on('own')) await api.call('add_copy', { game_id: gameId, shelf_id: str('shelf_id') || null, format: str('format') });
+          else if (gameId && on('own')) {
+            // The barcode of the case goes on the copy, so a scan finds the game later.
+            await api.call('add_copy', {
+              game_id: gameId,
+              shelf_id: str('shelf_id') || null,
+              platform: str('platform'),
+              format: str('format'),
+              ...(code ? { barcode: code } : {}),
+            });
+          }
           if (gameId) after = `/games/${encodeURIComponent(gameId)}`;
           break;
         }
@@ -882,13 +893,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
             release_date: str('release_date'),
             tags: splitList(str('tags')),
             summary: str('summary'),
-            barcode: null,
           };
-          if (str('barcode')) {
-            const code = normalizeBarcode(str('barcode'));
-            if (!code) throw new Error(t('scan.bad_barcode'));
-            fields.barcode = code;
-          }
           if (on('details_done')) fields.needs_details = false;
           await api.call('update_game', fields);
           break;
@@ -905,9 +910,13 @@ export class HomeKeeperGamesTab extends HTMLElement {
           const genres = splitList(str('genres'));
           if (genres.length) fields.genres = genres;
           await api.call('update_game', fields);
-          const format = str('format');
-          if (d.copyId && format && format !== this._idx?.copy.get(d.copyId)?.format) {
-            await api.call('update_copy', { copy_id: d.copyId, format });
+          const stored = d.copyId ? this._idx?.copy.get(d.copyId) : undefined;
+          const copyFields: Fields = {};
+          for (const name of ['format', 'platform'] as const) {
+            if (str(name) && str(name) !== stored?.[name]) copyFields[name] = str(name);
+          }
+          if (d.copyId && Object.keys(copyFields).length) {
+            await api.call('update_copy', { copy_id: d.copyId, ...copyFields });
           }
           if (photo) {
             const fileId = await api.uploadCover(photo);
@@ -918,17 +927,27 @@ export class HomeKeeperGamesTab extends HTMLElement {
         }
         case 'copy': {
           const fields: Fields = {
+            platform: str('platform'),
             format: str('format'),
+            storefront: str('storefront'),
+            region: str('region'),
+            edition: str('edition'),
+            steelbook: on('steelbook'),
+            barcode: null,
             condition: str('condition') || null,
             acquired: str('acquired') || null,
             acquired_from: str('acquired_from'),
             price: numberOrNull(str('price')),
             value: numberOrNull(str('value')),
-            signed: on('signed'),
-            first_edition: on('first_edition'),
             note: str('note'),
           };
-          const shelf = str('shelf_id') || null;
+          if (str('barcode')) {
+            const code = normalizeBarcode(str('barcode'));
+            if (!code) throw new Error(t('scan.bad_barcode'));
+            fields.barcode = code;
+          }
+          // A digital copy has no shelf.
+          const shelf = str('format') === 'digital' ? null : str('shelf_id') || null;
           if (d.copyId) {
             await api.call('update_copy', { copy_id: d.copyId, ...fields });
             if ((this._idx?.copy.get(d.copyId)?.shelf_id ?? null) !== shelf) await api.call('move_copy', { copy_id: d.copyId, shelf_id: shelf });
@@ -986,7 +1005,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
           break;
         }
         case 'got-it':
-          await api.call('got_wishlist_game', { game_id: d.gameId, shelf_id: str('shelf_id') || null, format: str('format') });
+          await api.call('got_wishlist_game', { game_id: d.gameId, shelf_id: str('shelf_id') || null, platform: str('platform'), format: str('format') });
           break;
         case 'room': {
           const fields = { name: str('name'), area_id: str('area_id') || null };
@@ -1228,7 +1247,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
         const game = (res?.game as Game | undefined) ?? null;
         entry.res = { result: 'added', game, copy: null, existing_copies: [] };
       } else {
-        entry.res = await this._api!.scanBarcode({ barcode, shelf_id: routeShelf(this._ctx()!), on_duplicate: 'ask' });
+        entry.res = await this._api!.scanBarcode({ barcode, shelf_id: routeShelf(this._ctx()!), platform: s.platform, format: s.format, on_duplicate: 'ask' });
       }
     } catch (err) {
       entry.error = errorText(err);
@@ -1285,7 +1304,8 @@ export class HomeKeeperGamesTab extends HTMLElement {
     entry.pending = true;
     this._render();
     try {
-      entry.res = await this._api!.scanBarcode({ barcode: entry.barcode, shelf_id: routeShelf(this._ctx()!), on_duplicate: choice });
+      const s = this._ui.scan;
+      entry.res = await this._api!.scanBarcode({ barcode: entry.barcode, shelf_id: routeShelf(this._ctx()!), platform: s.platform, format: s.format, on_duplicate: choice });
     } catch (err) {
       entry.error = errorText(err);
     }

@@ -25,7 +25,7 @@ implements:
   - custom_components/home_keeper_games/frontend/src/styles.ts
   - custom_components/home_keeper_games/frontend/src/global.d.ts
 related: [home-keeper-dependency, scan-and-barcode, csv-import-export, people-privilege]
-source_hash: 0c6e8cbd6be4
+source_hash: 30d4507c41c5
 ---
 
 # Tab and card
