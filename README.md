@@ -26,8 +26,8 @@
 | custom\_components/home\_keeper\_games/people.py           |       36 |        3 |       10 |        3 |     87% |40, 56, 63 |
 | custom\_components/home\_keeper\_games/projections.py      |      182 |        1 |       84 |        1 |     99% |       344 |
 | custom\_components/home\_keeper\_games/sensor.py           |       75 |        0 |        0 |        0 |    100% |           |
-| custom\_components/home\_keeper\_games/services.py         |      413 |        8 |      108 |        9 |     97% |348-349, 353-\>352, 359, 462, 568, 614, 717-\>719, 821, 850 |
-| custom\_components/home\_keeper\_games/store.py            |      485 |       33 |      140 |       27 |     90% |81, 118-\>exit, 134-135, 218, 242-\>244, 248, 275-\>277, 279, 294, 384, 396-\>398, 404, 424, 435-\>exit, 463, 543-547, 591, 636-\>650, 701, 709, 711-\>713, 766, 768-\>774, 775-778, 780, 810, 829-\>827, 835-\>832, 848-856 |
+| custom\_components/home\_keeper\_games/services.py         |      413 |        8 |      108 |        9 |     97% |348-349, 353-\>352, 359, 460, 566, 612, 715-\>717, 819, 848 |
+| custom\_components/home\_keeper\_games/store.py            |      485 |       33 |      140 |       27 |     90% |81, 118-\>exit, 134-135, 218, 242-\>244, 246, 271-\>273, 275, 290, 374, 386-\>388, 394, 414, 425-\>exit, 453, 533-537, 581, 626-\>640, 691, 699, 701-\>703, 756, 758-\>764, 765-768, 770, 800, 819-\>817, 825-\>822, 838-846 |
 | custom\_components/home\_keeper\_games/todo.py             |       72 |        9 |       14 |        3 |     86% |111, 130-131, 137, 142-143, 152, 155-156 |
 | custom\_components/home\_keeper\_games/websocket\_api.py   |       79 |        6 |       12 |        2 |     91% |101-108, 124-125, 152-153 |
 | custom\_components/home\_keeper\_games/wishlist.py         |      117 |        0 |       44 |        0 |    100% |           |
