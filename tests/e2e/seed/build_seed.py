@@ -120,7 +120,8 @@ SHELVES = [
 
 # ── Games ────────────────────────────────────────────────────────────────────
 # key: (title, authors, barcode first 12 digits, publisher, published, pages,
-#       subjects, series, tags, cover)
+#       subjects, series, tags, cover). The game record takes the year as its
+#       release date, the subjects as genres and the series as its franchise.
 # cover: None or "custom". Each cover is a file in tests/e2e/seed/covers.
 LE_GUIN = ["Ursula K. Le Guin"]
 SF = ["Science fiction"]
@@ -405,9 +406,9 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
             title,
             authors,
             code,
-            publisher,
+            _publisher,
             published,
-            pages,
+            _pages,
             subjects,
             series,
             tags,
@@ -416,14 +417,13 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
         created = f"2026-0{1 + n // 12}-{1 + n % 12 * 2:02d}T10:00:00+00:00"
         data: dict[str, Any] = {
             "title": title,
-            "authors": authors,
             "barcode": ean13(code),
-            "publisher": publisher,
-            "published": published,
-            "pages": pages,
-            "language": "en" if authors else None,
-            "subjects": subjects,
-            "series": {"name": series[0], "number": series[1]} if series else None,
+            "release_date": published,
+            "genres": subjects,
+            "franchise": series[0] if series else None,
+            "summary": f"A {subjects[0].lower()} title by {authors[0]}."
+            if subjects and authors
+            else "",
             "tags": tags,
             "shared_notes": SHARED_NOTES.get(key, ""),
         }

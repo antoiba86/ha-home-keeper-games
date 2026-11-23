@@ -45,7 +45,7 @@ export const coverUrls = new CoverUrls();
  */
 export function cover(game: Game, size: 'tile' | 'thumb' | 'large' = 'tile', badge = ''): string {
   const { bg, ink } = coverColors(game.id);
-  const author = game.authors[0] ?? '';
+  const author = game.franchise ?? '';
   const src = game.cover_url ? coverUrls.get(game.cover_url, Date.now()) : undefined;
   const img = src
     ? `<img src="${escapeHTML(src)}" alt="" loading="lazy" />`

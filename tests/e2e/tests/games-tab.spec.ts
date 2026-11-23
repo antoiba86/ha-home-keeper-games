@@ -31,10 +31,10 @@ test.describe('Games tab', { tag: '@responsive' }, () => {
 
   test('the search narrows the grid and goes into the URL', async ({ page }) => {
     const tab = await openTab(page);
-    await tab.locator('[data-k="q"]').fill('le guin');
-    await expect(page).toHaveURL(/\/home-keeper\/games\/games;q=le%20guin$/);
+    await tab.locator('[data-k="q"]').fill('science fiction');
+    await expect(page).toHaveURL(/\/home-keeper\/games\/games;q=science%20fiction$/);
     const state = await adminState();
-    const leGuin = state.games.filter((b: { owned: boolean; authors: string[] }) => b.owned && b.authors.includes('Ursula K. Le Guin'));
+    const leGuin = state.games.filter((b: { owned: boolean; genres: string[] }) => b.owned && b.genres.includes('Science fiction'));
     await expect(tab.locator('.hkl-tile')).toHaveCount(leGuin.length);
     await expect(tab.locator('.hkl-summary')).toContainText(`${leGuin.length} books`);
     await tab.locator('[data-k="clear"]').click();

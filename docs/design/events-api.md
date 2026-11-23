@@ -7,7 +7,7 @@ implements:
   - custom_components/home_keeper_games/websocket_api.py
   - custom_components/home_keeper_games/events.py
 related: [people-privilege, store-models, entities, architecture]
-source_hash: 9baee1d9b5f6
+source_hash: a0bec32bb78b
 ---
 
 # Services, websocket commands, events and the API surface

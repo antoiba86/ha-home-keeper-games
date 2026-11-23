@@ -98,7 +98,7 @@ still works when the library is not installed.
 | `sensor` Games | The games with 1 copy or more |
 | `sensor` Loans out | The open loans of lent copies |
 | `sensor` Loans overdue | The open loans past their due date |
-| `sensor` *person* games read this year | The games that the person finished this year, with `goal`, `pages` and `year` |
+| `sensor` *person* games read this year | The games that the person finished this year, with `goal` and `year` |
 | `sensor` *person* reading now | The games with status Reading, with `games` |
 | `todo` *person* to read | The games with status Want to read |
 

@@ -4,7 +4,7 @@ import { t, tn } from './i18n';
 import { cameraNeedsHttps } from './scanner';
 import { button, cover, ICONS, personOptions } from './markup';
 import type { ScanEntry, ViewCtx } from './tab-types';
-import { buildPath, escapeHTML, locationLabel, nextMiss, nextShelf, scanTally, shelfPath } from './utils';
+import { buildPath, escapeHTML, gameByline, locationLabel, nextMiss, nextShelf, scanTally, shelfPath } from './utils';
 
 /** True when the scan adds borrowed games (`;mode=borrowed`). */
 export function isBorrowedMode(ctx: ViewCtx): boolean {
@@ -93,7 +93,7 @@ function resultRow(ctx: ViewCtx, e: ScanEntry): string {
   const game = (scanned && ctx.idx.game.get(scanned.id)) || scanned;
   const thumb = game ? cover(game, 'thumb') : '<span class="hkl-cover hkl-cover-thumb blank" aria-hidden="true"></span>';
   const title = game?.title ?? e.barcode;
-  const by = game ? [game.authors.join(', '), game.published].filter(Boolean).join(' · ') : '';
+  const by = game ? [gameByline(game), game.release_date].filter(Boolean).join(' · ') : '';
   const k = `data-key="${e.key}"`;
   let sub = escapeHTML(by);
   let right = '';
@@ -185,7 +185,7 @@ function summaryStep(ctx: ViewCtx): string {
         if (from) label = t('scan.moved_from', { place: from });
       }
       if (res === 'not_found') label = t('action.add_details');
-      return `<div class="hkl-result">${game ? cover(game, 'thumb') : '<span class="hkl-cover hkl-cover-thumb blank"></span>'}<span class="hkl-row-main"><b>${escapeHTML(game?.title ?? r.barcode)}</b><span class="hkl-row-sub">${escapeHTML(game && res !== 'not_found' ? game.authors.join(', ') : t('scan.no_match'))}</span></span><span class="hkl-pill ${res === 'not_found' ? 'warn' : 'ok'}">${escapeHTML(label)}</span></div>`;
+      return `<div class="hkl-result">${game ? cover(game, 'thumb') : '<span class="hkl-cover hkl-cover-thumb blank"></span>'}<span class="hkl-row-main"><b>${escapeHTML(game?.title ?? r.barcode)}</b><span class="hkl-row-sub">${escapeHTML(game && res !== 'not_found' ? gameByline(game) : t('scan.no_match'))}</span></span><span class="hkl-pill ${res === 'not_found' ? 'warn' : 'ok'}">${escapeHTML(label)}</span></div>`;
     })
     .join('');
   const next = !isBorrowedMode(ctx) && shelfId ? nextShelf(ctx.lib, shelfId) : null;

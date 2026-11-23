@@ -865,7 +865,6 @@ export class HomeKeeperGamesTab extends HTMLElement {
           const code = retailBarcode(query);
           const res = await api.call<Record<string, unknown>>('add_game', {
             ...(code ? { barcode: code } : { title: query }),
-            authors: splitList(str('authors')),
           });
           const gameId = replyId(res, 'game');
           const existing = Boolean(res?.existing ?? (res?.game as Record<string, unknown> | undefined)?.existing);
@@ -875,20 +874,14 @@ export class HomeKeeperGamesTab extends HTMLElement {
           break;
         }
         case 'edit-game': {
-          const series = str('series_name');
           const fields: Fields = {
             game_id: d.gameId,
             title: str('title'),
-            subtitle: str('subtitle'),
-            authors: splitList(str('authors')),
-            publisher: str('publisher'),
-            published: str('published'),
-            pages: intOrNull(str('pages')),
-            language: str('language') || null,
-            series: series ? { name: series, number: numberOrNull(str('series_number')) } : null,
-            subjects: splitList(str('subjects')),
+            franchise: str('franchise') || null,
+            genres: splitList(str('genres')),
+            release_date: str('release_date'),
             tags: splitList(str('tags')),
-            description: str('description'),
+            summary: str('summary'),
             barcode: null,
           };
           if (str('barcode')) {
@@ -908,11 +901,9 @@ export class HomeKeeperGamesTab extends HTMLElement {
           if (photo && photo.size > MAX_COVER_BYTES) throw new Error(t('game.cover_too_big'));
           // Send only what the user typed. An empty field keeps the stored value.
           const fields: Fields = { game_id: d.gameId, title };
-          for (const name of ['subtitle', 'publisher', 'published']) if (str(name)) fields[name] = str(name);
-          const authors = splitList(str('authors'));
-          if (authors.length) fields.authors = authors;
-          const pages = intOrNull(str('pages'));
-          if (pages !== null) fields.pages = pages;
+          for (const name of ['franchise', 'release_date']) if (str(name)) fields[name] = str(name);
+          const genres = splitList(str('genres'));
+          if (genres.length) fields.genres = genres;
           await api.call('update_game', fields);
           const format = str('format');
           if (d.copyId && format && format !== this._idx?.copy.get(d.copyId)?.format) {

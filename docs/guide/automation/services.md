@@ -66,7 +66,7 @@ automation:
 | **Games** | The games with 1 copy or more |
 | **Loans out** | The open loans of lent copies |
 | **Loans overdue** | The open loans past their due date |
-| *Person* **games read this year** | The games read this year, with the goal and the pages |
+| *Person* **games read this year** | The games read this year, with the goal |
 | *Person* **reading now** | The games with status Reading, with their titles |
 | *Person* **to read** | A to-do list of the games with status Want to read |
 

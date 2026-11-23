@@ -25,7 +25,7 @@ implements:
   - custom_components/home_keeper_games/frontend/src/styles.ts
   - custom_components/home_keeper_games/frontend/src/global.d.ts
 related: [home-keeper-dependency, scan-and-barcode, csv-import-export, people-privilege]
-source_hash: 9b365a24039d
+source_hash: 0c6e8cbd6be4
 ---
 
 # Tab and card
@@ -101,7 +101,7 @@ are `;key=value` parameters on the last segment, as in `/games;q=le%20guin;statu
 | `/wishlist`, `/settings` | Wishlist, people settings | `tab-lists.ts` |
 | `/scan`, `/import` | Scan flow, import | `tab-scan.ts`, `tab-import.ts` |
 
-The game filters are `q`, `status`, `room`, `shelf`, `reader`, `subject`, `owned`, `sort` and
+The game filters are `q`, `status`, `room`, `shelf`, `reader`, `genre`, `owned`, `sort` and
 `view`. `utils.filterGames` and `sortGames` apply them. Each view is a free function over
 `ViewCtx` (`tab-types.ts`) that returns HTML. `tab.ts` renders it with
 `dom.renderKeepFocus`. It keeps the focus, the caret, the typed text and the camera video.

@@ -48,14 +48,14 @@ test.describe('Scan', { tag: '@responsive' }, () => {
     await expect(sheet.locator('[name="title"]')).toBeFocused();
     const submit = sheet.locator('[data-k="d-submit"]');
     await expect(submit).toBeDisabled();
-    await expect(sheet.locator('[name="authors"]')).toBeHidden();
+    await expect(sheet.locator('[name="franchise"]')).toBeHidden();
     await page.keyboard.press('Escape');
     await expect(sheet).toBeVisible();
 
     await sheet.locator('[name="title"]').fill(MISS_TITLE);
     await expect(submit).toBeEnabled();
     await sheet.locator('[data-k="d-more-toggle"]').click();
-    await sheet.locator('[name="authors"]').fill('A. Hollins');
+    await sheet.locator('[name="franchise"]').fill('Moss');
     await sheet.locator('[name="format"]').selectOption('hardcover');
     await sheet.locator('[data-k="d-cover"]').setInputFiles(COVER);
     await expect(sheet.locator('[data-k="d-cover-name"]')).toHaveText('13be6b0e5c354e1981a89fe2766196e0-552257a9.jpg');
@@ -65,7 +65,7 @@ test.describe('Scan', { tag: '@responsive' }, () => {
 
     const state = await adminState();
     const game = state.games.find((b: { barcode: string }) => b.barcode === MISS_CODE);
-    expect(game).toMatchObject({ title: MISS_TITLE, authors: ['A. Hollins'], needs_details: true });
+    expect(game).toMatchObject({ title: MISS_TITLE, franchise: 'Moss', needs_details: true });
     expect(game.cover.kind).toBe('custom');
     const copies = state.copies.filter((c: { game_id: string }) => c.game_id === game.id);
     expect(copies.map((c: { shelf_id: string; format: string }) => [c.shelf_id, c.format])).toEqual([[shelf, 'hardcover']]);

@@ -5,14 +5,14 @@ implements:
   - custom_components/home_keeper_games/wishlist.py
   - custom_components/home_keeper_games/wishlist_sync.py
 related: [store-models, entities, events-api]
-source_hash: f2b353d6175b
+source_hash: f2757d73475b
 ---
 
 # Wishlist and to-do sync
 
 Each game can be on the wishlist of 1 person. An admin can link a person to an existing
 `todo` entity, such as a shopping list. A wishlist game with **Buy** set then shows on
-that list as "Title by Author". When the person completes the item, the game is marked
+that list with its title. When the person completes the item, the game is marked
 bought. The sync follows the design of the shopping sync of Home Keeper.
 
 ## Goals
@@ -46,7 +46,7 @@ person's list is `wishlist_todo` in the `people` section.
 ### Planner
 
 `wishlist.lists_to_read` names the lists in use. `wishlist.plan_sync` takes the
-document, the items of each list and the summary template, and returns a `SyncPlan`. A
+document and the items of each list, and returns a `SyncPlan`. A
 list that the sync could not read is None:
 
 - an entry that wants an item and has none gets an add step;

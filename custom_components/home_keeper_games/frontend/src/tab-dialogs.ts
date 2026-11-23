@@ -87,12 +87,10 @@ function scanTitleBody(ctx: ViewCtx, d: Extract<Dialog, { kind: 'scan-title' }>)
       ${field(t('game.title'), text('title', '', `required autocomplete="off" data-input="miss-title" placeholder="${escapeHTML(t('scan.miss_placeholder'))}"`), 'wide')}
       <details class="hkl-miss-more" data-k="d-more"><summary data-k="d-more-toggle">${escapeHTML(t('scan.miss_more'))}</summary>
         <div class="hkl-fields">
-          ${field(t('game.subtitle'), text('subtitle'), 'wide')}
-          ${field(t('game.authors'), text('authors'), 'wide')}
-          ${field(t('game.publisher'), text('publisher'))}
-          ${field(t('game.published'), text('published'), 'small')}
+          ${field(t('game.franchise'), text('franchise'), 'wide')}
+          ${field(t('game.genres'), text('genres'), 'wide')}
+          ${field(t('game.release_date'), text('release_date'), 'small')}
           ${field(t('copy.format'), `<select name="format" data-k="d-format">${formatOptions(copy?.format ?? 'paperback')}</select>`)}
-          ${field(t('game.pages_label'), text('pages', '', 'type="number" min="0"'), 'small')}
           <label class="hkl-btn outline hkl-miss-cover">${ICONS.camera}<input class="hkl-sr" type="file" name="cover" accept="image/jpeg,image/png,image/webp" capture="environment" data-chg="miss-cover" data-k="d-cover" /><span data-k="d-cover-name">${escapeHTML(t('scan.miss_cover'))}</span></label>
         </div>
       </details>`,
@@ -106,7 +104,6 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
         title: t('dialog.add_game'),
         submit: t('action.add'),
         html: `${field(t('dialog.barcode_or_title'), text('query', '', 'required autocomplete="off"'), 'wide')}
-          ${field(t('game.authors'), text('authors'), 'wide')}
           ${check('own', t('dialog.own_copy'), true)}
           <div class="hkl-fields">
             ${field(t('copy.shelf'), `<select name="shelf_id" data-k="d-shelf">${shelfOptions(ctx.lib, null)}</select>`)}
@@ -122,19 +119,13 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
         submit: t('action.save'),
         html: `<div class="hkl-fields">
           ${field(t('game.title'), text('title', b?.title, 'required'), 'wide')}
-          ${field(t('game.subtitle'), text('subtitle', b?.subtitle), 'wide')}
-          ${field(t('game.authors'), text('authors', b?.authors.join(', ')), 'wide')}
+          ${field(t('game.franchise'), text('franchise', b?.franchise ?? ''), 'wide')}
+          ${field(t('game.genres'), text('genres', b?.genres.join(', ')), 'wide')}
+          ${field(t('game.release_date'), text('release_date', b?.release_date), 'small')}
           ${field(t('game.barcode_label'), text('barcode', b?.barcode ?? '', 'autocomplete="off"'))}
-          ${field(t('game.publisher'), text('publisher', b?.publisher))}
-          ${field(t('game.published'), text('published', b?.published), 'small')}
-          ${field(t('game.pages_label'), text('pages', b?.pages, 'type="number" min="0"'), 'small')}
-          ${field(t('game.language'), text('language', b?.language), 'small')}
-          ${field(t('game.series'), text('series_name', b?.series?.name))}
-          ${field(t('game.series_number'), text('series_number', b?.series?.number), 'small')}
-          ${field(t('game.subjects'), text('subjects', b?.subjects.join(', ')), 'wide')}
           ${field(t('game.tags'), text('tags', b?.tags.join(', ')), 'wide')}
         </div>
-        ${field(t('game.description'), `<textarea name="description" rows="4" data-k="d-description">${escapeHTML(b?.description ?? '')}</textarea>`, 'wide')}
+        ${field(t('game.summary'), `<textarea name="summary" rows="4" data-k="d-summary">${escapeHTML(b?.summary ?? '')}</textarea>`, 'wide')}
         ${b?.needs_details ? check('details_done', t('dialog.details_done'), true) : ''}`,
       };
     }

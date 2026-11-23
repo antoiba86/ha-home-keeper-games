@@ -18,14 +18,14 @@ import {
 import type { ViewCtx } from './tab-types';
 import type { Game, Copy, Loan, ReadingStatus } from './types';
 import {
-  allSubjects,
+  allGenres,
+  gameByline,
   buildPath,
   dueState,
   escapeHTML,
   filterGames,
   hasFilters,
   locationLabel,
-  progress,
   readFilters,
   readingOf,
   shelfPath,
@@ -77,7 +77,7 @@ function tile(ctx: ViewCtx, game: Game): string {
   return `<a class="hkl-tile" href="${escapeHTML(href(path))}" data-act="nav" data-path="${escapeHTML(path)}" data-k="b-${escapeHTML(game.id)}">
     ${cover(game, 'tile', badge)}
     <span class="hkl-tile-title">${escapeHTML(game.title)}</span>
-    <span class="hkl-tile-author">${escapeHTML(game.authors.join(', '))}</span>
+    <span class="hkl-tile-author">${escapeHTML(gameByline(game))}</span>
     <span class="hkl-tile-meta">${loc ? `<span class="hkl-loc">${escapeHTML(loc)}</span>` : ''}${game.wishlist ? `<span class="hkl-loc">${escapeHTML(t('nav.wishlist'))}</span>` : ''}</span>
     <span class="hkl-tile-readers">${readerDots(ctx, game)}</span>
     ${game.needs_details ? `<span class="hkl-pill warn">${escapeHTML(t('filter.needs'))}</span>` : ''}
@@ -90,7 +90,7 @@ function row(ctx: ViewCtx, game: Game): string {
   const loc = game.owned ? shortLocation(ctx.idx, firstShelf(ctx, game)) || t('common.no_shelf') : t('game.not_owned');
   return `<a class="hkl-row" href="${escapeHTML(href(path))}" data-act="nav" data-path="${escapeHTML(path)}" data-k="b-${escapeHTML(game.id)}">
     ${cover(game, 'thumb')}
-    <span class="hkl-row-main"><span class="hkl-row-title">${escapeHTML(game.title)}</span><span class="hkl-row-sub">${escapeHTML(game.authors.join(', '))}</span><span class="hkl-row-loc">${escapeHTML(loc)}</span></span>
+    <span class="hkl-row-main"><span class="hkl-row-title">${escapeHTML(game.title)}</span><span class="hkl-row-sub">${escapeHTML(gameByline(game))}</span><span class="hkl-row-loc">${escapeHTML(loc)}</span></span>
     <span class="hkl-row-dots">${readerDots(ctx, game)}${loanPill(ctx, game)}</span>
     ${statusPill(readingOf(game, ctx.me)?.status ?? null)}
   </a>`;
@@ -102,7 +102,7 @@ function summaryLine(ctx: ViewCtx, f: GameFilters, count: number): string {
   if (f.shelf === 'none') parts.push(t('common.no_shelf'));
   else if (f.shelf) parts.push(ctx.idx.shelf.get(f.shelf)?.name ?? '');
   if (f.reader) parts.push(t('filter.read_by_name', { name: ctx.idx.person.get(f.reader)?.name ?? '' }));
-  if (f.subject) parts.push(f.subject);
+  if (f.genre) parts.push(f.genre);
   if (f.owned === 'no') parts.push(t('filter.owned_no'));
   if (f.owned === 'all') parts.push(t('filter.owned_all'));
   if (f.q) parts.push(`"${f.q}"`);
@@ -128,7 +128,7 @@ export function renderGames(ctx: ViewCtx): string {
     shelves.push([sh.id, [room?.name, unit?.name, sh.name].filter(Boolean).join(' › ')]);
   }
   const readers: Array<[string, string]> = [['', t('filter.anyone')], ...ctx.lib.people.map((p): [string, string] => [p.id, p.name])];
-  const subjects: Array<[string, string]> = [['', t('filter.any')], ...allSubjects(ctx.lib.games).map((s): [string, string] => [s, s])];
+  const genres: Array<[string, string]> = [['', t('filter.any')], ...allGenres(ctx.lib.games).map((s): [string, string] => [s, s])];
   const sorts = SORT_KEYS.map((k): [string, string] => [k, t(`sort.${k}`)]);
   const owned: Array<[string, string]> = [
     ['yes', t('filter.owned_yes')],
@@ -157,7 +157,7 @@ export function renderGames(ctx: ViewCtx): string {
     ${menu(t('filter.room'), 'room', rooms, f.room)}
     ${menu(t('filter.shelf'), 'shelf', shelves, f.shelf)}
     ${menu(t('filter.read_by'), 'reader', readers, f.reader)}
-    ${menu(t('filter.subject'), 'subject', subjects, f.subject)}
+    ${menu(t('filter.genre'), 'genre', genres, f.genre)}
     ${menu(t('filter.owned'), 'owned', owned, f.owned)}
     ${menu(t('filter.sort'), 'sort', sorts, f.sort)}
     <div class="hkl-spacer"></div>
@@ -257,12 +257,9 @@ function readingSection(ctx: ViewCtx, game: Game): string {
   const household = people
     .map((p) => {
       const r = readingOf(game, p.id);
-      const pr = r?.status === 'reading' ? progress(r.page, game.pages) : null;
-      const page = r?.status === 'reading' && r.page != null
-        ? game.pages ? t('game.page_of', { page: r.page, pages: game.pages }) : t('game.page_n', { page: r.page })
-        : '';
+      const page = r?.status === 'reading' && r.page != null ? t('game.page_n', { page: r.page }) : '';
       const stars = r?.rating ? ` · ${tn('game.stars', r.rating)}` : '';
-      return `<div class="hkl-hh">${personDot(p)}<span class="hkl-hh-name">${escapeHTML(p.name)}</span><span class="hkl-pill st-${r?.status ?? 'none'}">${escapeHTML(statusLabel(r?.status ?? null))}</span>${pr != null ? `<span class="hkl-bar" role="img" aria-label="${pr}%"><span style="width:${pr}%"></span></span>` : ''}<span class="hkl-muted">${escapeHTML(page + stars)}</span></div>`;
+      return `<div class="hkl-hh">${personDot(p)}<span class="hkl-hh-name">${escapeHTML(p.name)}</span><span class="hkl-pill st-${r?.status ?? 'none'}">${escapeHTML(statusLabel(r?.status ?? null))}</span><span class="hkl-muted">${escapeHTML(page + stars)}</span></div>`;
     })
     .join('');
   const pick = ctx.lib.people.length > 1
@@ -305,17 +302,12 @@ export function renderGame(ctx: ViewCtx, game: Game | undefined): string {
   }
   const copies = ctx.idx.copiesByGame.get(game.id) ?? [];
   const loans = ctx.idx.activeLoans.get(game.id) ?? [];
-  const series = game.series?.name
-    ? ` · ${link(gamesPath({ q: game.series.name }), escapeHTML(game.series.number != null && game.series.number !== '' ? t('game.series_n', { name: game.series.name, n: game.series.number }) : game.series.name))}`
-    : '';
-  const authors = game.authors.map((a) => link(gamesPath({ q: a }), escapeHTML(a))).join(', ');
+  const franchise = game.franchise ? link(gamesPath({ q: game.franchise }), escapeHTML(game.franchise)) : '';
   const meta = [
-    game.published,
-    game.publisher,
-    game.pages ? tn('game.pages', game.pages) : '',
+    game.release_date,
     game.barcode ? t('game.barcode', { code: game.barcode }) : '',
   ].filter(Boolean).map((x) => escapeHTML(x));
-  const tags = [...game.subjects.slice(0, 6), ...game.tags]
+  const tags = [...game.genres, ...game.tags]
     .map((x) => `<span class="hkl-chip">${escapeHTML(x)}</span>`)
     .join('');
   const wish = game.wishlist
@@ -341,13 +333,12 @@ export function renderGame(ctx: ViewCtx, game: Game | undefined): string {
     </div>
     <div class="hkl-detail-info">
       <h1>${escapeHTML(game.title)}</h1>
-      ${game.subtitle ? `<span class="hkl-subtitle">${escapeHTML(game.subtitle)}</span>` : ''}
-      <span class="hkl-byline">${authors}${series}</span>
+      ${franchise ? `<span class="hkl-byline">${franchise}</span>` : ''}
       <span class="hkl-muted">${meta.join(' · ')}</span>
       ${tags ? `<div class="hkl-chips">${tags}</div>` : ''}
       ${needs}${wish}
       <div class="hkl-boxes">${copies.map((c, i) => copyBox(ctx, c, i, copies.length)).join('')}${loans.map((l) => loanBox(ctx, l)).join('')}</div>
-      ${game.description ? `<p class="hkl-desc">${escapeHTML(game.description)}</p>` : ''}
+      ${game.summary ? `<p class="hkl-desc">${escapeHTML(game.summary)}</p>` : ''}
     </div>
   </div>
   ${readingSection(ctx, game)}
