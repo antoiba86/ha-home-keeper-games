@@ -13,26 +13,26 @@
 | custom\_components/home\_keeper\_games/const.py            |       74 |        0 |        0 |        0 |    100% |           |
 | custom\_components/home\_keeper\_games/coordinator.py      |       41 |        0 |        6 |        1 |     98% |   79-\>77 |
 | custom\_components/home\_keeper\_games/covers.py           |      210 |       20 |       62 |       10 |     89% |87, 97, 107, 140, 155-157, 169-\>exit, 189, 216, 219, 225-227, 247-248, 275-276, 325, 334, 382 |
-| custom\_components/home\_keeper\_games/csv\_io.py          |      299 |        1 |       92 |        0 |     99% |       199 |
+| custom\_components/home\_keeper\_games/csv\_io.py          |      294 |        1 |       90 |        0 |     99% |       190 |
 | custom\_components/home\_keeper\_games/diagnostics.py      |       10 |        0 |        0 |        0 |    100% |           |
 | custom\_components/home\_keeper\_games/entity.py           |       50 |        1 |        8 |        1 |     97% |        62 |
 | custom\_components/home\_keeper\_games/events.py           |       40 |        0 |        0 |        0 |    100% |           |
 | custom\_components/home\_keeper\_games/frontend\_assets.py |       17 |        0 |        2 |        0 |    100% |           |
 | custom\_components/home\_keeper\_games/home\_keeper.py     |      135 |        5 |       34 |        2 |     96% |144, 259, 277-279 |
-| custom\_components/home\_keeper\_games/import\_export.py   |      510 |        2 |      196 |        3 |     99% |319-\>317, 572-575, 714-\>716 |
+| custom\_components/home\_keeper\_games/import\_export.py   |      510 |        2 |      196 |        3 |     99% |319-\>317, 572-575, 713-\>715 |
 | custom\_components/home\_keeper\_games/loan\_sync.py       |      131 |       15 |       50 |       13 |     85% |79-\>exit, 97, 112, 121-123, 128-\>131, 140, 147, 151, 168-\>148, 181, 185-186, 198, 205, 212, 215 |
 | custom\_components/home\_keeper\_games/loan\_tasks.py      |      104 |        0 |       36 |        0 |    100% |           |
-| custom\_components/home\_keeper\_games/models.py           |      493 |        0 |      282 |        0 |    100% |           |
+| custom\_components/home\_keeper\_games/models.py           |      458 |        0 |      260 |        0 |    100% |           |
 | custom\_components/home\_keeper\_games/people.py           |       36 |        3 |       10 |        3 |     87% |40, 56, 63 |
-| custom\_components/home\_keeper\_games/projections.py      |      182 |        1 |       84 |        1 |     99% |       344 |
-| custom\_components/home\_keeper\_games/sensor.py           |       75 |        0 |        0 |        0 |    100% |           |
-| custom\_components/home\_keeper\_games/services.py         |      413 |        8 |      108 |        9 |     97% |348-349, 353-\>352, 359, 460, 566, 612, 715-\>717, 819, 848 |
+| custom\_components/home\_keeper\_games/projections.py      |      178 |        1 |       84 |        1 |     99% |       342 |
+| custom\_components/home\_keeper\_games/sensor.py           |       74 |        0 |        0 |        0 |    100% |           |
+| custom\_components/home\_keeper\_games/services.py         |      413 |        8 |      108 |        9 |     97% |343-344, 348-\>347, 352, 453, 559, 605, 708-\>710, 812, 841 |
 | custom\_components/home\_keeper\_games/store.py            |      485 |       33 |      140 |       27 |     90% |81, 118-\>exit, 134-135, 218, 242-\>244, 246, 271-\>273, 275, 290, 374, 386-\>388, 394, 414, 425-\>exit, 453, 533-537, 581, 626-\>640, 691, 699, 701-\>703, 756, 758-\>764, 765-768, 770, 800, 819-\>817, 825-\>822, 838-846 |
-| custom\_components/home\_keeper\_games/todo.py             |       72 |        9 |       14 |        3 |     86% |111, 130-131, 137, 142-143, 152, 155-156 |
+| custom\_components/home\_keeper\_games/todo.py             |       69 |        9 |       14 |        3 |     86% |109, 126-127, 133, 138-139, 148, 151-152 |
 | custom\_components/home\_keeper\_games/websocket\_api.py   |       79 |        6 |       12 |        2 |     91% |101-108, 124-125, 152-153 |
 | custom\_components/home\_keeper\_games/wishlist.py         |      117 |        0 |       44 |        0 |    100% |           |
-| custom\_components/home\_keeper\_games/wishlist\_sync.py   |      105 |        7 |       28 |        3 |     92% |73-\>exit, 93-\>exit, 99, 109-111, 129-131 |
-| **TOTAL**                                                  | **4051** |  **133** | **1266** |   **86** | **96%** |           |
+| custom\_components/home\_keeper\_games/wishlist\_sync.py   |      103 |        7 |       28 |        3 |     92% |72-\>exit, 92-\>exit, 98, 108-110, 128-130 |
+| **TOTAL**                                                  | **4001** |  **133** | **1242** |   **86** | **96%** |           |
 
 
 ## Setup coverage badge
