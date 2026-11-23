@@ -9,7 +9,7 @@ Global sensors:
 Per person (the unique id holds the person id):
 
 * ``games_read_this_year``: the games finished this year, with the attributes
-  ``goal``, ``pages`` and ``year``.
+  ``goal`` and ``year``.
 * ``reading_now``: the number of games with status ``reading``, with the
   attribute ``games`` (at most 10 titles).
 """
@@ -122,17 +122,15 @@ class GamesReadThisYearSensor(PersonEntity, SensorEntity):
     @property
     def native_value(self) -> int:
         year = dt_util.now().year
-        return games_read_in_year(self.state_doc, self.person_id, year)[0]
+        return games_read_in_year(self.state_doc, self.person_id, year)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         year = dt_util.now().year
-        _, pages = games_read_in_year(self.state_doc, self.person_id, year)
         goal = person_settings(self.state_doc["people"], self.person_id)["yearly_goal"]
         return {
             **super().extra_state_attributes,
             "goal": goal,
-            "pages": pages,
             "year": year,
         }
 

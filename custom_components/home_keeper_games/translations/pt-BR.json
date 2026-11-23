@@ -256,45 +256,29 @@
           "name": "Título",
           "description": "O título do livro."
         },
-        "subtitle": {
-          "name": "Subtítulo",
-          "description": "O subtítulo do livro."
+        "summary": {
+          "name": "Resumo",
+          "description": "Um resumo curto do jogo."
         },
-        "authors": {
-          "name": "Autores",
-          "description": "Os autores, em ordem."
+        "genres": {
+          "name": "Gêneros",
+          "description": "Os gêneros do jogo."
+        },
+        "release_date": {
+          "name": "Data de lançamento",
+          "description": "A data de lançamento, como 2017-03-03 ou 2017."
+        },
+        "franchise": {
+          "name": "Franquia",
+          "description": "A franquia do jogo, como The Legend of Zelda."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "O ID do jogo no IGDB."
         },
         "barcode": {
           "name": "Código de barras",
           "description": "O número do código de barras, como um EAN-13."
-        },
-        "publisher": {
-          "name": "Editora",
-          "description": "A editora do livro."
-        },
-        "published": {
-          "name": "Publicado",
-          "description": "A data de publicação, em geral um ano."
-        },
-        "pages": {
-          "name": "Páginas",
-          "description": "O número de páginas."
-        },
-        "language": {
-          "name": "Idioma",
-          "description": "O código do idioma, por exemplo en."
-        },
-        "subjects": {
-          "name": "Assuntos",
-          "description": "Os assuntos do livro."
-        },
-        "series": {
-          "name": "Série",
-          "description": "O nome da série, ou um nome e um número."
-        },
-        "description": {
-          "name": "Descrição",
-          "description": "A descrição do livro."
         },
         "tags": {
           "name": "Etiquetas",
@@ -322,45 +306,29 @@
           "name": "Título",
           "description": "O título do livro."
         },
-        "subtitle": {
-          "name": "Subtítulo",
-          "description": "O subtítulo do livro."
+        "summary": {
+          "name": "Resumo",
+          "description": "Um resumo curto do jogo."
         },
-        "authors": {
-          "name": "Autores",
-          "description": "Os autores, em ordem."
+        "genres": {
+          "name": "Gêneros",
+          "description": "Os gêneros do jogo."
+        },
+        "release_date": {
+          "name": "Data de lançamento",
+          "description": "A data de lançamento, como 2017-03-03 ou 2017."
+        },
+        "franchise": {
+          "name": "Franquia",
+          "description": "A franquia do jogo, como The Legend of Zelda."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "O ID do jogo no IGDB."
         },
         "barcode": {
           "name": "Código de barras",
           "description": "O número do código de barras, como um EAN-13."
-        },
-        "publisher": {
-          "name": "Editora",
-          "description": "A editora do livro."
-        },
-        "published": {
-          "name": "Publicado",
-          "description": "A data de publicação, em geral um ano."
-        },
-        "pages": {
-          "name": "Páginas",
-          "description": "O número de páginas."
-        },
-        "language": {
-          "name": "Idioma",
-          "description": "O código do idioma, por exemplo en."
-        },
-        "subjects": {
-          "name": "Assuntos",
-          "description": "Os assuntos do livro."
-        },
-        "series": {
-          "name": "Série",
-          "description": "O nome da série, ou um nome e um número."
-        },
-        "description": {
-          "name": "Descrição",
-          "description": "A descrição do livro."
         },
         "tags": {
           "name": "Etiquetas",
@@ -638,10 +606,6 @@
           "name": "Título",
           "description": "O título do livro."
         },
-        "authors": {
-          "name": "Autores",
-          "description": "Os autores, em ordem."
-        },
         "party": {
           "name": "Outra pessoa",
           "description": "O nome da outra pessoa do empréstimo."
@@ -741,10 +705,6 @@
         "title": {
           "name": "Título",
           "description": "O título do livro."
-        },
-        "authors": {
-          "name": "Autores",
-          "description": "Os autores, em ordem."
         },
         "person_id": {
           "name": "Pessoa",
@@ -880,7 +840,7 @@
       "fields": {
         "query": {
           "name": "Pesquisa",
-          "description": "Texto no título, nos autores, no código de barras ou nas etiquetas."
+          "description": "Texto no título, no código de barras, na franquia, nos gêneros ou nas etiquetas."
         },
         "room_id": {
           "name": "Cômodo",

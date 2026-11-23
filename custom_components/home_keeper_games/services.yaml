@@ -156,46 +156,34 @@ delete_shelf:
 add_game:
   fields:
     title:
-      example: "The Left Hand of Darkness"
+      example: "The Legend of Zelda: Breath of the Wild"
       selector:
         text:
-    subtitle:
+    summary:
       selector:
         text:
-    authors:
+          multiline: true
+    genres:
       selector:
         text:
           multiple: true
+    release_date:
+      example: "2017-03-03"
+      selector:
+        text:
+    franchise:
+      example: "The Legend of Zelda"
+      selector:
+        text:
+    igdb_id:
+      selector:
+        number:
+          min: 1
+          mode: "box"
     barcode:
       example: "0711719505012"
       selector:
         text:
-    publisher:
-      selector:
-        text:
-    published:
-      selector:
-        text:
-    pages:
-      selector:
-        number:
-          min: 0
-          max: 100000
-          mode: "box"
-    language:
-      selector:
-        text:
-    subjects:
-      selector:
-        text:
-          multiple: true
-    series:
-      selector:
-        text:
-    description:
-      selector:
-        text:
-          multiline: true
     tags:
       selector:
         text:
@@ -215,46 +203,34 @@ update_game:
       selector:
         text:
     title:
-      example: "The Left Hand of Darkness"
+      example: "The Legend of Zelda: Breath of the Wild"
       selector:
         text:
-    subtitle:
+    summary:
       selector:
         text:
-    authors:
+          multiline: true
+    genres:
       selector:
         text:
           multiple: true
+    release_date:
+      example: "2017-03-03"
+      selector:
+        text:
+    franchise:
+      example: "The Legend of Zelda"
+      selector:
+        text:
+    igdb_id:
+      selector:
+        number:
+          min: 1
+          mode: "box"
     barcode:
       example: "0711719505012"
       selector:
         text:
-    publisher:
-      selector:
-        text:
-    published:
-      selector:
-        text:
-    pages:
-      selector:
-        number:
-          min: 0
-          max: 100000
-          mode: "box"
-    language:
-      selector:
-        text:
-    subjects:
-      selector:
-        text:
-          multiple: true
-    series:
-      selector:
-        text:
-    description:
-      selector:
-        text:
-          multiline: true
     tags:
       selector:
         text:
@@ -535,13 +511,9 @@ borrow_game:
       selector:
         text:
     title:
-      example: "The Left Hand of Darkness"
+      example: "The Legend of Zelda: Breath of the Wild"
       selector:
         text:
-    authors:
-      selector:
-        text:
-          multiple: true
     party:
       required: true
       example: "Alex"
@@ -633,13 +605,9 @@ add_to_wishlist:
       selector:
         text:
     title:
-      example: "The Left Hand of Darkness"
+      example: "The Legend of Zelda: Breath of the Wild"
       selector:
         text:
-    authors:
-      selector:
-        text:
-          multiple: true
     person_id:
       required: true
       selector:

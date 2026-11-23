@@ -256,45 +256,29 @@
           "name": "Tittel",
           "description": "Tittelen til boken."
         },
-        "subtitle": {
-          "name": "Undertittel",
-          "description": "Undertittelen til boken."
+        "summary": {
+          "name": "Sammendrag",
+          "description": "Et kort sammendrag av spillet."
         },
-        "authors": {
-          "name": "Forfattere",
-          "description": "Forfatterne, i rekkefølge."
+        "genres": {
+          "name": "Sjangre",
+          "description": "Sjangrene til spillet."
+        },
+        "release_date": {
+          "name": "Utgivelsesdato",
+          "description": "Utgivelsesdatoen, for eksempel 2017-03-03 eller 2017."
+        },
+        "franchise": {
+          "name": "Franchise",
+          "description": "Franchisen til spillet, for eksempel The Legend of Zelda."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "ID-en til spillet i IGDB."
         },
         "barcode": {
           "name": "Strekkode",
           "description": "Nummeret til strekkoden, for eksempel en EAN-13."
-        },
-        "publisher": {
-          "name": "Forlag",
-          "description": "Forlaget til boken."
-        },
-        "published": {
-          "name": "Utgitt",
-          "description": "Utgivelsesdatoen, vanligvis et år."
-        },
-        "pages": {
-          "name": "Sider",
-          "description": "Antall sider."
-        },
-        "language": {
-          "name": "Språk",
-          "description": "Språkkoden, for eksempel en."
-        },
-        "subjects": {
-          "name": "Emner",
-          "description": "Emnene til boken."
-        },
-        "series": {
-          "name": "Serie",
-          "description": "Navnet på serien, eller et navn og et nummer."
-        },
-        "description": {
-          "name": "Beskrivelse",
-          "description": "Beskrivelsen av boken."
         },
         "tags": {
           "name": "Merker",
@@ -322,45 +306,29 @@
           "name": "Tittel",
           "description": "Tittelen til boken."
         },
-        "subtitle": {
-          "name": "Undertittel",
-          "description": "Undertittelen til boken."
+        "summary": {
+          "name": "Sammendrag",
+          "description": "Et kort sammendrag av spillet."
         },
-        "authors": {
-          "name": "Forfattere",
-          "description": "Forfatterne, i rekkefølge."
+        "genres": {
+          "name": "Sjangre",
+          "description": "Sjangrene til spillet."
+        },
+        "release_date": {
+          "name": "Utgivelsesdato",
+          "description": "Utgivelsesdatoen, for eksempel 2017-03-03 eller 2017."
+        },
+        "franchise": {
+          "name": "Franchise",
+          "description": "Franchisen til spillet, for eksempel The Legend of Zelda."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "ID-en til spillet i IGDB."
         },
         "barcode": {
           "name": "Strekkode",
           "description": "Nummeret til strekkoden, for eksempel en EAN-13."
-        },
-        "publisher": {
-          "name": "Forlag",
-          "description": "Forlaget til boken."
-        },
-        "published": {
-          "name": "Utgitt",
-          "description": "Utgivelsesdatoen, vanligvis et år."
-        },
-        "pages": {
-          "name": "Sider",
-          "description": "Antall sider."
-        },
-        "language": {
-          "name": "Språk",
-          "description": "Språkkoden, for eksempel en."
-        },
-        "subjects": {
-          "name": "Emner",
-          "description": "Emnene til boken."
-        },
-        "series": {
-          "name": "Serie",
-          "description": "Navnet på serien, eller et navn og et nummer."
-        },
-        "description": {
-          "name": "Beskrivelse",
-          "description": "Beskrivelsen av boken."
         },
         "tags": {
           "name": "Merker",
@@ -638,10 +606,6 @@
           "name": "Tittel",
           "description": "Tittelen til boken."
         },
-        "authors": {
-          "name": "Forfattere",
-          "description": "Forfatterne, i rekkefølge."
-        },
         "party": {
           "name": "Annen person",
           "description": "Navnet på den andre personen i utlånet."
@@ -741,10 +705,6 @@
         "title": {
           "name": "Tittel",
           "description": "Tittelen til boken."
-        },
-        "authors": {
-          "name": "Forfattere",
-          "description": "Forfatterne, i rekkefølge."
         },
         "person_id": {
           "name": "Person",
@@ -880,7 +840,7 @@
       "fields": {
         "query": {
           "name": "Søk",
-          "description": "Tekst i tittelen, forfatterne, strekkoden eller merkene."
+          "description": "Tekst i tittelen, strekkoden, franchisen, sjangrene eller merkene."
         },
         "room_id": {
           "name": "Rom",

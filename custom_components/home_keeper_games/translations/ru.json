@@ -256,45 +256,29 @@
           "name": "Заглавие",
           "description": "Заглавие книги."
         },
-        "subtitle": {
-          "name": "Подзаголовок",
-          "description": "Подзаголовок книги."
+        "summary": {
+          "name": "Описание",
+          "description": "Краткое описание игры."
         },
-        "authors": {
-          "name": "Авторы",
-          "description": "Авторы по порядку."
+        "genres": {
+          "name": "Жанры",
+          "description": "Жанры игры."
+        },
+        "release_date": {
+          "name": "Дата выхода",
+          "description": "Дата выхода, например 2017-03-03 или 2017."
+        },
+        "franchise": {
+          "name": "Франшиза",
+          "description": "Франшиза игры, например The Legend of Zelda."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "ID игры в IGDB."
         },
         "barcode": {
           "name": "Штрихкод",
           "description": "Номер штрихкода, например EAN-13."
-        },
-        "publisher": {
-          "name": "Издательство",
-          "description": "Издательство книги."
-        },
-        "published": {
-          "name": "Издано",
-          "description": "Дата издания, обычно год."
-        },
-        "pages": {
-          "name": "Страницы",
-          "description": "Число страниц."
-        },
-        "language": {
-          "name": "Язык",
-          "description": "Код языка, например en."
-        },
-        "subjects": {
-          "name": "Темы",
-          "description": "Темы книги."
-        },
-        "series": {
-          "name": "Серия",
-          "description": "Название серии или название и номер."
-        },
-        "description": {
-          "name": "Описание",
-          "description": "Описание книги."
         },
         "tags": {
           "name": "Метки",
@@ -322,45 +306,29 @@
           "name": "Заглавие",
           "description": "Заглавие книги."
         },
-        "subtitle": {
-          "name": "Подзаголовок",
-          "description": "Подзаголовок книги."
+        "summary": {
+          "name": "Описание",
+          "description": "Краткое описание игры."
         },
-        "authors": {
-          "name": "Авторы",
-          "description": "Авторы по порядку."
+        "genres": {
+          "name": "Жанры",
+          "description": "Жанры игры."
+        },
+        "release_date": {
+          "name": "Дата выхода",
+          "description": "Дата выхода, например 2017-03-03 или 2017."
+        },
+        "franchise": {
+          "name": "Франшиза",
+          "description": "Франшиза игры, например The Legend of Zelda."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "ID игры в IGDB."
         },
         "barcode": {
           "name": "Штрихкод",
           "description": "Номер штрихкода, например EAN-13."
-        },
-        "publisher": {
-          "name": "Издательство",
-          "description": "Издательство книги."
-        },
-        "published": {
-          "name": "Издано",
-          "description": "Дата издания, обычно год."
-        },
-        "pages": {
-          "name": "Страницы",
-          "description": "Число страниц."
-        },
-        "language": {
-          "name": "Язык",
-          "description": "Код языка, например en."
-        },
-        "subjects": {
-          "name": "Темы",
-          "description": "Темы книги."
-        },
-        "series": {
-          "name": "Серия",
-          "description": "Название серии или название и номер."
-        },
-        "description": {
-          "name": "Описание",
-          "description": "Описание книги."
         },
         "tags": {
           "name": "Метки",
@@ -638,10 +606,6 @@
           "name": "Заглавие",
           "description": "Заглавие книги."
         },
-        "authors": {
-          "name": "Авторы",
-          "description": "Авторы по порядку."
-        },
         "party": {
           "name": "Другой человек",
           "description": "Имя другого человека в выдаче."
@@ -741,10 +705,6 @@
         "title": {
           "name": "Заглавие",
           "description": "Заглавие книги."
-        },
-        "authors": {
-          "name": "Авторы",
-          "description": "Авторы по порядку."
         },
         "person_id": {
           "name": "Человек",
@@ -880,7 +840,7 @@
       "fields": {
         "query": {
           "name": "Поиск",
-          "description": "Текст в заглавии, авторах, штрихкоде или метках."
+          "description": "Текст в названии, штрихкоде, франшизе, жанрах или метках."
         },
         "room_id": {
           "name": "Комната",

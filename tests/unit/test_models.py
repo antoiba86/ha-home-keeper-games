@@ -73,7 +73,7 @@ def test_merge_changes_writes_only_what_the_plan_changed() -> None:
     )
     after = m.clone(before)
     after["games"]["b"]["tags"] = ["sf"]
-    after["games"]["b"]["series"] = {"name": "Dune"}
+    after["games"]["b"]["franchise"] = "Dune"
     del after["games"]["b"]["gone"]
     after["games"]["lost"]["tags"] = ["x"]
     del after["games"]["drop"]
@@ -93,7 +93,7 @@ def test_merge_changes_writes_only_what_the_plan_changed() -> None:
             "id": "b",
             "title": "Dune (edited)",
             "tags": ["sf"],
-            "series": {"name": "Dune"},
+            "franchise": "Dune",
         },
         "same": {"id": "same", "title": "Same (edited)"},
         "new": {"id": "new", "title": "New", "tags": ["a"]},
@@ -339,25 +339,14 @@ def test_build_game_barcode() -> None:
 
 def test_game_fields() -> None:
     assert m.game_field("barcode", "") is None
-    assert m.game_field("pages", 300) == 300
-    assert _err(m.game_field, "pages", 0).key == "out_of_range"
-    assert m.game_field("language", " en ") == "en"
-    assert m.game_field("series", "Dune") == {"name": "Dune", "number": None}
-    assert m.game_field("series", {"name": "Dune", "number": 2}) == {
-        "name": "Dune",
-        "number": "2",
-    }
-    assert m.game_field("series", {"name": " "}) is None
-    assert m.game_field("series", None) is None
-    assert m.game_field("series", {"name": "D", "number": ""}) == {
-        "name": "D",
-        "number": None,
-    }
-    assert _err(m.game_field, "series", 3).key == "invalid_field"
-    assert _err(m.game_field, "series", {"name": "D", "number": [1]}).key == (
-        "invalid_field"
-    )
-    for gone in ("catalogs", "isbn13", "isbn10"):
+    assert m.game_field("igdb_id", 7346) == 7346
+    assert _err(m.game_field, "igdb_id", 0).key == "out_of_range"
+    assert m.game_field("franchise", " Zelda ") == "Zelda"
+    assert m.game_field("franchise", None) is None
+    assert m.game_field("genres", ["RPG"]) == ["RPG"]
+    assert m.game_field("release_date", " 2017-03-03 ") == "2017-03-03"
+    assert m.game_field("summary", "") == ""
+    for gone in ("catalogs", "isbn13", "isbn10", "series", "pages", "language"):
         err = _err(m.game_field, gone, None)
         assert (err.key, err.placeholders) == ("invalid_field", {"field": gone})
     assert m.game_field("needs_details", True) is True
@@ -365,7 +354,6 @@ def test_game_fields() -> None:
     assert _err(m.game_field, "nope", 1).key == "invalid_field"
     assert m.game_field("title", " T ") == "T"
     assert _err(m.game_field, "title", "").key == "field_required"
-    assert m.game_field("subtitle", "") == ""
 
 
 def test_update_game() -> None:
@@ -373,9 +361,9 @@ def test_update_game() -> None:
     same, changed = m.update_game(game, {"title": "Dune"}, now="t1")
     assert changed == [] and same["updated_at"] == "t0"
     updated, changed = m.update_game(
-        game, {"subtitle": "S", "pages": 10, "id": "x"}, now="t1"
+        game, {"summary": "S", "igdb_id": 10, "id": "x"}, now="t1"
     )
-    assert changed == ["subtitle", "pages"]
+    assert changed == ["summary", "igdb_id"]
     assert updated["updated_at"] == "t1" and updated["id"] == game["id"]
     updated, changed = m.update_game(game, {"barcode": "ab-12"}, now="t1")
     assert changed == ["barcode"] and updated["barcode"] == "AB12"
@@ -391,21 +379,13 @@ def test_update_game() -> None:
     )
 
 
-def test_game_summary_and_keys() -> None:
-    assert m.game_summary({"title": "Dune", "authors": ["Frank Herbert"]}) == (
-        "Dune by Frank Herbert"
-    )
-    assert m.game_summary({"title": "Dune", "authors": []}) == "Dune"
-    assert m.game_summary({"title": "Dune", "authors": ["F"]}, "{author}: {title}") == (
-        "F: Dune"
-    )
+def test_fold_and_title_key() -> None:
     assert m.fold("Élan, Vital!") == "elan vital"
     assert m.fold(None) == ""
-    assert m.title_key("Dune: Messiah", ["Frank Herbert"]) == "dune|herbert"
-    assert m.title_key("Dune", ["Herbert, Frank"]) == "dune|herbert"
-    assert m.title_key("Dune", "Frank Herbert") == "dune|herbert"
-    assert m.title_key("Dune", []) == "dune|"
-    assert m.title_key(None, None) == "|"
+    assert m.title_key("Zelda: Breath of the Wild") == "zelda breath of the wild"
+    assert m.title_key("Zelda: Tears of the Kingdom") != m.title_key("Zelda")
+    assert m.title_key("ZELDA!") == "zelda"
+    assert m.title_key(None) == ""
 
 
 # ── Copies ───────────────────────────────────────────────────────────────────

@@ -11,7 +11,7 @@ LIST = "todo.books"
 
 def _state(**entry) -> dict:
     state = m.empty_state()
-    game = m.build_game({"title": "Dune", "authors": ["Frank Herbert"]}, now=NOW)
+    game = m.build_game({"title": "Dune", "franchise": "Dune"}, now=NOW)
     game["id"] = "dune"
     game["wishlist"] = {**m.build_wishlist("p", buy=True, now=NOW), **entry}
     state["games"]["dune"] = game
@@ -19,7 +19,7 @@ def _state(**entry) -> dict:
     return state
 
 
-def _item(uid: str, summary: str = "Dune by Frank Herbert", done: bool = False):
+def _item(uid: str, summary: str = "Dune", done: bool = False):
     return {
         "uid": uid,
         "summary": summary,
@@ -49,21 +49,16 @@ def test_lists_to_read() -> None:
 def test_add_then_bind() -> None:
     state = _state()
     plan = w.plan_sync(state, {LIST: []})
-    assert plan.adds == [w.AddOp("dune", LIST, "Dune by Frank Herbert")]
+    assert plan.adds == [w.AddOp("dune", LIST, "Dune")]
     assert not plan.store_changes and not plan.empty
     plan = w.plan_sync(state, {LIST: [_item("u1")]})
     assert plan.binds == [w.BindOp("dune", LIST, "u1")] and plan.adds == []
     assert plan.store_changes
 
 
-def test_template_changes_the_summary() -> None:
-    plan = w.plan_sync(_state(), {LIST: []}, "{title} von {author}")
-    assert plan.adds[0].summary == "Dune von Frank Herbert"
-
-
 def test_bind_skips_completed_and_claimed_items() -> None:
     state = _state()
-    other = m.build_game({"title": "Dune", "authors": ["Frank Herbert"]}, now=NOW)
+    other = m.build_game({"title": "Dune"}, now=NOW)
     other["id"] = "aaa"
     other["wishlist"] = {
         **m.build_wishlist("p", buy=True, now=NOW),
@@ -71,7 +66,7 @@ def test_bind_skips_completed_and_claimed_items() -> None:
         "todo_uid": "u1",
     }
     state["games"]["aaa"] = other
-    items = [_item("u1"), _item("u0", done=True), {"summary": "Dune by Frank Herbert"}]
+    items = [_item("u1"), _item("u0", done=True), {"summary": "Dune"}]
     plan = w.plan_sync(state, {LIST: items})
     assert plan.binds == [] and plan.adds == [
         w.AddOp("dune", LIST, plan.adds[0].summary)

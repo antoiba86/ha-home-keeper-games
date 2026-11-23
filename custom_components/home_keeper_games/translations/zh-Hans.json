@@ -256,45 +256,29 @@
           "name": "书名",
           "description": "图书的书名。"
         },
-        "subtitle": {
-          "name": "副书名",
-          "description": "图书的副书名。"
+        "summary": {
+          "name": "简介",
+          "description": "游戏的简短简介。"
         },
-        "authors": {
-          "name": "作者",
-          "description": "按顺序列出的作者。"
+        "genres": {
+          "name": "类型",
+          "description": "游戏的类型。"
+        },
+        "release_date": {
+          "name": "发行日期",
+          "description": "发行日期，例如 2017-03-03 或 2017。"
+        },
+        "franchise": {
+          "name": "系列",
+          "description": "游戏所属的系列，例如 The Legend of Zelda。"
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "游戏在 IGDB 中的 ID。"
         },
         "barcode": {
           "name": "条形码",
           "description": "条形码编号，例如 EAN-13。"
-        },
-        "publisher": {
-          "name": "出版社",
-          "description": "图书的出版社。"
-        },
-        "published": {
-          "name": "出版时间",
-          "description": "出版日期，通常是年份。"
-        },
-        "pages": {
-          "name": "页数",
-          "description": "总页数。"
-        },
-        "language": {
-          "name": "语言",
-          "description": "语言代码，例如 en。"
-        },
-        "subjects": {
-          "name": "主题",
-          "description": "图书的主题。"
-        },
-        "series": {
-          "name": "系列",
-          "description": "系列名称，或名称加编号。"
-        },
-        "description": {
-          "name": "简介",
-          "description": "图书的简介。"
         },
         "tags": {
           "name": "标签",
@@ -322,45 +306,29 @@
           "name": "书名",
           "description": "图书的书名。"
         },
-        "subtitle": {
-          "name": "副书名",
-          "description": "图书的副书名。"
+        "summary": {
+          "name": "简介",
+          "description": "游戏的简短简介。"
         },
-        "authors": {
-          "name": "作者",
-          "description": "按顺序列出的作者。"
+        "genres": {
+          "name": "类型",
+          "description": "游戏的类型。"
+        },
+        "release_date": {
+          "name": "发行日期",
+          "description": "发行日期，例如 2017-03-03 或 2017。"
+        },
+        "franchise": {
+          "name": "系列",
+          "description": "游戏所属的系列，例如 The Legend of Zelda。"
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "游戏在 IGDB 中的 ID。"
         },
         "barcode": {
           "name": "条形码",
           "description": "条形码编号，例如 EAN-13。"
-        },
-        "publisher": {
-          "name": "出版社",
-          "description": "图书的出版社。"
-        },
-        "published": {
-          "name": "出版时间",
-          "description": "出版日期，通常是年份。"
-        },
-        "pages": {
-          "name": "页数",
-          "description": "总页数。"
-        },
-        "language": {
-          "name": "语言",
-          "description": "语言代码，例如 en。"
-        },
-        "subjects": {
-          "name": "主题",
-          "description": "图书的主题。"
-        },
-        "series": {
-          "name": "系列",
-          "description": "系列名称，或名称加编号。"
-        },
-        "description": {
-          "name": "简介",
-          "description": "图书的简介。"
         },
         "tags": {
           "name": "标签",
@@ -638,10 +606,6 @@
           "name": "书名",
           "description": "图书的书名。"
         },
-        "authors": {
-          "name": "作者",
-          "description": "按顺序列出的作者。"
-        },
         "party": {
           "name": "对方",
           "description": "借阅中另一方的名字。"
@@ -741,10 +705,6 @@
         "title": {
           "name": "书名",
           "description": "图书的书名。"
-        },
-        "authors": {
-          "name": "作者",
-          "description": "按顺序列出的作者。"
         },
         "person_id": {
           "name": "人员",
@@ -880,7 +840,7 @@
       "fields": {
         "query": {
           "name": "搜索",
-          "description": "书名、作者、条形码 或标签中的文字。"
+          "description": "标题、条形码、系列、类型或标签中的文字。"
         },
         "room_id": {
           "name": "房间",

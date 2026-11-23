@@ -130,7 +130,6 @@ async def test_borrow_game_sets_reading(hass, setup_entry, call) -> None:
         "borrow_game",
         {
             "title": "Emma",
-            "authors": ["Jane Austen"],
             "party": "City library",
             "person_id": BOB,
             "due": "2030-11-01",

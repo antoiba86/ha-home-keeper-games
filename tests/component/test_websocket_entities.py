@@ -21,7 +21,7 @@ async def _game(call, **data):
 
 
 async def test_get_state_shape_and_projection(hass, setup_entry, call, ws) -> None:
-    game = await _game(call, authors=["Frank Herbert"])
+    game = await _game(call)
     copy = (await call("add_copy", {"game_id": game["id"], "price": 9}))["copy"]
     await call("lend_game", {"copy_id": copy["id"], "party": "Zed"})
     await call(
@@ -114,7 +114,7 @@ async def test_list_todo_entities_skips_library_lists(
 
 
 async def test_sensors(hass, setup_entry, call) -> None:
-    game = await _game(call, pages=400)
+    game = await _game(call)
     await call("add_copy", {"game_id": game["id"]})
     await call("set_person_settings", {"person_id": ALICE, "yearly_goal": 12})
     await call(
@@ -127,7 +127,7 @@ async def test_sensors(hass, setup_entry, call) -> None:
     assert hass.states.get("sensor.home_keeper_games_books").state == "1"
     read = hass.states.get("sensor.home_keeper_games_alice_books_read_this_year")
     assert read.state == "1"
-    assert read.attributes["goal"] == 12 and read.attributes["pages"] == 400
+    assert read.attributes["goal"] == 12 and "pages" not in read.attributes
     assert read.attributes["person_id"] == ALICE
     now = hass.states.get("sensor.home_keeper_games_bob_reading_now")
     assert now.state == "1" and now.attributes["games"] == ["Emma"]
@@ -135,7 +135,7 @@ async def test_sensors(hass, setup_entry, call) -> None:
 
 async def test_to_read_list(hass, setup_entry, call) -> None:
     entity = "todo.home_keeper_games_bob_to_read"
-    game = await _game(call, authors=["Frank Herbert"])
+    game = await _game(call)
     await call(
         "set_reading", {"game_id": game["id"], "person_id": BOB, "status": "want"}
     )
@@ -150,7 +150,7 @@ async def test_to_read_list(hass, setup_entry, call) -> None:
     assert items[entity]["items"] == [
         {
             "uid": game["id"],
-            "summary": "Dune by Frank Herbert",
+            "summary": "Dune",
             "status": "needs_action",
         }
     ]
@@ -190,7 +190,7 @@ async def test_to_read_list(hass, setup_entry, call) -> None:
 
 async def test_wishlist_sync(hass, setup_entry, call, todo_list) -> None:
     await call("set_person_settings", {"person_id": BOB, "wishlist_todo": todo_list})
-    game = await _game(call, authors=["Jane Austen"], title="Emma")
+    game = await _game(call, title="Emma")
     await call(
         "add_to_wishlist", {"game_id": game["id"], "person_id": BOB, "buy": True}
     )
@@ -203,7 +203,7 @@ async def test_wishlist_sync(hass, setup_entry, call, todo_list) -> None:
     await hass.services.async_call(
         TODO,
         "update_item",
-        {"item": "Emma by Jane Austen", "status": "completed"},
+        {"item": "Emma", "status": "completed"},
         target={"entity_id": todo_list},
         blocking=True,
     )
@@ -220,7 +220,7 @@ async def test_wishlist_sync(hass, setup_entry, call, todo_list) -> None:
     )
     assert [i["status"] for i in items[todo_list]["items"]] == ["completed"]
     # A second game that leaves the wishlist loses its item.
-    other = await _game(call, title="Persuasion", authors=["Jane Austen"])
+    other = await _game(call, title="Persuasion")
     await call(
         "add_to_wishlist", {"game_id": other["id"], "person_id": BOB, "buy": True}
     )
@@ -236,7 +236,7 @@ async def test_wishlist_sync(hass, setup_entry, call, todo_list) -> None:
         blocking=True,
         return_response=True,
     )
-    assert [i["summary"] for i in items[todo_list]["items"]] == ["Emma by Jane Austen"]
+    assert [i["summary"] for i in items[todo_list]["items"]] == ["Emma"]
     assert setup_entry.runtime_data.store.state["todo_orphans"] == []
 
 
@@ -260,9 +260,7 @@ async def test_first_copy_of_a_wishlist_game_clears_the_wishlist(
     removed = async_capture_events(hass, "home_keeper_games_wishlist_removed")
     added = async_capture_events(hass, "home_keeper_games_copy_added")
     await call("set_person_settings", {"person_id": BOB, "wishlist_todo": todo_list})
-    game = await _game(
-        call, title="Emma", authors=["Jane Austen"], barcode="9780441478125"
-    )
+    game = await _game(call, title="Emma", barcode="9780441478125")
     await call(
         "add_to_wishlist", {"game_id": game["id"], "person_id": BOB, "buy": True}
     )
@@ -287,7 +285,7 @@ async def test_first_copy_of_a_wishlist_game_clears_the_wishlist(
     )
     assert skipped["from_wishlist"] is False
     # add_copy clears the wishlist too.
-    other = await _game(call, title="Persuasion", authors=["Jane Austen"])
+    other = await _game(call, title="Persuasion")
     await call("add_to_wishlist", {"game_id": other["id"], "person_id": BOB})
     reply = await call("add_copy", {"game_id": other["id"]})
     assert reply["from_wishlist"] is True

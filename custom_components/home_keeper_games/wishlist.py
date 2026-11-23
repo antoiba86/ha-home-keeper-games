@@ -28,7 +28,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from .models import SUMMARY_TEMPLATE, game_summary, person_settings
+from .models import person_settings
 
 STATUS_COMPLETED = "completed"
 
@@ -141,12 +141,11 @@ def _is_open(item: dict[str, Any]) -> bool:
 def plan_sync(
     state: dict[str, Any],
     lists: dict[str, list[dict[str, Any]] | None],
-    template: str = SUMMARY_TEMPLATE,
 ) -> SyncPlan:
     """The steps that make the lists match the wishlist.
 
     *lists* maps an entity id to its items from ``todo.get_items``, or to None if
-    the list could not be read. *template* is the item text template.
+    the list could not be read. The text of an item is the title of its game.
     """
     plan = SyncPlan()
     claimed: set[tuple[str, str]] = set()
@@ -185,7 +184,7 @@ def plan_sync(
         items = lists.get(target)
         if items is None:
             continue
-        summary = game_summary(game, template)
+        summary = str(game.get("title") or "")
         match = next(
             (
                 item

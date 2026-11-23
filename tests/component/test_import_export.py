@@ -64,7 +64,7 @@ async def _library(hass, call, todo_list) -> dict:
     dune = (
         await call(
             "add_game",
-            {"title": "Dune", "authors": ["Frank Herbert"]},
+            {"title": "Dune"},
         )
     )["game"]
     copy = (await call("add_copy", {"game_id": dune["id"], "shelf_id": shelf["id"]}))[
@@ -82,7 +82,7 @@ async def _library(hass, call, todo_list) -> dict:
     emma = (
         await call(
             "add_game",
-            {"title": "Emma", "authors": ["Jane Austen"]},
+            {"title": "Emma"},
         )
     )["game"]
     await call(
@@ -179,7 +179,7 @@ async def test_import_data_into_a_new_install(
     }
     # The wishlist sync made the to-do item again.
     items = await _todo_items(hass, todo_list)
-    assert [i["summary"] for i in items] == ["Emma by Jane Austen"]
+    assert [i["summary"] for i in items] == ["Emma"]
     assert state["games"][ids["emma"]]["wishlist"]["todo_uid"] == items[0]["uid"]
     # The export of the new install is the same document.
     again = (await call("export_data"))["data"]
@@ -205,7 +205,7 @@ async def test_import_data_reports_problems(hass, setup_entry, call) -> None:
         "import_data",
         {
             "document": {
-                "games": [{"title": "A"}, {"title": "B", "pages": 0}],
+                "games": [{"title": "A"}, {"title": "B", "igdb_id": 0}],
                 "reading": [{"person_id": "gone", "person_name": "Zed", "games": []}],
             }
         },
@@ -214,8 +214,8 @@ async def test_import_data_reports_problems(hass, setup_entry, call) -> None:
     assert reply["problems"] == [
         {
             "level": "error",
-            "path": "games[1].pages",
-            "message": "pages must be from 1 to 100000.",
+            "path": "games[1].igdb_id",
+            "message": "igdb_id must be from 1 to 9007199254740992.",
         },
         {
             "level": "warning",

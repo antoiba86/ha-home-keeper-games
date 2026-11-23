@@ -135,7 +135,7 @@ async def test_move_unit_and_shelf(hass, setup_entry, call) -> None:
 
 async def test_games_and_duplicates(hass, setup_entry, call) -> None:
     added = async_capture_events(hass, EVENT("game_added"))
-    game = await _game(call, barcode="9780441478125", authors=["Ursula K. Le Guin"])
+    game = await _game(call, barcode="9780441478125")
     assert game["barcode"] == "9780441478125" and game["title"] == "Dune"
     assert game["owned"] is False and game["cover_url"] is None
     again = await call("add_game", {"barcode": "978-0-441-47812-5"})
@@ -148,15 +148,15 @@ async def test_games_and_duplicates(hass, setup_entry, call) -> None:
         await call("add_game", {"barcode": "12#3"})
     assert info.value.translation_key == "invalid_barcode"
     updated = async_capture_events(hass, EVENT("game_updated"))
-    reply = await call("update_game", {"game_id": game["id"], "pages": 304})
-    assert reply["game"]["pages"] == 304
-    assert updated[0].data["changed_fields"] == ["pages"]
+    reply = await call("update_game", {"game_id": game["id"], "igdb_id": 7346})
+    assert reply["game"]["igdb_id"] == 7346
+    assert updated[0].data["changed_fields"] == ["igdb_id"]
     other = await _game(call, title="Other")
     with pytest.raises(ServiceValidationError) as info:
         await call("update_game", {"game_id": other["id"], "barcode": "9780441478125"})
     assert info.value.translation_key == "duplicate_barcode"
     with pytest.raises(ServiceValidationError) as info:
-        await call("update_game", {"game_id": game["id"], "pages": 0})
+        await call("update_game", {"game_id": game["id"], "igdb_id": 0})
     assert info.value.translation_key == "out_of_range"
 
 
@@ -245,7 +245,7 @@ async def test_set_reading_gates_and_events(hass, setup_entry, call) -> None:
 
 async def test_read_services_project_for_a_non_admin(hass, setup_entry, call) -> None:
     shelf = await _shelf(call)
-    game = await _game(call, authors=["Frank Herbert"])
+    game = await _game(call)
     await call(
         "add_copy",
         {
@@ -333,7 +333,7 @@ async def test_wishlist_services(hass, setup_entry, call) -> None:
     removed = async_capture_events(hass, EVENT("wishlist_removed"))
     reply = await call(
         "add_to_wishlist",
-        {"title": "Emma", "authors": ["Jane Austen"], "person_id": BOB, "buy": True},
+        {"title": "Emma", "person_id": BOB, "buy": True},
     )
     game = reply["game"]
     assert game["wishlist"]["person_id"] == BOB and game["wishlist"]["buy"] is True
@@ -342,11 +342,11 @@ async def test_wishlist_services(hass, setup_entry, call) -> None:
     with pytest.raises(ServiceValidationError) as info:
         await call("add_to_wishlist", {"game_id": game["id"], "person_id": BOB})
     assert info.value.translation_key == "already_on_wishlist"
-    # A title and author that match a stored game give that game.
+    # A title that matches a stored game gives that game.
     with pytest.raises(ServiceValidationError) as info:
         await call(
             "add_to_wishlist",
-            {"title": "emma", "authors": ["Austen, Jane"], "person_id": BOB},
+            {"title": "emma", "person_id": BOB},
         )
     assert info.value.translation_key == "already_on_wishlist"
     reply = await call("update_wishlist", {"game_id": game["id"], "buy": False})
@@ -370,9 +370,9 @@ async def test_wishlist_services(hass, setup_entry, call) -> None:
 async def test_import_and_export(hass, setup_entry, call) -> None:
     shelf = await _shelf(call)
     csv_text = (
-        "title,authors,barcode,rating,status,format,finished,wishlist\n"
-        "Dune,Frank Herbert,9780441013593,5,read,hardcover,2024-01-02,false\n"
-        "Emma,Jane Austen,,,,,,true\n"
+        "title,genres,barcode,rating,status,format,finished,wishlist\n"
+        "Dune,Strategy,9780441013593,5,read,hardcover,2024-01-02,false\n"
+        "Emma,Puzzle,,,,,,true\n"
     )
     done = async_capture_events(hass, EVENT("import_completed"))
     dry = await call(
@@ -401,7 +401,6 @@ async def test_import_and_export(hass, setup_entry, call) -> None:
     assert dry["rows"][0] == {
         "line": 1,
         "title": "Dune",
-        "authors": ["Frank Herbert"],
         "barcode": "9780441013593",
         "game_id": dry["rows"][0]["game_id"],
         "action": "new",
@@ -457,7 +456,7 @@ async def test_import_row_error_message(hass, setup_entry, call) -> None:
     reply = await call(
         "import_csv",
         {
-            "content": "title,authors\n,Nobody\n",
+            "content": "title,genres\n,Puzzle\n",
             "person_id": BOB,
             "dry_run": True,
         },

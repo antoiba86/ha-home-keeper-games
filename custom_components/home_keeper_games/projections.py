@@ -252,21 +252,19 @@ def game_matches(
 ) -> bool:
     """Whether a game passes the ``list_games`` filters.
 
-    ``query`` searches the title, the subtitle, the authors, the barcode, the
-    series and the tags. ``shelf_id`` and ``room_id`` match a copy location.
+    ``query`` searches the title, the barcode, the franchise, the genres and the
+    tags. ``shelf_id`` and ``room_id`` match a copy location.
     ``owned`` keeps games with or without copies. ``status`` with ``person_id``
     matches a reading status.
     """
     query = str(filters.get("query") or "").strip().casefold()
     if query:
-        series = game["series"] or {"name": ""}
         haystack = " ".join(
             [
                 game["title"],
-                game["subtitle"],
-                *game["authors"],
                 game["barcode"] or "",
-                series["name"],
+                game["franchise"] or "",
+                *game["genres"],
                 *game["tags"],
             ]
         ).casefold()
@@ -360,22 +358,17 @@ def game_detail(
 # ── Stats for the sensors ────────────────────────────────────────────────────
 
 
-def games_read_in_year(
-    state: dict[str, Any], person_id: str, year: int
-) -> tuple[int, int]:
-    """``(games, pages)`` that the person finished in *year*."""
+def games_read_in_year(state: dict[str, Any], person_id: str, year: int) -> int:
+    """The number of games that the person finished in *year*."""
     count = 0
-    pages = 0
-    for game_id, row in (state["reading"].get(person_id) or {}).items():
+    for row in (state["reading"].get(person_id) or {}).values():
         finished = row.get("finished")
         if row.get("status") != "read" or not isinstance(finished, str):
             continue
         if not finished.startswith(f"{year:04d}-"):
             continue
         count += 1
-        game = state["games"].get(game_id) or {}
-        pages += int(game.get("pages") or 0)
-    return count, pages
+    return count
 
 
 def reading_now(state: dict[str, Any], person_id: str) -> list[str]:

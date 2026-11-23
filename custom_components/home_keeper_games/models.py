@@ -65,28 +65,24 @@ MAX_MONEY = 1_000_000_000
 # have their own paths.
 GAME_TEXT_FIELDS = {
     "title": MAX_TITLE,
-    "subtitle": MAX_TITLE,
-    "publisher": MAX_SHORT,
-    "published": 50,
-    "description": MAX_LONG,
+    "summary": MAX_LONG,
+    "release_date": 50,
     "shared_notes": MAX_LONG,
 }
 GAME_FIELDS = (
     "title",
-    "subtitle",
-    "authors",
+    "summary",
+    "genres",
+    "release_date",
+    "franchise",
+    "igdb_id",
     "barcode",
-    "publisher",
-    "published",
-    "pages",
-    "language",
-    "subjects",
-    "series",
-    "description",
     "tags",
     "shared_notes",
     "needs_details",
 )
+# The largest IGDB game id that the integration takes.
+MAX_IGDB_ID = 2**53
 COPY_FIELDS = (
     "shelf_id",
     "format",
@@ -458,26 +454,6 @@ def next_order(records: dict[str, dict[str, Any]], **match: Any) -> int:
 # ── Games ────────────────────────────────────────────────────────────────────
 
 
-def _series(value: Any) -> dict[str, Any] | None:
-    if value is None or value == "":
-        return None
-    if isinstance(value, str):
-        value = {"name": value}
-    if not isinstance(value, dict):
-        raise LibraryError("invalid_field", field="series")
-    name = text(value.get("name"), "series", MAX_SHORT)
-    if not name:
-        return None
-    number = value.get("number")
-    if number is not None and number != "":
-        if isinstance(number, bool) or not isinstance(number, int | float | str):
-            raise LibraryError("invalid_field", field="series")
-        number = text(number, "series", 20) or None
-    else:
-        number = None
-    return {"name": name, "number": number}
-
-
 def clean_barcode(value: Any) -> str:
     """A barcode without spaces and hyphens, in capital letters."""
     return re.sub(r"[\s-]", "", str(value)).upper()
@@ -499,16 +475,14 @@ def game_field(field: str, value: Any) -> Any:
     """Check one caller-set game field and return its stored value."""
     if field in GAME_TEXT_FIELDS:
         return text(value, field, GAME_TEXT_FIELDS[field], required=field == "title")
-    if field in ("authors", "subjects", "tags"):
+    if field in ("genres", "tags"):
         return str_list(value, field)
     if field == "barcode":
         return barcode(value)
-    if field == "pages":
-        return integer(value, field, low=1, high=MAX_PAGES)
-    if field == "language":
-        return optional_text(value, field, 20)
-    if field == "series":
-        return _series(value)
+    if field == "franchise":
+        return optional_text(value, field, MAX_SHORT) or None
+    if field == "igdb_id":
+        return integer(value, field, low=1, high=MAX_IGDB_ID)
     if field == "needs_details":
         return boolean(value, field)
     raise LibraryError("invalid_field", field=field)
@@ -519,16 +493,12 @@ def build_game(data: dict[str, Any], *, now: str) -> dict[str, Any]:
     game: dict[str, Any] = {
         "id": new_id(),
         "title": "",
-        "subtitle": "",
-        "authors": [],
+        "summary": "",
+        "genres": [],
+        "release_date": "",
+        "franchise": None,
+        "igdb_id": None,
         "barcode": None,
-        "publisher": "",
-        "published": "",
-        "pages": None,
-        "language": None,
-        "subjects": [],
-        "series": None,
-        "description": "",
         "tags": [],
         "shared_notes": "",
         "cover": {"kind": "none", "file": None},
@@ -562,22 +532,6 @@ def update_game(
     return updated, changed
 
 
-SUMMARY_TEMPLATE = "{title} by {author}"
-
-
-def game_summary(game: dict[str, Any], template: str = SUMMARY_TEMPLATE) -> str:
-    """``Title by Author``, or the title alone if the game has no author.
-
-    *template* is the ``item.summary`` backend string in the language of Home
-    Assistant.
-    """
-    authors = game.get("authors") or []
-    title = str(game.get("title") or "")
-    if not authors:
-        return title
-    return template.replace("{title}", title).replace("{author}", str(authors[0]))
-
-
 def fold(value: Any) -> str:
     """A key for loose text comparison: no accents, case or punctuation."""
     if not isinstance(value, str):
@@ -588,24 +542,13 @@ def fold(value: Any) -> str:
     return " ".join(words)
 
 
-def title_key(title: Any, authors: Any) -> str:
-    """The match key of a title and its first author.
+def title_key(title: Any) -> str:
+    """The match key of a title: no accents, case or punctuation.
 
-    A subtitle after ``:`` is ignored, and the author is reduced to the last word
-    of the name, so ``Le Guin, Ursula K.`` and ``Ursula K. Le Guin`` can match.
+    The whole title counts, because the part after ``:`` often names a different
+    game of 1 franchise.
     """
-    raw = str(title or "").split(":", 1)[0]
-    first = ""
-    if isinstance(authors, list | tuple) and authors:
-        first = str(authors[0])
-    elif isinstance(authors, str):
-        first = authors
-    if "," in first:
-        first = first.split(",", 1)[0]
-    else:
-        parts = fold(first).split(" ")
-        first = parts[-1] if parts else ""
-    return f"{fold(raw)}|{fold(first)}"
+    return fold(title)
 
 
 # ── Copies ───────────────────────────────────────────────────────────────────
@@ -953,7 +896,6 @@ __all__ = [
     "build_unit",
     "build_wishlist",
     "empty_state",
-    "game_summary",
     "normalize_state",
     "update_copy",
     "update_game",

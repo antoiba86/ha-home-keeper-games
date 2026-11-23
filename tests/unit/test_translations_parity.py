@@ -30,24 +30,44 @@ _COGNATE_IDENTICAL: dict[str, set[str]] = {
     "ca": {"services.*.fields.format.name"},
     "da": {
         "services.*.fields.format.name",
+        "services.*.fields.franchise.name",
         "services.*.fields.note.name",
         "services.*.fields.person_id.name",
     },
     "de": {
         "services.*.fields.barcode.name",
         "services.*.fields.format.name",
+        "services.*.fields.franchise.name",
+        "services.*.fields.genres.name",
         "services.*.fields.name.name",
         "services.*.fields.person_id.name",
     },
-    "fr": {"services.*.fields.note.name"},
-    "it": {"services.*.fields.area_id.name"},
-    "nl": {"services.*.fields.barcode.name"},
-    "nb": {"services.*.fields.format.name", "services.*.fields.person_id.name"},
-    "sv": {"services.*.fields.format.name", "services.*.fields.person_id.name"},
+    "fr": {
+        "services.*.fields.franchise.name",
+        "services.*.fields.genres.name",
+        "services.*.fields.note.name",
+    },
+    "it": {"services.*.fields.area_id.name", "services.*.fields.franchise.name"},
+    "nl": {
+        "services.*.fields.barcode.name",
+        "services.*.fields.franchise.name",
+        "services.*.fields.genres.name",
+    },
+    "nb": {
+        "services.*.fields.format.name",
+        "services.*.fields.franchise.name",
+        "services.*.fields.person_id.name",
+    },
+    "sv": {
+        "services.*.fields.format.name",
+        "services.*.fields.franchise.name",
+        "services.*.fields.person_id.name",
+    },
 }
-# Values that are the same in each language: the product name.
+# Values that are the same in each language: the product name and the IGDB ID label.
 _INTENTIONALLY_IDENTICAL: set[str] = {
     "config.step.user.title",
+    "services.*.fields.igdb_id.name",
 }
 
 

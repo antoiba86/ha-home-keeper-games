@@ -256,45 +256,29 @@
           "name": "Titel",
           "description": "Bokens titel."
         },
-        "subtitle": {
-          "name": "Undertitel",
-          "description": "Bokens undertitel."
+        "summary": {
+          "name": "Sammanfattning",
+          "description": "En kort sammanfattning av spelet."
         },
-        "authors": {
-          "name": "Författare",
-          "description": "Författarna, i ordning."
+        "genres": {
+          "name": "Genrer",
+          "description": "Spelets genrer."
+        },
+        "release_date": {
+          "name": "Utgivningsdatum",
+          "description": "Utgivningsdatumet, till exempel 2017-03-03 eller 2017."
+        },
+        "franchise": {
+          "name": "Franchise",
+          "description": "Spelets franchise, till exempel The Legend of Zelda."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "Spelets ID i IGDB."
         },
         "barcode": {
           "name": "Streckkod",
           "description": "Streckkodens nummer, till exempel en EAN-13."
-        },
-        "publisher": {
-          "name": "Förlag",
-          "description": "Bokens förlag."
-        },
-        "published": {
-          "name": "Utgiven",
-          "description": "Utgivningsdatumet, oftast ett år."
-        },
-        "pages": {
-          "name": "Sidor",
-          "description": "Antalet sidor."
-        },
-        "language": {
-          "name": "Språk",
-          "description": "Språkkoden, till exempel en."
-        },
-        "subjects": {
-          "name": "Ämnen",
-          "description": "Bokens ämnen."
-        },
-        "series": {
-          "name": "Serie",
-          "description": "Seriens namn, eller ett namn och ett nummer."
-        },
-        "description": {
-          "name": "Beskrivning",
-          "description": "Bokens beskrivning."
         },
         "tags": {
           "name": "Taggar",
@@ -322,45 +306,29 @@
           "name": "Titel",
           "description": "Bokens titel."
         },
-        "subtitle": {
-          "name": "Undertitel",
-          "description": "Bokens undertitel."
+        "summary": {
+          "name": "Sammanfattning",
+          "description": "En kort sammanfattning av spelet."
         },
-        "authors": {
-          "name": "Författare",
-          "description": "Författarna, i ordning."
+        "genres": {
+          "name": "Genrer",
+          "description": "Spelets genrer."
+        },
+        "release_date": {
+          "name": "Utgivningsdatum",
+          "description": "Utgivningsdatumet, till exempel 2017-03-03 eller 2017."
+        },
+        "franchise": {
+          "name": "Franchise",
+          "description": "Spelets franchise, till exempel The Legend of Zelda."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "Spelets ID i IGDB."
         },
         "barcode": {
           "name": "Streckkod",
           "description": "Streckkodens nummer, till exempel en EAN-13."
-        },
-        "publisher": {
-          "name": "Förlag",
-          "description": "Bokens förlag."
-        },
-        "published": {
-          "name": "Utgiven",
-          "description": "Utgivningsdatumet, oftast ett år."
-        },
-        "pages": {
-          "name": "Sidor",
-          "description": "Antalet sidor."
-        },
-        "language": {
-          "name": "Språk",
-          "description": "Språkkoden, till exempel en."
-        },
-        "subjects": {
-          "name": "Ämnen",
-          "description": "Bokens ämnen."
-        },
-        "series": {
-          "name": "Serie",
-          "description": "Seriens namn, eller ett namn och ett nummer."
-        },
-        "description": {
-          "name": "Beskrivning",
-          "description": "Bokens beskrivning."
         },
         "tags": {
           "name": "Taggar",
@@ -638,10 +606,6 @@
           "name": "Titel",
           "description": "Bokens titel."
         },
-        "authors": {
-          "name": "Författare",
-          "description": "Författarna, i ordning."
-        },
         "party": {
           "name": "Annan person",
           "description": "Namnet på lånets andra person."
@@ -741,10 +705,6 @@
         "title": {
           "name": "Titel",
           "description": "Bokens titel."
-        },
-        "authors": {
-          "name": "Författare",
-          "description": "Författarna, i ordning."
         },
         "person_id": {
           "name": "Person",
@@ -880,7 +840,7 @@
       "fields": {
         "query": {
           "name": "Sök",
-          "description": "Text i titeln, författarna, streckkoden eller taggarna."
+          "description": "Text i titeln, streckkoden, franchisen, genrerna eller taggarna."
         },
         "room_id": {
           "name": "Rum",

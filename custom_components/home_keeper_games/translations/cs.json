@@ -256,45 +256,29 @@
           "name": "Titul",
           "description": "Titul knihy."
         },
-        "subtitle": {
-          "name": "Podtitul",
-          "description": "Podtitul knihy."
+        "summary": {
+          "name": "Shrnutí",
+          "description": "Krátké shrnutí hry."
         },
-        "authors": {
-          "name": "Autoři",
-          "description": "Autoři v pořadí."
+        "genres": {
+          "name": "Žánry",
+          "description": "Žánry hry."
+        },
+        "release_date": {
+          "name": "Datum vydání",
+          "description": "Datum vydání, například 2017-03-03 nebo 2017."
+        },
+        "franchise": {
+          "name": "Franšíza",
+          "description": "Franšíza hry, například The Legend of Zelda."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "ID hry v IGDB."
         },
         "barcode": {
           "name": "Čárový kód",
           "description": "Číslo čárového kódu, například EAN-13."
-        },
-        "publisher": {
-          "name": "Nakladatel",
-          "description": "Nakladatel knihy."
-        },
-        "published": {
-          "name": "Vydáno",
-          "description": "Datum vydání, obvykle rok."
-        },
-        "pages": {
-          "name": "Strany",
-          "description": "Počet stran."
-        },
-        "language": {
-          "name": "Jazyk",
-          "description": "Kód jazyka, například en."
-        },
-        "subjects": {
-          "name": "Témata",
-          "description": "Témata knihy."
-        },
-        "series": {
-          "name": "Série",
-          "description": "Název série nebo název a číslo."
-        },
-        "description": {
-          "name": "Popis",
-          "description": "Popis knihy."
         },
         "tags": {
           "name": "Štítky",
@@ -322,45 +306,29 @@
           "name": "Titul",
           "description": "Titul knihy."
         },
-        "subtitle": {
-          "name": "Podtitul",
-          "description": "Podtitul knihy."
+        "summary": {
+          "name": "Shrnutí",
+          "description": "Krátké shrnutí hry."
         },
-        "authors": {
-          "name": "Autoři",
-          "description": "Autoři v pořadí."
+        "genres": {
+          "name": "Žánry",
+          "description": "Žánry hry."
+        },
+        "release_date": {
+          "name": "Datum vydání",
+          "description": "Datum vydání, například 2017-03-03 nebo 2017."
+        },
+        "franchise": {
+          "name": "Franšíza",
+          "description": "Franšíza hry, například The Legend of Zelda."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "ID hry v IGDB."
         },
         "barcode": {
           "name": "Čárový kód",
           "description": "Číslo čárového kódu, například EAN-13."
-        },
-        "publisher": {
-          "name": "Nakladatel",
-          "description": "Nakladatel knihy."
-        },
-        "published": {
-          "name": "Vydáno",
-          "description": "Datum vydání, obvykle rok."
-        },
-        "pages": {
-          "name": "Strany",
-          "description": "Počet stran."
-        },
-        "language": {
-          "name": "Jazyk",
-          "description": "Kód jazyka, například en."
-        },
-        "subjects": {
-          "name": "Témata",
-          "description": "Témata knihy."
-        },
-        "series": {
-          "name": "Série",
-          "description": "Název série nebo název a číslo."
-        },
-        "description": {
-          "name": "Popis",
-          "description": "Popis knihy."
         },
         "tags": {
           "name": "Štítky",
@@ -638,10 +606,6 @@
           "name": "Titul",
           "description": "Titul knihy."
         },
-        "authors": {
-          "name": "Autoři",
-          "description": "Autoři v pořadí."
-        },
         "party": {
           "name": "Druhá osoba",
           "description": "Jméno druhé osoby výpůjčky."
@@ -741,10 +705,6 @@
         "title": {
           "name": "Titul",
           "description": "Titul knihy."
-        },
-        "authors": {
-          "name": "Autoři",
-          "description": "Autoři v pořadí."
         },
         "person_id": {
           "name": "Osoba",
@@ -880,7 +840,7 @@
       "fields": {
         "query": {
           "name": "Hledat",
-          "description": "Text v titulu, autorech, čárovém kódu nebo štítcích."
+          "description": "Text v názvu, čárovém kódu, franšíze, žánrech nebo štítcích."
         },
         "room_id": {
           "name": "Místnost",
