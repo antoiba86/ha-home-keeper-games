@@ -21,9 +21,10 @@ test.describe('Games tab', { tag: '@responsive' }, () => {
     const state = await adminState();
     const copy = state.copies.find((c: { game_id: string; barcode: string | null }) => c.game_id === game.id && c.barcode);
     const tab = await openTab(page, `/games/${game.id}`);
-    const details = tab.locator('.hkl-copy').first();
+    // Only the copy with the barcode shows it.
+    const details = tab.locator('.hkl-copy').filter({ hasText: copy.barcode });
+    await expect(details).toHaveCount(1);
     await expect(details).toContainText('Platform');
-    await expect(details).toContainText(copy.barcode);
     await tab.locator(`[data-k="ec-${copy.id}"]`).click();
     const dialog = tab.locator('.hkl-dialog');
     await expect(dialog.locator('[name="platform"]')).toHaveValue(copy.platform);

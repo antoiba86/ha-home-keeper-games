@@ -79,6 +79,16 @@ test('record the Library walkthrough', async ({ browser }) => {
     await expect(tab.locator('.hkl-star.on')).toHaveCount(4);
     await beat(page);
 
+    // 3b. A copy has a platform, a format and the barcode of its case.
+    const editCopy = tab.locator('[data-k^="ec-"]').first();
+    await editCopy.scrollIntoViewIfNeeded();
+    await editCopy.click();
+    const copyDialog = tab.locator('.hkl-dialog');
+    await expect(copyDialog.locator('[name="platform"]')).toBeVisible();
+    await beat(page, 2);
+    await copyDialog.locator('[data-k="d-cancel"]').click();
+    await expect(copyDialog).toHaveCount(0);
+
     // 4. Scan barcodes into a shelf.
     const state = await adminState();
     const office = state.rooms.find((r: { name: string }) => r.name === 'Office');
@@ -90,6 +100,8 @@ test('record the Library walkthrough', async ({ browser }) => {
     await beat(page);
     await tab.locator('[data-k="m-manual"]').check();
     await expect(tab.locator('[data-k="m-manual"]')).toBeChecked();
+    // Each copy that the scan adds gets the platform and the format of the setup.
+    await tab.locator('[data-k="sc-platform"]').selectOption('switch');
     await beat(page);
     await tab.locator('[data-k="scan-start"]').click();
     await expect(tab.locator('[data-k="barcode-input"]')).toBeVisible();
