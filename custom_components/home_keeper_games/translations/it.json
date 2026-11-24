@@ -50,16 +50,16 @@
       "loans_overdue": {
         "name": "Prestiti scaduti"
       },
-      "games_read_this_year": {
-        "name": "{person} libri letti quest'anno"
+      "games_completed_this_year": {
+        "name": "{person} giochi completati quest'anno"
       },
-      "reading_now": {
-        "name": "{person} sta leggendo"
+      "playing_now": {
+        "name": "{person} sta giocando"
       }
     },
     "todo": {
-      "to_read": {
-        "name": "{person} da leggere"
+      "backlog": {
+        "name": "{person} giochi da fare"
       }
     }
   },
@@ -550,45 +550,53 @@
         }
       }
     },
-    "set_reading": {
-      "name": "Imposta stato di lettura",
-      "description": "Imposta lo stato di lettura di un libro per una persona. Un utente non amministratore può impostare solo il proprio stato.",
+    "set_progress": {
+      "name": "Imposta progresso",
+      "description": "Imposta il progresso di un gioco su una piattaforma per una persona. Un utente non amministratore può impostare solo il proprio progresso.",
       "fields": {
         "game_id": {
-          "name": "Libro",
-          "description": "L'ID del libro."
+          "name": "Gioco",
+          "description": "L'ID del gioco."
         },
         "person_id": {
           "name": "Persona",
           "description": "L'ID della persona di Home Assistant."
         },
-        "status": {
-          "name": "Stato",
-          "description": "Lo stato di lettura."
+        "platform": {
+          "name": "Piattaforma",
+          "description": "La console. Vuoto per usare la piattaforma delle copie del gioco."
+        },
+        "play_status": {
+          "name": "Stato di gioco",
+          "description": "Lo stato di gioco. none rimuove il progresso."
         },
         "rating": {
           "name": "Voto",
           "description": "Un voto da 1 a 5."
         },
-        "page": {
-          "name": "Pagina",
-          "description": "La pagina attuale."
+        "playtime_minutes": {
+          "name": "Tempo di gioco",
+          "description": "Il tempo di gioco in minuti."
         },
-        "started": {
+        "started_at": {
           "name": "Iniziato",
           "description": "La data di inizio."
         },
-        "finished": {
-          "name": "Finito",
-          "description": "La data in cui il libro è stato finito."
+        "completed_at": {
+          "name": "Completato",
+          "description": "La data in cui il gioco è stato completato."
         },
-        "read_count": {
-          "name": "Letture",
-          "description": "Il numero di volte che il libro è stato letto."
+        "last_played_at": {
+          "name": "Ultima partita",
+          "description": "La data in cui il gioco è stato giocato l'ultima volta."
         },
-        "private_notes": {
-          "name": "Note private",
-          "description": "Note che solo la persona può leggere."
+        "completion_count": {
+          "name": "Volte completato",
+          "description": "Il numero di volte in cui il gioco è stato completato."
+        },
+        "review": {
+          "name": "Recensione",
+          "description": "Una recensione che solo la persona può leggere."
         }
       }
     },
@@ -806,13 +814,13 @@
           "name": "Persona",
           "description": "L'ID della persona di Home Assistant."
         },
-        "share_reading": {
-          "name": "Condividi lo stato di lettura",
-          "description": "Gli altri utenti vedono lo stato. Se disattivato, i sensori e l'elenco di cose da fare della persona non sono disponibili."
+        "share_progress": {
+          "name": "Condividi progresso",
+          "description": "Gli altri utenti possono vedere il progresso. Se disattivato, i sensori e la lista di cose da fare della persona non sono disponibili."
         },
         "yearly_goal": {
           "name": "Obiettivo annuale",
-          "description": "Il numero di libri da leggere quest'anno."
+          "description": "Il numero di giochi da completare quest'anno."
         },
         "wishlist_todo": {
           "name": "Lista dei desideri",
@@ -846,13 +854,13 @@
           "name": "Ripiano",
           "description": "L'ID del ripiano. Vuoto per nessun ripiano."
         },
-        "import_notes": {
-          "name": "Importa note",
-          "description": "Importa le recensioni e le note come note private."
+        "import_review": {
+          "name": "Importa recensioni",
+          "description": "Importa le recensioni del file come recensioni private."
         },
-        "replace_reading": {
-          "name": "Sostituisci lo stato di lettura",
-          "description": "Sostituisci uno stato di lettura esistente."
+        "replace_progress": {
+          "name": "Sostituisci progresso",
+          "description": "Sostituisci il progresso esistente."
         },
         "dry_run": {
           "name": "Prova",
@@ -890,9 +898,9 @@
           "name": "Posseduto",
           "description": "Solo libri con una copia, oppure solo libri senza copia."
         },
-        "status": {
-          "name": "Stato",
-          "description": "Lo stato di lettura."
+        "play_status": {
+          "name": "Stato di gioco",
+          "description": "Lo stato di gioco della persona su una piattaforma."
         },
         "person_id": {
           "name": "Persona",
@@ -1013,6 +1021,9 @@
     },
     "person_not_found": {
       "message": "Nessuna persona ha l'ID {id}."
+    },
+    "platform_required": {
+      "message": "Scegli la piattaforma. Le copie del gioco sono su più di 1 piattaforma, o il gioco non ha copie."
     },
     "no_person": {
       "message": "Il tuo utente non ha una persona di Home Assistant. Collega una persona all'utente."

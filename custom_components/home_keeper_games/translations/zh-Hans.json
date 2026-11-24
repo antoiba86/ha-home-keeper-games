@@ -50,16 +50,16 @@
       "loans_overdue": {
         "name": "逾期借阅"
       },
-      "games_read_this_year": {
-        "name": "{person} 今年已读图书"
+      "games_completed_this_year": {
+        "name": "{person} 今年通关的游戏"
       },
-      "reading_now": {
-        "name": "{person} 正在阅读"
+      "playing_now": {
+        "name": "{person} 正在玩"
       }
     },
     "todo": {
-      "to_read": {
-        "name": "{person} 想读"
+      "backlog": {
+        "name": "{person} 待玩"
       }
     }
   },
@@ -550,45 +550,53 @@
         }
       }
     },
-    "set_reading": {
-      "name": "设置阅读状态",
-      "description": "为某人设置图书的阅读状态。非管理员用户只能设置自己的状态。",
+    "set_progress": {
+      "name": "设置进度",
+      "description": "为某人设置游戏在某个平台上的进度。非管理员用户只能设置自己的进度。",
       "fields": {
         "game_id": {
-          "name": "图书",
-          "description": "图书的 ID。"
+          "name": "游戏",
+          "description": "游戏的 ID。"
         },
         "person_id": {
           "name": "人员",
           "description": "Home Assistant 人员的 ID。"
         },
-        "status": {
-          "name": "阅读状态",
-          "description": "阅读状态。"
+        "platform": {
+          "name": "平台",
+          "description": "主机。留空则使用游戏副本的平台。"
+        },
+        "play_status": {
+          "name": "游玩状态",
+          "description": "游玩状态。none 会删除进度。"
         },
         "rating": {
           "name": "评分",
           "description": "1 到 5 的评分。"
         },
-        "page": {
-          "name": "当前页",
-          "description": "当前读到的页码。"
+        "playtime_minutes": {
+          "name": "游玩时间",
+          "description": "以分钟计的游玩时间。"
         },
-        "started": {
+        "started_at": {
           "name": "开始日期",
           "description": "开始的日期。"
         },
-        "finished": {
-          "name": "读完日期",
-          "description": "读完这本书的日期。"
+        "completed_at": {
+          "name": "通关日期",
+          "description": "游戏通关的日期。"
         },
-        "read_count": {
-          "name": "阅读次数",
-          "description": "这本书被读过的次数。"
+        "last_played_at": {
+          "name": "上次游玩",
+          "description": "上次玩这个游戏的日期。"
         },
-        "private_notes": {
-          "name": "私人笔记",
-          "description": "只有本人能阅读的笔记。"
+        "completion_count": {
+          "name": "通关次数",
+          "description": "游戏通关的次数。"
+        },
+        "review": {
+          "name": "评测",
+          "description": "只有本人能看的评测。"
         }
       }
     },
@@ -806,13 +814,13 @@
           "name": "人员",
           "description": "Home Assistant 人员的 ID。"
         },
-        "share_reading": {
-          "name": "共享阅读状态",
-          "description": "其他用户可以看到状态。关闭时，此人的传感器和待办事项列表不可用。"
+        "share_progress": {
+          "name": "共享进度",
+          "description": "其他用户可以看到进度。关闭后，此人的传感器和待办列表不可用。"
         },
         "yearly_goal": {
           "name": "年度目标",
-          "description": "今年要读的图书数量。"
+          "description": "今年要通关的游戏数量。"
         },
         "wishlist_todo": {
           "name": "心愿清单",
@@ -846,13 +854,13 @@
           "name": "书架层",
           "description": "书架层的 ID。留空表示没有书架层。"
         },
-        "import_notes": {
-          "name": "导入笔记",
-          "description": "将书评和笔记作为私人笔记导入。"
+        "import_review": {
+          "name": "导入评测",
+          "description": "将文件中的评测作为私人评测导入。"
         },
-        "replace_reading": {
-          "name": "替换阅读状态",
-          "description": "替换已有的阅读状态。"
+        "replace_progress": {
+          "name": "替换进度",
+          "description": "替换已有的进度。"
         },
         "dry_run": {
           "name": "试运行",
@@ -890,9 +898,9 @@
           "name": "已拥有",
           "description": "只显示有藏本的图书，或只显示没有藏本的图书。"
         },
-        "status": {
-          "name": "阅读状态",
-          "description": "阅读状态。"
+        "play_status": {
+          "name": "游玩状态",
+          "description": "此人在某个平台上的游玩状态。"
         },
         "person_id": {
           "name": "人员",
@@ -1013,6 +1021,9 @@
     },
     "person_not_found": {
       "message": "没有 ID 为 {id} 的人员。"
+    },
+    "platform_required": {
+      "message": "请选择平台。游戏的副本在多于 1 个平台上，或游戏没有副本。"
     },
     "no_person": {
       "message": "你的用户没有关联 Home Assistant 人员。请将一个人员关联到该用户。"

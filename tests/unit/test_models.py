@@ -110,7 +110,7 @@ def test_merge_changes_keeps_links() -> None:
     games = {"b": {"id": "b"}, "gone": {"id": "gone"}}
     shelves = {"s": {"id": "s"}, "old": {"id": "old"}}
     before = _merge_state(games=dict(games), shelves=dict(shelves))
-    before["reading"] = {"p": {"b": {"status": "want"}}}
+    before["progress"] = {"p": {"b": {"ps5": {"play_status": "backlog"}}}}
     after = m.clone(before)
     after["copies"] = {
         "c1": {"id": "c1", "game_id": "b", "shelf_id": "s"},
@@ -118,15 +118,22 @@ def test_merge_changes_keeps_links() -> None:
         "c3": {"id": "c3", "game_id": "gone", "shelf_id": None},
         "c4": {"id": "c4", "game_id": "b", "shelf_id": None},
     }
-    after["reading"] = {
-        "p": {"b": {"status": "read"}, "gone": {"status": "read"}},
-        "q": {"gone": {"status": "want"}},
+    after["progress"] = {
+        "p": {
+            "b": {
+                "ps5": {"play_status": "completed"},
+                "pc": {"play_status": "playing"},
+            },
+            "gone": {"ps5": {"play_status": "completed"}},
+        },
+        "q": {"gone": {"pc": {"play_status": "backlog"}}},
     }
     current = m.clone(before)
     del current["games"]["gone"]
     del current["shelves"]["old"]
-    current["reading"]["p"]["other"] = {"status": "reading"}
-    current["reading"]["r"] = {"x": {"status": "want"}}
+    current["progress"]["p"]["other"] = {"ps4": {"play_status": "playing"}}
+    current["progress"]["p"]["b"]["switch"] = {"play_status": "abandoned"}
+    current["progress"]["r"] = {"x": {"pc": {"play_status": "backlog"}}}
     current["copies"]["mine"] = {"id": "mine", "game_id": "zzz", "shelf_id": "zz"}
     merged = m.merge_changes(current, before, after)
     assert merged["copies"] == {
@@ -135,19 +142,29 @@ def test_merge_changes_keeps_links() -> None:
         "c4": {"id": "c4", "game_id": "b", "shelf_id": None},
         "mine": {"id": "mine", "game_id": "zzz", "shelf_id": "zz"},
     }
-    assert merged["reading"] == {
-        "p": {"b": {"status": "read"}, "other": {"status": "reading"}},
-        "r": {"x": {"status": "want"}},
+    assert merged["progress"] == {
+        "p": {
+            "b": {
+                "ps5": {"play_status": "completed"},
+                "pc": {"play_status": "playing"},
+                "switch": {"play_status": "abandoned"},
+            },
+            "other": {"ps4": {"play_status": "playing"}},
+        },
+        "r": {"x": {"pc": {"play_status": "backlog"}}},
     }
 
 
 def test_merge_changes_removes_a_person_with_no_rows() -> None:
     before = _merge_state(games={"b": {"id": "b"}})
-    before["reading"] = {"p": {"b": {"status": "want"}}}
+    before["progress"] = {"p": {"b": {"ps5": {"play_status": "backlog"}}}}
     after = m.clone(before)
-    after["reading"] = {}
+    after["progress"] = {}
     merged = m.merge_changes(m.clone(before), before, after)
-    assert merged["reading"] == {}
+    assert merged["progress"] == {}
+    after["progress"] = {"p": {"b": {"pc": {"play_status": "backlog"}}}}
+    merged = m.merge_changes(m.clone(before), before, after)
+    assert merged["progress"] == {"p": {"b": {"pc": {"play_status": "backlog"}}}}
     assert m.merge_changes(m.clone(before), before, m.clone(before)) == before
 
 
@@ -420,58 +437,107 @@ def test_build_and_update_copy() -> None:
     assert _err(m.copy_field, "nope", 1).key == "invalid_field"
 
 
-# ── Reading ──────────────────────────────────────────────────────────────────
+# ── Progress ─────────────────────────────────────────────────────────────────
 
 
-def test_apply_reading_new_row() -> None:
-    row, changed = m.apply_reading(None, {}, now=NOW, today=TODAY)
-    assert row["status"] == "want" and changed == ["status"]
-    assert row["updated_at"] == NOW and row["read_count"] == 0
+def test_apply_progress_new_row() -> None:
+    row, changed = m.apply_progress(None, {}, now=NOW, today=TODAY)
+    assert row["play_status"] == "backlog" and changed == ["play_status"]
+    assert row["updated_at"] == NOW and row["completion_count"] == 0
+    assert row["playtime_minutes"] is None and row["last_played_at"] is None
+    assert row["review"] == ""
 
 
-def test_apply_reading_read_sets_finished_and_count() -> None:
-    row, changed = m.apply_reading(None, {"status": "read"}, now=NOW, today=TODAY)
-    assert row["finished"] == TODAY and row["read_count"] == 1
-    assert changed == ["status", "finished", "read_count"]
-    again, changed = m.apply_reading(row, {"status": "read"}, now="t2", today="x")
-    assert changed == [] and again["read_count"] == 1 and again["updated_at"] == NOW
-    reread, _ = m.apply_reading(
-        {**row, "status": "reading"}, {"status": "read"}, now="t2", today="2027-01-01"
+def test_apply_progress_completed_sets_date_and_count() -> None:
+    data = {"play_status": "completed"}
+    row, changed = m.apply_progress(None, data, now=NOW, today=TODAY)
+    assert row["completed_at"] == TODAY and row["completion_count"] == 1
+    assert changed == ["play_status", "completed_at", "completion_count"]
+    again, changed = m.apply_progress(row, data, now="t2", today="x")
+    assert changed == [] and again["completion_count"] == 1
+    assert again["updated_at"] == NOW
+    replay, _ = m.apply_progress(
+        {**row, "play_status": "playing"}, data, now="t2", today="2027-01-01"
     )
-    assert reread["read_count"] == 2 and reread["finished"] == "2027-01-01"
-    explicit, _ = m.apply_reading(
+    assert replay["completion_count"] == 2
+    assert replay["completed_at"] == "2027-01-01"
+    explicit, _ = m.apply_progress(
         None,
-        {"status": "read", "finished": "2020-02-02", "read_count": 4},
+        {
+            "play_status": "completed",
+            "completed_at": "2020-02-02",
+            "completion_count": 4,
+        },
         now=NOW,
         today=TODAY,
     )
-    assert explicit["finished"] == "2020-02-02" and explicit["read_count"] == 4
+    assert explicit["completed_at"] == "2020-02-02"
+    assert explicit["completion_count"] == 4
 
 
-def test_apply_reading_reading_sets_started() -> None:
-    row, _ = m.apply_reading(None, {"status": "reading"}, now=NOW, today=TODAY)
-    assert row["started"] == TODAY and row["finished"] is None
-    row, _ = m.apply_reading(
-        None, {"status": "reading", "started": "2026-01-01"}, now=NOW, today=TODAY
+def test_apply_progress_playing_sets_started() -> None:
+    data = {"play_status": "playing"}
+    row, _ = m.apply_progress(None, data, now=NOW, today=TODAY)
+    assert row["started_at"] == TODAY and row["completed_at"] is None
+    row, _ = m.apply_progress(
+        None, {**data, "started_at": "2026-01-01"}, now=NOW, today=TODAY
     )
-    assert row["started"] == "2026-01-01"
-    dnf, _ = m.apply_reading(row, {"status": "dnf"}, now=NOW, today=TODAY)
-    assert dnf["started"] == "2026-01-01" and dnf["finished"] is None
+    assert row["started_at"] == "2026-01-01"
+    gone, _ = m.apply_progress(row, {"play_status": "abandoned"}, now=NOW, today=TODAY)
+    assert gone["started_at"] == "2026-01-01" and gone["completed_at"] is None
 
 
-def test_apply_reading_fields_and_errors() -> None:
-    _row, changed = m.apply_reading(
-        None,
-        {"rating": 5, "page": 10, "private_notes": "p"},
-        now=NOW,
-        today=TODAY,
-    )
-    assert changed == ["status", "rating", "page", "private_notes"]
-    assert _err(m.reading_field, "rating", 6).key == "out_of_range"
-    assert _err(m.reading_field, "status", "maybe").key == "invalid_choice"
-    assert _err(m.reading_field, "nope", 1).key == "invalid_field"
-    assert _err(m.reading_field, "read_count", None).key == "field_required"
-    assert m.reading_field("page", 0) == 0
+def test_apply_progress_fields_and_errors() -> None:
+    data = {
+        "rating": 5,
+        "playtime_minutes": 90,
+        "last_played_at": "2026-03-04",
+        "review": "p",
+    }
+    row, changed = m.apply_progress(None, data, now=NOW, today=TODAY)
+    assert changed == [
+        "play_status",
+        "rating",
+        "playtime_minutes",
+        "last_played_at",
+        "review",
+    ]
+    assert row["playtime_minutes"] == 90 and row["last_played_at"] == "2026-03-04"
+    assert _err(m.progress_field, "rating", 6).key == "out_of_range"
+    assert _err(m.progress_field, "rating", 0).key == "out_of_range"
+    assert m.progress_field("rating", 1) == 1
+    assert _err(m.progress_field, "play_status", "maybe").key == "invalid_choice"
+    assert _err(m.progress_field, "nope", 1).key == "invalid_field"
+    assert _err(m.progress_field, "completion_count", None).key == "field_required"
+    assert _err(m.progress_field, "completion_count", 1001).key == "out_of_range"
+    assert m.progress_field("completion_count", 1000) == 1000
+    assert _err(m.progress_field, "playtime_minutes", -1).key == "out_of_range"
+    assert m.progress_field("playtime_minutes", 0) == 0
+    assert m.progress_field("playtime_minutes", m.MAX_PLAYTIME) == m.MAX_PLAYTIME
+    assert _err(m.progress_field, "playtime_minutes", m.MAX_PLAYTIME + 1)
+    for field in m.PROGRESS_DATES:
+        assert m.progress_field(field, "2026-05-06") == "2026-05-06"
+        assert _err(m.progress_field, field, "06/05/2026").key == "invalid_date"
+    assert _err(m.progress_field, "review", "x" * (m.MAX_LONG + 1))
+
+
+def test_progress_platform() -> None:
+    state = m.empty_state()
+    assert _err(m.progress_platform, state, "g", None).key == "platform_required"
+    assert m.progress_platform(state, "g", "switch") == "switch"
+    assert _err(m.progress_platform, state, "g", "gameboy").key == "invalid_choice"
+    state["copies"] = {
+        "a": {"game_id": "g", "platform": "ps5"},
+        "b": {"game_id": "g", "platform": "ps5"},
+        "c": {"game_id": "other", "platform": "pc"},
+    }
+    assert m.progress_platform(state, "g", None) == "ps5"
+    assert m.progress_platform(state, "g", "") == "ps5"
+    assert m.progress_platform(state, "g", "pc") == "pc"
+    state["copies"]["d"] = {"game_id": "g"}
+    assert _err(m.progress_platform, state, "g", None).key == "platform_required"
+    del state["copies"]["a"], state["copies"]["b"]
+    assert m.progress_platform(state, "g", None) == m.DEFAULT_PLATFORM
 
 
 # ── Loans ────────────────────────────────────────────────────────────────────
@@ -532,18 +598,18 @@ def test_loan_state() -> None:
 
 def test_person_settings() -> None:
     assert m.person_settings({}, "p") == m.default_person()
-    stored = {"p": {"share_reading": False, "junk": 1}}
+    stored = {"p": {"share_progress": False, "junk": 1}}
     assert m.person_settings(stored, "p") == {
-        "share_reading": False,
+        "share_progress": False,
         "wishlist_todo": None,
         "yearly_goal": None,
     }
     assert m.person_settings({"p": "bad"}, "p") == m.default_person()
     settings, changed = m.apply_person_settings(
         m.default_person(),
-        {"share_reading": False, "wishlist_todo": "todo.books", "yearly_goal": 12},
+        {"share_progress": False, "wishlist_todo": "todo.books", "yearly_goal": 12},
     )
-    assert changed == ["share_reading", "wishlist_todo", "yearly_goal"]
+    assert changed == ["share_progress", "wishlist_todo", "yearly_goal"]
     assert settings["yearly_goal"] == 12
     _, changed = m.apply_person_settings(settings, {"yearly_goal": 12})
     assert changed == []

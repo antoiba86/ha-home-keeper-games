@@ -3,7 +3,7 @@
 The store holds one JSON document with these sections, each a map by id::
 
     rooms, units, shelves, games, copies, loans
-    reading:  {person_id: {game_id: row}}
+    progress: {person_id: {game_id: {platform: row}}}
     people:   {person_id: settings}
     todo_orphans: [{entity_id, uid}]
 
@@ -32,7 +32,7 @@ STATE_SECTIONS = (
     "shelves",
     "games",
     "copies",
-    "reading",
+    "progress",
     "loans",
     "people",
 )
@@ -53,8 +53,8 @@ PLATFORMS = (
 )
 DEFAULT_PLATFORM = "other"
 CONDITIONS = ("new", "fine", "good", "fair", "poor")
-STATUSES = ("want", "reading", "read", "dnf")
-# The ``status`` value of ``set_reading`` that removes the reading row.
+PLAY_STATUSES = ("backlog", "playing", "completed", "abandoned")
+# The ``play_status`` value of ``set_progress`` that removes the progress row.
 STATUS_NONE = "none"
 DIRECTIONS = ("out", "in")
 COVER_KINDS = ("custom", "none")
@@ -69,8 +69,8 @@ MAX_NOTE = 2000
 MAX_LONG = 20000
 MAX_LIST = 50
 MAX_ORDER = 1_000_000
-MAX_PAGES = 100_000
-MAX_READ_COUNT = 1000
+MAX_PLAYTIME = 10_000_000
+MAX_COMPLETIONS = 1000
 MAX_GOAL = 10_000
 MAX_MONEY = 1_000_000_000
 
@@ -111,17 +111,19 @@ COPY_FIELDS = (
     "value",
     "note",
 )
-READING_FIELDS = (
-    "status",
+PROGRESS_FIELDS = (
+    "play_status",
     "rating",
-    "page",
-    "started",
-    "finished",
-    "read_count",
-    "private_notes",
+    "playtime_minutes",
+    "started_at",
+    "completed_at",
+    "last_played_at",
+    "completion_count",
+    "review",
 )
+PROGRESS_DATES = ("started_at", "completed_at", "last_played_at")
 LOAN_UPDATE_FIELDS = ("party", "due", "note", "started", "format")
-PERSON_FIELDS = ("share_reading", "wishlist_todo", "yearly_goal")
+PERSON_FIELDS = ("share_progress", "wishlist_todo", "yearly_goal")
 
 
 class LibraryError(ValueError):
@@ -179,9 +181,9 @@ def clone(value: Any) -> Any:
     return _copy.deepcopy(value)
 
 
-# The sections that hold 1 record for each id. ``reading`` holds 1 map of rows
-# for each person.
-RECORD_SECTIONS = tuple(name for name in STATE_SECTIONS if name != "reading")
+# The sections that hold 1 record for each id. ``progress`` holds 1 map of rows
+# for each person and game.
+RECORD_SECTIONS = tuple(name for name in STATE_SECTIONS if name != "progress")
 
 
 def _merge_records(
@@ -224,7 +226,7 @@ def merge_changes(
 
     An import plans its changes on a snapshot (*before*) while other changes
     can go on. This merge writes only the records and the fields that the plan
-    changed, so a change made in the meantime stays. A copy or a reading row of
+    changed, so a change made in the meantime stays. A copy or a progress row of
     the plan whose game was deleted in the meantime is dropped, and a copy on a
     deleted shelf goes to no shelf. *current* does not change.
     """
@@ -234,14 +236,18 @@ def merge_changes(
         for name in RECORD_SECTIONS
     }
     rows_written: list[tuple[str, str]] = []
-    for person_id in sorted(set(before["reading"]) | set(after["reading"])):
-        rows = merged["reading"].setdefault(person_id, {})
-        for game_id in _merge_records(
-            rows,
-            before["reading"].get(person_id, {}),
-            after["reading"].get(person_id, {}),
-        ):
-            rows_written.append((person_id, game_id))
+    for person_id in sorted(set(before["progress"]) | set(after["progress"])):
+        old_games = before["progress"].get(person_id, {})
+        new_games = after["progress"].get(person_id, {})
+        games = merged["progress"].setdefault(person_id, {})
+        for game_id in sorted(set(old_games) | set(new_games)):
+            rows = games.setdefault(game_id, {})
+            if _merge_records(
+                rows, old_games.get(game_id, {}), new_games.get(game_id, {})
+            ):
+                rows_written.append((person_id, game_id))
+            if not rows:
+                del games[game_id]
     for copy_id in written["copies"]:
         copy = merged["copies"][copy_id]
         if copy.get("game_id") not in merged["games"]:
@@ -250,8 +256,8 @@ def merge_changes(
             copy["shelf_id"] = None
     for person_id, game_id in rows_written:
         if game_id not in merged["games"]:
-            del merged["reading"][person_id][game_id]
-    merged["reading"] = {p: r for p, r in merged["reading"].items() if r}
+            del merged["progress"][person_id][game_id]
+    merged["progress"] = {p: g for p, g in merged["progress"].items() if g}
     return merged
 
 
@@ -652,69 +658,89 @@ def update_copy(
     return updated, changed
 
 
-# ── Reading ──────────────────────────────────────────────────────────────────
+# ── Progress ─────────────────────────────────────────────────────────────────
 
 
-def empty_reading(*, now: str) -> dict[str, Any]:
-    """A reading row with status ``want``."""
+def empty_progress(*, now: str) -> dict[str, Any]:
+    """A progress row with play status ``backlog``."""
     return {
-        "status": "want",
+        "play_status": "backlog",
         "rating": None,
-        "page": None,
-        "started": None,
-        "finished": None,
-        "read_count": 0,
-        "private_notes": "",
+        "playtime_minutes": None,
+        "started_at": None,
+        "completed_at": None,
+        "last_played_at": None,
+        "completion_count": 0,
+        "review": "",
         "updated_at": now,
     }
 
 
-def reading_field(field: str, value: Any) -> Any:
-    """Check one reading field and return its stored value."""
-    if field == "status":
-        return choice(value, field, STATUSES)
+def progress_field(field: str, value: Any) -> Any:
+    """Check one progress field and return its stored value."""
+    if field == "play_status":
+        return choice(value, field, PLAY_STATUSES)
     if field == "rating":
         return integer(value, field, low=1, high=5)
-    if field == "page":
-        return integer(value, field, low=0, high=MAX_PAGES)
-    if field in ("started", "finished"):
+    if field == "playtime_minutes":
+        return integer(value, field, low=0, high=MAX_PLAYTIME)
+    if field in PROGRESS_DATES:
         return iso_date(value, field)
-    if field == "read_count":
-        return integer(value, field, low=0, high=MAX_READ_COUNT, nullable=False)
-    if field == "private_notes":
+    if field == "completion_count":
+        return integer(value, field, low=0, high=MAX_COMPLETIONS, nullable=False)
+    if field == "review":
         return text(value, field, MAX_LONG)
     raise LibraryError("invalid_field", field=field)
 
 
-def apply_reading(
+def progress_platform(state: dict[str, Any], game_id: str, platform: Any) -> str:
+    """The platform of a progress row.
+
+    With no *platform*, it is the platform of the copies of the game when they
+    all have the same one. Else the caller must send it: ``platform_required``.
+    """
+    if platform not in (None, ""):
+        return choice(platform, "platform", PLATFORMS)
+    found = {
+        c.get("platform") or DEFAULT_PLATFORM
+        for c in state["copies"].values()
+        if c.get("game_id") == game_id
+    }
+    if len(found) == 1:
+        return found.pop()
+    raise LibraryError("platform_required")
+
+
+def apply_progress(
     row: dict[str, Any] | None, data: dict[str, Any], *, now: str, today: str
 ) -> tuple[dict[str, Any], list[str]]:
-    """Return ``(row, changed_fields)`` after a ``set_reading`` call.
+    """Return ``(row, changed_fields)`` after a ``set_progress`` call.
 
-    When the status becomes ``read``, ``finished`` is today and ``read_count``
-    goes up by 1, unless the call sends those fields. When the status becomes
-    ``reading``, ``started`` is today unless the call sends it.
+    When the play status becomes ``completed``, ``completed_at`` is today and
+    ``completion_count`` goes up by 1, unless the call sends those fields. When
+    the play status becomes ``playing``, ``started_at`` is today unless the call
+    sends it.
     """
-    base = dict(row) if row else empty_reading(now=now)
-    previous = row.get("status") if row else None
+    base = dict(row) if row else empty_progress(now=now)
+    previous = row.get("play_status") if row else None
     updated = dict(base)
-    for field in READING_FIELDS:
+    for field in PROGRESS_FIELDS:
         if field in data:
-            updated[field] = reading_field(field, data[field])
-    status = updated["status"]
+            updated[field] = progress_field(field, data[field])
+    status = updated["play_status"]
     if status != previous:
-        if status == "read":
-            if "finished" not in data:
-                updated["finished"] = today
-            if "read_count" not in data:
-                updated["read_count"] = int(base.get("read_count") or 0) + 1
-        elif status == "reading" and "started" not in data:
-            updated["started"] = today
+        if status == "completed":
+            if "completed_at" not in data:
+                updated["completed_at"] = today
+            if "completion_count" not in data:
+                updated["completion_count"] = int(base.get("completion_count") or 0) + 1
+        elif status == "playing" and "started_at" not in data:
+            updated["started_at"] = today
     changed = [
-        field for field in READING_FIELDS if updated.get(field) != base.get(field)
+        field for field in PROGRESS_FIELDS if updated.get(field) != base.get(field)
     ]
-    if row is None and "status" not in changed:
-        changed.insert(0, "status")
+    if row is None and "play_status" not in changed:
+        changed.insert(0, "play_status")
     if changed:
         updated["updated_at"] = now
     return updated, changed
@@ -803,7 +829,7 @@ def is_overdue(loan: dict[str, Any], today: str) -> bool:
 
 def default_person() -> dict[str, Any]:
     """The settings of a person with no stored settings."""
-    return {"share_reading": True, "wishlist_todo": None, "yearly_goal": None}
+    return {"share_progress": True, "wishlist_todo": None, "yearly_goal": None}
 
 
 def person_settings(people: dict[str, Any], person_id: str) -> dict[str, Any]:
@@ -824,7 +850,7 @@ def apply_person_settings(
         if field not in data:
             continue
         raw = data[field]
-        if field == "share_reading":
+        if field == "share_progress":
             updated[field] = boolean(raw, field)
         elif field == "wishlist_todo":
             updated[field] = entity_id_or_none(raw, field, "todo")
@@ -928,11 +954,11 @@ __all__ = [
     "FORMATS",
     "GAME_FIELDS",
     "PLATFORMS",
-    "STATUSES",
+    "PLAY_STATUSES",
     "STATUS_NONE",
     "LibraryError",
     "apply_person_settings",
-    "apply_reading",
+    "apply_progress",
     "build_copy",
     "build_game",
     "build_loan",

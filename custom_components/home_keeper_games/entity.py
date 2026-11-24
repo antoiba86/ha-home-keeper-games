@@ -52,16 +52,16 @@ class PersonEntity(LibraryEntity):
 
     @property
     def available(self) -> bool:
-        """Whether the person exists and shares their reading.
+        """Whether the person exists and shares their progress.
 
         Home Assistant shows each entity to each user. So while a person does
-        not share their reading (``share_reading: false``), the per-person
-        entities are unavailable and show no reading.
+        not share their progress (``share_progress: false``), the per-person
+        entities are unavailable and show no progress.
         """
         if people.person(self.hass, self.person_id) is None:
             return False
         settings = person_settings(self.state_doc["people"], self.person_id)
-        return bool(settings["share_reading"])
+        return bool(settings["share_progress"])
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:

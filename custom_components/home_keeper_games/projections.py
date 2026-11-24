@@ -4,8 +4,8 @@ An admin reads the full document. A non-admin reads a projection:
 
 * A copy has no ``price``, ``value`` or ``acquired_from``.
 * A loan has no ``party``.
-* The reading row of another person shows only if that person shares the
-  reading status (``share_reading``), and never with ``private_notes``.
+* The progress rows of another person show only if that person shares the
+  progress (``share_progress``), and never with ``review``.
 * A person setting of another person has no ``wishlist_todo``.
 
 A reply never leaks: each read surface goes through :func:`project_state` or
@@ -23,7 +23,7 @@ from .models import clone, is_open, is_overdue, location_path, person_settings
 
 PRIVATE_COPY_FIELDS = ("price", "value", "acquired_from")
 PRIVATE_LOAN_FIELDS = ("party",)
-PRIVATE_READING_FIELDS = ("private_notes",)
+PRIVATE_PROGRESS_FIELDS = ("review",)
 PRIVATE_PERSON_FIELDS = ("wishlist_todo",)
 # The to-do item of a wishlist entry names the ``wishlist_todo`` of its person.
 PRIVATE_WISHLIST_FIELDS = ("todo_entity", "todo_uid")
@@ -44,9 +44,9 @@ def project_export(data: dict[str, Any], *, is_admin: bool) -> dict[str, Any]:
     for loan in out.get("loans", []):
         for name in PRIVATE_LOAN_FIELDS:
             loan.pop(name, None)
-    for entry in out.get("reading", []):
+    for entry in out.get("progress", []):
         for row in entry.get("games", []):
-            for name in PRIVATE_READING_FIELDS:
+            for name in PRIVATE_PROGRESS_FIELDS:
                 row.pop(name, None)
     for person in out.get("people", []):
         for name in (*PRIVATE_PERSON_FIELDS, "wishlist_todo_name"):
@@ -68,28 +68,31 @@ def cover_url(game: dict[str, Any]) -> str | None:
     return f"{COVER_URL_PREFIX}/{game['id']}?v={token}"
 
 
-def visible_reading(
+def visible_progress(
     state: dict[str, Any],
     game_id: str,
     *,
     viewer: str | None,
     is_admin: bool,
-) -> dict[str, dict[str, Any]]:
-    """The reading rows of a game that the viewer can read, by person id."""
-    out: dict[str, dict[str, Any]] = {}
-    for person_id, rows in state["reading"].items():
-        row = rows.get(game_id) if isinstance(rows, dict) else None
-        if row is None:
+) -> dict[str, dict[str, dict[str, Any]]]:
+    """The progress rows of a game that the viewer can read.
+
+    The map is by person id, then by platform.
+    """
+    out: dict[str, dict[str, dict[str, Any]]] = {}
+    for person_id, games in state["progress"].items():
+        rows = games.get(game_id) if isinstance(games, dict) else None
+        if not isinstance(rows, dict) or not rows:
             continue
         if is_admin or person_id == viewer:
-            out[person_id] = dict(row)
+            out[person_id] = {platform: dict(row) for platform, row in rows.items()}
             continue
-        if not person_settings(state["people"], person_id)["share_reading"]:
+        if not person_settings(state["people"], person_id)["share_progress"]:
             continue
-        shared = dict(row)
-        for field in PRIVATE_READING_FIELDS:
-            shared.pop(field, None)
-        out[person_id] = shared
+        out[person_id] = {
+            platform: {k: v for k, v in row.items() if k not in PRIVATE_PROGRESS_FIELDS}
+            for platform, row in rows.items()
+        }
     return out
 
 
@@ -119,7 +122,7 @@ def project_game(
     is_admin: bool,
     copy_count: int | None = None,
 ) -> dict[str, Any]:
-    """A game with its visible ``reading``, ``owned`` and ``cover_url``."""
+    """A game with its visible ``progress``, ``owned`` and ``cover_url``."""
     out = dict(game)
     if copy_count is None:
         copy_count = sum(
@@ -128,7 +131,7 @@ def project_game(
     out["owned"] = copy_count > 0
     out["copy_count"] = copy_count
     out["cover_url"] = cover_url(game)
-    out["reading"] = visible_reading(
+    out["progress"] = visible_progress(
         state, game["id"], viewer=viewer, is_admin=is_admin
     )
     wishlist = game.get("wishlist")
@@ -254,8 +257,8 @@ def game_matches(
 
     ``query`` searches the title, the franchise, the genres, the tags and the
     barcodes of the copies. ``shelf_id`` and ``room_id`` match a copy location.
-    ``owned`` keeps games with or without copies. ``status`` with ``person_id``
-    matches a reading status.
+    ``owned`` keeps games with or without copies. ``play_status`` with
+    ``person_id`` matches the play status of the person on any platform.
     """
     if copies_index is None:
         copies_index = copies_by_game(state)
@@ -287,11 +290,11 @@ def game_matches(
             rooms.add(unit.get("room_id"))
         if room_id not in rooms:
             return False
-    status = filters.get("status")
+    status = filters.get("play_status")
     if status:
         person_id = filters.get("person_id")
-        row = (state["reading"].get(person_id) or {}).get(game["id"]) or {}
-        if row.get("status") != status:
+        rows = (state["progress"].get(person_id) or {}).get(game["id"]) or {}
+        if not any(row.get("play_status") == status for row in rows.values()):
             return False
     return True
 
@@ -357,39 +360,50 @@ def game_detail(
 # ── Stats for the sensors ────────────────────────────────────────────────────
 
 
-def games_read_in_year(state: dict[str, Any], person_id: str, year: int) -> int:
-    """The number of games that the person finished in *year*."""
-    count = 0
-    for row in (state["reading"].get(person_id) or {}).values():
-        finished = row.get("finished")
-        if row.get("status") != "read" or not isinstance(finished, str):
+def _rows_of(
+    state: dict[str, Any], person_id: str, play_status: str
+) -> list[tuple[str, str, dict[str, Any]]]:
+    """``(game_id, platform, row)`` for each row with *play_status*."""
+    out = []
+    for game_id, rows in (state["progress"].get(person_id) or {}).items():
+        if game_id not in state["games"]:
             continue
-        if not finished.startswith(f"{year:04d}-"):
-            continue
-        count += 1
-    return count
+        for platform, row in rows.items():
+            if row.get("play_status") == play_status:
+                out.append((game_id, platform, row))
+    return out
 
 
-def reading_now(state: dict[str, Any], person_id: str) -> list[str]:
-    """The titles that the person reads now, sorted by the last change."""
-    rows = [
-        (row.get("updated_at") or "", game_id)
-        for game_id, row in (state["reading"].get(person_id) or {}).items()
-        if row.get("status") == "reading" and game_id in state["games"]
-    ]
-    rows.sort(reverse=True)
-    return [str(state["games"][game_id].get("title", "")) for _, game_id in rows]
+def games_completed_in_year(state: dict[str, Any], person_id: str, year: int) -> int:
+    """The number of games that the person completed in *year*, on any platform."""
+    return len(
+        {
+            game_id
+            for game_id, _, row in _rows_of(state, person_id, "completed")
+            if str(row.get("completed_at") or "").startswith(f"{year:04d}-")
+        }
+    )
 
 
-def want_to_read(state: dict[str, Any], person_id: str) -> list[dict[str, Any]]:
-    """The games with status ``want`` for the person, oldest first."""
-    rows = [
-        (row.get("updated_at") or "", game_id)
-        for game_id, row in (state["reading"].get(person_id) or {}).items()
-        if row.get("status") == "want" and game_id in state["games"]
-    ]
-    rows.sort()
-    return [state["games"][game_id] for _, game_id in rows]
+def playing_now(state: dict[str, Any], person_id: str) -> list[str]:
+    """The titles that the person plays now, the last change first."""
+    latest: dict[str, str] = {}
+    for game_id, _, row in _rows_of(state, person_id, "playing"):
+        stamp = str(row.get("updated_at") or "")
+        latest[game_id] = max(stamp, latest.get(game_id, ""))
+    order = sorted(
+        ((stamp, game_id) for game_id, stamp in latest.items()), reverse=True
+    )
+    return [str(state["games"][game_id].get("title", "")) for _, game_id in order]
+
+
+def backlog(state: dict[str, Any], person_id: str) -> list[tuple[dict[str, Any], str]]:
+    """``(game, platform)`` for each backlog row of the person, oldest first."""
+    rows = sorted(
+        (str(row.get("updated_at") or ""), game_id, platform)
+        for game_id, platform, row in _rows_of(state, person_id, "backlog")
+    )
+    return [(state["games"][game_id], platform) for _, game_id, platform in rows]
 
 
 def owned_game_count(state: dict[str, Any]) -> int:

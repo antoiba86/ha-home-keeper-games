@@ -1,7 +1,7 @@
 """Diagnostics of Home Keeper Games.
 
 The download has the config entry, the counts and the library document. The
-names of the loan parties and all notes are redacted.
+names of the loan parties, all notes and the reviews are redacted.
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ from . import LibraryConfigEntry
 TO_REDACT = {
     "party",
     "note",
-    "private_notes",
+    "review",
     "shared_notes",
     "acquired_from",
 }

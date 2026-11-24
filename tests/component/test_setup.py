@@ -274,8 +274,8 @@ async def test_diagnostics_redact_names_and_notes(hass, setup_entry, call) -> No
     ]
     await call("lend_game", {"copy_id": copy["id"], "party": "Zed", "note": "n"})
     await call(
-        "set_reading",
-        {"game_id": game["id"], "person_id": ALICE, "private_notes": "secret"},
+        "set_progress",
+        {"game_id": game["id"], "person_id": ALICE, "review": "secret"},
     )
     data = await async_get_config_entry_diagnostics(hass, setup_entry)
     text = str(data)

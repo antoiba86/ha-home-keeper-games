@@ -256,14 +256,14 @@ def _built() -> dict[str, dict[str, Any]]:
         const.EVENT_COPY_UPDATED: events.copy_updated_event_data(
             _GAME, _COPY, ["note"], None
         ),
-        const.EVENT_READING_UPDATED: events.reading_updated_event_data(
-            _GAME, "p1", "reading", ["page"], None
+        const.EVENT_PROGRESS_UPDATED: events.progress_updated_event_data(
+            _GAME, "p1", "ps5", "playing", ["playtime_minutes"], None
         ),
-        const.EVENT_READING_CHANGED: events.reading_changed_event_data(
-            _GAME, "p1", "read", "reading", None
+        const.EVENT_PROGRESS_CHANGED: events.progress_changed_event_data(
+            _GAME, "p1", "ps5", "completed", "playing", None
         ),
-        const.EVENT_GAME_FINISHED: events.game_finished_event_data(
-            _GAME, "p1", {"finished": "2026-10-01", "rating": 5}, None
+        const.EVENT_GAME_COMPLETED: events.game_completed_event_data(
+            _GAME, "p1", "ps5", {"completed_at": "2026-10-01", "rating": 5}, None
         ),
         const.EVENT_LOAN_STARTED: events.loan_event_data(_GAME, _LOAN, None),
         const.EVENT_LOAN_RETURNED: events.loan_event_data(_GAME, _LOAN, None),
@@ -390,7 +390,7 @@ def test_frontend_command_names_stay_the_same() -> None:
         "list_todo_entities",
         "add_room",
         "scan_barcode",
-        "set_reading",
+        "set_progress",
         "lend_game",
         "borrow_game",
         "return_loan",

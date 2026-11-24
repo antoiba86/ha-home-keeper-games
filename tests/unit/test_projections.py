@@ -62,13 +62,13 @@ def _state() -> dict:
     )
     loan["id"] = "l1"
     state["loans"]["l1"] = loan
-    row = {**m.empty_reading(now=NOW), "status": "read", "private_notes": "secret"}
-    state["reading"] = {
-        "alice": {"dune": dict(row)},
-        "bob": {"dune": {**row, "status": "reading"}},
-        "carol": {"dune": {**row, "status": "want"}},
+    row = {**m.empty_progress(now=NOW), "play_status": "completed", "review": "secret"}
+    state["progress"] = {
+        "alice": {"dune": {"ps5": dict(row)}},
+        "bob": {"dune": {"ps5": {**row, "play_status": "playing"}}},
+        "carol": {"dune": {"ps5": {**row, "play_status": "backlog"}}},
     }
-    state["people"] = {"carol": {"share_reading": False}}
+    state["people"] = {"carol": {"share_progress": False}}
     return state
 
 
@@ -104,15 +104,15 @@ def test_admin_reads_everything() -> None:
     assert reply["copies"][0]["price"] == 10
     assert reply["loans"][0]["party"] == "Zed"
     dune = next(b for b in reply["games"] if b["id"] == "dune")
-    assert set(dune["reading"]) == {"alice", "bob", "carol"}
-    assert dune["reading"]["carol"]["private_notes"] == "secret"
+    assert set(dune["progress"]) == {"alice", "bob", "carol"}
+    assert dune["progress"]["carol"]["ps5"]["review"] == "secret"
     assert dune["owned"] is True and dune["copy_count"] == 1
     emma = next(b for b in reply["games"] if b["id"] == "emma")
     assert emma["owned"] is False and emma["cover_url"].endswith("?v=0a1b2c3d")
     assert [b["id"] for b in reply["games"]] == ["dune", "emma"]
     assert list(reply["people"]) == ["alice", "bob", "carol"]
     carol = reply["people"]["carol"]
-    assert carol["share_reading"] is False and "wishlist_todo" in carol
+    assert carol["share_progress"] is False and "wishlist_todo" in carol
     assert "catalog_accounts" not in reply
 
 
@@ -131,9 +131,10 @@ def test_non_admin_projection_never_leaks() -> None:
     for secret in ("Zed", "Shop", '"price"', '"value"', '"party"'):
         assert secret not in text, secret
     dune = next(b for b in reply["games"] if b["id"] == "dune")
-    assert set(dune["reading"]) == {"alice", "bob"}
-    assert dune["reading"]["bob"]["private_notes"] == "secret"
-    assert "private_notes" not in dune["reading"]["alice"]
+    assert set(dune["progress"]) == {"alice", "bob"}
+    assert dune["progress"]["bob"]["ps5"]["review"] == "secret"
+    assert "review" not in dune["progress"]["alice"]["ps5"]
+    assert dune["progress"]["alice"]["ps5"]["play_status"] == "completed"
     copy = reply["copies"][0]
     assert not {"price", "value", "acquired_from"} & set(copy)
     assert "party" not in reply["loans"][0]
@@ -167,14 +168,18 @@ def test_wishlist_todo_ids_of_another_person_are_hidden() -> None:
         ]
         is None
     )
-    assert state["reading"]["alice"]["dune"]["private_notes"] == "secret"
+    assert state["progress"]["alice"]["dune"]["ps5"]["review"] == "secret"
 
 
 def test_viewer_with_no_person() -> None:
     state = _state()
-    rows = pr.visible_reading(state, "dune", viewer=None, is_admin=False)
+    state["progress"]["alice"]["dune"]["pc"] = {**m.empty_progress(now=NOW)}
+    state["progress"]["alice"]["emma"] = {}
+    rows = pr.visible_progress(state, "dune", viewer=None, is_admin=False)
     assert set(rows) == {"alice", "bob"}
-    assert all("private_notes" not in row for row in rows.values())
+    assert set(rows["alice"]) == {"ps5", "pc"}
+    assert all("review" not in row for by in rows.values() for row in by.values())
+    assert pr.visible_progress(state, "emma", viewer=None, is_admin=True) == {}
 
 
 def test_game_detail() -> None:
@@ -203,8 +208,9 @@ def test_game_detail() -> None:
         ({"shelf_id": "x"}, []),
         ({"room_id": "r"}, ["dune"]),
         ({"room_id": "q"}, []),
-        ({"status": "read", "person_id": "alice"}, ["dune"]),
-        ({"status": "want", "person_id": "alice"}, []),
+        ({"play_status": "completed", "person_id": "alice"}, ["dune"]),
+        ({"play_status": "backlog", "person_id": "alice"}, []),
+        ({"play_status": "backlog", "person_id": "carol"}, ["dune"]),
         ({"limit": 1}, ["dune"]),
     ],
 )
@@ -219,7 +225,7 @@ def test_people_projection() -> None:
         "person_id": "alice",
         "name": "Alice",
         "entity_id": "person.alice",
-        "share_reading": True,
+        "share_progress": True,
         "wishlist_todo": None,
         "yearly_goal": None,
     }
@@ -227,23 +233,30 @@ def test_people_projection() -> None:
 
 def test_stats() -> None:
     state = _state()
-    state["reading"]["alice"]["dune"]["finished"] = "2026-03-01"
-    state["reading"]["alice"]["emma"] = {
-        **m.empty_reading(now=NOW),
-        "status": "read",
-        "finished": "2025-12-31",
-    }
-    assert pr.games_read_in_year(state, "alice", 2026) == 1
-    assert pr.games_read_in_year(state, "alice", 2025) == 1
-    assert pr.games_read_in_year(state, "nobody", 2026) == 0
-    state["reading"]["bob"]["emma"] = {
-        **m.empty_reading(now="2026-10-06"),
-        "status": "reading",
-    }
-    state["reading"]["bob"]["gone"] = {**m.empty_reading(now=NOW), "status": "reading"}
-    assert pr.reading_now(state, "bob") == ["Emma", "Dune"]
-    state["reading"]["carol"]["emma"] = {**m.empty_reading(now="2026-01-01")}
-    assert [b["id"] for b in pr.want_to_read(state, "carol")] == ["emma", "dune"]
+    done = {**m.empty_progress(now=NOW), "play_status": "completed"}
+    alice = state["progress"]["alice"]
+    alice["dune"]["ps5"]["completed_at"] = "2026-03-01"
+    alice["dune"]["pc"] = {**done, "completed_at": "2026-04-01"}
+    alice["emma"] = {"ps5": {**done, "completed_at": "2025-12-31"}}
+    alice["gone"] = {"ps5": {**done, "completed_at": "2026-01-01"}}
+    assert pr.games_completed_in_year(state, "alice", 2026) == 1
+    assert pr.games_completed_in_year(state, "alice", 2025) == 1
+    assert pr.games_completed_in_year(state, "nobody", 2026) == 0
+    alice["emma"]["ps5"]["play_status"] = "abandoned"
+    assert pr.games_completed_in_year(state, "alice", 2025) == 0
+    playing = {**m.empty_progress(now="2026-10-06"), "play_status": "playing"}
+    bob = state["progress"]["bob"]
+    bob["emma"] = {"pc": playing, "ps4": {**playing, "updated_at": "2020"}}
+    bob["dune"]["pc"] = {**playing, "updated_at": "2026-10-07"}
+    bob["gone"] = {"ps5": playing}
+    assert pr.playing_now(state, "bob") == ["Dune", "Emma"]
+    assert pr.playing_now(state, "nobody") == []
+    carol = state["progress"]["carol"]
+    carol["emma"] = {"pc": m.empty_progress(now="2026-01-01")}
+    carol["dune"]["pc"] = m.empty_progress(now="2027-01-01")
+    carol["gone"] = {"pc": m.empty_progress(now="2020-01-01")}
+    rows = [(g["id"], p) for g, p in pr.backlog(state, "carol")]
+    assert rows == [("emma", "pc"), ("dune", "ps5"), ("dune", "pc")]
     assert pr.owned_game_count(state) == 1
     assert pr.loans_out_count(state) == 1
     state["loans"]["l1"]["due"] = "2026-10-04"
@@ -260,7 +273,8 @@ def test_project_state_is_fast_for_5000_games() -> None:
         state["games"][game["id"]] = game
         copy = m.build_copy({"game_id": game["id"]}, now=NOW)
         state["copies"][copy["id"]] = copy
-        state["reading"].setdefault("alice", {})[game["id"]] = m.empty_reading(now=NOW)
+        rows = state["progress"].setdefault("alice", {})
+        rows[game["id"]] = {"ps5": m.empty_progress(now=NOW)}
     start = time.perf_counter()
     reply = pr.project_state(
         state,
@@ -281,13 +295,16 @@ def _export_section() -> dict:
         "format": 1,
         "copies": [{"id": "c", "price": 3, "value": 4, "acquired_from": "Shop"}],
         "loans": [{"id": "l", "party": "Sam", "due": None}],
-        "reading": [
-            {"person_id": "a", "games": [{"game_id": "b", "private_notes": "x"}]}
+        "progress": [
+            {
+                "person_id": "a",
+                "games": [{"game_id": "b", "platform": "pc", "review": "x"}],
+            }
         ],
         "people": [
             {
                 "person_id": "a",
-                "share_reading": True,
+                "share_progress": True,
                 "wishlist_todo": "todo.x",
                 "wishlist_todo_name": "X",
             }
@@ -308,7 +325,9 @@ def test_project_export_non_admin_never_leaks() -> None:
     out = pr.project_export(section, is_admin=False)
     assert out["copies"] == [{"id": "c"}]
     assert out["loans"] == [{"id": "l", "due": None}]
-    assert out["reading"] == [{"person_id": "a", "games": [{"game_id": "b"}]}]
-    assert out["people"] == [{"person_id": "a", "share_reading": True}]
+    assert out["progress"] == [
+        {"person_id": "a", "games": [{"game_id": "b", "platform": "pc"}]}
+    ]
+    assert out["people"] == [{"person_id": "a", "share_progress": True}]
     assert out["format"] == 1
     assert section == _export_section()

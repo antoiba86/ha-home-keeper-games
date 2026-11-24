@@ -1,7 +1,7 @@
 """Component tests: each change that keeps the record fires an event.
 
-A copy change with no move, a loan change, a deleted loan, a reading change
-that keeps the status, the settings of a person and the currency each fire a
+A copy change with no move, a loan change, a deleted loan, a progress change
+that keeps the play status, the settings of a person and the currency each fire a
 ``home_keeper_games_<noun>_<verb>`` event from the store.
 """
 
@@ -64,22 +64,19 @@ async def test_loan_updated_and_removed(hass, setup_entry, call) -> None:
     assert "changed_fields" not in removed[0].data
 
 
-async def test_reading_updated_keeps_the_notes_private(hass, setup_entry, call) -> None:
-    updated = async_capture_events(hass, EVENT("reading_updated"))
-    changed = async_capture_events(hass, EVENT("reading_changed"))
+async def test_progress_updated_keeps_the_review_private(
+    hass, setup_entry, call
+) -> None:
+    updated = async_capture_events(hass, EVENT("progress_updated"))
+    changed = async_capture_events(hass, EVENT("progress_changed"))
     game = await _game(call)
-    await call(
-        "set_reading", {"game_id": game["id"], "person_id": BOB, "status": "reading"}
-    )
+    key = {"game_id": game["id"], "person_id": BOB, "platform": "ps5"}
+    await call("set_progress", {**key, "play_status": "playing"})
     assert len(changed) == 1 and updated == []
+    assert changed[0].data["platform"] == "ps5"
     await call(
-        "set_reading",
-        {
-            "game_id": game["id"],
-            "person_id": BOB,
-            "page": 40,
-            "private_notes": "secret",
-        },
+        "set_progress",
+        {**key, "playtime_minutes": 40, "review": "secret"},
     )
     assert len(changed) == 1
     assert [e.data for e in updated] == [
@@ -88,12 +85,13 @@ async def test_reading_updated_keeps_the_notes_private(hass, setup_entry, call) 
             "title": "Dune",
             "person_id": BOB,
             "origin": None,
-            "status": "reading",
-            "changed_fields": ["page", "private_notes"],
+            "platform": "ps5",
+            "play_status": "playing",
+            "changed_fields": ["playtime_minutes", "review"],
         }
     ]
     assert "secret" not in str(updated[0].data)
-    await call("set_reading", {"game_id": game["id"], "person_id": BOB, "page": 40})
+    await call("set_progress", {**key, "playtime_minutes": 40})
     assert len(updated) == 1
 
 
@@ -101,16 +99,16 @@ async def test_person_settings_updated(hass, setup_entry, call, todo_list) -> No
     updated = async_capture_events(hass, EVENT("person_settings_updated"))
     await call(
         "set_person_settings",
-        {"person_id": BOB, "share_reading": False, "wishlist_todo": todo_list},
+        {"person_id": BOB, "share_progress": False, "wishlist_todo": todo_list},
     )
     assert [e.data for e in updated] == [
         {
             "person_id": BOB,
-            "changed_fields": ["share_reading", "wishlist_todo"],
+            "changed_fields": ["share_progress", "wishlist_todo"],
             "origin": None,
         }
     ]
-    await call("set_person_settings", {"person_id": BOB, "share_reading": False})
+    await call("set_person_settings", {"person_id": BOB, "share_progress": False})
     assert len(updated) == 1
 
 

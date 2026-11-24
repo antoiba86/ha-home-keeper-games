@@ -50,16 +50,16 @@
       "loans_overdue": {
         "name": "Forsinkede udlån"
       },
-      "games_read_this_year": {
-        "name": "{person} læste bøger i år"
+      "games_completed_this_year": {
+        "name": "{person} spil gennemført i år"
       },
-      "reading_now": {
-        "name": "{person} læser nu"
+      "playing_now": {
+        "name": "{person} spiller nu"
       }
     },
     "todo": {
-      "to_read": {
-        "name": "{person} vil læse"
+      "backlog": {
+        "name": "{person} spil til senere"
       }
     }
   },
@@ -550,45 +550,53 @@
         }
       }
     },
-    "set_reading": {
-      "name": "Angiv læsestatus",
-      "description": "Angiv læsestatussen for en bog for en person. En bruger, der ikke er administrator, kan kun angive sin egen status.",
+    "set_progress": {
+      "name": "Angiv fremskridt",
+      "description": "Angiver fremskridtet for et spil på en platform for en person. En bruger uden administratorrettigheder kan kun angive sit eget fremskridt.",
       "fields": {
         "game_id": {
-          "name": "Bog",
-          "description": "Bogens ID."
+          "name": "Spil",
+          "description": "Spillets ID."
         },
         "person_id": {
           "name": "Person",
           "description": "ID for personen i Home Assistant."
         },
-        "status": {
-          "name": "Læsestatus",
-          "description": "Læsestatussen."
+        "platform": {
+          "name": "Platform",
+          "description": "Konsollen. Tom for at bruge platformen for spillets eksemplarer."
+        },
+        "play_status": {
+          "name": "Spilstatus",
+          "description": "Spilstatussen. none fjerner fremskridtet."
         },
         "rating": {
           "name": "Bedømmelse",
           "description": "En bedømmelse fra 1 til 5."
         },
-        "page": {
-          "name": "Side",
-          "description": "Den aktuelle side."
+        "playtime_minutes": {
+          "name": "Spilletid",
+          "description": "Spilletiden i minutter."
         },
-        "started": {
+        "started_at": {
           "name": "Påbegyndt",
           "description": "Startdatoen."
         },
-        "finished": {
-          "name": "Færdiglæst",
-          "description": "Datoen, hvor bogen blev færdiglæst."
+        "completed_at": {
+          "name": "Gennemført",
+          "description": "Datoen, hvor spillet blev gennemført."
         },
-        "read_count": {
-          "name": "Antal læsninger",
-          "description": "Antallet af gange, bogen er blevet læst."
+        "last_played_at": {
+          "name": "Sidst spillet",
+          "description": "Datoen, hvor spillet sidst blev spillet."
         },
-        "private_notes": {
-          "name": "Private noter",
-          "description": "Noter, som kun personen kan læse."
+        "completion_count": {
+          "name": "Gange gennemført",
+          "description": "Antallet af gange, spillet blev gennemført."
+        },
+        "review": {
+          "name": "Anmeldelse",
+          "description": "En anmeldelse, som kun personen kan læse."
         }
       }
     },
@@ -806,13 +814,13 @@
           "name": "Person",
           "description": "ID for personen i Home Assistant."
         },
-        "share_reading": {
-          "name": "Del læsestatus",
-          "description": "Andre brugere ser statussen. Når den er slået fra, er personens sensorer og opgaveliste utilgængelige."
+        "share_progress": {
+          "name": "Del fremskridt",
+          "description": "Andre brugere kan se fremskridtet. Når det er slået fra, er personens sensorer og opgaveliste utilgængelige."
         },
         "yearly_goal": {
           "name": "Årsmål",
-          "description": "Antallet af bøger, der skal læses i år."
+          "description": "Antallet af spil, der skal gennemføres i år."
         },
         "wishlist_todo": {
           "name": "Ønskeliste",
@@ -846,13 +854,13 @@
           "name": "Hylde",
           "description": "Hyldens ID. Tom for ingen hylde."
         },
-        "import_notes": {
-          "name": "Importér noter",
-          "description": "Importér anmeldelser og noter som private noter."
+        "import_review": {
+          "name": "Importér anmeldelser",
+          "description": "Importér filens anmeldelser som private anmeldelser."
         },
-        "replace_reading": {
-          "name": "Erstat læsestatus",
-          "description": "Erstat en eksisterende læsestatus."
+        "replace_progress": {
+          "name": "Erstat fremskridt",
+          "description": "Erstat det fremskridt, der findes."
         },
         "dry_run": {
           "name": "Prøvekørsel",
@@ -890,9 +898,9 @@
           "name": "Ejet",
           "description": "Kun bøger med et eksemplar, eller kun bøger uden eksemplar."
         },
-        "status": {
-          "name": "Læsestatus",
-          "description": "Læsestatussen."
+        "play_status": {
+          "name": "Spilstatus",
+          "description": "Personens spilstatus på en platform."
         },
         "person_id": {
           "name": "Person",
@@ -1013,6 +1021,9 @@
     },
     "person_not_found": {
       "message": "Ingen person har ID {id}."
+    },
+    "platform_required": {
+      "message": "Vælg platformen. Spillets eksemplarer er på mere end 1 platform, eller spillet har intet eksemplar."
     },
     "no_person": {
       "message": "Din bruger har ingen person i Home Assistant. Knyt en person til brugeren."

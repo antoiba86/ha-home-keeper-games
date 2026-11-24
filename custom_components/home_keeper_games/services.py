@@ -207,16 +207,20 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
         vol.Required("kind"): vol.In(models.COVER_KINDS),
         vol.Optional("file_id"): cv.string,
     },
-    "set_reading": {
+    "set_progress": {
         vol.Required("game_id"): cv.string,
         vol.Optional("person_id"): cv.string,
-        vol.Optional("status"): vol.In((*models.STATUSES, models.STATUS_NONE)),
+        vol.Optional("platform"): _PLATFORM,
+        vol.Optional("play_status"): vol.In(
+            (*models.PLAY_STATUSES, models.STATUS_NONE)
+        ),
         vol.Optional("rating"): _OPT_INT,
-        vol.Optional("page"): _OPT_INT,
-        vol.Optional("started"): _OPT_STR,
-        vol.Optional("finished"): _OPT_STR,
-        vol.Optional("read_count"): vol.Coerce(int),
-        vol.Optional("private_notes"): _OPT_STR,
+        vol.Optional("playtime_minutes"): _OPT_INT,
+        vol.Optional("started_at"): _OPT_STR,
+        vol.Optional("completed_at"): _OPT_STR,
+        vol.Optional("last_played_at"): _OPT_STR,
+        vol.Optional("completion_count"): vol.Coerce(int),
+        vol.Optional("review"): _OPT_STR,
     },
     "lend_game": {vol.Required("copy_id"): cv.string, **_LOAN_FIELDS},
     "borrow_game": {
@@ -257,7 +261,7 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
     },
     "set_person_settings": {
         vol.Required("person_id"): cv.string,
-        vol.Optional("share_reading"): cv.boolean,
+        vol.Optional("share_progress"): cv.boolean,
         vol.Optional("yearly_goal"): _OPT_INT,
         vol.Optional("wishlist_todo"): _OPT_STR,
     },
@@ -266,8 +270,8 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
         vol.Required("content"): cv.string,
         vol.Required("person_id"): cv.string,
         vol.Optional("shelf_id"): _OPT_STR,
-        vol.Optional("import_notes", default=True): cv.boolean,
-        vol.Optional("replace_reading", default=False): cv.boolean,
+        vol.Optional("import_review", default=True): cv.boolean,
+        vol.Optional("replace_progress", default=False): cv.boolean,
         vol.Optional("dry_run", default=False): cv.boolean,
     },
     "export_csv": {vol.Optional("person_id"): _OPT_STR},
@@ -282,7 +286,7 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
         vol.Optional("room_id"): cv.string,
         vol.Optional("shelf_id"): cv.string,
         vol.Optional("owned"): cv.boolean,
-        vol.Optional("status"): vol.In(models.STATUSES),
+        vol.Optional("play_status"): vol.In(models.PLAY_STATUSES),
         vol.Optional("person_id"): cv.string,
         vol.Optional("limit"): vol.All(vol.Coerce(int), vol.Range(min=1)),
     },
@@ -543,15 +547,15 @@ async def _set_cover(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
     return {"game": ctx.game_reply(game)}
 
 
-# ── Reading ──────────────────────────────────────────────────────────────────
+# ── Progress ─────────────────────────────────────────────────────────────────
 
 
-async def _set_reading(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+async def _set_progress(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
     person_id = _self_or_admin(ctx, data.get("person_id"))
-    row = await ctx.store.set_reading(
+    row = await ctx.store.set_progress(
         data["game_id"], person_id, _clean(data, "game_id", "person_id")
     )
-    return {"game_id": data["game_id"], "person_id": person_id, "reading": row}
+    return {"game_id": data["game_id"], "person_id": person_id, "progress": row}
 
 
 # ── Loans ────────────────────────────────────────────────────────────────────
@@ -681,13 +685,13 @@ async def _import_csv(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
             rows,
             person_id=person_id,
             shelf_id=shelf_id,
-            import_notes=data.get("import_notes", True),
-            replace_reading=data.get("replace_reading", False),
+            import_review=data.get("import_review", True),
+            replace_progress=data.get("replace_progress", False),
             now=now(),
         )
     )
     dry_run = data.get("dry_run", False)
-    summary = csv_io.summary_of(counts, counts["reading_kept"])
+    summary = csv_io.summary_of(counts, counts["progress_kept"])
     if not dry_run:
         # The plan ran on a snapshot. The store merges it into the current
         # data, so a change made while the plan ran stays.
@@ -867,14 +871,14 @@ async def _import_data(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
 
 async def _list_games(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
     filters = dict(data)
-    if filters.get("status"):
+    if filters.get("play_status"):
         person_id = filters.get("person_id") or ctx.actor.person_id
         filters["person_id"] = person_id
         shared = models.person_settings(ctx.store.state["people"], str(person_id))
         if (
             not ctx.actor.is_admin
             and person_id != ctx.actor.person_id
-            and not shared["share_reading"]
+            and not shared["share_progress"]
         ):
             return {"games": []}
     return {
@@ -974,7 +978,7 @@ SERVICE_HANDLERS: dict[str, Handler] = {
     "move_copy": _move_copy,
     "delete_copy": _delete_copy,
     "set_cover": _set_cover,
-    "set_reading": _set_reading,
+    "set_progress": _set_progress,
     "lend_game": _lend_game,
     "borrow_game": _borrow_game,
     "return_loan": _return_loan,

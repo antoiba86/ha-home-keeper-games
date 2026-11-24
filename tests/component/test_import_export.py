@@ -56,7 +56,7 @@ async def _todo_items(hass, entity: str) -> list[dict]:
 
 
 async def _library(hass, call, todo_list) -> dict:
-    """A library with a room in an area, a shelf, 2 games, a copy, loans and reading."""
+    """A library with a room in an area, a shelf, 2 games, a copy, loans, progress."""
     area = ar.async_get(hass).async_create("Living room")
     room = (await call("add_room", {"name": "Study", "area_id": area.id}))["room"]
     case = (await call("add_unit", {"room_id": room["id"], "name": "Oak"}))["unit"]
@@ -76,7 +76,8 @@ async def _library(hass, call, todo_list) -> dict:
         )
     )["loan"]
     await call(
-        "set_reading", {"game_id": dune["id"], "person_id": ALICE, "status": "read"}
+        "set_progress",
+        {"game_id": dune["id"], "person_id": ALICE, "play_status": "completed"},
     )
     await call("set_person_settings", {"person_id": BOB, "wishlist_todo": todo_list})
     emma = (
@@ -125,7 +126,8 @@ async def test_export_data_reply(hass, setup_entry, call, todo_list) -> None:
     data = reply["data"]
     assert data["rooms"][0]["area_id"] == ids["area"]
     assert data["rooms"][0]["area_name"] == "Living room"
-    assert data["reading"][0]["person_name"] == "Alice"
+    assert data["progress"][0]["person_name"] == "Alice"
+    assert data["progress"][0]["games"][0]["platform"] == "other"
     people = {p["person_id"]: p for p in data["people"]}
     assert people[BOB]["wishlist_todo"] == todo_list
     assert people[BOB]["wishlist_todo_name"] == "Books"
@@ -170,7 +172,8 @@ async def test_import_data_into_a_new_install(
     state = coordinator(setup_entry).store.state
     assert set(state["games"]) == {ids["dune"], ids["emma"]}
     assert state["rooms"][ids["room"]]["area_id"] == ids["area"]
-    assert state["reading"][ALICE][ids["dune"]]["status"] == "read"
+    row = state["progress"][ALICE][ids["dune"]]["other"]
+    assert row["play_status"] == "completed"
     # The loan sync made the Home Keeper task again.
     task_id = state["loans"][ids["loan"]]["hk_task_id"]
     assert task_id in _fake(hass)["tasks"]
@@ -206,7 +209,7 @@ async def test_import_data_reports_problems(hass, setup_entry, call) -> None:
         {
             "document": {
                 "games": [{"title": "A"}, {"title": "B", "igdb_id": 0}],
-                "reading": [{"person_id": "gone", "person_name": "Zed", "games": []}],
+                "progress": [{"person_id": "gone", "person_name": "Zed", "games": []}],
             }
         },
     )
@@ -219,7 +222,7 @@ async def test_import_data_reports_problems(hass, setup_entry, call) -> None:
         },
         {
             "level": "warning",
-            "path": "reading[0].person_id",
+            "path": "progress[0].person_id",
             "message": "No person matches Zed.",
         },
     ]

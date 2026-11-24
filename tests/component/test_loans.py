@@ -125,7 +125,7 @@ async def test_delete_in_home_keeper_and_in_the_library(
     )
 
 
-async def test_borrow_game_sets_reading(hass, setup_entry, call) -> None:
+async def test_borrow_game_keeps_the_progress(hass, setup_entry, call) -> None:
     reply = await call(
         "borrow_game",
         {
@@ -140,7 +140,7 @@ async def test_borrow_game_sets_reading(hass, setup_entry, call) -> None:
     assert loan["direction"] == "in" and loan["copy_id"] is None
     assert loan["person_id"] == BOB and loan["format"] == "digital"
     assert reply["game"]["owned"] is False
-    assert reply["game"]["reading"][BOB]["status"] == "reading"
+    assert reply["game"]["progress"] == {}
     add = _calls(hass, "add_task")[0]
     assert add["name"] == "Return Emma to City library"
 

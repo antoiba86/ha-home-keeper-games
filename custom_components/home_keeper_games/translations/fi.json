@@ -50,16 +50,16 @@
       "loans_overdue": {
         "name": "Myöhässä olevat lainat"
       },
-      "games_read_this_year": {
-        "name": "{person} luetut kirjat tänä vuonna"
+      "games_completed_this_year": {
+        "name": "{person} tänä vuonna läpäistyt pelit"
       },
-      "reading_now": {
-        "name": "{person} lukee nyt"
+      "playing_now": {
+        "name": "{person} pelaa nyt"
       }
     },
     "todo": {
-      "to_read": {
-        "name": "{person} haluaa lukea"
+      "backlog": {
+        "name": "{person} pelattavat"
       }
     }
   },
@@ -550,45 +550,53 @@
         }
       }
     },
-    "set_reading": {
-      "name": "Aseta lukutila",
-      "description": "Aseta kirjan lukutila henkilölle. Käyttäjä, joka ei ole ylläpitäjä, voi asettaa vain oman tilansa.",
+    "set_progress": {
+      "name": "Aseta edistyminen",
+      "description": "Asettaa henkilön edistymisen pelissä alustalla. Muu kuin ylläpitäjä voi asettaa vain oman edistymisensä.",
       "fields": {
         "game_id": {
-          "name": "Kirja",
-          "description": "Kirjan ID."
+          "name": "Peli",
+          "description": "Pelin tunnus."
         },
         "person_id": {
           "name": "Henkilö",
           "description": "Home Assistant -henkilön ID."
         },
-        "status": {
-          "name": "Lukutila",
-          "description": "Lukutila."
+        "platform": {
+          "name": "Alusta",
+          "description": "Konsoli. Tyhjä käyttää pelin kopioiden alustaa."
+        },
+        "play_status": {
+          "name": "Pelitila",
+          "description": "Pelitila. none poistaa edistymisen."
         },
         "rating": {
           "name": "Arvosana",
           "description": "Arvosana 1–5."
         },
-        "page": {
-          "name": "Sivu",
-          "description": "Nykyinen sivu."
+        "playtime_minutes": {
+          "name": "Peliaika",
+          "description": "Peliaika minuutteina."
         },
-        "started": {
+        "started_at": {
           "name": "Aloitettu",
           "description": "Aloituspäivä."
         },
-        "finished": {
-          "name": "Luettu loppuun",
-          "description": "Päivä, jona kirja luettiin loppuun."
+        "completed_at": {
+          "name": "Läpäisty",
+          "description": "Päivä, jolloin peli läpäistiin."
         },
-        "read_count": {
-          "name": "Lukukerrat",
-          "description": "Kuinka monta kertaa kirja on luettu."
+        "last_played_at": {
+          "name": "Viimeksi pelattu",
+          "description": "Päivä, jolloin peliä viimeksi pelattiin."
         },
-        "private_notes": {
-          "name": "Yksityiset muistiinpanot",
-          "description": "Muistiinpanot, jotka vain henkilö voi lukea."
+        "completion_count": {
+          "name": "Läpäisykerrat",
+          "description": "Kuinka monta kertaa peli läpäistiin."
+        },
+        "review": {
+          "name": "Arvio",
+          "description": "Arvio, jonka vain henkilö voi lukea."
         }
       }
     },
@@ -806,13 +814,13 @@
           "name": "Henkilö",
           "description": "Home Assistant -henkilön ID."
         },
-        "share_reading": {
-          "name": "Jaa lukutila",
-          "description": "Muut käyttäjät näkevät tilan. Kun asetus on pois päältä, henkilön anturit ja tehtävälista eivät ole käytettävissä."
+        "share_progress": {
+          "name": "Jaa edistyminen",
+          "description": "Muut käyttäjät näkevät edistymisen. Kun pois päältä, henkilön anturit ja tehtävälista eivät ole käytettävissä."
         },
         "yearly_goal": {
           "name": "Vuositavoite",
-          "description": "Tänä vuonna luettavien kirjojen määrä."
+          "description": "Tänä vuonna läpäistävien pelien määrä."
         },
         "wishlist_todo": {
           "name": "Toivelista",
@@ -846,13 +854,13 @@
           "name": "Hyllytaso",
           "description": "Hyllytason ID. Tyhjä, jos hyllytasoa ei ole."
         },
-        "import_notes": {
-          "name": "Tuo muistiinpanot",
-          "description": "Tuo arviot ja muistiinpanot yksityisinä muistiinpanoina."
+        "import_review": {
+          "name": "Tuo arviot",
+          "description": "Tuo tiedoston arviot yksityisinä arvioina."
         },
-        "replace_reading": {
-          "name": "Korvaa lukutila",
-          "description": "Korvaa olemassa oleva lukutila."
+        "replace_progress": {
+          "name": "Korvaa edistyminen",
+          "description": "Korvaa olemassa oleva edistyminen."
         },
         "dry_run": {
           "name": "Koeajo",
@@ -890,9 +898,9 @@
           "name": "Omistettu",
           "description": "Vain kirjat, joilla on kappale, tai vain kirjat ilman kappaletta."
         },
-        "status": {
-          "name": "Lukutila",
-          "description": "Lukutila."
+        "play_status": {
+          "name": "Pelitila",
+          "description": "Henkilön pelitila alustalla."
         },
         "person_id": {
           "name": "Henkilö",
@@ -1013,6 +1021,9 @@
     },
     "person_not_found": {
       "message": "Millään henkilöllä ei ole ID:tä {id}."
+    },
+    "platform_required": {
+      "message": "Valitse alusta. Pelin kopiot ovat useammalla kuin 1 alustalla, tai pelillä ei ole kopiota."
     },
     "no_person": {
       "message": "Käyttäjälläsi ei ole Home Assistant -henkilöä. Yhdistä henkilö käyttäjään."

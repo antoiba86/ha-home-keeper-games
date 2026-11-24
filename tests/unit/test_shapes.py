@@ -36,15 +36,17 @@ def test_empty_row() -> None:
         "owned": 0,
         "copy": None,
         "location": [],
-        "status": None,
+        "platform": None,
+        "play_status": None,
         "wishlist": False,
         "wishlist_buy": False,
         "rating": None,
-        "page": None,
-        "started": None,
-        "finished": None,
-        "read_count": None,
-        "notes": "",
+        "playtime_minutes": None,
+        "started_at": None,
+        "completed_at": None,
+        "last_played_at": None,
+        "completion_count": None,
+        "review": "",
         "needs_details": True,
     }
 
@@ -205,9 +207,11 @@ def test_field_names_in_errors() -> None:
     assert key(m.game_field, "genres", 3)[1] == {"field": "genres"}
     for gone in ("authors", "pages", "series", "subtitle", "description"):
         assert key(m.game_field, gone, None)[1] == {"field": gone}
-    assert key(m.reading_field, "started", "x")[1] == {"field": "started"}
-    assert key(m.reading_field, "page", -1)[1]["field"] == "page"
-    assert key(m.reading_field, "private_notes", [])[1] == {"field": "private_notes"}
+    assert key(m.progress_field, "started_at", "x")[1] == {"field": "started_at"}
+    assert key(m.progress_field, "playtime_minutes", -1)[1]["field"] == (
+        "playtime_minutes"
+    )
+    assert key(m.progress_field, "review", [])[1] == {"field": "review"}
     assert key(m.update_location, "room", {"name": "a"}, {"area_id": []})[1] == {
         "field": "area_id"
     }
@@ -226,8 +230,8 @@ def test_field_names_in_errors() -> None:
     assert key(m.update_loan, loan, {"note": []})[1] == {"field": "note"}
     assert key(m.update_loan, loan, {"format": "x"})[1]["field"] == "format"
     assert key(m.update_loan, loan, {"due": "x"})[1] == {"field": "due"}
-    assert key(m.apply_person_settings, {}, {"share_reading": 1})[1] == {
-        "field": "share_reading"
+    assert key(m.apply_person_settings, {}, {"share_progress": 1})[1] == {
+        "field": "share_progress"
     }
     assert key(m.apply_person_settings, {}, {"yearly_goal": 0})[1]["field"] == (
         "yearly_goal"
@@ -267,11 +271,12 @@ def _two_games() -> dict:
         copy = m.build_copy({"game_id": "a"}, now=stamp)
         copy["id"] = copy_id
         state["copies"][copy_id] = copy
-    state["reading"]["p"] = {"a": {**m.empty_reading(now=NOW), "status": "read"}}
+    done = {**m.empty_progress(now=NOW), "play_status": "completed"}
+    state["progress"]["p"] = {"a": {"other": done}}
     return state
 
 
-def test_rows_from_state_order_and_reading() -> None:
+def test_rows_from_state_order_and_progress() -> None:
     state = _two_games()
     rows = cio.rows_from_state(state, "p")
     assert [(r["game_id"], (r["copy"] or {}).get("id")) for r in rows] == [
@@ -280,8 +285,10 @@ def test_rows_from_state_order_and_reading() -> None:
         ("a", "c1"),
     ]
     assert [r["line"] for r in rows] == [1, 2, 3]
-    assert rows[1]["status"] == "read" and rows[0]["status"] is None
-    assert cio.rows_from_state(state, None)[1]["status"] is None
+    assert rows[1]["play_status"] == "completed" and rows[0]["play_status"] is None
+    assert rows[2]["play_status"] is None, "only the first row of a platform"
+    assert rows[1]["platform"] == "other" and rows[0]["platform"] is None
+    assert cio.rows_from_state(state, None)[1]["play_status"] is None
     assert [r["owned"] for r in rows] == [0, 2, 2]
 
 
@@ -290,14 +297,14 @@ def test_cells() -> None:
     row.update(
         title="T",
         barcode="9780441478125",
-        status="read",
+        play_status="completed",
         rating=4,
-        finished="2026-01-02",
-        read_count=2,
+        completed_at="2026-01-02",
+        completion_count=2,
         tags=["fav"],
         owned=1,
         copy={"format": "digital"},
-        notes="n",
+        review="n",
     )
     row.update(
         game_id="b",
@@ -319,8 +326,9 @@ def test_cells() -> None:
             "note": "cn",
         },
         location=["R", "B", "S"],
-        page=9,
-        started="2025-12-01",
+        playtime_minutes=9,
+        started_at="2025-12-01",
+        last_played_at="2026-01-01",
         wishlist=True,
         wishlist_buy=False,
         genres=["x", "y"],
@@ -353,13 +361,14 @@ def test_cells() -> None:
         "value": "",
         "copy_note": "cn",
         "location": "R / B / S",
-        "status": "read",
+        "play_status": "completed",
         "rating": "4",
-        "page": "9",
-        "started": "2025-12-01",
-        "finished": "2026-01-02",
-        "read_count": "2",
-        "private_notes": "n",
+        "playtime_minutes": "9",
+        "started_at": "2025-12-01",
+        "completed_at": "2026-01-02",
+        "last_played_at": "2026-01-01",
+        "completion_count": "2",
+        "review": "n",
         "wishlist": "true",
         "wishlist_buy": "false",
     }
@@ -368,6 +377,9 @@ def test_cells() -> None:
     assert empty["game_id"] == "" and empty["franchise"] == ""
     assert empty["igdb_id"] == "" and empty["genres"] == ""
     assert empty["barcode"] == ""
+    assert cio._library_cells({**cio.empty_row(1), "platform": "pc"})["platform"] == (
+        "pc"
+    )
     assert empty["wishlist"] == "false" and empty["format"] == ""
 
 
@@ -420,11 +432,12 @@ def test_game_detail_order_and_projection() -> None:
         "l1": {"id": "l1", "game_id": "a", "started": "2026-01-01", "party": "Y"},
         "l3": {"id": "l3", "game_id": "z", "started": "2026-01-01", "party": "Z"},
     }
-    state["reading"]["q"] = {"a": {**m.empty_reading(now=NOW), "private_notes": "s"}}
+    row = {**m.empty_progress(now=NOW), "review": "s"}
+    state["progress"]["q"] = {"a": {"other": row}}
     detail = pr.game_detail(state, "a", viewer="p", is_admin=False)
     assert [c["id"] for c in detail["copies"]] == ["c2", "c1"]
     assert [lo["id"] for lo in detail["loans"]] == ["l1", "l2"]
-    assert "private_notes" not in detail["reading"]["q"]
+    assert "review" not in detail["progress"]["q"]["other"]
     assert "party" not in detail["loans"][0]
 
 

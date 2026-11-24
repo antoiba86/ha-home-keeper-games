@@ -1,8 +1,8 @@
 """Constants for Home Keeper Games.
 
 Home Keeper Games is a companion of Home Keeper. It stores the games of a
-household: the rooms, units and shelves where the copies are, the reading
-status of each person, the loans and the wishlist. The admin UI is a tab in the
+household: the rooms, units and shelves where the copies are, the play
+progress of each person, the loans and the wishlist. The admin UI is a tab in the
 Home Keeper panel. The usage surfaces are the card, the per-person entities and
 the services.
 
@@ -84,8 +84,8 @@ MAX_IMPORT_ROW_RESULTS = 200
 # The overdue loan check interval.
 OVERDUE_CHECK_INTERVAL_S = 60 * 60
 
-# The number of titles that the "Reading now" sensor lists.
-READING_NOW_MAX_TITLES = 10
+# The number of titles that the "Playing now" sensor lists.
+PLAYING_NOW_MAX_TITLES = 10
 
 # The origin marker that this integration sends to Home Keeper, and that it reads
 # back in the events of Home Keeper to stop a loop.
@@ -109,9 +109,9 @@ EVENT_COPY_ADDED = f"{DOMAIN}_copy_added"
 EVENT_COPY_MOVED = f"{DOMAIN}_copy_moved"
 EVENT_COPY_UPDATED = f"{DOMAIN}_copy_updated"
 EVENT_COPY_REMOVED = f"{DOMAIN}_copy_removed"
-EVENT_READING_CHANGED = f"{DOMAIN}_reading_changed"
-EVENT_READING_UPDATED = f"{DOMAIN}_reading_updated"
-EVENT_GAME_FINISHED = f"{DOMAIN}_game_finished"
+EVENT_PROGRESS_CHANGED = f"{DOMAIN}_progress_changed"
+EVENT_PROGRESS_UPDATED = f"{DOMAIN}_progress_updated"
+EVENT_GAME_COMPLETED = f"{DOMAIN}_game_completed"
 EVENT_LOAN_STARTED = f"{DOMAIN}_loan_started"
 EVENT_LOAN_RETURNED = f"{DOMAIN}_loan_returned"
 EVENT_LOAN_OVERDUE = f"{DOMAIN}_loan_overdue"

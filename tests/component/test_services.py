@@ -164,14 +164,14 @@ async def test_games_and_duplicates(hass, setup_entry, call) -> None:
 async def test_delete_game_cascades(hass, setup_entry, call) -> None:
     game = await _game(call)
     copy = (await call("add_copy", {"game_id": game["id"]}))["copy"]
-    await call("set_reading", {"game_id": game["id"], "status": "reading"})
+    await call("set_progress", {"game_id": game["id"], "play_status": "playing"})
     await call("lend_game", {"copy_id": copy["id"], "party": "Zed", "add_task": False})
     removed = async_capture_events(hass, EVENT("game_removed"))
     copies_removed = async_capture_events(hass, EVENT("copy_removed"))
     await call("delete_game", {"game_id": game["id"]})
     state = setup_entry.runtime_data.store.state
     assert state["games"] == {} and state["copies"] == {}
-    assert state["loans"] == {} and state["reading"] == {}
+    assert state["loans"] == {} and state["progress"] == {}
     assert removed[0].data["game_id"] == game["id"]
     assert copies_removed[0].data["copy_id"] == copy["id"]
 
@@ -226,37 +226,43 @@ async def test_copies(hass, setup_entry, call) -> None:
     assert info.value.translation_key == "copy_on_loan"
 
 
-async def test_set_reading_gates_and_events(hass, setup_entry, call) -> None:
+async def test_set_progress_gates_and_events(hass, setup_entry, call) -> None:
     game = await _game(call)
-    changed = async_capture_events(hass, EVENT("reading_changed"))
-    finished = async_capture_events(hass, EVENT("game_finished"))
-    reply = await call(
-        "set_reading", {"game_id": game["id"], "status": "read"}, as_="user"
-    )
-    assert reply["person_id"] == BOB and reply["reading"]["read_count"] == 1
-    assert changed[0].data["status"] == "read"
+    changed = async_capture_events(hass, EVENT("progress_changed"))
+    completed = async_capture_events(hass, EVENT("game_completed"))
+    key = {"game_id": game["id"], "platform": "switch"}
+    reply = await call("set_progress", {**key, "play_status": "completed"}, as_="user")
+    assert reply["person_id"] == BOB and reply["progress"]["completion_count"] == 1
+    assert reply["progress"]["platform"] == "switch"
+    assert changed[0].data["play_status"] == "completed"
+    assert changed[0].data["platform"] == "switch"
     assert changed[0].data["previous_status"] is None
-    assert finished[0].data["person_id"] == BOB
+    assert completed[0].data["person_id"] == BOB
+    assert completed[0].data["platform"] == "switch"
+    same = await call("set_progress", {**key, "play_status": "completed"}, as_="user")
+    assert same["progress"]["platform"] == "switch" and len(changed) == 1
     with pytest.raises(Unauthorized):
-        await call(
-            "set_reading", {"game_id": game["id"], "person_id": ALICE}, as_="user"
-        )
-    reply = await call(
-        "set_reading", {"game_id": game["id"], "person_id": CAROL, "rating": 4}
-    )
-    assert reply["reading"]["rating"] == 4 and reply["reading"]["status"] == "want"
+        await call("set_progress", {**key, "person_id": ALICE}, as_="user")
+    reply = await call("set_progress", {**key, "person_id": CAROL, "rating": 4})
+    assert reply["progress"]["rating"] == 4
+    assert reply["progress"]["play_status"] == "backlog"
     with pytest.raises(ServiceValidationError) as info:
-        await call("set_reading", {"game_id": game["id"]}, as_=None)
+        await call("set_progress", key, as_=None)
     assert info.value.translation_key == "no_person"
     with pytest.raises(ServiceValidationError) as info:
-        await call("set_reading", {"game_id": game["id"], "person_id": "ghost"})
+        await call("set_progress", {**key, "person_id": "ghost"})
     assert info.value.translation_key == "person_not_found"
-    reply = await call(
-        "set_reading", {"game_id": game["id"], "status": "none"}, as_="user"
-    )
-    assert reply["reading"] is None
-    assert changed[-1].data["status"] is None
-    assert changed[-1].data["previous_status"] == "read"
+    with pytest.raises(ServiceValidationError) as info:
+        await call("set_progress", {"game_id": game["id"], "play_status": "playing"})
+    assert info.value.translation_key == "platform_required"
+    reply = await call("set_progress", {**key, "play_status": "none"}, as_="user")
+    assert reply["progress"] is None
+    assert changed[-1].data["play_status"] is None
+    assert changed[-1].data["previous_status"] == "completed"
+    reply = await call("set_progress", {**key, "play_status": "none"}, as_="user")
+    assert reply["progress"] is None and len(changed) == 3
+    rows = setup_entry.runtime_data.store.state["progress"]
+    assert BOB not in rows and set(rows[CAROL][game["id"]]) == {"switch"}
 
 
 async def test_read_services_project_for_a_non_admin(hass, setup_entry, call) -> None:
@@ -276,43 +282,45 @@ async def test_read_services_project_for_a_non_admin(hass, setup_entry, call) ->
     await call("lend_game", {"copy_id": copy_id, "party": "Zed", "add_task": False})
     for person in (ALICE, CAROL):
         await call(
-            "set_reading",
+            "set_progress",
             {
                 "game_id": game["id"],
                 "person_id": person,
-                "status": "read",
-                "private_notes": "secret",
+                "play_status": "completed",
+                "review": "secret",
             },
         )
-    await call("set_person_settings", {"person_id": CAROL, "share_reading": False})
+    await call("set_person_settings", {"person_id": CAROL, "share_progress": False})
     user_games = await call("list_games", {}, as_="user")
     text = str(user_games)
     for secret in ("Zed", "Shop", "secret", "'price'", "'value'"):
         assert secret not in text, secret
-    assert set(user_games["games"][0]["reading"]) == {ALICE}
+    assert set(user_games["games"][0]["progress"]) == {ALICE}
     detail = await call("get_game", {"game_id": game["id"]}, as_="user")
     assert "party" not in detail["game"]["loans"][0]
     assert "price" not in detail["game"]["copies"][0]
     assert detail["game"]["copies"][0]["location"] == ["Den", "Left", "Top"]
     admin = await call("get_game", {"game_id": game["id"]})
     assert admin["game"]["loans"][0]["party"] == "Zed"
-    assert admin["game"]["reading"][CAROL]["private_notes"] == "secret"
+    assert admin["game"]["progress"][CAROL]["other"]["review"] == "secret"
     loans = await call("list_loans", {"status": "open"}, as_="user")
     assert loans["loans"][0]["title"] == "Dune" and "party" not in loans["loans"][0]
     assert (await call("list_loans", {"status": "returned"}))["loans"] == []
     assert (await call("list_loans", {"direction": "in"}))["loans"] == []
     filtered = await call(
-        "list_games", {"status": "read", "person_id": CAROL}, as_="user"
+        "list_games", {"play_status": "completed", "person_id": CAROL}, as_="user"
     )
     assert filtered == {"games": []}
-    own = await call("list_games", {"status": "read", "person_id": ALICE}, as_="user")
+    own = await call(
+        "list_games", {"play_status": "completed", "person_id": ALICE}, as_="user"
+    )
     assert len(own["games"]) == 1
     locations = await call("list_locations", {}, as_="user")
     assert locations["rooms"][0]["units"][0]["shelves"][0]["copies"] == 1
     assert locations["no_shelf"] == 0
     people = await call("list_people", {}, as_="user")
     rows = {p["person_id"]: p for p in people["people"]}
-    assert rows[CAROL]["share_reading"] is False
+    assert rows[CAROL]["share_progress"] is False
     assert "wishlist_todo" not in rows[CAROL] and "wishlist_todo" in rows[BOB]
     with pytest.raises(ServiceValidationError) as info:
         await call("get_game", {"game_id": "nope"}, as_="user")
@@ -386,8 +394,8 @@ async def test_wishlist_services(hass, setup_entry, call) -> None:
 async def test_import_and_export(hass, setup_entry, call) -> None:
     shelf = await _shelf(call)
     csv_text = (
-        "title,genres,barcode,rating,status,format,finished,wishlist\n"
-        "Dune,Strategy,9780441013593,5,read,physical,2024-01-02,false\n"
+        "title,genres,barcode,rating,play_status,format,completed_at,wishlist\n"
+        "Dune,Strategy,9780441013593,5,completed,physical,2024-01-02,false\n"
         "Emma,Puzzle,,,,,,true\n"
     )
     done = async_capture_events(hass, EVENT("import_completed"))
@@ -402,10 +410,10 @@ async def test_import_and_export(hass, setup_entry, call) -> None:
     )
     assert dry["dry_run"] is True and dry["counts"] == {
         "rows": 2,
-        "read": 1,
-        "reading": 0,
-        "want": 0,
-        "dnf": 0,
+        "backlog": 0,
+        "playing": 0,
+        "completed": 1,
+        "abandoned": 0,
         "wishlist": 1,
         "copies": 1,
         "tags": 0,
@@ -441,7 +449,7 @@ async def test_import_and_export(hass, setup_entry, call) -> None:
     assert exported["filename"].startswith("games-")
     assert exported["content"].startswith("game_id,title")
     assert ",9780441013593," in exported["content"]
-    assert ",read," in exported["content"]
+    assert ",completed," in exported["content"]
     with pytest.raises(ServiceValidationError) as info:
         await call(
             "import_csv",

@@ -171,7 +171,7 @@ SERVICES: tuple[ServiceSpec, ...] = (
     ServiceSpec("move_copy", response="optional", **_ADMIN),
     ServiceSpec("delete_copy", response="optional", **_ADMIN),
     ServiceSpec("set_cover", response="optional", **_ADMIN),
-    ServiceSpec("set_reading", response="optional", caller_scoped=True),
+    ServiceSpec("set_progress", response="optional", caller_scoped=True),
     ServiceSpec("lend_game", response="optional", **_ADMIN),
     ServiceSpec("borrow_game", response="optional", **_ADMIN),
     ServiceSpec("return_loan", response="optional", **_ADMIN),
@@ -246,7 +246,7 @@ PAYLOAD_SPINES: dict[str, tuple[Field, ...]] = {
         Field("games_added", "int"),
         Field("games_matched", "int"),
         Field("copies_added", "int"),
-        Field("reading_set", "int"),
+        Field("progress_set", "int"),
         Field("wishlist_added", "int"),
         Field("errors", "int"),
         _ORIGIN,
@@ -315,7 +315,7 @@ EVENTS: tuple[EventSpec, ...] = (
     _event(
         "EVENT_GAME_REMOVED",
         "game",
-        "A game was deleted, with its copies, reading rows and loans.",
+        "A game was deleted, with its copies, progress rows and loans.",
     ),
     _event("EVENT_COPY_ADDED", "game", "A copy of a game was added.", _COPY),
     _event(
@@ -332,26 +332,32 @@ EVENTS: tuple[EventSpec, ...] = (
     ),
     _event("EVENT_COPY_REMOVED", "game", "A copy was deleted.", _COPY),
     _event(
-        "EVENT_READING_CHANGED",
+        "EVENT_PROGRESS_CHANGED",
         "game",
-        "The reading row of a person changed. status is None for a removed row.",
-        (Field("status", "str | None"), Field("previous_status", "str | None")),
-    ),
-    _event(
-        "EVENT_READING_UPDATED",
-        "game",
-        "The rating, page, dates, count or notes of a reading row changed, and "
-        "the status stayed. Names the fields, never the notes.",
-        (Field("status", "str"), *_CHANGED),
-    ),
-    _event(
-        "EVENT_GAME_FINISHED",
-        "game",
-        "The reading status of a person became read.",
+        "The play status of a person on a platform changed. play_status is None "
+        "for a removed row.",
         (
-            Field("finished", "str | None", "YYYY-MM-DD."),
+            Field("platform", "str"),
+            Field("play_status", "str | None"),
+            Field("previous_status", "str | None"),
+        ),
+    ),
+    _event(
+        "EVENT_PROGRESS_UPDATED",
+        "game",
+        "The rating, play time, dates, count or review of a progress row changed, "
+        "and the play status stayed. Names the fields, never the review.",
+        (Field("platform", "str"), Field("play_status", "str"), *_CHANGED),
+    ),
+    _event(
+        "EVENT_GAME_COMPLETED",
+        "game",
+        "The play status of a person on a platform became completed.",
+        (
+            Field("platform", "str"),
+            Field("completed_at", "str | None", "YYYY-MM-DD."),
             Field("rating", "int | None"),
-            Field("read_count", "int"),
+            Field("completion_count", "int"),
         ),
     ),
     _event("EVENT_LOAN_STARTED", "game", "A game was lent or borrowed.", _LOAN),
@@ -425,19 +431,19 @@ ENTITY_PLATFORMS: tuple[EntityPlatformSpec, ...] = (
             "games",
             "loans_out",
             "loans_overdue",
-            "games_read_this_year",
-            "reading_now",
+            "games_completed_this_year",
+            "playing_now",
         ),
         attributes=(
-            Field("goal", "int | None", "Games read this year: the yearly goal."),
-            Field("year", "int", "Games read this year: the year."),
-            Field("games", "list[str]", "Reading now: at most 10 titles."),
+            Field("goal", "int | None", "Games completed this year: the yearly goal."),
+            Field("year", "int", "Games completed this year: the year."),
+            Field("games", "list[str]", "Playing now: at most 10 titles."),
             Field("person_id", "str", "The person of a per-person sensor."),
         ),
     ),
     EntityPlatformSpec(
         "todo",
-        translation_keys=("to_read",),
+        translation_keys=("backlog",),
         attributes=(Field("person_id", "str", "The person of the list."),),
     ),
 )
@@ -516,7 +522,7 @@ SURFACE_KINDS: tuple[SurfaceKind, ...] = (
         "Entity platforms",
         "published",
         "A `sensor` platform with library and per-person counts, and a per-person "
-        "`todo` list of the games to read.",
+        "`todo` list of the games in the backlog.",
     ),
     SurfaceKind(
         "Entity attributes",

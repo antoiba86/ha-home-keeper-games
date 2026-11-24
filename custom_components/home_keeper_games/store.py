@@ -28,7 +28,7 @@ from .const import (
     EVENT_COPY_UPDATED,
     EVENT_DATA_IMPORTED,
     EVENT_GAME_ADDED,
-    EVENT_GAME_FINISHED,
+    EVENT_GAME_COMPLETED,
     EVENT_GAME_REMOVED,
     EVENT_GAME_UPDATED,
     EVENT_IMPORT_COMPLETED,
@@ -38,8 +38,8 @@ from .const import (
     EVENT_LOAN_STARTED,
     EVENT_LOAN_UPDATED,
     EVENT_PERSON_SETTINGS_UPDATED,
-    EVENT_READING_CHANGED,
-    EVENT_READING_UPDATED,
+    EVENT_PROGRESS_CHANGED,
+    EVENT_PROGRESS_UPDATED,
     EVENT_ROOM_ADDED,
     EVENT_ROOM_REMOVED,
     EVENT_ROOM_UPDATED,
@@ -193,9 +193,12 @@ class LibraryStore:
             self.shelf(shelf_id)
         return shelf_id or None
 
-    def reading_row(self, person_id: str, game_id: str) -> dict[str, Any] | None:
-        """The reading row of a person for a game."""
-        row = (self.state["reading"].get(person_id) or {}).get(game_id)
+    def progress_row(
+        self, person_id: str, game_id: str, platform: str
+    ) -> dict[str, Any] | None:
+        """The progress row of a person for a game on a platform."""
+        games = self.state["progress"].get(person_id) or {}
+        row = (games.get(game_id) or {}).get(platform)
         return dict(row) if row else None
 
     # ── Rooms, units and shelves ─────────────────────────────────────────
@@ -418,7 +421,7 @@ class LibraryStore:
     async def delete_game(
         self, game_id: str, *, origin: str | None = None
     ) -> dict[str, Any]:
-        """Delete a game with its copies, reading rows and loans."""
+        """Delete a game with its copies, progress rows and loans."""
         game = self.game(game_id)
         fired: list[Event] = []
         for copy_id in [
@@ -428,9 +431,9 @@ class LibraryStore:
             fired.append(
                 (EVENT_COPY_REMOVED, events.copy_event_data(game, copy, origin))
             )
-        for rows in self.state["reading"].values():
-            rows.pop(game_id, None)
-        self.state["reading"] = {p: r for p, r in self.state["reading"].items() if r}
+        for games in self.state["progress"].values():
+            games.pop(game_id, None)
+        self.state["progress"] = {p: g for p, g in self.state["progress"].items() if g}
         for loan_id in [
             lo["id"] for lo in self.state["loans"].values() if lo["game_id"] == game_id
         ]:
@@ -538,35 +541,38 @@ class LibraryStore:
         await self._commit([(EVENT_COPY_REMOVED, payload)])
         return record
 
-    # ── Reading ──────────────────────────────────────────────────────────────
+    # ── Progress ─────────────────────────────────────────────────────────────
 
-    def _reading_events(
+    def _progress_events(
         self,
         game: dict[str, Any],
         person_id: str,
+        platform: str,
         row: dict[str, Any] | None,
         previous: str | None,
         origin: str | None,
     ) -> list[Event]:
-        status = row["status"] if row else None
+        status = row["play_status"] if row else None
         fired: list[Event] = [
             (
-                EVENT_READING_CHANGED,
-                events.reading_changed_event_data(
-                    game, person_id, status, previous, origin
+                EVENT_PROGRESS_CHANGED,
+                events.progress_changed_event_data(
+                    game, person_id, platform, status, previous, origin
                 ),
             )
         ]
-        if row is not None and status == "read" and previous != "read":
+        if row is not None and status == "completed" and previous != "completed":
             fired.append(
                 (
-                    EVENT_GAME_FINISHED,
-                    events.game_finished_event_data(game, person_id, row, origin),
+                    EVENT_GAME_COMPLETED,
+                    events.game_completed_event_data(
+                        game, person_id, platform, row, origin
+                    ),
                 )
             )
         return fired
 
-    async def set_reading(
+    async def set_progress(
         self,
         game_id: str,
         person_id: str,
@@ -574,32 +580,46 @@ class LibraryStore:
         *,
         origin: str | None = None,
     ) -> dict[str, Any] | None:
-        """Set the reading row of a person. Status ``none`` removes the row."""
+        """Set the progress row of a person on a platform.
+
+        ``play_status: none`` removes the row. With no ``platform``, the row is on
+        the platform of the copies (:func:`models.progress_platform`). The reply
+        has the ``platform`` of the row.
+        """
         game = self.game(game_id)
-        current = self.reading_row(person_id, game_id)
-        previous = current["status"] if current else None
-        if data.get("status") == models.STATUS_NONE:
+        platform = models.progress_platform(self.state, game_id, data.get("platform"))
+        current = self.progress_row(person_id, game_id, platform)
+        previous = current["play_status"] if current else None
+        if data.get("play_status") == models.STATUS_NONE:
             if current is None:
                 return None
-            del self.state["reading"][person_id][game_id]
-            if not self.state["reading"][person_id]:
-                del self.state["reading"][person_id]
-            fired = self._reading_events(game, person_id, None, previous, origin)
+            games = self.state["progress"][person_id]
+            del games[game_id][platform]
+            if not games[game_id]:
+                del games[game_id]
+            if not games:
+                del self.state["progress"][person_id]
+            fired = self._progress_events(
+                game, person_id, platform, None, previous, origin
+            )
             await self._commit(fired)
             return None
-        row, changed = models.apply_reading(current, data, now=now(), today=today())
+        row, changed = models.apply_progress(current, data, now=now(), today=today())
         if not changed:
-            return row
-        self.state["reading"].setdefault(person_id, {})[game_id] = row
-        if "status" in changed:
-            fired = self._reading_events(game, person_id, row, previous, origin)
-        else:
-            payload = events.reading_updated_event_data(
-                game, person_id, row["status"], changed, origin
+            return {**row, "platform": platform}
+        games = self.state["progress"].setdefault(person_id, {})
+        games.setdefault(game_id, {})[platform] = row
+        if "play_status" in changed:
+            fired = self._progress_events(
+                game, person_id, platform, row, previous, origin
             )
-            fired = [(EVENT_READING_UPDATED, payload)]
+        else:
+            payload = events.progress_updated_event_data(
+                game, person_id, platform, row["play_status"], changed, origin
+            )
+            fired = [(EVENT_PROGRESS_UPDATED, payload)]
         await self._commit(fired)
-        return dict(row)
+        return {**row, "platform": platform}
 
     # ── Loans ────────────────────────────────────────────────────────────────
 
@@ -608,9 +628,7 @@ class LibraryStore:
     ) -> dict[str, Any]:
         """Start a loan.
 
-        ``out`` lends a copy, and the copy keeps its shelf. ``in`` borrows a game,
-        and sets the status of the person to ``reading`` if it is ``want`` or
-        absent.
+        ``out`` lends a copy, and the copy keeps its shelf. ``in`` borrows a game.
         """
         if data.get("direction") == "out":
             copy = self.copy(str(data.get("copy_id")))
@@ -623,22 +641,6 @@ class LibraryStore:
         fired: list[Event] = [
             (EVENT_LOAN_STARTED, events.loan_event_data(game, loan, origin))
         ]
-        if loan["direction"] == "in" and loan["person_id"]:
-            current = self.reading_row(loan["person_id"], game["id"])
-            if current is None or current["status"] == "want":
-                row, _ = models.apply_reading(
-                    current, {"status": "reading"}, now=now(), today=today()
-                )
-                self.state["reading"].setdefault(loan["person_id"], {})[game["id"]] = (
-                    row
-                )
-                fired += self._reading_events(
-                    game,
-                    loan["person_id"],
-                    row,
-                    current["status"] if current else None,
-                    origin,
-                )
         await self._commit(fired)
         return dict(loan)
 

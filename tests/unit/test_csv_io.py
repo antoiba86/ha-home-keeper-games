@@ -16,15 +16,15 @@ NOW = "2026-10-05T12:00:00+00:00"
 LEFT = "9780441478125"
 
 LIB = (
-    "\ufefftitle,franchise,barcode,genres,release_date,format,status,rating,finished,"
-    "read_count,private_notes,tags,wishlist\n"
-    f"The Left Hand of Darkness,Hainish,{LEFT},Science fiction,1969,physical,read,5,"
-    '2024-03-05,2,"Great\ngame",favorites,false\n'
-    "Dune,,,Science fiction; Classic,,,reading,,,,,,false\n"
-    "Emma,,,,,,,,,,,,true\n"
-    "Persuasion,,,,,physical,want,,,,,,false\n"
-    "Ulysses,,,,,,dnf,,,,,,false\n"
-    "Notes,,,,,,,,,,,,false\n"
+    "\ufefftitle,franchise,barcode,genres,release_date,platform,format,play_status,"
+    "rating,completed_at,completion_count,review,tags,wishlist\n"
+    f"The Left Hand of Darkness,Hainish,{LEFT},Science fiction,1969,ps5,physical,"
+    'completed,5,2024-03-05,2,"Great\ngame",favorites,false\n'
+    "Dune,,,Science fiction; Classic,,gameboy,,playing,,,,,,false\n"
+    "Emma,,,,,,,,,,,,,true\n"
+    "Persuasion,,,,,,physical,backlog,,,,,,false\n"
+    "Ulysses,,,,,switch,,abandoned,,,,,,false\n"
+    "Notes,,,,,,,,,,,,,false\n"
 )
 
 
@@ -35,21 +35,24 @@ def test_parse() -> None:
     assert left["title"] == "The Left Hand of Darkness"
     assert left["franchise"] == "Hainish" and left["genres"] == ["Science fiction"]
     assert left["barcode"] == LEFT
-    assert left["status"] == "read" and left["rating"] == 5
-    assert left["finished"] == "2024-03-05" and left["read_count"] == 2
+    assert left["play_status"] == "completed" and left["rating"] == 5
+    assert left["completed_at"] == "2024-03-05" and left["completion_count"] == 2
+    assert left["platform"] == "ps5" and left["copy"]["platform"] == "ps5"
     assert left["owned"] == 1 and left["copy"]["format"] == "physical"
-    assert left["tags"] == ["favorites"] and left["notes"] == "Great\ngame"
+    assert left["tags"] == ["favorites"] and left["review"] == "Great\ngame"
     assert left["release_date"] == "1969"
     dune = rows[1]
     assert (
         dune["genres"] == ["Science fiction", "Classic"] and dune["franchise"] is None
     )
-    assert dune["barcode"] is None and dune["status"] == "reading"
+    assert dune["barcode"] is None and dune["play_status"] == "playing"
+    assert dune["platform"] is None
     assert dune["rating"] is None and dune["copy"] is None and dune["owned"] == 0
-    assert rows[2]["wishlist"] is True and rows[2]["status"] is None
-    assert rows[3]["status"] == "want" and rows[3]["copy"]["format"] == "physical"
-    assert rows[4]["status"] == "dnf"
-    assert rows[5]["status"] is None and rows[5]["tags"] == []
+    assert rows[2]["wishlist"] is True and rows[2]["play_status"] is None
+    assert rows[3]["play_status"] == "backlog"
+    assert rows[3]["copy"]["format"] == "physical"
+    assert rows[4]["play_status"] == "abandoned" and rows[4]["platform"] == "switch"
+    assert rows[5]["play_status"] is None and rows[5]["tags"] == []
     assert not any(r["needs_details"] for r in rows)
 
 
@@ -69,8 +72,8 @@ def test_a_barcode_of_another_game_is_a_row_error() -> None:
         rows,
         person_id="p",
         shelf_id=None,
-        import_notes=True,
-        replace_reading=False,
+        import_review=True,
+        replace_progress=False,
         now=NOW,
     )
     assert results[0]["error"] == "duplicate_barcode"
@@ -85,8 +88,8 @@ def test_a_new_copy_barcode_matches_a_later_row() -> None:
         cio.parse(text),
         person_id="p",
         shelf_id=None,
-        import_notes=True,
-        replace_reading=False,
+        import_review=True,
+        replace_progress=False,
         now=NOW,
     )
     assert [r["action"] for r in results] == ["new", "existing"]
@@ -161,17 +164,17 @@ def test_apply_import() -> None:
         rows,
         person_id="p",
         shelf_id="s",
-        import_notes=True,
-        replace_reading=False,
+        import_review=True,
+        replace_progress=False,
         now=NOW,
     )
     assert state["games"].keys() == {"persuasion"}, "the input must not change"
     assert summary == {
         "rows": 6,
-        "read": 1,
-        "reading": 1,
-        "want": 1,
-        "dnf": 1,
+        "backlog": 1,
+        "playing": 1,
+        "completed": 1,
+        "abandoned": 1,
         "wishlist": 1,
         "copies": 2,
         "tags": 1,
@@ -179,7 +182,7 @@ def test_apply_import() -> None:
         "existing": 0,
         "new": 5,
         "title_match": 1,
-        "reading_kept": 0,
+        "progress_kept": 0,
     }
     assert [r["action"] for r in results] == [
         "new",
@@ -202,8 +205,8 @@ def test_apply_import() -> None:
         "games_added": 5,
         "games_matched": 1,
         "copies_added": 2,
-        "reading_set": 4,
-        "reading_kept": 2,
+        "progress_set": 4,
+        "progress_kept": 2,
         "wishlist_added": 1,
         "errors": 0,
     }
@@ -212,30 +215,34 @@ def test_apply_import() -> None:
     copies = [c for c in new["copies"].values() if c["game_id"] == left["id"]]
     assert len(copies) == 1 and copies[0]["shelf_id"] == "s"
     assert copies[0]["format"] == "physical"
-    reading = new["reading"]["p"][left["id"]]
-    assert reading["status"] == "read" and reading["read_count"] == 2
-    assert reading["private_notes"] == "Great\ngame"
+    progress = new["progress"]["p"][left["id"]]
+    assert list(progress) == ["ps5"]
+    assert progress["ps5"]["play_status"] == "completed"
+    assert progress["ps5"]["completion_count"] == 2
+    assert progress["ps5"]["review"] == "Great\ngame"
+    dune = next(b for b in new["games"].values() if b["title"] == "Dune")
+    assert list(new["progress"]["p"][dune["id"]]) == ["other"]
     emma = next(b for b in new["games"].values() if b["title"] == "Emma")
     assert emma["wishlist"]["person_id"] == "p" and emma["wishlist"]["buy"] is False
-    assert emma["id"] not in new["reading"]["p"]
+    assert emma["id"] not in new["progress"]["p"]
 
 
-def test_import_matches_and_keeps_reading() -> None:
+def test_import_matches_and_keeps_progress() -> None:
     state = _library()
-    state["reading"]["p"] = {"persuasion": {**m.empty_reading(now=NOW)}}
+    state["progress"]["p"] = {"persuasion": {"other": m.empty_progress(now=NOW)}}
     rows = cio.parse(LIB)
     first, _, _ = cio.apply_import(
         state,
         rows,
         person_id="p",
         shelf_id="missing",
-        import_notes=False,
-        replace_reading=False,
+        import_review=False,
+        replace_progress=False,
         now=NOW,
     )
-    assert first["reading"]["p"]["persuasion"]["status"] == "want"
+    assert first["progress"]["p"]["persuasion"]["other"]["play_status"] == "backlog"
     left = m.find_game_by_barcode(first, LEFT)
-    assert first["reading"]["p"][left["id"]]["private_notes"] == ""
+    assert first["progress"]["p"][left["id"]]["ps5"]["review"] == ""
     copy = next(c for c in first["copies"].values() if c["game_id"] == left["id"])
     assert copy["shelf_id"] is None
     _second, summary, _results = cio.apply_import(
@@ -243,27 +250,27 @@ def test_import_matches_and_keeps_reading() -> None:
         rows,
         person_id="p",
         shelf_id=None,
-        import_notes=True,
-        replace_reading=False,
+        import_review=True,
+        replace_progress=False,
         now=NOW,
     )
     assert summary["new"] == 0 and summary["existing"] == 1
     assert summary["title_match"] == 5
-    assert summary["copies"] == 0 and summary["reading_kept"] == 4
-    assert summary["read"] + summary["reading"] + summary["want"] == 0
+    assert summary["copies"] == 0 and summary["progress_kept"] == 4
+    assert summary["completed"] + summary["playing"] + summary["backlog"] == 0
     assert summary["wishlist"] == 0
     third, summary, _ = cio.apply_import(
         first,
         rows,
         person_id="p",
         shelf_id=None,
-        import_notes=True,
-        replace_reading=True,
+        import_review=True,
+        replace_progress=True,
         now=NOW,
     )
-    assert summary["read"] + summary["want"] + summary["dnf"] == 3
-    assert summary["reading"] == 1 and summary["reading_kept"] == 0
-    assert third["reading"]["p"][left["id"]]["private_notes"] == "Great\ngame"
+    assert summary["completed"] + summary["backlog"] + summary["abandoned"] == 3
+    assert summary["playing"] == 1 and summary["progress_kept"] == 0
+    assert third["progress"]["p"][left["id"]]["ps5"]["review"] == "Great\ngame"
 
 
 def test_import_row_error_and_empty_person() -> None:
@@ -274,14 +281,14 @@ def test_import_row_error_and_empty_person() -> None:
         rows,
         person_id="p",
         shelf_id=None,
-        import_notes=True,
-        replace_reading=False,
+        import_review=True,
+        replace_progress=False,
         now=NOW,
     )
     assert summary["errors"] == 1 and results[0]["action"] == "error"
     assert results[0]["error"] == "field_required"
     assert results[0]["placeholders"] == {"field": "title"}
-    assert "p" not in new["reading"]
+    assert "p" not in new["progress"]
 
 
 def test_import_library_rows_use_ids_and_locations() -> None:
@@ -302,8 +309,8 @@ def test_import_library_rows_use_ids_and_locations() -> None:
         cio.parse(text),
         person_id="p",
         shelf_id=None,
-        import_notes=True,
-        replace_reading=False,
+        import_review=True,
+        replace_progress=False,
         now=NOW,
     )
     assert summary["new"] == 1 and summary["copies"] == 1
@@ -314,8 +321,8 @@ def test_import_library_rows_use_ids_and_locations() -> None:
         cio.parse(text),
         person_id="p",
         shelf_id=None,
-        import_notes=True,
-        replace_reading=False,
+        import_review=True,
+        replace_progress=False,
         now=NOW,
     )
     assert again["copies"] == 0 and again["existing"] == 1
@@ -345,8 +352,8 @@ def test_import_row_with_a_bad_copy_adds_no_game() -> None:
         rows,
         person_id="p",
         shelf_id=None,
-        import_notes=True,
-        replace_reading=False,
+        import_review=True,
+        replace_progress=False,
         now=NOW,
     )
     assert results[0]["action"] == "error"
@@ -355,27 +362,26 @@ def test_import_row_with_a_bad_copy_adds_no_game() -> None:
     assert new["games"] == {} and new["copies"] == {}
 
 
-def test_import_sets_the_reading_of_a_game_once() -> None:
+def test_import_sets_the_progress_of_a_platform_once() -> None:
     state = _library()
     for _ in range(2):
-        copy = m.build_copy({"game_id": "persuasion"}, now=NOW)
+        copy = m.build_copy({"game_id": "persuasion", "platform": "pc"}, now=NOW)
         state["copies"][copy["id"]] = copy
-    state["reading"]["p"] = {
-        "persuasion": m.empty_reading(now=NOW) | {"status": "read"}
-    }
+    done = m.empty_progress(now=NOW) | {"play_status": "completed"}
+    state["progress"]["p"] = {"persuasion": {"pc": done}}
     text = cio.export(state, "p")
-    for replace, read, kept in ((False, 1, 0), (True, 1, 0)):
+    for replace, completed, kept in ((False, 1, 0), (True, 1, 0)):
         _, summary, _ = cio.apply_import(
             m.empty_state(),
             cio.parse(text),
             person_id="p",
             shelf_id=None,
-            import_notes=True,
-            replace_reading=replace,
+            import_review=True,
+            replace_progress=replace,
             now=NOW,
         )
         assert summary["rows"] == 2
-        assert (summary["read"], summary["reading_kept"]) == (read, kept)
+        assert (summary["completed"], summary["progress_kept"]) == (completed, kept)
 
 
 # ── Export ───────────────────────────────────────────────────────────────────
@@ -393,26 +399,32 @@ def test_export_header_and_cells() -> None:
         now=NOW,
     )
     state["copies"][copy["id"]] = copy
-    state["reading"]["p"] = {
-        "persuasion": {
-            **m.empty_reading(now=NOW),
-            "status": "read",
-            "rating": 4,
-            "finished": "2024-01-02",
-            "read_count": 1,
-        }
+    done = {
+        **m.empty_progress(now=NOW),
+        "play_status": "completed",
+        "rating": 4,
+        "completed_at": "2024-01-02",
+        "completion_count": 1,
+    }
+    state["progress"]["p"] = {
+        "persuasion": {"ps5": done, "switch": {**done, "play_status": "playing"}}
     }
     text = cio.export(state, "p")
     reader = csv.DictReader(io.StringIO(text, newline=""))
     assert tuple(reader.fieldnames or ()) == cio.LIBRARY_COLUMNS
     row = next(reader)
     assert row["barcode"] == LEFT and row["genres"] == "Romance"
-    assert row["status"] == "read" and row["rating"] == "4"
-    assert row["finished"] == "2024-01-02" and row["format"] == "digital"
+    assert row["play_status"] == "completed" and row["rating"] == "4"
+    assert row["completed_at"] == "2024-01-02" and row["format"] == "digital"
     assert row["platform"] == "ps5" and row["steelbook"] == "false"
     assert row["copy_id"] == copy["id"]
-    no_person = next(csv.DictReader(io.StringIO(cio.export(state, None))))
-    assert no_person["status"] == "" and no_person["read_count"] == ""
+    extra = next(reader)
+    assert extra["platform"] == "switch" and extra["play_status"] == "playing"
+    assert extra["copy_id"] == "" and extra["format"] == ""
+    assert next(reader, None) is None
+    no_person = list(csv.DictReader(io.StringIO(cio.export(state, None))))
+    assert len(no_person) == 1
+    assert no_person[0]["play_status"] == "" and no_person[0]["completion_count"] == ""
     assert cio.export_filename("2026-10-05") == "games-2026-10-05.csv"
 
 
@@ -489,15 +501,18 @@ def _library_row(draw) -> dict:
         }
         row["owned"] = 1
         row["location"] = draw(st.just([]) | st.lists(_NAME, min_size=3, max_size=3))
-    status = draw(st.sampled_from([None, *m.STATUSES]))
-    row["status"] = status
+        row["platform"] = row["copy"]["platform"]
+    else:
+        row["platform"] = draw(st.none() | st.sampled_from(m.PLATFORMS))
+    status = draw(st.sampled_from([None, *m.PLAY_STATUSES]))
+    row["play_status"] = status
     if status is not None:
         row["rating"] = draw(st.none() | st.integers(min_value=1, max_value=5))
-        row["page"] = draw(st.none() | st.integers(min_value=0, max_value=900))
-        row["started"] = draw(st.none() | _DATE)
-        row["finished"] = draw(st.none() | _DATE)
-        row["read_count"] = draw(st.none() | st.integers(min_value=0, max_value=9))
-    row["notes"] = draw(_TEXT)
+        row["playtime_minutes"] = draw(st.none() | st.integers(0, 90000))
+        for field in ("started_at", "completed_at", "last_played_at"):
+            row[field] = draw(st.none() | _DATE)
+        row["completion_count"] = draw(st.none() | st.integers(0, 9))
+    row["review"] = draw(_TEXT)
     row["wishlist"] = draw(st.booleans())
     row["wishlist_buy"] = row["wishlist"] and draw(st.booleans())
     return row
@@ -537,8 +552,8 @@ def test_state_export_import_export_is_stable(rows: list[dict]) -> None:
         rows,
         person_id="p",
         shelf_id=None,
-        import_notes=True,
-        replace_reading=True,
+        import_review=True,
+        replace_progress=True,
         now=NOW,
     )
     first = cio.export(state, "p")
@@ -547,8 +562,8 @@ def test_state_export_import_export_is_stable(rows: list[dict]) -> None:
         cio.parse(first),
         person_id="p",
         shelf_id=None,
-        import_notes=True,
-        replace_reading=True,
+        import_review=True,
+        replace_progress=True,
         now=NOW,
     )
     assert cio.export(rebuilt, "p") == first
