@@ -465,6 +465,7 @@ export function matchesBase(game: Game, f: GameFilters, ctx: FilterContext): boo
   if (f.genre && !game.genres.includes(f.genre)) return false;
   if (f.reader && statusOf(game, f.reader) !== 'read') return false;
   if (!inPlace(game, f, ctx)) return false;
+  // Stryker disable next-line ArrayDeclaration: a string in the fallback maps to an undefined barcode, the same as no copy.
   const codes = (ctx.idx.copiesByGame.get(game.id) ?? []).map((c) => c.barcode);
   return matchesSearch(game, f.q, ctx.me, codes);
 }

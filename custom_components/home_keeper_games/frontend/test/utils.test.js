@@ -406,8 +406,29 @@ describe('reading helpers and search', () => {
     expect(u.matchesSearch(game('g', { title: 'Godel' }), 'Gödel', null)).toBe(true);
   });
 
+  it('reads only the extra text that the caller gives', () => {
+    const g = game('x', { title: 'Plain' });
+    expect(u.searchText(g, null)).not.toMatch(/stryker/i);
+    expect(u.matchesSearch(g, 'stryker', null)).toBe(false);
+    expect(u.matchesSearch(g, 'abc', null, [null, 'ABC'])).toBe(true);
+  });
+
   it('separates fields so a search does not join 2 fields', () => {
     expect(u.searchText(game('s', { title: 'ab', franchise: 'cd' }), null)).not.toContain('abcd');
+  });
+});
+
+describe('copy formats and platforms', () => {
+  it('lists the formats and the platforms in display order', () => {
+    expect(u.FORMATS).toEqual(['physical', 'digital', 'other']);
+    expect(u.PLATFORMS).toEqual(['ps5', 'ps4', 'ps3', 'switch2', 'switch', 'xbox_series', 'xbox_one', 'pc', 'other']);
+  });
+
+  it('names each platform, and any other value as Other platform', () => {
+    expect(u.PLATFORMS.map((p) => u.platformLabel(p))).toEqual([
+      'PS5', 'PS4', 'PS3', 'Switch 2', 'Switch', 'Xbox Series', 'Xbox One', 'PC', 'Other platform',
+    ]);
+    for (const value of [null, undefined, '', 'gameboy']) expect(u.platformLabel(value)).toBe('Other platform');
   });
 });
 
@@ -422,11 +443,17 @@ describe('filterGames, statusCounts and sortGames', () => {
         c: game('c', { title: 'Gamma', franchise: 'Amy Bee', owned: false, reading: { me: row('want', { rating: 5 }) }, created_at: '2026-01-01' }),
         d: game('d', { title: 'Delta', genres: ['SF', 'Art'], created_at: '2026-01-04', release_date: '2001' }),
       },
-      copies: { k1: copy('k1', 'a', 's1'), k2: copy('k2', 'b', 's3'), k3: copy('k3', 'd', null) },
+      copies: { k1: copy('k1', 'a', 's1', { barcode: '0045496590420' }), k2: copy('k2', 'b', 's3'), k3: copy('k3', 'd', null) },
     });
     ctx = { idx: u.buildIndex(l), me: 'me' };
   });
   const ids = (q) => u.filterGames(l.games, u.readFilters(q), ctx).map((x) => x.id);
+
+  it('finds a game by the barcode of its copy', () => {
+    expect(ids({ q: '0045496590420' })).toEqual(['a']);
+    expect(ids({ q: '45496590420' })).toEqual(['a']);
+    expect(ids({ q: 'Stryker' })).toEqual([]);
+  });
 
   it('shows owned games by default, sorted by title', () => {
     expect(ids({})).toEqual(['a', 'b', 'd']);

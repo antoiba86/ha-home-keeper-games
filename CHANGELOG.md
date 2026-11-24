@@ -9,9 +9,9 @@ is the single source of truth (see `RELEASE.md`).
 
 ### Changed
 
-- **Copy details.** A copy has a platform, a physical or digital format, a storefront, a
-  region, an edition and a steelbook mark, and the barcode is on the copy. A digital copy
-  is on no shelf, and the signed and first edition marks are gone.
+- **Copy details.** Each copy has a platform, a physical or digital format, a storefront,
+  a region, an edition, a steelbook mark and its own barcode, and a digital copy is on no
+  shelf. The signed and first edition marks are gone.
 
 ## [0.5.0b3] - 2026-11-23
 
