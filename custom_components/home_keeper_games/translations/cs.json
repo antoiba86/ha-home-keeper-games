@@ -326,10 +326,6 @@
           "name": "IGDB ID",
           "description": "ID hry v IGDB."
         },
-        "barcode": {
-          "name": "Čárový kód",
-          "description": "Číslo čárového kódu, například EAN-13."
-        },
         "tags": {
           "name": "Štítky",
           "description": "Štítky knihy."
@@ -366,6 +362,10 @@
           "name": "Police",
           "description": "ID police. Prázdné pro žádnou polici."
         },
+        "platform": {
+          "name": "Platforma",
+          "description": "Konzole kopie, například ps5 nebo switch."
+        },
         "format": {
           "name": "Formát",
           "description": "Formát výtisku."
@@ -388,9 +388,33 @@
           "name": "Police",
           "description": "ID police. Prázdné pro žádnou polici."
         },
+        "platform": {
+          "name": "Platforma",
+          "description": "Konzole kopie, například ps5 nebo switch."
+        },
         "format": {
           "name": "Formát",
           "description": "Formát výtisku."
+        },
+        "storefront": {
+          "name": "Obchod",
+          "description": "Obchod digitální kopie, například PlayStation Store."
+        },
+        "region": {
+          "name": "Region",
+          "description": "Region kopie, například PAL."
+        },
+        "edition": {
+          "name": "Edice",
+          "description": "Edice, například Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "Kopie je v obalu steelbook."
+        },
+        "barcode": {
+          "name": "Čárový kód",
+          "description": "Číslo čárového kódu, například EAN-13."
         },
         "condition": {
           "name": "Stav výtisku",
@@ -411,14 +435,6 @@
         "value": {
           "name": "Hodnota",
           "description": "Současná hodnota výtisku."
-        },
-        "signed": {
-          "name": "S podpisem",
-          "description": "Výtisk je podepsaný."
-        },
-        "first_edition": {
-          "name": "První vydání",
-          "description": "Výtisk je první vydání."
         },
         "note": {
           "name": "Poznámka",
@@ -438,9 +454,33 @@
           "name": "Police",
           "description": "ID police. Prázdné pro žádnou polici."
         },
+        "platform": {
+          "name": "Platforma",
+          "description": "Konzole kopie, například ps5 nebo switch."
+        },
         "format": {
           "name": "Formát",
           "description": "Formát výtisku."
+        },
+        "storefront": {
+          "name": "Obchod",
+          "description": "Obchod digitální kopie, například PlayStation Store."
+        },
+        "region": {
+          "name": "Region",
+          "description": "Region kopie, například PAL."
+        },
+        "edition": {
+          "name": "Edice",
+          "description": "Edice, například Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "Kopie je v obalu steelbook."
+        },
+        "barcode": {
+          "name": "Čárový kód",
+          "description": "Číslo čárového kódu, například EAN-13."
         },
         "condition": {
           "name": "Stav výtisku",
@@ -461,14 +501,6 @@
         "value": {
           "name": "Hodnota",
           "description": "Současná hodnota výtisku."
-        },
-        "signed": {
-          "name": "S podpisem",
-          "description": "Výtisk je podepsaný."
-        },
-        "first_edition": {
-          "name": "První vydání",
-          "description": "Výtisk je první vydání."
         },
         "note": {
           "name": "Poznámka",
@@ -755,6 +787,10 @@
         "shelf_id": {
           "name": "Police",
           "description": "ID police. Prázdné pro žádnou polici."
+        },
+        "platform": {
+          "name": "Platforma",
+          "description": "Konzole kopie, například ps5 nebo switch."
         },
         "format": {
           "name": "Formát",
@@ -1070,6 +1106,9 @@
     },
     "import_cover_unreadable": {
       "message": "Soubor obálky {file} není platný obrázek."
+    },
+    "digital_copy_no_shelf": {
+      "message": "Digitální kopie nemá polici."
     }
   }
 }

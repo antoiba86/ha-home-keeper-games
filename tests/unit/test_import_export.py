@@ -67,7 +67,7 @@ def _state() -> dict:
     }
     state["games"] = {DUNE: dune, EMMA: emma}
     copy = m.build_copy(
-        {"game_id": DUNE, "shelf_id": SHELF, "format": "hardcover", "price": 12},
+        {"game_id": DUNE, "shelf_id": SHELF, "format": "physical", "price": 12},
         now=NOW,
     )
     copy["id"] = COPY
@@ -300,42 +300,46 @@ def test_records_report_names_and_matches() -> None:
 # ── Matching ─────────────────────────────────────────────────────────────────
 
 
-def test_games_match_by_barcode_then_title() -> None:
+def test_games_match_by_id_then_title() -> None:
     state = m.empty_state()
-    stored = m.build_game({"title": "Dune", "barcode": "9780441013593"}, now=NOW)
+    stored = m.build_game({"title": "Dune"}, now=NOW)
     other = m.build_game({"title": "Emma", "genres": ["Puzzle"]}, now=NOW)
     state["games"] = {b["id"]: b for b in (stored, other)}
     document = {
         "games": [
-            {"id": "x" * 32, "title": "Dune Messiah", "barcode": "9780441013593"},
+            {"id": stored["id"], "title": "Dune Messiah"},
             {"title": "EMMA!", "genres": ["Puzzle"]},
-            {"title": "Dune", "barcode": "978-0441013593"},
+            {"title": "DUNE"},
         ]
     }
     plan = _plan(state, document)
     assert plan.ok, plan.problems
     matched = [(r["id"], r["matched_by"]) for r in plan.records]
     assert matched == [
-        (stored["id"], "barcode"),
+        (stored["id"], "id"),
         (other["id"], "title"),
-        (stored["id"], "barcode"),
+        (stored["id"], "title"),
     ]
     assert len(plan.state["games"]) == 2
-    assert plan.state["games"][stored["id"]]["title"] == "Dune"
-    assert plan.state["games"][stored["id"]]["updated_at"] == LATER
+    assert plan.state["games"][stored["id"]]["title"] == "DUNE"
 
 
-def test_two_games_with_one_barcode_in_the_document_make_one_game() -> None:
+def test_a_copy_barcode_of_another_game_blocks_the_import() -> None:
     document = {
-        "games": [
-            {"title": "Dune", "barcode": "9780441013593"},
-            {"title": "Dune (2nd)", "barcode": "9780441013593"},
-        ]
+        "games": [{"id": "a" * 32, "title": "Dune"}, {"id": "b" * 32, "title": "Emma"}],
+        "copies": [
+            {"id": "c" * 32, "game_id": "a" * 32, "barcode": "9780441013593"},
+            {"id": "d" * 32, "game_id": "b" * 32, "barcode": "978-0441013593"},
+            {"id": "e" * 32, "game_id": "a" * 32, "barcode": "9780441013593"},
+            {"id": "f" * 32, "game_id": "a" * 32, "format": "digital"},
+        ],
     }
     plan = _plan(m.empty_state(), document)
-    assert len(plan.state["games"]) == 1
-    assert [r["action"] for r in plan.records] == ["create", "update"]
-    assert plan.counts["games"] == {"created": 1, "updated": 1, "skipped": 0}
+    assert _problems(plan) == [("error", "copies[1].barcode", "duplicate_barcode")]
+    assert not plan.ok
+    copies = plan.state["copies"]
+    assert sorted(copies) == ["c" * 32, "e" * 32, "f" * 32]
+    assert copies["f" * 32]["shelf_id"] is None
 
 
 def test_locations_match_by_name_within_the_parent() -> None:
@@ -529,9 +533,9 @@ def test_copy_on_a_missing_shelf_goes_to_no_shelf() -> None:
 
 def test_copy_update_by_id() -> None:
     state = _state()
-    document = {"copies": [{"id": COPY, "game_id": DUNE, "format": "ebook"}]}
+    document = {"copies": [{"id": COPY, "game_id": DUNE, "format": "digital"}]}
     plan = _plan(state, document)
-    assert plan.state["copies"][COPY]["format"] == "ebook"
+    assert plan.state["copies"][COPY]["format"] == "digital"
     assert plan.state["copies"][COPY]["shelf_id"] is None
     assert plan.records[0]["matched_by"] == "id"
 
@@ -608,7 +612,7 @@ def test_field_errors_name_the_path_and_block_the_import() -> None:
         "rooms": [{"name": ""}],
         "games": [
             {"title": "Ok"},
-            {"title": "Bad", "barcode": "1#3", "igdb_id": -1},
+            {"title": "Bad", "franchise": [], "igdb_id": -1},
             {"title": ""},
         ],
         "copies": [{"game_id": "nope", "format": "scroll"}],
@@ -622,8 +626,8 @@ def test_field_errors_name_the_path_and_block_the_import() -> None:
     assert not plan.ok
     assert _problems(plan) == [
         ("error", "rooms[0].name", "field_required"),
+        ("error", "games[1].franchise", "invalid_field"),
         ("error", "games[1].igdb_id", "out_of_range"),
-        ("error", "games[1].barcode", "invalid_barcode"),
         ("error", "games[2].title", "field_required"),
         ("error", "copies[0].game_id", "import_reference_missing"),
         ("error", "copies[0].format", "invalid_choice"),

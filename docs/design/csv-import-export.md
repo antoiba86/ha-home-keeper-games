@@ -5,7 +5,7 @@ implements:
   - custom_components/home_keeper_games/csv_io.py
   - custom_components/home_keeper_games/frontend/src/tab-import.ts
 related: [store-models, events-api, import-export]
-source_hash: 8200333250c6
+source_hash: 8a8e04bfbee6
 ---
 
 # CSV import and export
@@ -56,7 +56,8 @@ the save have no `await` between them, so no other change comes in the middle.
 The file has every game field, the copy fields, the location as a path of room, unit
 and shelf names, the reading row of the chosen person and the wishlist flags
 (`csv_io.LIBRARY_COLUMNS`). A list cell separates its items with `; `. The barcode cell
-is cleaned as in [scan-and-barcode](scan-and-barcode.md#barcode-rules).
+is cleaned as in [scan-and-barcode](scan-and-barcode.md#barcode-rules). The barcode cell
+is a copy field. A row whose barcode is on a copy of another game is an error row.
 
 - A row puts its copy on the shelf of its path when that shelf exists, else on the
   chosen shelf. A row with no copy id adds a copy only to a game with no copy.

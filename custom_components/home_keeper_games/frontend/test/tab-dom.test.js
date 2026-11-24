@@ -3,6 +3,10 @@ import '../src/tab-index.ts';
 import { coverUrls } from '../src/markup.ts';
 import { ALEX, gameId, fakeHass, fixture, flush, SAM } from './fake-hass.js';
 
+// The barcode is on a copy. The scan tests type these codes; the fake replies choose the game.
+const DUNE_CODE = '9780441013593';
+const WISHED_CODE = '9780547928227';
+
 let el;
 let host;
 
@@ -308,7 +312,6 @@ describe('game detail', () => {
     $('[data-k="edit-game"]').click();
     const dlg = el.shadowRoot.getElementById('dlg');
     dlg.querySelector('[name="genres"]').value = 'Strategy, Classic';
-    dlg.querySelector('[name="barcode"]').value = 'ab-12';
     dlg.querySelector('[name="franchise"]').value = 'Dune';
     dlg.querySelector('[data-k="d-submit"]').click();
     await flush();
@@ -316,10 +319,55 @@ describe('game detail', () => {
       game_id: id,
       title: 'Dune',
       genres: ['Strategy', 'Classic'],
-      barcode: 'AB12',
       franchise: 'Dune',
     });
     expect(dlg.innerHTML).toBe('');
+  });
+
+  it('adds a copy with the game fields, and a digital copy goes on no shelf', async () => {
+    const state = fixture();
+    const id = gameId(state, 'Dune');
+    const fake = await mount(`/games/${id}`);
+    expect(text()).toContain('Barcode');
+    $('[data-k="add-copy"]').click();
+    const dlg = el.shadowRoot.getElementById('dlg');
+    const set = (name, value) => (dlg.querySelector(`[name="${name}"]`).value = value);
+    expect([...dlg.querySelectorAll('[name="platform"] option')].map((o) => o.textContent)).toEqual([
+      'PS5', 'PS4', 'PS3', 'Switch 2', 'Switch', 'Xbox Series', 'Xbox One', 'PC', 'Other platform',
+    ]);
+    set('platform', 'switch');
+    set('format', 'digital');
+    set('shelf_id', state.shelves[0].id);
+    set('storefront', 'eShop');
+    set('region', 'PAL');
+    set('edition', 'Deluxe');
+    set('barcode', '045496-590420');
+    dlg.querySelector('[name="steelbook"]').checked = true;
+    dlg.querySelector('[data-k="d-submit"]').click();
+    await flush();
+    expect(fake.calls('add_copy')[0]).toMatchObject({
+      game_id: id,
+      shelf_id: null,
+      platform: 'switch',
+      format: 'digital',
+      storefront: 'eShop',
+      region: 'PAL',
+      edition: 'Deluxe',
+      steelbook: true,
+      barcode: '045496590420',
+    });
+  });
+
+  it('refuses a bad copy barcode', async () => {
+    const state = fixture();
+    const fake = await mount(`/games/${gameId(state, 'Dune')}`);
+    $('[data-k="add-copy"]').click();
+    const dlg = el.shadowRoot.getElementById('dlg');
+    dlg.querySelector('[name="barcode"]').value = 'b#d';
+    dlg.querySelector('[data-k="d-submit"]').click();
+    await flush();
+    expect(dlg.querySelector('.hkl-error').textContent).toBe('This is not a valid barcode.');
+    expect(fake.calls('add_copy')).toHaveLength(0);
   });
 
   it('shows the error of a failed dialog inline and keeps what the user typed', async () => {
@@ -410,7 +458,7 @@ describe('shelves, loans, wishlist and settings', () => {
     expect($$('.hkl-listrow')).toHaveLength(3);
     expect($('[data-k="lt-in"]').textContent).toContain('2');
     await mount('/loans;tab=in');
-    expect(text()).toContain('Seattle Public Library · Alex · Paperback · Reading');
+    expect(text()).toContain('Seattle Public Library · Alex · Physical · Reading');
   });
 
   it('lends a copy with a task', async () => {
@@ -541,10 +589,16 @@ describe('scan', () => {
     input.value = 'b#d';
     $('[data-k="barcode-add"]').click();
     expect(host.showToast).toHaveBeenCalledWith('This is not a valid barcode.');
-    $('[data-k="barcode-input"]').value = dune.barcode;
+    $('[data-k="barcode-input"]').value = DUNE_CODE;
     $('[data-k="barcode-add"]').click();
     await flush();
-    expect(fake.calls('scan_barcode')[0]).toMatchObject({ barcode: dune.barcode, shelf_id: shelf, on_duplicate: 'ask' });
+    expect(fake.calls('scan_barcode')[0]).toMatchObject({
+      barcode: DUNE_CODE,
+      shelf_id: shelf,
+      platform: 'other',
+      format: 'physical',
+      on_duplicate: 'ask',
+    });
     expect(text()).toContain('Already in Living room › Unit A › Shelf 1');
     $('[data-value="move"]').click();
     await flush();
@@ -578,13 +632,13 @@ describe('scan', () => {
     const fake = await mount(`/scan;shelf=${shelf};step=camera`, {
       replies: {
         scan_barcode: (m) =>
-          m.barcode === wished.barcode
+          m.barcode === WISHED_CODE
             ? { result: 'added', game: wished, copy: null, existing_copies: [], from_wishlist: true }
             : { result: 'added', game: dune, copy: null, existing_copies: [] },
       },
     });
     void fake;
-    for (const code of [wished.barcode, dune.barcode]) {
+    for (const code of [WISHED_CODE, DUNE_CODE]) {
       $('[data-k="barcode-input"]').value = code;
       $('[data-k="barcode-add"]').click();
       await flush();
@@ -604,7 +658,7 @@ describe('scan', () => {
     const fake = await mount(`/scan;shelf=${shelf};step=camera`, {
       replies: { scan_barcode: { result: 'added', game: dune, copy: null, existing_copies: [] } },
     });
-    $('[data-k="barcode-input"]').value = dune.barcode;
+    $('[data-k="barcode-input"]').value = DUNE_CODE;
     $('[data-k="barcode-add"]').click();
     await flush();
     $('[data-k="scan-done"]').click();
@@ -623,8 +677,8 @@ describe('scan with no match', () => {
   /** A game that a scan of a new barcode saved: its barcode is its title. */
   function missing(state, code, id) {
     const shelf = state.shelves[0].id;
-    const game = { ...state.games[0], id, title: code, franchise: null, genres: [], barcode: code, release_date: '', needs_details: true, cover: null };
-    const copy = { ...state.copies[0], id: `c-${id}`, game_id: id, shelf_id: shelf, format: 'paperback' };
+    const game = { ...state.games[0], id, title: code, franchise: null, genres: [], release_date: '', needs_details: true, cover: null };
+    const copy = { ...state.copies[0], id: `c-${id}`, game_id: id, shelf_id: shelf, platform: 'other', format: 'physical', barcode: code };
     state.games.push(game);
     state.copies.push(copy);
     return { game, copy, reply: { result: 'not_found', game, copy, existing_copies: [] } };
@@ -656,7 +710,7 @@ describe('scan with no match', () => {
         },
       },
     });
-    await scan(miss.game.barcode);
+    await scan(miss.copy.barcode);
     await flush();
     expect(sheet()).not.toBeNull();
     expect(sheet().querySelector('h2').textContent).toBe('No book has this barcode');
@@ -703,7 +757,7 @@ describe('scan with no match', () => {
     const state = fixture();
     const miss = missing(state, '9781402894626', 'new');
     const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, { state, replies: { scan_barcode: miss.reply } });
-    await scan(miss.game.barcode);
+    await scan(miss.copy.barcode);
     await flush();
     sheet().dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     await flush();
@@ -723,10 +777,10 @@ describe('scan with no match', () => {
         },
       },
     });
-    await scan(miss.game.barcode);
+    await scan(miss.copy.barcode);
     await flush();
     typeTitle('Field Notes on Moss');
-    sheet().querySelector('[name="format"]').value = 'hardcover';
+    sheet().querySelector('[name="format"]').value = 'digital';
     sheet().querySelector('[data-k="d-submit"]').click();
     await flush();
     expect(fake.calls('update_game')).toHaveLength(1);
@@ -743,7 +797,7 @@ describe('scan with no match', () => {
     const state = fixture();
     const miss = missing(state, '9781402894626', 'new');
     const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, { state, replies: { scan_barcode: miss.reply } });
-    await scan(miss.game.barcode);
+    await scan(miss.copy.barcode);
     await flush();
     sheet().querySelector('[data-k="d-more-toggle"]').click();
     expect(sheet().querySelector('[data-k="d-more"]').open).toBe(true);
@@ -753,7 +807,8 @@ describe('scan with no match', () => {
     set('franchise', 'Moss');
     set('genres', 'Puzzle, Casual');
     set('release_date', '2004');
-    set('format', 'hardcover');
+    set('format', 'digital');
+    set('platform', 'switch');
     sheet().querySelector('[data-k="d-submit"]').click();
     await flush();
     expect(fake.calls('update_game')[0]).toEqual({
@@ -764,7 +819,7 @@ describe('scan with no match', () => {
       release_date: '2004',
       genres: ['Puzzle', 'Casual'],
     });
-    expect(fake.calls('update_copy')[0]).toEqual({ type: 'home_keeper_games/update_copy', copy_id: 'c-new', format: 'hardcover' });
+    expect(fake.calls('update_copy')[0]).toEqual({ type: 'home_keeper_games/update_copy', copy_id: 'c-new', format: 'digital', platform: 'switch' });
     expect(sheet()).toBeNull();
   });
 
@@ -774,11 +829,11 @@ describe('scan with no match', () => {
     const second = missing(state, '9780306406157', 'two');
     const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, {
       state,
-      replies: { scan_barcode: (m) => (m.barcode === first.game.barcode ? first.reply : second.reply) },
+      replies: { scan_barcode: (m) => (m.barcode === first.copy.barcode ? first.reply : second.reply) },
     });
     // The 2nd scan starts while the lookup of the 1st one runs.
-    void scan(first.game.barcode);
-    void scan(second.game.barcode);
+    void scan(first.copy.barcode);
+    void scan(second.copy.barcode);
     await flush();
     expect(fake.calls('scan_barcode')).toHaveLength(2);
     expect(sheet().querySelector('[data-k="d-barcode"]').textContent).toBe('Barcode 9781402894626');
@@ -805,7 +860,7 @@ describe('scan with no match', () => {
       state,
       replies: { scan_barcode: miss.reply },
     });
-    await scan(miss.game.barcode);
+    await scan(miss.copy.barcode);
     await flush();
     typeTitle('Field Notes on Moss');
     sheet().querySelector('[data-k="d-submit"]').click();
@@ -820,7 +875,7 @@ describe('scan with no match', () => {
     const state = fixture();
     const miss = missing(state, '9781402894626', 'new');
     await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, { state, replies: { scan_barcode: miss.reply } });
-    await scan(miss.game.barcode);
+    await scan(miss.copy.barcode);
     await flush();
     expect(sheet()).not.toBeNull();
     el.route = { path: '/games' };
@@ -898,7 +953,7 @@ describe('scan camera', () => {
     const slot = v.parentNode;
     expect(v.paused).toBe(false);
     $('[data-k="scan-manual"]').click();
-    $('[data-k="barcode-input"]').value = dune.barcode;
+    $('[data-k="barcode-input"]').value = DUNE_CODE;
     $('[data-k="barcode-add"]').click();
     fake.push();
     await flush();

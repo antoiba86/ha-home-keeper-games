@@ -64,6 +64,12 @@ export async function gameByTitle(title: string): Promise<Record<string, any>> {
 }
 
 /** The whole `get_state` reply as Alex. */
+/** The games of *state* that have a copy with 1 of *codes*. The barcode is on the copy. */
+export function gamesWithCode(state: Record<string, any>, codes: string[]): any[] {
+  const ids = new Set(state.copies.filter((c: { barcode: string | null }) => codes.includes(c.barcode ?? '')).map((c: { game_id: string }) => c.game_id));
+  return state.games.filter((g: { id: string }) => ids.has(g.id));
+}
+
 export function adminState(): Promise<Record<string, any>> {
   return library('get_state');
 }

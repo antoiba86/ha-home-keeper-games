@@ -92,6 +92,7 @@ _OPT_INT = vol.Any(None, vol.Coerce(int))
 _OPT_NUM = vol.Any(None, vol.Coerce(float))
 _STR_LIST = vol.All(cv.ensure_list, [cv.string])
 _FORMAT = vol.In(models.FORMATS)
+_PLATFORM = vol.In(models.PLATFORMS)
 _ORDER = vol.All(vol.Coerce(int), vol.Range(min=0))
 
 _GAME_FIELDS = {
@@ -101,21 +102,24 @@ _GAME_FIELDS = {
     vol.Optional("release_date"): vol.Any(None, cv.string, vol.Coerce(str)),
     vol.Optional("franchise"): _OPT_STR,
     vol.Optional("igdb_id"): _OPT_INT,
-    vol.Optional("barcode"): _OPT_STR,
     vol.Optional("tags"): _STR_LIST,
     vol.Optional("shared_notes"): _OPT_STR,
     vol.Optional("needs_details"): cv.boolean,
 }
 _COPY_FIELDS = {
     vol.Optional("shelf_id"): _OPT_STR,
+    vol.Optional("platform"): _PLATFORM,
     vol.Optional("format"): _FORMAT,
+    vol.Optional("storefront"): _OPT_STR,
+    vol.Optional("region"): _OPT_STR,
+    vol.Optional("edition"): _OPT_STR,
+    vol.Optional("steelbook"): cv.boolean,
+    vol.Optional("barcode"): _OPT_STR,
     vol.Optional("condition"): vol.Any(None, vol.In(models.CONDITIONS)),
     vol.Optional("acquired"): _OPT_STR,
     vol.Optional("acquired_from"): _OPT_STR,
     vol.Optional("price"): _OPT_NUM,
     vol.Optional("value"): _OPT_NUM,
-    vol.Optional("signed"): cv.boolean,
-    vol.Optional("first_edition"): cv.boolean,
     vol.Optional("note"): _OPT_STR,
 }
 _GAME_REF = {
@@ -179,12 +183,13 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
         vol.Required("shelf_id"): cv.string,
         vol.Optional("force", default=False): cv.boolean,
     },
-    "add_game": {**_GAME_FIELDS},
+    "add_game": {**_GAME_FIELDS, vol.Optional("barcode"): _OPT_STR},
     "update_game": {vol.Required("game_id"): cv.string, **_GAME_FIELDS},
     "delete_game": {vol.Required("game_id"): cv.string},
     "scan_barcode": {
         vol.Required("barcode"): cv.string,
         vol.Optional("shelf_id"): _OPT_STR,
+        vol.Optional("platform"): _PLATFORM,
         vol.Optional("format"): _FORMAT,
         vol.Optional("on_duplicate", default="ask"): vol.In(
             ("ask", "add_copy", "move", "skip")
@@ -247,6 +252,7 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
     "got_wishlist_game": {
         vol.Required("game_id"): cv.string,
         vol.Optional("shelf_id"): _OPT_STR,
+        vol.Optional("platform"): _PLATFORM,
         vol.Optional("format"): _FORMAT,
     },
     "set_person_settings": {
@@ -317,15 +323,15 @@ def _self_or_admin(ctx: Ctx, person_id: str | None) -> str:
 async def _add_game(ctx: Ctx, data: dict[str, Any]) -> tuple[dict[str, Any], bool]:
     """Add a game. Return ``(game, existing)``.
 
-    With a barcode, a stored game with that barcode is returned. A game with a
-    barcode and no title takes the barcode as its title and needs details.
+    A barcode only looks up the game of a copy with that code. With no match, a
+    game with no title takes the barcode as its title and needs details. A copy
+    keeps the barcode, so the caller passes it to the copy.
     """
     fields = dict(data)
-    code = models.barcode(fields.get("barcode"))
+    code = models.barcode(fields.pop("barcode", None))
     if code is not None:
         if found := models.find_game_by_barcode(ctx.store.state, code):
             return dict(found), True
-        fields["barcode"] = code
         if not fields.get("title"):
             fields["title"] = code
             fields["needs_details"] = True
@@ -448,12 +454,13 @@ async def _new_copy(ctx: Ctx, data: dict[str, Any]) -> tuple[dict[str, Any], boo
 
 async def _scan_barcode(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
     shelf_id = ctx.store.check_shelf(data.get("shelf_id"))
-    copy_data: dict[str, Any] = {"shelf_id": shelf_id}
-    if data.get("format"):
-        copy_data["format"] = data["format"]
     code = models.barcode(data["barcode"])
     if code is None:
         raise LibraryError("field_required", field="barcode")
+    copy_data: dict[str, Any] = {"shelf_id": shelf_id, "barcode": code}
+    for field in ("platform", "format"):
+        if data.get(field):
+            copy_data[field] = data[field]
     existing = models.find_game_by_barcode(ctx.store.state, code)
     if existing is not None:
         copies = models.copies_of(ctx.store.state, existing["id"])
@@ -467,8 +474,10 @@ async def _scan_barcode(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
                 "from_wishlist": False,
             }
         if copies and mode == "move":
+            # A digital copy has no shelf, so only a copy on a shelf moves.
+            movable = [c for c in copies if c.get("format") != "digital"] or copies
             target = next(
-                (c for c in copies if c.get("shelf_id") != shelf_id), copies[0]
+                (c for c in movable if c.get("shelf_id") != shelf_id), movable[0]
             )
             moved = await ctx.store.move_copy(target["id"], shelf_id)
             return {

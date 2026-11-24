@@ -252,27 +252,26 @@ def game_matches(
 ) -> bool:
     """Whether a game passes the ``list_games`` filters.
 
-    ``query`` searches the title, the barcode, the franchise, the genres and the
-    tags. ``shelf_id`` and ``room_id`` match a copy location.
+    ``query`` searches the title, the franchise, the genres, the tags and the
+    barcodes of the copies. ``shelf_id`` and ``room_id`` match a copy location.
     ``owned`` keeps games with or without copies. ``status`` with ``person_id``
     matches a reading status.
     """
-    query = str(filters.get("query") or "").strip().casefold()
-    if query:
-        haystack = " ".join(
-            [
-                game["title"],
-                game["barcode"] or "",
-                game["franchise"] or "",
-                *game["genres"],
-                *game["tags"],
-            ]
-        ).casefold()
-        if query not in haystack:
-            return False
     if copies_index is None:
         copies_index = copies_by_game(state)
     copies = copies_index.get(game["id"], [])
+    query = str(filters.get("query") or "").strip().casefold()
+    if query:
+        parts = [
+            game["title"],
+            game["franchise"],
+            *game["genres"],
+            *game["tags"],
+            *(c.get("barcode") for c in copies),
+        ]
+        haystack = " ".join(str(p) for p in parts if p).casefold()
+        if query not in haystack:
+            return False
     owned = filters.get("owned")
     if owned is not None and bool(copies) != owned:
         return False

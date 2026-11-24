@@ -326,10 +326,6 @@
           "name": "IGDB ID",
           "description": "Het ID van het spel in IGDB."
         },
-        "barcode": {
-          "name": "Barcode",
-          "description": "Het nummer van de barcode, bijvoorbeeld een EAN-13."
-        },
         "tags": {
           "name": "Labels",
           "description": "De labels van het boek."
@@ -366,6 +362,10 @@
           "name": "Plank",
           "description": "De ID van de plank. Leeg voor geen plank."
         },
+        "platform": {
+          "name": "Platform",
+          "description": "De console van het exemplaar, bijvoorbeeld ps5 of switch."
+        },
         "format": {
           "name": "Formaat",
           "description": "Het formaat van het exemplaar."
@@ -388,9 +388,33 @@
           "name": "Plank",
           "description": "De ID van de plank. Leeg voor geen plank."
         },
+        "platform": {
+          "name": "Platform",
+          "description": "De console van het exemplaar, bijvoorbeeld ps5 of switch."
+        },
         "format": {
           "name": "Formaat",
           "description": "Het formaat van het exemplaar."
+        },
+        "storefront": {
+          "name": "Winkel",
+          "description": "De winkel van een digitaal exemplaar, bijvoorbeeld PlayStation Store."
+        },
+        "region": {
+          "name": "Regio",
+          "description": "De regio van het exemplaar, bijvoorbeeld PAL."
+        },
+        "edition": {
+          "name": "Editie",
+          "description": "De editie, bijvoorbeeld Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "Het exemplaar zit in een steelbook-hoes."
+        },
+        "barcode": {
+          "name": "Barcode",
+          "description": "Het nummer van de barcode, bijvoorbeeld een EAN-13."
         },
         "condition": {
           "name": "Staat",
@@ -411,14 +435,6 @@
         "value": {
           "name": "Waarde",
           "description": "De huidige waarde van het exemplaar."
-        },
-        "signed": {
-          "name": "Gesigneerd",
-          "description": "Het exemplaar is gesigneerd."
-        },
-        "first_edition": {
-          "name": "Eerste druk",
-          "description": "Het exemplaar is een eerste druk."
         },
         "note": {
           "name": "Notitie",
@@ -438,9 +454,33 @@
           "name": "Plank",
           "description": "De ID van de plank. Leeg voor geen plank."
         },
+        "platform": {
+          "name": "Platform",
+          "description": "De console van het exemplaar, bijvoorbeeld ps5 of switch."
+        },
         "format": {
           "name": "Formaat",
           "description": "Het formaat van het exemplaar."
+        },
+        "storefront": {
+          "name": "Winkel",
+          "description": "De winkel van een digitaal exemplaar, bijvoorbeeld PlayStation Store."
+        },
+        "region": {
+          "name": "Regio",
+          "description": "De regio van het exemplaar, bijvoorbeeld PAL."
+        },
+        "edition": {
+          "name": "Editie",
+          "description": "De editie, bijvoorbeeld Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "Het exemplaar zit in een steelbook-hoes."
+        },
+        "barcode": {
+          "name": "Barcode",
+          "description": "Het nummer van de barcode, bijvoorbeeld een EAN-13."
         },
         "condition": {
           "name": "Staat",
@@ -461,14 +501,6 @@
         "value": {
           "name": "Waarde",
           "description": "De huidige waarde van het exemplaar."
-        },
-        "signed": {
-          "name": "Gesigneerd",
-          "description": "Het exemplaar is gesigneerd."
-        },
-        "first_edition": {
-          "name": "Eerste druk",
-          "description": "Het exemplaar is een eerste druk."
         },
         "note": {
           "name": "Notitie",
@@ -755,6 +787,10 @@
         "shelf_id": {
           "name": "Plank",
           "description": "De ID van de plank. Leeg voor geen plank."
+        },
+        "platform": {
+          "name": "Platform",
+          "description": "De console van het exemplaar, bijvoorbeeld ps5 of switch."
         },
         "format": {
           "name": "Formaat",
@@ -1070,6 +1106,9 @@
     },
     "import_cover_unreadable": {
       "message": "Het omslagbestand {file} is geen geldige afbeelding."
+    },
+    "digital_copy_no_shelf": {
+      "message": "Een digitaal exemplaar heeft geen plank."
     }
   }
 }

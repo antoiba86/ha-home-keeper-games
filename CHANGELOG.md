@@ -5,6 +5,14 @@ Each change that a user can see is in this file. The format is based on
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). `manifest.json` `version`
 is the single source of truth (see `RELEASE.md`).
 
+## [0.5.0b4] - 2026-11-23
+
+### Changed
+
+- **Copy details.** Each copy has a platform, a physical or digital format, a storefront,
+  a region, an edition, a steelbook mark and its own barcode, and a digital copy is on no
+  shelf. The signed and first edition marks are gone.
+
 ## [0.5.0b3] - 2026-11-23
 
 ### Changed

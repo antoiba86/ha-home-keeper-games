@@ -364,14 +364,8 @@ class LibraryStore:
     async def add_game(
         self, data: dict[str, Any], *, origin: str | None = None
     ) -> tuple[dict[str, Any], bool]:
-        """Add a game. Return ``(game, existing)``.
-
-        If the barcode of the new game matches a stored game, the store adds no
-        game and returns the stored one with ``existing`` True.
-        """
+        """Add a game. Return ``(game, existing)``, where ``existing`` is False."""
         game = models.build_game(data, now=now())
-        if found := models.find_game_by_barcode(self.state, game["barcode"]):
-            return dict(found), True
         self.state["games"][game["id"]] = game
         await self._commit([(EVENT_GAME_ADDED, events.game_event_data(game, origin))])
         return dict(game), False
@@ -381,10 +375,6 @@ class LibraryStore:
     ) -> dict[str, Any]:
         """Change the fields of a game."""
         updated, changed = models.update_game(self.game(game_id), data, now=now())
-        if "barcode" in changed and updated["barcode"]:
-            other = models.find_game_by_barcode(self.state, updated["barcode"])
-            if other is not None and other["id"] != game_id:
-                raise LibraryError("duplicate_barcode", barcode=updated["barcode"])
         return await self._replace_game(updated, changed, origin)
 
     async def _replace_game(
@@ -455,10 +445,18 @@ class LibraryStore:
 
     # ── Copies ───────────────────────────────────────────────────────────────
 
+    def _check_barcode(self, code: str | None, game_id: str) -> None:
+        """Refuse a barcode that a copy of another game has: 1 code is 1 game."""
+        other = models.find_game_by_barcode(self.state, code)
+        if other is not None and other["id"] != game_id:
+            raise LibraryError("duplicate_barcode", barcode=str(code))
+
     def _copy_record(self, data: dict[str, Any]) -> tuple[dict[str, Any], Any]:
         game = self.game(str(data.get("game_id")))
         self.check_shelf(data.get("shelf_id"))
-        return models.build_copy(data, now=now()), game
+        record = models.build_copy(data, now=now())
+        self._check_barcode(record["barcode"], game["id"])
+        return record, game
 
     async def add_copy(
         self, data: dict[str, Any], *, origin: str | None = None
@@ -499,6 +497,8 @@ class LibraryStore:
         updated, changed = models.update_copy(record, data)
         if not changed:
             return updated
+        if "barcode" in changed:
+            self._check_barcode(updated["barcode"], updated["game_id"])
         self.state["copies"][copy_id] = updated
         fired: list[Event] = []
         game = self.game(updated["game_id"])
@@ -520,7 +520,9 @@ class LibraryStore:
     async def move_copy(
         self, copy_id: str, shelf_id: str | None, *, origin: str | None = None
     ) -> dict[str, Any]:
-        """Move a copy to a shelf, or to no shelf."""
+        """Move a copy to a shelf, or to no shelf. A digital copy has no shelf."""
+        if shelf_id and self.copy(copy_id).get("format") == "digital":
+            raise LibraryError("digital_copy_no_shelf")
         return await self.update_copy(copy_id, {"shelf_id": shelf_id}, origin=origin)
 
     async def delete_copy(

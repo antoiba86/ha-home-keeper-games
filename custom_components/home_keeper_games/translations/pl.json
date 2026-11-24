@@ -326,10 +326,6 @@
           "name": "IGDB ID",
           "description": "ID gry w IGDB."
         },
-        "barcode": {
-          "name": "Kod kreskowy",
-          "description": "Numer kodu kreskowego, na przykład EAN-13."
-        },
         "tags": {
           "name": "Tagi",
           "description": "Tagi książki."
@@ -366,6 +362,10 @@
           "name": "Półka",
           "description": "ID półki. Puste dla braku półki."
         },
+        "platform": {
+          "name": "Platforma",
+          "description": "Konsola egzemplarza, na przykład ps5 lub switch."
+        },
         "format": {
           "name": "Format egzemplarza",
           "description": "Format egzemplarza."
@@ -388,9 +388,33 @@
           "name": "Półka",
           "description": "ID półki. Puste dla braku półki."
         },
+        "platform": {
+          "name": "Platforma",
+          "description": "Konsola egzemplarza, na przykład ps5 lub switch."
+        },
         "format": {
           "name": "Format egzemplarza",
           "description": "Format egzemplarza."
+        },
+        "storefront": {
+          "name": "Sklep",
+          "description": "Sklep egzemplarza cyfrowego, na przykład PlayStation Store."
+        },
+        "region": {
+          "name": "Region",
+          "description": "Region egzemplarza, na przykład PAL."
+        },
+        "edition": {
+          "name": "Edycja",
+          "description": "Edycja, na przykład Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "Egzemplarz jest w pudełku steelbook."
+        },
+        "barcode": {
+          "name": "Kod kreskowy",
+          "description": "Numer kodu kreskowego, na przykład EAN-13."
         },
         "condition": {
           "name": "Stan",
@@ -411,14 +435,6 @@
         "value": {
           "name": "Wartość",
           "description": "Obecna wartość egzemplarza."
-        },
-        "signed": {
-          "name": "Z autografem",
-          "description": "Egzemplarz ma autograf."
-        },
-        "first_edition": {
-          "name": "Pierwsze wydanie",
-          "description": "Egzemplarz to pierwsze wydanie."
         },
         "note": {
           "name": "Notatka",
@@ -438,9 +454,33 @@
           "name": "Półka",
           "description": "ID półki. Puste dla braku półki."
         },
+        "platform": {
+          "name": "Platforma",
+          "description": "Konsola egzemplarza, na przykład ps5 lub switch."
+        },
         "format": {
           "name": "Format egzemplarza",
           "description": "Format egzemplarza."
+        },
+        "storefront": {
+          "name": "Sklep",
+          "description": "Sklep egzemplarza cyfrowego, na przykład PlayStation Store."
+        },
+        "region": {
+          "name": "Region",
+          "description": "Region egzemplarza, na przykład PAL."
+        },
+        "edition": {
+          "name": "Edycja",
+          "description": "Edycja, na przykład Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "Egzemplarz jest w pudełku steelbook."
+        },
+        "barcode": {
+          "name": "Kod kreskowy",
+          "description": "Numer kodu kreskowego, na przykład EAN-13."
         },
         "condition": {
           "name": "Stan",
@@ -461,14 +501,6 @@
         "value": {
           "name": "Wartość",
           "description": "Obecna wartość egzemplarza."
-        },
-        "signed": {
-          "name": "Z autografem",
-          "description": "Egzemplarz ma autograf."
-        },
-        "first_edition": {
-          "name": "Pierwsze wydanie",
-          "description": "Egzemplarz to pierwsze wydanie."
         },
         "note": {
           "name": "Notatka",
@@ -755,6 +787,10 @@
         "shelf_id": {
           "name": "Półka",
           "description": "ID półki. Puste dla braku półki."
+        },
+        "platform": {
+          "name": "Platforma",
+          "description": "Konsola egzemplarza, na przykład ps5 lub switch."
         },
         "format": {
           "name": "Format egzemplarza",
@@ -1070,6 +1106,9 @@
     },
     "import_cover_unreadable": {
       "message": "Plik okładki {file} nie jest poprawnym obrazem."
+    },
+    "digital_copy_no_shelf": {
+      "message": "Egzemplarz cyfrowy nie ma półki."
     }
   }
 }

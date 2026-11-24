@@ -588,7 +588,6 @@ class _Planner:
             raw = record.get("id")
             key = {
                 "game_id": raw,
-                "barcode": fields.get("barcode"),
                 "title": fields["title"],
             }
             target, matched_by = _match_game(index, key)
@@ -698,6 +697,20 @@ class _Planner:
             data["shelf_id"] = shelf_id
             data["game_id"] = game_id
             raw = record.get("id")
+            code = data.get("barcode")
+            if code and any(
+                c.get("barcode") == code
+                and c.get("game_id") != game_id
+                and c["id"] != raw
+                for c in self.new["copies"].values()
+            ):
+                # 1 barcode is 1 game, as LibraryStore checks for each copy.
+                self.problem(
+                    LEVEL_ERROR, f"{path}.barcode", "duplicate_barcode", barcode=code
+                )
+                continue
+            if data.get("format") == "digital":
+                data["shelf_id"] = None
             title = str(self.new["games"][str(game_id)].get("title", ""))
             if isinstance(raw, str) and raw in self.new["copies"]:
                 copy = self.new["copies"][raw]
@@ -869,11 +882,9 @@ class _Planner:
 
 
 def _match_game(index: GameIndex, key: dict[str, Any]) -> tuple[str | None, str | None]:
-    """``(game_id, matched_by)``: by id, barcode, then title."""
+    """``(game_id, matched_by)``: by id, then title."""
     if key["game_id"] in index.by_id:
         return str(key["game_id"]), "id"
-    if key["barcode"] and key["barcode"] in index.barcode:
-        return index.barcode[key["barcode"]], "barcode"
     found = index.title.get(title_key(key["title"]))
     return (found, "title") if found else (None, None)
 

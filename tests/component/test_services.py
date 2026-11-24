@@ -135,9 +135,10 @@ async def test_move_unit_and_shelf(hass, setup_entry, call) -> None:
 
 async def test_games_and_duplicates(hass, setup_entry, call) -> None:
     added = async_capture_events(hass, EVENT("game_added"))
-    game = await _game(call, barcode="9780441478125")
-    assert game["barcode"] == "9780441478125" and game["title"] == "Dune"
+    game = await _game(call)
+    assert "barcode" not in game and game["title"] == "Dune"
     assert game["owned"] is False and game["cover_url"] is None
+    await call("add_copy", {"game_id": game["id"], "barcode": "9780441478125"})
     again = await call("add_game", {"barcode": "978-0-441-47812-5"})
     assert again["existing"] is True and again["game"]["id"] == game["id"]
     assert len(added) == 1
@@ -153,7 +154,7 @@ async def test_games_and_duplicates(hass, setup_entry, call) -> None:
     assert updated[0].data["changed_fields"] == ["igdb_id"]
     other = await _game(call, title="Other")
     with pytest.raises(ServiceValidationError) as info:
-        await call("update_game", {"game_id": other["id"], "barcode": "9780441478125"})
+        await call("add_copy", {"game_id": other["id"], "barcode": "9780441478125"})
     assert info.value.translation_key == "duplicate_barcode"
     with pytest.raises(ServiceValidationError) as info:
         await call("update_game", {"game_id": game["id"], "igdb_id": 0})
@@ -185,13 +186,16 @@ async def test_copies(hass, setup_entry, call) -> None:
             "add_copy",
             {
                 "game_id": game["id"],
-                "format": "hardcover",
+                "format": "physical",
+                "platform": "ps5",
+                "region": "PAL",
                 "price": 12.5,
-                "signed": True,
+                "steelbook": True,
             },
         )
     )["copy"]
-    assert copy["price"] == 12.5 and copy["signed"] is True
+    assert copy["price"] == 12.5 and copy["steelbook"] is True
+    assert copy["platform"] == "ps5" and copy["region"] == "PAL"
     assert added[0].data["copy_id"] == copy["id"]
     reply = await call("move_copy", {"copy_id": copy["id"], "shelf_id": shelf["id"]})
     assert reply["copy"]["shelf_id"] == shelf["id"]
@@ -201,6 +205,18 @@ async def test_copies(hass, setup_entry, call) -> None:
     with pytest.raises(ServiceValidationError) as info:
         await call("add_copy", {"game_id": game["id"], "shelf_id": "nope"})
     assert info.value.translation_key == "shelf_not_found"
+    digital = (
+        await call(
+            "add_copy",
+            {"game_id": game["id"], "format": "digital", "shelf_id": shelf["id"]},
+        )
+    )["copy"]
+    assert digital["shelf_id"] is None
+    with pytest.raises(ServiceValidationError) as info:
+        await call("move_copy", {"copy_id": digital["id"], "shelf_id": shelf["id"]})
+    assert info.value.translation_key == "digital_copy_no_shelf"
+    reply = await call("move_copy", {"copy_id": digital["id"], "shelf_id": None})
+    assert reply["copy"]["shelf_id"] is None
     await call("lend_game", {"copy_id": copy["id"], "party": "Zed", "add_task": False})
     with pytest.raises(ServiceValidationError) as info:
         await call("delete_copy", {"copy_id": copy["id"]})
@@ -353,7 +369,7 @@ async def test_wishlist_services(hass, setup_entry, call) -> None:
     assert reply["game"]["wishlist"]["buy"] is False
     copy = await call(
         "got_wishlist_game",
-        {"game_id": game["id"], "shelf_id": shelf["id"], "format": "hardcover"},
+        {"game_id": game["id"], "shelf_id": shelf["id"], "format": "physical"},
     )
     assert copy["copy"]["shelf_id"] == shelf["id"]
     state = setup_entry.runtime_data.store.state
@@ -371,7 +387,7 @@ async def test_import_and_export(hass, setup_entry, call) -> None:
     shelf = await _shelf(call)
     csv_text = (
         "title,genres,barcode,rating,status,format,finished,wishlist\n"
-        "Dune,Strategy,9780441013593,5,read,hardcover,2024-01-02,false\n"
+        "Dune,Strategy,9780441013593,5,read,physical,2024-01-02,false\n"
         "Emma,Puzzle,,,,,,true\n"
     )
     done = async_capture_events(hass, EVENT("import_completed"))

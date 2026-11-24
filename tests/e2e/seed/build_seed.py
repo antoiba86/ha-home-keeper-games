@@ -91,6 +91,25 @@ def seed_id(kind: str, key: str) -> str:
     return uuid.UUID(bytes=digest[:16], version=4).hex
 
 
+# The copy format of each book format of the seed tables.
+FORMAT_OF = {
+    "hardcover": "physical",
+    "paperback": "physical",
+    "ebook": "digital",
+    "audiobook": "digital",
+    "other": "other",
+}
+# The platforms that the seed copies use, picked by a hash of the game key.
+SEED_PLATFORMS = ("ps5", "switch", "ps4", "switch2", "pc")
+
+
+def seed_platform(key: str) -> str:
+    """A stable platform for a seed game."""
+    return SEED_PLATFORMS[
+        hashlib.sha256(key.encode()).digest()[0] % len(SEED_PLATFORMS)
+    ]
+
+
 def ean13(first12: str) -> str:
     """An EAN-13 barcode with a correct check digit for the first 12 digits."""
     total = sum(int(d) * (3 if i % 2 else 1) for i, d in enumerate(first12))
@@ -227,7 +246,9 @@ SHARED_NOTES = {
 }
 
 # (game, shelf or None, format, condition, acquired, acquired_from, price, value,
-#  signed, first_edition, note)
+#  signed, first_edition, note). The copy record takes the book format as physical or
+#  digital (FORMAT_OF), a platform from the game key, and the signed mark as a steelbook.
+#  The first copy of a game takes the barcode of the game.
 COPIES = [
     ("left_hand", "a2", "paperback", "good", "2019-05-04", "Elliott Bay Game Co.", 7.99, 45,
      True, False, "Signed at a reading in Portland."),
@@ -401,6 +422,7 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
         )
         shelf["id"] = seed_id("shelf", key)
         state["shelves"][shelf["id"]] = shelf
+    codes: dict[str, str] = {}
     for n, (key, row) in enumerate(GAMES.items()):
         (
             title,
@@ -417,7 +439,6 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
         created = f"2026-0{1 + n // 12}-{1 + n % 12 * 2:02d}T10:00:00+00:00"
         data: dict[str, Any] = {
             "title": title,
-            "barcode": ean13(code),
             "release_date": published,
             "genres": subjects,
             "franchise": series[0] if series else None,
@@ -434,6 +455,7 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
         if cov:
             game["cover"] = {"kind": "custom", "file": cover_file(key)}
         state["games"][game["id"]] = game
+        codes[key] = ean13(code)
     copy_ids: dict[str, list[str]] = {}
     for row in COPIES:
         game, shelf, fmt, cond, acquired, source, price, value, signed, first, note = (
@@ -443,14 +465,17 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
             {
                 "game_id": seed_id("book", game),
                 "shelf_id": seed_id("shelf", shelf) if shelf else None,
-                "format": fmt,
+                "format": FORMAT_OF[fmt],
+                "platform": seed_platform(game),
+                "steelbook": signed,
+                "edition": "First print" if first else "",
+                "region": "PAL",
+                "barcode": None if copy_ids.get(game) else codes[game],
                 "condition": cond,
                 "acquired": acquired,
                 "acquired_from": source,
                 "price": price,
                 "value": value,
-                "signed": signed,
-                "first_edition": first,
                 "note": note,
             },
             now=state["games"][seed_id("book", game)]["created_at"],
@@ -504,7 +529,7 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
                 "copy_id": copy_ids[game][index] if index is not None else None,
                 "party": party,
                 "person_id": person,
-                "format": fmt,
+                "format": FORMAT_OF[fmt] if fmt else None,
                 "started": started,
                 "due": due,
                 "note": note,

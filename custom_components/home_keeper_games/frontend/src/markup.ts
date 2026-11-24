@@ -4,7 +4,7 @@
 import { t } from './i18n';
 import type { Game, Lib, Person, ReadingStatus } from './types';
 import type { LibraryApi } from './api';
-import { COVER_SIGN_SECONDS, coverColors, CoverUrls, escapeHTML, initials, type TabRoute } from './utils';
+import { COVER_SIGN_SECONDS, coverColors, CoverUrls, escapeHTML, FORMATS, initials, PLATFORMS, platformLabel, type TabRoute } from './utils';
 
 /** The panel URL of the tab. A tab path is added after it. */
 export const TAB_BASE = '/home-keeper/games';
@@ -123,11 +123,13 @@ export function personOptions(lib: Lib, selected: string | null): string {
 
 /** The format options of a copy or a loan. */
 export function formatOptions(selected: string | null, withEmpty = false): string {
-  const items: Array<[string, string]> = ['hardcover', 'paperback', 'ebook', 'audiobook', 'other'].map((f) => [
-    f,
-    t(`format.kind_${f}`),
-  ]);
+  const items: Array<[string, string]> = FORMATS.map((f) => [f, t(`format.kind_${f}`)]);
   return options(withEmpty ? [['', t('common.none')], ...items] : items, selected);
+}
+
+/** The platform options of a copy. */
+export function platformOptions(selected: string | null): string {
+  return options(PLATFORMS.map((p): [string, string] => [p, platformLabel(p)]), selected);
 }
 
 /** The top navigation of the tab, with the view actions on the right. */

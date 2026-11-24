@@ -5,7 +5,7 @@ implements:
   - custom_components/home_keeper_games/store.py
   - custom_components/home_keeper_games/models.py
 related: [architecture, events-api, people-privilege, csv-import-export]
-source_hash: a92d187f3c88
+source_hash: fb03d0d13e00
 ---
 
 # Store and models
@@ -60,7 +60,12 @@ storage version stays 1.1.
 - A bad value raises `models.LibraryError` with a key and placeholders. The key is in
   `strings.json` `exceptions`.
 - A barcode goes through `models.barcode`
-  ([scan-and-barcode](scan-and-barcode.md#barcode-rules)).
+  ([scan-and-barcode](scan-and-barcode.md#barcode-rules)). The barcode is a field of the
+  copy, because 2 platforms of 1 game have 2 codes.
+- A copy has a `platform` from `models.PLATFORMS` and a `format` from `models.FORMATS`
+  (`physical`, `digital`, `other`). A digital copy has no shelf: `build_copy` and
+  `update_copy` set `shelf_id` to null, and `move_copy` to a shelf raises
+  `digital_copy_no_shelf`.
 - `models.title_key` folds the whole title for a match with no barcode. The part after
   `:` counts, because it often names another game of 1 franchise.
 
@@ -75,9 +80,10 @@ listener. A listener that fails is logged and the others still run. The listener
 
 ### Rules
 
-- **Duplicates.** `add_game` returns the stored game with `existing: true` when the
-  barcode matches. A second copy is a separate call. `update_game` refuses a barcode that
-  another game has with `duplicate_barcode`.
+- **Duplicates.** `add_game` with a barcode returns the game of the oldest copy that
+  has the code (`models.find_game_by_barcode`), with `existing: true`. A second copy is a
+  separate call. `add_copy` and `update_copy` refuse a barcode that a copy of another game
+  has with `duplicate_barcode`.
 - **Locations.** A room with units, a unit with shelves and a shelf with copies
   fail to delete with a localized error, unless `force: true`. With `force`, each child
   is removed and each copy moves to no shelf.

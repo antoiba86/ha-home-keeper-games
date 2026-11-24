@@ -22,7 +22,7 @@ async def test_copy_updated(hass, setup_entry, call) -> None:
     moved = async_capture_events(hass, EVENT("copy_moved"))
     game = await _game(call)
     copy = (await call("add_copy", {"game_id": game["id"]}))["copy"]
-    await call("update_copy", {"copy_id": copy["id"], "price": 12, "signed": True})
+    await call("update_copy", {"copy_id": copy["id"], "price": 12, "steelbook": True})
     assert [e.data for e in updated] == [
         {
             "game_id": game["id"],
@@ -31,7 +31,7 @@ async def test_copy_updated(hass, setup_entry, call) -> None:
             "origin": None,
             "copy_id": copy["id"],
             "shelf_id": None,
-            "changed_fields": ["price", "signed"],
+            "changed_fields": ["steelbook", "price"],
         }
     ]
     assert "price" not in updated[0].data and moved == []

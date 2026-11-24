@@ -6,7 +6,7 @@ implements:
   - custom_components/home_keeper_games/frontend/src/zxing-decoder.ts
   - custom_components/home_keeper_games/frontend/src/tab-scan.ts
 related: [covers, store-models, frontend-tab-card, loans-home-keeper]
-source_hash: 274c18dd9302
+source_hash: caad69b2e062
 ---
 
 # Scan and barcode
@@ -35,12 +35,12 @@ cannot read is typed by hand. Each scan calls the `scan_barcode` service.
 ## Design
 
 ### Barcode rules
-
-`models.barcode` removes spaces and hyphens, changes letters to capitals, and accepts 1 to
-50 letters and digits. Any other value raises `invalid_barcode`. `utils.normalizeBarcode`
-has the same rule for the tab, so the tab can refuse a bad code before a call. A field
-that takes a title or a barcode (`utils.retailBarcode`) reads the text as a barcode only
-when it is an EAN-8, UPC-A or EAN-13 with a correct check digit, so a title such as
+ `models.barcode` removes spaces and hyphens, changes letters to capitals, and accepts 1 to 50
+letters and digits. Any other value raises `invalid_barcode`. The code is a field of the copy, and
+`duplicate_barcode` stops a copy of a 2nd game from taking a code that a copy of another game has.
+`utils.normalizeBarcode` has the same rule for the tab, so the tab can refuse a bad code before a
+call. A field that takes a title or a barcode (`utils.retailBarcode`) reads the text as a barcode
+only when it is an EAN-8, UPC-A or EAN-13 with a correct check digit, so a title such as
 "1984" stays a title.
 
 ### Scanner
@@ -87,7 +87,7 @@ A `not_found` result opens the title sheet (`scan-title` dialog, `nextMiss` in `
 The camera reads no code and **Enter barcode** adds no game until the user saves a title or
 selects **Remove this scan**. The sheet has no close button, and Escape and the scrim do
 not close it. Save calls `update_game` with the title and each optional field that has a
-value, `update_copy` for a new format, and `set_cover` for a photo. Remove calls
+value, `update_copy` for a new format or platform, and `set_cover` for a photo. Remove calls
 `delete_game`. A failed call keeps the sheet open with the error. The game keeps
 `needs_details`. A 2nd miss waits until the 1st closes. After the last sheet, the barcode
 field gets the focus. If the user leaves the scan, the sheet closes and the game keeps its
@@ -100,12 +100,15 @@ of the session, and adds no copy ([loans-home-keeper](loans-home-keeper.md)).
 
 1. Check the shelf. A missing `shelf_id` means no shelf.
 2. Clean the barcode. An empty value raises `field_required`.
-3. If no game has the barcode, add a game with the barcode as its title and
-   `needs_details: true`, and add a copy. The result is `not_found`.
+3. If no copy has the barcode, add a game with the barcode as its title and
+   `needs_details: true`, and add a copy with the barcode, the `platform` and the
+   `format`. The result is `not_found`.
 4. If the game has no copy, add a copy: `added`.
 5. If the game has copies, `on_duplicate` decides: `ask` returns `duplicate` with the
-   copies and their locations, `skip` returns `skipped`, `move` moves a copy from
-   another shelf and returns `moved`, and `add_copy` adds a copy.
+   copies and their locations, `skip` returns `skipped`, `move` moves a copy that is not
+   digital from another shelf and returns `moved`, and `add_copy` adds a copy.
+
+The scan setup has a platform and a format. Each copy that the scan adds gets them.
 
 The reply has `from_wishlist: true` when the new copy took its game off the wishlist
 ([store-models](store-models.md#rules)). The service then runs the wishlist sync, so the
@@ -124,8 +127,8 @@ to-do item goes at once.
 
 ## One-way doors
 
-- The `scan_barcode` fields (`barcode`, `shelf_id`, `format`, `on_duplicate`), the result
-  values `added`, `duplicate`, `moved`, `skipped` and `not_found`, and the reply key
+- The `scan_barcode` fields (`barcode`, `shelf_id`, `platform`, `format`, `on_duplicate`), the
+  result values `added`, `duplicate`, `moved`, `skipped` and `not_found`, and the reply key
   `from_wishlist`.
 - The scan URL and its parameters `shelf`, `mode` and `step`.
 - The cleaned barcode as the key of the duplicate check.

@@ -326,10 +326,6 @@
           "name": "IGDB ID",
           "description": "Die ID des Spiels in IGDB."
         },
-        "barcode": {
-          "name": "Barcode",
-          "description": "Die Nummer des Barcodes, zum Beispiel ein EAN-13."
-        },
         "tags": {
           "name": "Schlagwörter",
           "description": "Die Schlagwörter des Buchs."
@@ -366,6 +362,10 @@
           "name": "Regalboden",
           "description": "Die ID des Regalbodens. Leer für keinen Regalboden."
         },
+        "platform": {
+          "name": "Plattform",
+          "description": "Die Konsole des Exemplars, zum Beispiel ps5 oder switch."
+        },
         "format": {
           "name": "Format",
           "description": "Das Format des Exemplars."
@@ -388,9 +388,33 @@
           "name": "Regalboden",
           "description": "Die ID des Regalbodens. Leer für keinen Regalboden."
         },
+        "platform": {
+          "name": "Plattform",
+          "description": "Die Konsole des Exemplars, zum Beispiel ps5 oder switch."
+        },
         "format": {
           "name": "Format",
           "description": "Das Format des Exemplars."
+        },
+        "storefront": {
+          "name": "Shop",
+          "description": "Der Shop eines digitalen Exemplars, zum Beispiel PlayStation Store."
+        },
+        "region": {
+          "name": "Region",
+          "description": "Die Region des Exemplars, zum Beispiel PAL."
+        },
+        "edition": {
+          "name": "Edition",
+          "description": "Die Edition, zum Beispiel Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "Das Exemplar ist in einer Steelbook-Hülle."
+        },
+        "barcode": {
+          "name": "Barcode",
+          "description": "Die Nummer des Barcodes, zum Beispiel ein EAN-13."
         },
         "condition": {
           "name": "Zustand",
@@ -411,14 +435,6 @@
         "value": {
           "name": "Wert",
           "description": "Der aktuelle Wert des Exemplars."
-        },
-        "signed": {
-          "name": "Signiert",
-          "description": "Das Exemplar ist signiert."
-        },
-        "first_edition": {
-          "name": "Erstausgabe",
-          "description": "Das Exemplar ist eine Erstausgabe."
         },
         "note": {
           "name": "Notiz",
@@ -438,9 +454,33 @@
           "name": "Regalboden",
           "description": "Die ID des Regalbodens. Leer für keinen Regalboden."
         },
+        "platform": {
+          "name": "Plattform",
+          "description": "Die Konsole des Exemplars, zum Beispiel ps5 oder switch."
+        },
         "format": {
           "name": "Format",
           "description": "Das Format des Exemplars."
+        },
+        "storefront": {
+          "name": "Shop",
+          "description": "Der Shop eines digitalen Exemplars, zum Beispiel PlayStation Store."
+        },
+        "region": {
+          "name": "Region",
+          "description": "Die Region des Exemplars, zum Beispiel PAL."
+        },
+        "edition": {
+          "name": "Edition",
+          "description": "Die Edition, zum Beispiel Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "Das Exemplar ist in einer Steelbook-Hülle."
+        },
+        "barcode": {
+          "name": "Barcode",
+          "description": "Die Nummer des Barcodes, zum Beispiel ein EAN-13."
         },
         "condition": {
           "name": "Zustand",
@@ -461,14 +501,6 @@
         "value": {
           "name": "Wert",
           "description": "Der aktuelle Wert des Exemplars."
-        },
-        "signed": {
-          "name": "Signiert",
-          "description": "Das Exemplar ist signiert."
-        },
-        "first_edition": {
-          "name": "Erstausgabe",
-          "description": "Das Exemplar ist eine Erstausgabe."
         },
         "note": {
           "name": "Notiz",
@@ -755,6 +787,10 @@
         "shelf_id": {
           "name": "Regalboden",
           "description": "Die ID des Regalbodens. Leer für keinen Regalboden."
+        },
+        "platform": {
+          "name": "Plattform",
+          "description": "Die Konsole des Exemplars, zum Beispiel ps5 oder switch."
         },
         "format": {
           "name": "Format",
@@ -1070,6 +1106,9 @@
     },
     "import_cover_unreadable": {
       "message": "Die Coverdatei {file} ist kein gültiges Bild."
+    },
+    "digital_copy_no_shelf": {
+      "message": "Ein digitales Exemplar hat keinen Regalboden."
     }
   }
 }

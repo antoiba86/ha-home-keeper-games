@@ -326,10 +326,6 @@
           "name": "IGDB ID",
           "description": "游戏在 IGDB 中的 ID。"
         },
-        "barcode": {
-          "name": "条形码",
-          "description": "条形码编号，例如 EAN-13。"
-        },
         "tags": {
           "name": "标签",
           "description": "图书的标签。"
@@ -366,6 +362,10 @@
           "name": "书架层",
           "description": "书架层的 ID。留空表示没有书架层。"
         },
+        "platform": {
+          "name": "平台",
+          "description": "副本的主机，例如 ps5 或 switch。"
+        },
         "format": {
           "name": "形式",
           "description": "藏本的形式。"
@@ -388,9 +388,33 @@
           "name": "书架层",
           "description": "书架层的 ID。留空表示没有书架层。"
         },
+        "platform": {
+          "name": "平台",
+          "description": "副本的主机，例如 ps5 或 switch。"
+        },
         "format": {
           "name": "形式",
           "description": "藏本的形式。"
+        },
+        "storefront": {
+          "name": "商店",
+          "description": "数字副本的商店，例如 PlayStation Store。"
+        },
+        "region": {
+          "name": "地区",
+          "description": "副本的地区，例如 PAL。"
+        },
+        "edition": {
+          "name": "版本",
+          "description": "版本，例如 Collector's Edition。"
+        },
+        "steelbook": {
+          "name": "铁盒",
+          "description": "副本装在铁盒中。"
+        },
+        "barcode": {
+          "name": "条形码",
+          "description": "条形码编号，例如 EAN-13。"
         },
         "condition": {
           "name": "品相",
@@ -411,14 +435,6 @@
         "value": {
           "name": "价值",
           "description": "藏本当前的价值。"
-        },
-        "signed": {
-          "name": "签名本",
-          "description": "该藏本有签名。"
-        },
-        "first_edition": {
-          "name": "初版",
-          "description": "该藏本是初版。"
         },
         "note": {
           "name": "备注",
@@ -438,9 +454,33 @@
           "name": "书架层",
           "description": "书架层的 ID。留空表示没有书架层。"
         },
+        "platform": {
+          "name": "平台",
+          "description": "副本的主机，例如 ps5 或 switch。"
+        },
         "format": {
           "name": "形式",
           "description": "藏本的形式。"
+        },
+        "storefront": {
+          "name": "商店",
+          "description": "数字副本的商店，例如 PlayStation Store。"
+        },
+        "region": {
+          "name": "地区",
+          "description": "副本的地区，例如 PAL。"
+        },
+        "edition": {
+          "name": "版本",
+          "description": "版本，例如 Collector's Edition。"
+        },
+        "steelbook": {
+          "name": "铁盒",
+          "description": "副本装在铁盒中。"
+        },
+        "barcode": {
+          "name": "条形码",
+          "description": "条形码编号，例如 EAN-13。"
         },
         "condition": {
           "name": "品相",
@@ -461,14 +501,6 @@
         "value": {
           "name": "价值",
           "description": "藏本当前的价值。"
-        },
-        "signed": {
-          "name": "签名本",
-          "description": "该藏本有签名。"
-        },
-        "first_edition": {
-          "name": "初版",
-          "description": "该藏本是初版。"
         },
         "note": {
           "name": "备注",
@@ -755,6 +787,10 @@
         "shelf_id": {
           "name": "书架层",
           "description": "书架层的 ID。留空表示没有书架层。"
+        },
+        "platform": {
+          "name": "平台",
+          "description": "副本的主机，例如 ps5 或 switch。"
         },
         "format": {
           "name": "形式",
@@ -1070,6 +1106,9 @@
     },
     "import_cover_unreadable": {
       "message": "封面文件 {file} 不是有效的图片。"
+    },
+    "digital_copy_no_shelf": {
+      "message": "数字副本没有书架层。"
     }
   }
 }

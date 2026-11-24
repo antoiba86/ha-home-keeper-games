@@ -11,6 +11,7 @@ console, and the play status of each person.
 
 - The **Games** tab of the Home Keeper panel, with the rooms, shelves and items.
 - A barcode scan into a shelf. A new barcode asks for the title.
+- Copies with a platform, a physical or digital format, and the barcode of the case.
 - Loans with a Home Keeper task, and a wishlist for each person.
 - A CSV import and export in the format of Home Keeper Games.
 - The [dashboard card](../views/dashboard-card.md), the sensors and the

@@ -326,10 +326,6 @@
           "name": "IGDB ID",
           "description": "El ID del juego en IGDB."
         },
-        "barcode": {
-          "name": "Código de barras",
-          "description": "El número del código de barras, como un EAN-13."
-        },
         "tags": {
           "name": "Etiquetas",
           "description": "Las etiquetas del libro."
@@ -366,6 +362,10 @@
           "name": "Estante",
           "description": "El ID del estante. Vacío para ningún estante."
         },
+        "platform": {
+          "name": "Plataforma",
+          "description": "La consola de la copia, como ps5 o switch."
+        },
         "format": {
           "name": "Formato",
           "description": "El formato del ejemplar."
@@ -388,9 +388,33 @@
           "name": "Estante",
           "description": "El ID del estante. Vacío para ningún estante."
         },
+        "platform": {
+          "name": "Plataforma",
+          "description": "La consola de la copia, como ps5 o switch."
+        },
         "format": {
           "name": "Formato",
           "description": "El formato del ejemplar."
+        },
+        "storefront": {
+          "name": "Tienda",
+          "description": "La tienda de una copia digital, como PlayStation Store."
+        },
+        "region": {
+          "name": "Región",
+          "description": "La región de la copia, como PAL."
+        },
+        "edition": {
+          "name": "Edición",
+          "description": "La edición, como Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "La copia está en una caja steelbook."
+        },
+        "barcode": {
+          "name": "Código de barras",
+          "description": "El número del código de barras, como un EAN-13."
         },
         "condition": {
           "name": "Estado",
@@ -411,14 +435,6 @@
         "value": {
           "name": "Valor",
           "description": "El valor actual del ejemplar."
-        },
-        "signed": {
-          "name": "Firmado",
-          "description": "El ejemplar está firmado."
-        },
-        "first_edition": {
-          "name": "Primera edición",
-          "description": "El ejemplar es una primera edición."
         },
         "note": {
           "name": "Nota",
@@ -438,9 +454,33 @@
           "name": "Estante",
           "description": "El ID del estante. Vacío para ningún estante."
         },
+        "platform": {
+          "name": "Plataforma",
+          "description": "La consola de la copia, como ps5 o switch."
+        },
         "format": {
           "name": "Formato",
           "description": "El formato del ejemplar."
+        },
+        "storefront": {
+          "name": "Tienda",
+          "description": "La tienda de una copia digital, como PlayStation Store."
+        },
+        "region": {
+          "name": "Región",
+          "description": "La región de la copia, como PAL."
+        },
+        "edition": {
+          "name": "Edición",
+          "description": "La edición, como Collector's Edition."
+        },
+        "steelbook": {
+          "name": "Steelbook",
+          "description": "La copia está en una caja steelbook."
+        },
+        "barcode": {
+          "name": "Código de barras",
+          "description": "El número del código de barras, como un EAN-13."
         },
         "condition": {
           "name": "Estado",
@@ -461,14 +501,6 @@
         "value": {
           "name": "Valor",
           "description": "El valor actual del ejemplar."
-        },
-        "signed": {
-          "name": "Firmado",
-          "description": "El ejemplar está firmado."
-        },
-        "first_edition": {
-          "name": "Primera edición",
-          "description": "El ejemplar es una primera edición."
         },
         "note": {
           "name": "Nota",
@@ -755,6 +787,10 @@
         "shelf_id": {
           "name": "Estante",
           "description": "El ID del estante. Vacío para ningún estante."
+        },
+        "platform": {
+          "name": "Plataforma",
+          "description": "La consola de la copia, como ps5 o switch."
         },
         "format": {
           "name": "Formato",
@@ -1070,6 +1106,9 @@
     },
     "import_cover_unreadable": {
       "message": "El archivo de portada {file} no es una imagen válida."
+    },
+    "digital_copy_no_shelf": {
+      "message": "Una copia digital no tiene estante."
     }
   }
 }

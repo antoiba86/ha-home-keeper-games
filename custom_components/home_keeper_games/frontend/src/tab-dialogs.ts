@@ -3,7 +3,7 @@
 // view, so a data push does not clear what the user types.
 
 import { t } from './i18n';
-import { formatOptions, ICONS, options, personOptions, shelfOptions } from './markup';
+import { formatOptions, ICONS, options, personOptions, platformOptions, shelfOptions } from './markup';
 import type { ViewCtx } from './tab-types';
 import type { Copy } from './types';
 import { escapeHTML, locationLabel } from './utils';
@@ -52,15 +52,19 @@ function copyFields(ctx: ViewCtx, copy: Copy | null): string {
   const conditions: Array<[string, string]> = [['', t('common.none')], ...['new', 'fine', 'good', 'fair', 'poor'].map((c): [string, string] => [c, t(`condition.${c}`)])];
   return `<div class="hkl-fields">
     ${field(t('copy.shelf'), `<select name="shelf_id" data-k="d-shelf">${shelfOptions(ctx.lib, copy?.shelf_id ?? null)}</select>`)}
-    ${field(t('copy.format'), `<select name="format" data-k="d-format">${formatOptions(copy?.format ?? 'paperback')}</select>`)}
+    ${field(t('copy.platform'), `<select name="platform" data-k="d-platform">${platformOptions(copy?.platform ?? 'other')}</select>`)}
+    ${field(t('copy.format'), `<select name="format" data-k="d-format">${formatOptions(copy?.format ?? 'physical')}</select>`)}
+    ${field(t('copy.storefront'), text('storefront', copy?.storefront))}
+    ${field(t('copy.region'), text('region', copy?.region), 'small')}
+    ${field(t('copy.edition'), text('edition', copy?.edition))}
+    ${field(t('game.barcode_label'), text('barcode', copy?.barcode ?? '', 'autocomplete="off"'))}
     ${field(t('copy.condition'), `<select name="condition" data-k="d-condition">${options(conditions, copy?.condition ?? '')}</select>`)}
     ${field(t('copy.acquired'), text('acquired', copy?.acquired, 'type="date"'))}
     ${field(t('copy.acquired_from'), text('acquired_from', copy?.acquired_from))}
     ${field(t('copy.price'), text('price', copy?.price, 'inputmode="decimal"'), 'small')}
     ${field(t('copy.value'), text('value', copy?.value, 'inputmode="decimal"'), 'small')}
   </div>
-  ${check('signed', t('copy.signed'), Boolean(copy?.signed))}
-  ${check('first_edition', t('copy.first_edition'), Boolean(copy?.first_edition))}
+  ${check('steelbook', t('copy.steelbook'), Boolean(copy?.steelbook))}
   ${field(t('copy.note'), text('note', copy?.note), 'wide')}`;
 }
 
@@ -90,7 +94,8 @@ function scanTitleBody(ctx: ViewCtx, d: Extract<Dialog, { kind: 'scan-title' }>)
           ${field(t('game.franchise'), text('franchise'), 'wide')}
           ${field(t('game.genres'), text('genres'), 'wide')}
           ${field(t('game.release_date'), text('release_date'), 'small')}
-          ${field(t('copy.format'), `<select name="format" data-k="d-format">${formatOptions(copy?.format ?? 'paperback')}</select>`)}
+          ${field(t('copy.platform'), `<select name="platform" data-k="d-platform">${platformOptions(copy?.platform ?? 'other')}</select>`)}
+          ${field(t('copy.format'), `<select name="format" data-k="d-format">${formatOptions(copy?.format ?? 'physical')}</select>`)}
           <label class="hkl-btn outline hkl-miss-cover">${ICONS.camera}<input class="hkl-sr" type="file" name="cover" accept="image/jpeg,image/png,image/webp" capture="environment" data-chg="miss-cover" data-k="d-cover" /><span data-k="d-cover-name">${escapeHTML(t('scan.miss_cover'))}</span></label>
         </div>
       </details>`,
@@ -107,7 +112,8 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
           ${check('own', t('dialog.own_copy'), true)}
           <div class="hkl-fields">
             ${field(t('copy.shelf'), `<select name="shelf_id" data-k="d-shelf">${shelfOptions(ctx.lib, null)}</select>`)}
-            ${field(t('copy.format'), `<select name="format" data-k="d-format">${formatOptions('paperback')}</select>`)}
+            ${field(t('copy.platform'), `<select name="platform" data-k="d-platform">${platformOptions('other')}</select>`)}
+            ${field(t('copy.format'), `<select name="format" data-k="d-format">${formatOptions('physical')}</select>`)}
           </div>`,
       };
     case 'scan-title':
@@ -122,7 +128,6 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
           ${field(t('game.franchise'), text('franchise', b?.franchise ?? ''), 'wide')}
           ${field(t('game.genres'), text('genres', b?.genres.join(', ')), 'wide')}
           ${field(t('game.release_date'), text('release_date', b?.release_date), 'small')}
-          ${field(t('game.barcode_label'), text('barcode', b?.barcode ?? '', 'autocomplete="off"'))}
           ${field(t('game.tags'), text('tags', b?.tags.join(', ')), 'wide')}
         </div>
         ${field(t('game.summary'), `<textarea name="summary" rows="4" data-k="d-summary">${escapeHTML(b?.summary ?? '')}</textarea>`, 'wide')}
@@ -155,7 +160,7 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
     }
     case 'lend': {
       const avail = ctx.lib.copies
-        .filter((c) => !ctx.idx.loanByCopy.has(c.id) && c.format !== 'ebook' && c.format !== 'audiobook')
+        .filter((c) => !ctx.idx.loanByCopy.has(c.id) && c.format !== 'digital')
         .filter((c) => !d.gameId || c.game_id === d.gameId)
         .map((c): [string, string] => [c.id, `${ctx.idx.game.get(c.game_id)?.title ?? ''} · ${c.shelf_id ? locationLabel(ctx.idx, c.shelf_id) : t('common.no_shelf')}`])
         .sort((a, b) => a[1].localeCompare(b[1]));
@@ -180,7 +185,7 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
           <div class="hkl-fields">
             ${field(t('loan.lender'), text('party', '', 'required'))}
             ${field(t('common.person'), `<select name="person_id" data-k="d-person">${personOptions(ctx.lib, ctx.me)}</select>`)}
-            ${field(t('copy.format'), `<select name="format" data-k="d-format">${formatOptions('paperback')}</select>`)}
+            ${field(t('copy.format'), `<select name="format" data-k="d-format">${formatOptions('physical')}</select>`)}
             ${field(t('loan.started'), text('started', ctx.today, 'type="date"'), 'small')}
             ${field(t('loan.due'), text('due', '', 'type="date"'), 'small')}
           </div>
@@ -205,7 +210,8 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
         submit: t('action.save'),
         html: `<p><b>${escapeHTML(b?.title ?? '')}</b></p><div class="hkl-fields">
           ${field(t('copy.shelf'), `<select name="shelf_id" data-k="d-shelf">${shelfOptions(ctx.lib, null)}</select>`)}
-          ${field(t('copy.format'), `<select name="format" data-k="d-format">${formatOptions('paperback')}</select>`)}
+          ${field(t('copy.platform'), `<select name="platform" data-k="d-platform">${platformOptions('other')}</select>`)}
+            ${field(t('copy.format'), `<select name="format" data-k="d-format">${formatOptions('physical')}</select>`)}
         </div>`,
       };
     }

@@ -17,8 +17,8 @@ Keeper as a task.
 | Room | A room of the home. It can link to a Home Assistant area. |
 | Bookcase | A piece of furniture in a room. It holds shelves. |
 | Shelf | 1 shelf of a bookcase. |
-| Book | A title, with its franchise, genres, release date, barcode, cover and notes. |
-| Copy | 1 book that the household owns, on a shelf, in a format. A book can have 0, 1 or more copies. |
+| Book | A title, with its franchise, genres, release date, cover and notes. |
+| Copy | 1 book that the household owns, with a platform, a format and the barcode of its case. A physical copy is on a shelf. A book can have 0, 1 or more copies. |
 | Reading status | Want to read, Reading, Read or Did not finish, for 1 person. |
 | Loan | A copy that the household lent out, or a book that a person borrowed. |
 | Wishlist | The books that a person wants to get. |

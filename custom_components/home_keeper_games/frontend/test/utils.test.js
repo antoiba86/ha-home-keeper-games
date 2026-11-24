@@ -38,11 +38,15 @@ const copy = (id, gameId, shelfId, extra = {}) => ({
   id,
   game_id: gameId,
   shelf_id: shelfId,
-  format: 'paperback',
+  platform: 'other',
+  format: 'physical',
+  storefront: '',
+  region: '',
+  edition: '',
+  steelbook: false,
+  barcode: null,
   condition: null,
   acquired: null,
-  signed: false,
-  first_edition: false,
   note: '',
   created_at: '',
   ...extra,
@@ -355,7 +359,6 @@ describe('reading helpers and search', () => {
   const b = game('b', {
     title: 'The Left Hand',
     genres: ['Strategy game'],
-    barcode: '9780441478125',
     franchise: 'Hainish',
     shared_notes: 'Game club',
     tags: ['hugo'],
@@ -372,8 +375,13 @@ describe('reading helpers and search', () => {
   });
 
   it('searches each field', () => {
-    for (const q of ['left hand', 'STRATEGY', 'game', '9780441478125', '978-0-441-47812-5', '0441478125', 'hainish', 'club', 'hugo', 'secret']) {
+    for (const q of ['left hand', 'STRATEGY', 'game', 'hainish', 'club', 'hugo', 'secret']) {
       expect(u.matchesSearch(b, q, 'me'), q).toBe(true);
+    }
+    // The barcode is on a copy. The caller passes the codes of the copies.
+    for (const q of ['9780441478125', '978-0-441-47812-5', '0441478125']) {
+      expect(u.matchesSearch(b, q, 'me', [null, '9780441478125']), q).toBe(true);
+      expect(u.matchesSearch(b, q, 'me'), q).toBe(false);
     }
   });
 
@@ -386,9 +394,10 @@ describe('reading helpers and search', () => {
   });
 
   it('matches a hyphenated barcode only as digits', () => {
-    expect(u.matchesSearch(b, '0-441-47812-5', 'me')).toBe(true);
-    expect(u.matchesSearch(b, '0441478125x', 'me')).toBe(false);
-    expect(u.matchesSearch(b, '978-0-441-9', 'me')).toBe(false);
+    const codes = ['9780441478125'];
+    expect(u.matchesSearch(b, '0-441-47812-5', 'me', codes)).toBe(true);
+    expect(u.matchesSearch(b, '0441478125x', 'me', codes)).toBe(false);
+    expect(u.matchesSearch(b, '978-0-441-9', 'me', codes)).toBe(false);
     expect(u.matchesSearch(game('n', { title: 'a-b' }), 'ab', null)).toBe(false);
   });
 
@@ -397,8 +406,29 @@ describe('reading helpers and search', () => {
     expect(u.matchesSearch(game('g', { title: 'Godel' }), 'Gödel', null)).toBe(true);
   });
 
+  it('reads only the extra text that the caller gives', () => {
+    const g = game('x', { title: 'Plain' });
+    expect(u.searchText(g, null)).not.toMatch(/stryker/i);
+    expect(u.matchesSearch(g, 'stryker', null)).toBe(false);
+    expect(u.matchesSearch(g, 'abc', null, [null, 'ABC'])).toBe(true);
+  });
+
   it('separates fields so a search does not join 2 fields', () => {
     expect(u.searchText(game('s', { title: 'ab', franchise: 'cd' }), null)).not.toContain('abcd');
+  });
+});
+
+describe('copy formats and platforms', () => {
+  it('lists the formats and the platforms in display order', () => {
+    expect(u.FORMATS).toEqual(['physical', 'digital', 'other']);
+    expect(u.PLATFORMS).toEqual(['ps5', 'ps4', 'ps3', 'switch2', 'switch', 'xbox_series', 'xbox_one', 'pc', 'other']);
+  });
+
+  it('names each platform, and any other value as Other platform', () => {
+    expect(u.PLATFORMS.map((p) => u.platformLabel(p))).toEqual([
+      'PS5', 'PS4', 'PS3', 'Switch 2', 'Switch', 'Xbox Series', 'Xbox One', 'PC', 'Other platform',
+    ]);
+    for (const value of [null, undefined, '', 'gameboy']) expect(u.platformLabel(value)).toBe('Other platform');
   });
 });
 
@@ -413,11 +443,17 @@ describe('filterGames, statusCounts and sortGames', () => {
         c: game('c', { title: 'Gamma', franchise: 'Amy Bee', owned: false, reading: { me: row('want', { rating: 5 }) }, created_at: '2026-01-01' }),
         d: game('d', { title: 'Delta', genres: ['SF', 'Art'], created_at: '2026-01-04', release_date: '2001' }),
       },
-      copies: { k1: copy('k1', 'a', 's1'), k2: copy('k2', 'b', 's3'), k3: copy('k3', 'd', null) },
+      copies: { k1: copy('k1', 'a', 's1', { barcode: '0045496590420' }), k2: copy('k2', 'b', 's3'), k3: copy('k3', 'd', null) },
     });
     ctx = { idx: u.buildIndex(l), me: 'me' };
   });
   const ids = (q) => u.filterGames(l.games, u.readFilters(q), ctx).map((x) => x.id);
+
+  it('finds a game by the barcode of its copy', () => {
+    expect(ids({ q: '0045496590420' })).toEqual(['a']);
+    expect(ids({ q: '45496590420' })).toEqual(['a']);
+    expect(ids({ q: 'Stryker' })).toEqual([]);
+  });
 
   it('shows owned games by default, sorted by title', () => {
     expect(ids({})).toEqual(['a', 'b', 'd']);

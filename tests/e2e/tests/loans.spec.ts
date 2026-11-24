@@ -59,6 +59,6 @@ test.describe('Loans', { tag: '@responsive' }, () => {
     await expect(tab.locator('.hkl-listrow')).toHaveCount(out.length);
     await tab.locator('[data-k="lt-in"]').click();
     await expect(page).toHaveURL(/\/loans;tab=in$/);
-    await expect(tab.locator('.hkl-listrow').filter({ hasText: 'Spinning Silver' })).toContainText('Seattle Public Library · Alex · Paperback · Reading');
+    await expect(tab.locator('.hkl-listrow').filter({ hasText: 'Spinning Silver' })).toContainText('Seattle Public Library · Alex · Physical · Reading');
   });
 });

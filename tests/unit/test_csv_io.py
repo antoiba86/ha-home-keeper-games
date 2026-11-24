@@ -18,11 +18,11 @@ LEFT = "9780441478125"
 LIB = (
     "\ufefftitle,franchise,barcode,genres,release_date,format,status,rating,finished,"
     "read_count,private_notes,tags,wishlist\n"
-    f"The Left Hand of Darkness,Hainish,{LEFT},Science fiction,1969,paperback,read,5,"
+    f"The Left Hand of Darkness,Hainish,{LEFT},Science fiction,1969,physical,read,5,"
     '2024-03-05,2,"Great\ngame",favorites,false\n'
     "Dune,,,Science fiction; Classic,,,reading,,,,,,false\n"
     "Emma,,,,,,,,,,,,true\n"
-    "Persuasion,,,,,hardcover,want,,,,,,false\n"
+    "Persuasion,,,,,physical,want,,,,,,false\n"
     "Ulysses,,,,,,dnf,,,,,,false\n"
     "Notes,,,,,,,,,,,,false\n"
 )
@@ -37,7 +37,7 @@ def test_parse() -> None:
     assert left["barcode"] == LEFT
     assert left["status"] == "read" and left["rating"] == 5
     assert left["finished"] == "2024-03-05" and left["read_count"] == 2
-    assert left["owned"] == 1 and left["copy"]["format"] == "paperback"
+    assert left["owned"] == 1 and left["copy"]["format"] == "physical"
     assert left["tags"] == ["favorites"] and left["notes"] == "Great\ngame"
     assert left["release_date"] == "1969"
     dune = rows[1]
@@ -47,10 +47,50 @@ def test_parse() -> None:
     assert dune["barcode"] is None and dune["status"] == "reading"
     assert dune["rating"] is None and dune["copy"] is None and dune["owned"] == 0
     assert rows[2]["wishlist"] is True and rows[2]["status"] is None
-    assert rows[3]["status"] == "want" and rows[3]["copy"]["format"] == "hardcover"
+    assert rows[3]["status"] == "want" and rows[3]["copy"]["format"] == "physical"
     assert rows[4]["status"] == "dnf"
     assert rows[5]["status"] is None and rows[5]["tags"] == []
     assert not any(r["needs_details"] for r in rows)
+
+
+def test_a_barcode_of_another_game_is_a_row_error() -> None:
+    state = m.empty_state()
+    first = m.build_game({"title": "First"}, now=NOW)
+    state["games"][first["id"]] = first
+    copy = m.build_copy({"game_id": first["id"], "barcode": LEFT}, now=NOW)
+    state["copies"][copy["id"]] = copy
+    other = m.build_game({"title": "Other"}, now=NOW)
+    state["games"][other["id"]] = other
+    rows = cio.parse(
+        f"game_id,title,barcode,format\n{other['id']},Other,{LEFT},physical\n"
+    )
+    new, summary, results = cio.apply_import(
+        state,
+        rows,
+        person_id="p",
+        shelf_id=None,
+        import_notes=True,
+        replace_reading=False,
+        now=NOW,
+    )
+    assert results[0]["error"] == "duplicate_barcode"
+    assert summary["errors"] == 1 and summary["copies"] == 0
+    assert len(new["copies"]) == 1
+
+
+def test_a_new_copy_barcode_matches_a_later_row() -> None:
+    text = f"title,barcode,format\nAlpha,{LEFT},physical\nAlpha 2,{LEFT},digital\n"
+    new, summary, results = cio.apply_import(
+        m.empty_state(),
+        cio.parse(text),
+        person_id="p",
+        shelf_id=None,
+        import_notes=True,
+        replace_reading=False,
+        now=NOW,
+    )
+    assert [r["action"] for r in results] == ["new", "existing"]
+    assert summary["copies"] == 1 and len(new["games"]) == 1
 
 
 def test_parse_cleans_the_barcode() -> None:
@@ -167,11 +207,11 @@ def test_apply_import() -> None:
         "wishlist_added": 1,
         "errors": 0,
     }
-    left = next(b for b in new["games"].values() if b["barcode"] == LEFT)
+    left = m.find_game_by_barcode(new, LEFT)
     assert left["needs_details"] is False and left["tags"] == ["favorites"]
     copies = [c for c in new["copies"].values() if c["game_id"] == left["id"]]
     assert len(copies) == 1 and copies[0]["shelf_id"] == "s"
-    assert copies[0]["format"] == "paperback"
+    assert copies[0]["format"] == "physical"
     reading = new["reading"]["p"][left["id"]]
     assert reading["status"] == "read" and reading["read_count"] == 2
     assert reading["private_notes"] == "Great\ngame"
@@ -194,7 +234,7 @@ def test_import_matches_and_keeps_reading() -> None:
         now=NOW,
     )
     assert first["reading"]["p"]["persuasion"]["status"] == "want"
-    left = next(b for b in first["games"].values() if b["barcode"] == LEFT)
+    left = m.find_game_by_barcode(first, LEFT)
     assert first["reading"]["p"][left["id"]]["private_notes"] == ""
     copy = next(c for c in first["copies"].values() if c["game_id"] == left["id"])
     assert copy["shelf_id"] is None
@@ -285,10 +325,10 @@ def test_import_library_ids_that_are_not_record_ids_are_dropped() -> None:
     header = "game_id,copy_id,title,format\n"
     rows = cio.parse(
         header
-        + "../../evil,x,Escape,paperback\n"
-        + f"{GAME_HEX},{GAME_HEX.upper()},Upper,paperback\n"
-        + f"{GAME_HEX}0,{GAME_HEX},Long,paperback\n"
-        + f"{GAME_HEX},{GAME_HEX},Good,paperback\n",
+        + "../../evil,x,Escape,physical\n"
+        + f"{GAME_HEX},{GAME_HEX.upper()},Upper,physical\n"
+        + f"{GAME_HEX}0,{GAME_HEX},Long,physical\n"
+        + f"{GAME_HEX},{GAME_HEX},Good,physical\n",
     )
     assert [(r["game_id"], r["copy"]["id"]) for r in rows] == [
         (None, None),
@@ -299,7 +339,7 @@ def test_import_library_ids_that_are_not_record_ids_are_dropped() -> None:
 
 
 def test_import_row_with_a_bad_copy_adds_no_game() -> None:
-    rows = cio.parse("title,format,condition\nPersuasion,paperback,mint\n")
+    rows = cio.parse("title,format,condition\nPersuasion,physical,mint\n")
     new, summary, results = cio.apply_import(
         m.empty_state(),
         rows,
@@ -343,8 +383,15 @@ def test_import_sets_the_reading_of_a_game_once() -> None:
 
 def test_export_header_and_cells() -> None:
     state = _library()
-    state["games"]["persuasion"]["barcode"] = LEFT
-    copy = m.build_copy({"game_id": "persuasion", "format": "audiobook"}, now=NOW)
+    copy = m.build_copy(
+        {
+            "game_id": "persuasion",
+            "format": "digital",
+            "barcode": LEFT,
+            "platform": "ps5",
+        },
+        now=NOW,
+    )
     state["copies"][copy["id"]] = copy
     state["reading"]["p"] = {
         "persuasion": {
@@ -361,7 +408,8 @@ def test_export_header_and_cells() -> None:
     row = next(reader)
     assert row["barcode"] == LEFT and row["genres"] == "Romance"
     assert row["status"] == "read" and row["rating"] == "4"
-    assert row["finished"] == "2024-01-02" and row["format"] == "audiobook"
+    assert row["finished"] == "2024-01-02" and row["format"] == "digital"
+    assert row["platform"] == "ps5" and row["steelbook"] == "false"
     assert row["copy_id"] == copy["id"]
     no_person = next(csv.DictReader(io.StringIO(cio.export(state, None))))
     assert no_person["status"] == "" and no_person["read_count"] == ""
@@ -381,11 +429,11 @@ def test_export_wishlist_of_the_person() -> None:
 
 def test_export_library_has_a_row_for_each_copy() -> None:
     state = _library()
-    for stamp, fmt in (("t1", "hardcover"), ("t2", "ebook")):
+    for stamp, fmt in (("t1", "physical"), ("t2", "digital")):
         copy = m.build_copy({"game_id": "persuasion", "format": fmt}, now=stamp)
         state["copies"][copy["id"]] = copy
     rows = cio.rows_from_state(state, None)
-    assert [r["copy"]["format"] for r in rows] == ["hardcover", "ebook"]
+    assert [r["copy"]["format"] for r in rows] == ["physical", "digital"]
     assert [r["line"] for r in rows] == [1, 2]
 
 
@@ -427,13 +475,16 @@ def _library_row(draw) -> dict:
         row["copy"] = {
             "id": draw(st.uuids()).hex,
             "format": draw(st.sampled_from(m.FORMATS)),
+            "platform": draw(st.sampled_from(m.PLATFORMS)),
+            "storefront": draw(_TEXT),
+            "region": draw(st.sampled_from(["", "PAL", "NTSC-U"])),
+            "edition": draw(_TEXT),
+            "steelbook": draw(st.booleans()),
             "condition": draw(st.sampled_from([None, *m.CONDITIONS])),
             "acquired": draw(st.none() | _DATE),
             "acquired_from": draw(_TEXT),
             "price": draw(st.none() | st.integers(0, 500) | st.just(9.5)),
             "value": draw(st.none() | st.integers(0, 500)),
-            "signed": draw(st.booleans()),
-            "first_edition": draw(st.booleans()),
             "note": draw(_TEXT),
         }
         row["owned"] = 1

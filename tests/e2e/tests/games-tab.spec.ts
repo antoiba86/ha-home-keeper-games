@@ -10,12 +10,30 @@ import { adminState, gameByTitle, expect, libraryTab, openTab, restoreReading, t
 async function lendableGame(): Promise<Record<string, any>> {
   const state = await adminState();
   const lent = new Set(state.loans.filter((l: any) => !l.returned).map((l: any) => l.copy_id));
-  const copy = state.copies.find((c: any) => !lent.has(c.id) && c.format !== 'ebook' && c.format !== 'audiobook');
+  const copy = state.copies.find((c: any) => !lent.has(c.id) && c.format !== 'digital');
   if (!copy) throw new Error('no copy to lend in the seed');
   return state.games.find((b: any) => b.id === copy.game_id);
 }
 
 test.describe('Games tab', { tag: '@responsive' }, () => {
+  test('a copy shows its platform and the barcode of its case', async ({ page }) => {
+    const game = await gameByTitle('The Left Hand of Darkness');
+    const state = await adminState();
+    const copy = state.copies.find((c: { game_id: string; barcode: string | null }) => c.game_id === game.id && c.barcode);
+    const tab = await openTab(page, `/games/${game.id}`);
+    // Only the copy with the barcode shows it.
+    const details = tab.locator('.hkl-copy').filter({ hasText: copy.barcode });
+    await expect(details).toHaveCount(1);
+    await expect(details).toContainText('Platform');
+    await tab.locator(`[data-k="ec-${copy.id}"]`).click();
+    const dialog = tab.locator('.hkl-dialog');
+    await expect(dialog.locator('[name="platform"]')).toHaveValue(copy.platform);
+    await expect(dialog.locator('[name="barcode"]')).toHaveValue(copy.barcode);
+    await expect(dialog.locator('[name="steelbook"]')).toBeVisible();
+    await dialog.locator('[data-k="d-cancel"]').click();
+    await expect(dialog).toHaveCount(0);
+  });
+
   test('Home Keeper shows the Games tab at /home-keeper/games', async ({ page }) => {
     const errors = trackErrors(page);
     const tab = await openTab(page);
