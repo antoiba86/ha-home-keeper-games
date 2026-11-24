@@ -19,9 +19,9 @@ const FEATURES: Feature[] = [
       'Scan the barcode of each item with a phone. Each scan adds a copy to the shelf.',
   },
   {
-    title: 'Shelves and reading',
+    title: 'Shelves and play progress',
     description:
-      'Each copy has a room, a bookcase and a shelf. Each person has a reading status, a rating and notes.',
+      'Each copy has a room, a unit and a shelf. Each person has a play status, a rating and the play time for each platform.',
   },
   {
     title: 'Loans and Home Keeper',

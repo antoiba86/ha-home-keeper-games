@@ -115,7 +115,7 @@ describe('card', () => {
     expect(text()).toContain('No person is linked to this user.');
   });
 
-  it('picks a random game to read', async () => {
+  it('picks a random game from the backlog', async () => {
     const rnd = vi.spyOn(Math, 'random').mockReturnValue(0.99);
     await mount();
     $('[data-k="random"]').click();

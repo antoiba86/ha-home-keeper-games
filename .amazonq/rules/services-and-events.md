@@ -49,9 +49,9 @@ How the surfaces work is in [events-api](../../docs/design/events-api.md). Integ
 - An update that changes no field fires no event. A CSV import fires only
   `import_completed`.
 - **A change that keeps the main field still fires an event.** A copy that keeps its
-  shelf fires `copy_updated`, and a reading row that keeps its status fires
-  `reading_updated`. Each `*_updated` payload names the fields in `changed_fields`.
-- **A payload never holds a private value**: no price, no value, no private notes and no
+  shelf fires `copy_updated`, and a progress row that keeps its play status fires
+  `progress_updated`. Each `*_updated` payload names the fields in `changed_fields`.
+- **A payload never holds a private value**: no price, no value, no review and no
   setting value of a person. Name the changed field, and leave its value out.
 - An event needs no new service. It observes a change that a service already makes.
 - **A new event is not done until `docs/EVENTS.md` describes it**: when it fires, its

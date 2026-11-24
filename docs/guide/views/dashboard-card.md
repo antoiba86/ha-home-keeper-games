@@ -1,7 +1,7 @@
 # Dashboard card
 
 Home Keeper Games supports a dashboard card, **Home Keeper Games**
-(`custom:home-keeper-games-card`), that shows the reading of 1 person. Every user can
+(`custom:home-keeper-games-card`), that shows the play progress of 1 person. Every user can
 add it to a dashboard, such as the dashboard of a phone or a wall tablet. The card
 resource is registered automatically.
 
@@ -18,10 +18,10 @@ resource is registered automatically.
 | Section | What it shows |
 |---|---|
 | **Search** | A search of the library. Each result shows its shelf. |
-| **Reading** | The books that the person reads now, with the page. Select **Set page** to change the page, or **Read** when the book is done. |
-| **Want to read** | The covers of the books to read next. Select **Random pick** to get 1 at random. |
-| **Yearly goal** | The books read this year, against the goal of the person. |
-| **Household activity** | The reading of the other people who share their reading. |
+| **Playing** | The games that the person plays now, with the platform and the play time. Select **Set play time** to change the time, or **Completed** when the game is done. |
+| **Backlog** | The covers of the games to play next. Select **Random pick** to get 1 at random. |
+| **Yearly goal** | The games completed this year, against the goal of the person. |
+| **Household activity** | The progress of the other people who share their progress, with the platform. |
 
 Turn each section on or off in the card editor.
 
@@ -42,8 +42,8 @@ type: custom:home-keeper-games-card
 person: alice   # optional, the id of a Home Assistant person
 title: Our books  # optional
 search: true
-reading: true
-want: true
+playing: true
+backlog: true
 goal: true
 household: true
 ```

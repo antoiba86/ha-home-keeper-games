@@ -29,6 +29,14 @@ async function shot(page: Page, name: string): Promise<void> {
   await page.screenshot({ path: resolve(SHOT_DIR, `${name}.png`) });
 }
 
+/** A screenshot of 1 part of the page, scrolled into view. */
+async function shotOf(page: Page, el: Locator, name: string): Promise<void> {
+  await el.scrollIntoViewIfNeeded();
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(600);
+  await el.screenshot({ path: resolve(SHOT_DIR, `${name}.png`) });
+}
+
 /** A screenshot from the top of the page to a little below *el*. */
 async function shotTo(page: Page, el: Locator, name: string): Promise<void> {
   await page.mouse.move(0, 0);
@@ -146,6 +154,10 @@ test('capture the Library screenshots', async ({ page, browser }) => {
   await coversLoaded(page);
   await shot(page, 'game-detail-desktop');
 
+  // The progress of Alex: a chip for each platform over the status form.
+  await expect(tab.locator('.hkl-plats .hkl-plat')).toHaveCount(2);
+  await shotOf(page, tab.locator('section.hkl-card', { has: tab.locator('.hkl-plats') }), 'progress-desktop');
+
   // The copy dialog: the platform, the format, the store, the region, the edition and the barcode.
   await openCopyDialog(page);
   await shot(page, 'copy-dialog-desktop');
@@ -202,6 +214,7 @@ test('capture the Library screenshots', async ({ page, browser }) => {
   await openTab(page, `/games/${left.id}`);
   await coversLoaded(page);
   await shot(page, 'game-detail-mobile');
+  await shotOf(page, libraryTab(page).locator('section.hkl-card', { has: libraryTab(page).locator('.hkl-plats') }), 'progress-mobile');
 
   await openCopyDialog(page);
   await shot(page, 'copy-dialog-mobile');

@@ -67,8 +67,8 @@ The admin and usage split is also the security boundary ([SECURITY.md](../../doc
 - **A reply never leaks.** Every read goes through `projections.project_state` or
   `projections.project_game`. A non-admin reads no `price`, `value` or `acquired_from`
   of a copy, and no `party` of a loan.
-- A non-admin reads the reading row of another person only if that person has
-  `share_reading: true`, and never with `private_notes`.
+- A non-admin reads the progress rows of another person only if that person has
+  `share_progress: true`, and never with `review`.
 - A new field that a non-admin must not read goes in a `PRIVATE_*_FIELDS` tuple of
   `projections.py`. Test each new field with an admin and with a non-admin user.
 
@@ -77,7 +77,7 @@ The admin and usage split is also the security boundary ([SECURITY.md](../../doc
 Use this list for each new service, websocket command, HTTP method and event. Write the
 result in the plan's Security section ([pr-workflow.md](pr-workflow.md)).
 
-- **Open, for the caller's own person: reading status, rating, notes and settings.** A
+- **Open, for the caller's own person: progress, rating, review and settings.** A
   non-admin user changes only their own rows.
 - **Open: a read that the card or a native entity needs**, through a projection.
 - **Admin-only: the catalog.** Rooms, units, shelves, games, copies, covers, loans
@@ -123,7 +123,7 @@ How the entities work is in [entities](../../docs/design/entities.md).
   placeholder.
 - **An entity applies the privacy rules itself**, because Home Assistant shows each
   entity to every user and has no projection. A per-person entity is unavailable while
-  its person has `share_reading: false`. A write method of a per-person entity refuses a
+  its person has `share_progress: false`. A write method of a per-person entity refuses a
   user who is not the person and not an admin, with a localized error
   ([people-privilege](../../docs/design/people-privilege.md#entities)).
 

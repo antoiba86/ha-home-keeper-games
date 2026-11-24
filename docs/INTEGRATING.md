@@ -28,7 +28,7 @@ Each operation of the tab is a `home_keeper_games.*` service. The groups are:
 | Locations | `add_room`, `update_room`, `delete_room`, the same 3 for `unit` and `shelf` |
 | Games | `add_game`, `update_game`, `delete_game`, `scan_barcode` |
 | Copies and covers | `add_copy`, `update_copy`, `move_copy`, `delete_copy`, `set_cover` |
-| Reading | `set_reading` |
+| Progress | `set_progress` |
 | Loans | `lend_game`, `borrow_game`, `return_loan`, `update_loan`, `delete_loan` |
 | Wishlist | `add_to_wishlist`, `update_wishlist`, `remove_from_wishlist`, `got_wishlist_game` |
 | People and settings | `set_person_settings`, `set_settings` |
@@ -52,17 +52,22 @@ action:
   # The barcode is a copy field: add_copy with barcode puts it on the copy.
 ```
 
-### Mark a game as read
+### Mark a game as completed
 
 ```yaml
 action:
-  - action: home_keeper_games.set_reading
+  - action: home_keeper_games.set_progress
     data:
       game_id: "5f0c1b2a9d8e4f7a8b6c5d4e3f2a1b0c"
       person_id: "alice"
-      status: read
+      platform: switch
+      play_status: completed
       rating: 5
 ```
+
+A person has 1 progress row for each platform of a game. Without `platform`, the call
+uses the platform of the copies of the game if they have only 1. Else it fails with a
+"platform required" error.
 
 `person_id` is the id of a Home Assistant `person`, from its `id` attribute. A call from a
 user with no `person_id` acts for the person of that user. A call from an automation has
@@ -79,7 +84,7 @@ action:
     response_variable: found
 ```
 
-Each game in the reply has `owned`, `copy_count`, `cover_url` and the reading rows that
+Each game in the reply has `owned`, `copy_count`, `cover_url` and the progress rows that
 the caller can read.
 
 Guard each call from another integration with
@@ -90,7 +95,7 @@ still works when the library is not installed.
 
 [EVENTS.md](EVENTS.md) has the catalog, the payloads and an example automation. Use an
 `event` trigger on a `home_keeper_games_<noun>_<verb>` event, such as
-`home_keeper_games_game_finished` or `home_keeper_games_loan_overdue`.
+`home_keeper_games_game_completed` or `home_keeper_games_loan_overdue`.
 
 ## Entities
 
@@ -99,9 +104,9 @@ still works when the library is not installed.
 | `sensor` Games | The games with 1 copy or more |
 | `sensor` Loans out | The open loans of lent copies |
 | `sensor` Loans overdue | The open loans past their due date |
-| `sensor` *person* games read this year | The games that the person finished this year, with `goal` and `year` |
-| `sensor` *person* reading now | The games with status Reading, with `games` |
-| `todo` *person* to read | The games with status Want to read |
+| `sensor` *person* games completed this year | The games that the person completed this year on any platform, with `goal` and `year` |
+| `sensor` *person* playing now | The games with a Playing row, with `games` |
+| `todo` *person* backlog | The games in the Backlog of the person, 1 item for each platform |
 
 The entities are on 1 service device, Home Keeper Games. The unique id of a
 per-person entity holds the person id, so a new name of the person keeps the entity.

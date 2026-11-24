@@ -7,7 +7,7 @@ implements:
   - custom_components/home_keeper_games/websocket_api.py
   - custom_components/home_keeper_games/events.py
 related: [people-privilege, store-models, entities, architecture]
-source_hash: 43429b9e592b
+source_hash: df6674e42a02
 ---
 
 # Services, websocket commands, events and the API surface
@@ -78,25 +78,27 @@ and shelf events have their own id, their parent id and the name. `import_comple
 the person, the source and the counts. `data_imported` has the counts of each section of
 a Home Keeper import ([import-export](import-export.md)). The store fires each event after
 the save, in the order of the change: a `force` delete fires each `copy_moved`, then the
-`*_removed` of each child, then the `*_removed` of the parent. `game_finished` follows
-its `reading_changed`.
+`*_removed` of each child, then the `*_removed` of the parent. `game_completed` follows
+its `progress_changed`. Each progress event has `platform`. `progress_changed` adds
+`play_status` and `previous_status`, and `game_completed` adds `completed_at`, `rating` and
+`completion_count`.
 
 An update fires an event only if a field changed. Each `*_updated` event names the
-fields in `changed_fields`. A payload never holds a price, a value, private notes or the
+fields in `changed_fields`. A payload never holds a price, a value, a review or the
 value of a setting of a person:
 
 | Event | Builder | Keys after the spine |
 |---|---|---|
 | `copy_updated` | `events.copy_updated_event_data` | `copy_id`, `shelf_id`, `changed_fields` |
-| `reading_updated` | `events.reading_updated_event_data` | `status`, `changed_fields` |
+| `progress_updated` | `events.progress_updated_event_data` | `platform`, `play_status`, `changed_fields` |
 | `loan_updated` | `events.loan_updated_event_data` | the loan keys, `changed_fields` |
 | `loan_removed` | `events.loan_event_data` | the loan keys, as before the delete |
 | `person_settings_updated` | `events.person_settings_event_data` | no spine: `person_id`, `changed_fields`, `origin` |
 | `settings_updated` | `events.settings_event_data` | no spine: `changed_fields`, `currency`, `origin` |
 
 `copy_updated` fires for a copy change other than the shelf, and `copy_moved` for a new
-shelf. `reading_updated` fires for a change that keeps the status, and `reading_changed`
-for a new status. The loan keys are `loan_id`, `direction`, `copy_id`, `party`, `started`,
+shelf. `progress_updated` fires for a change that keeps the play status, and `progress_changed`
+for a new play status. The loan keys are `loan_id`, `direction`, `copy_id`, `party`, `started`,
 `due` and `returned`. `settings_updated` is not a store change: the currency is on the
 entry. `coordinator.async_check_settings` fires it 1 time for each change, with `currency`
 in `changed_fields`.
