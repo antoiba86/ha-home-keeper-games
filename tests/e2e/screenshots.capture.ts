@@ -156,7 +156,7 @@ test('capture the Library screenshots', async ({ page, browser }) => {
 
   // The progress of Alex: a chip for each platform over the status form.
   await expect(tab.locator('.hkl-plats .hkl-plat')).toHaveCount(2);
-  await shotOf(page, tab.locator('section.hkl-card', { has: tab.locator('.hkl-plats') }), 'progress-desktop');
+  await shotOf(page, tab.locator('section.hkl-card:has(.hkl-plats)'), 'progress-desktop');
 
   // The copy dialog: the platform, the format, the store, the region, the edition and the barcode.
   await openCopyDialog(page);
@@ -214,7 +214,7 @@ test('capture the Library screenshots', async ({ page, browser }) => {
   await openTab(page, `/games/${left.id}`);
   await coversLoaded(page);
   await shot(page, 'game-detail-mobile');
-  await shotOf(page, libraryTab(page).locator('section.hkl-card', { has: libraryTab(page).locator('.hkl-plats') }), 'progress-mobile');
+  await shotOf(page, libraryTab(page).locator('section.hkl-card:has(.hkl-plats)'), 'progress-mobile');
 
   await openCopyDialog(page);
   await shot(page, 'copy-dialog-mobile');
