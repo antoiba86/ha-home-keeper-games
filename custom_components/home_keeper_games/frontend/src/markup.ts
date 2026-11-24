@@ -2,7 +2,7 @@
 // and escapes every user value.
 
 import { t } from './i18n';
-import type { Game, Lib, Person, ReadingStatus } from './types';
+import type { Game, Lib, Person, PlayStatus } from './types';
 import type { LibraryApi } from './api';
 import { COVER_SIGN_SECONDS, coverColors, CoverUrls, escapeHTML, FORMATS, initials, PLATFORMS, platformLabel, type TabRoute } from './utils';
 
@@ -73,20 +73,20 @@ export function taskLinkHtml(ctx: { taskLink: (id: string) => string }, taskId: 
 }
 
 /** A round person mark with the initial, and the name as its label. */
-export function personDot(person: Person | undefined, status: ReadingStatus | null = null): string {
+export function personDot(person: Person | undefined, status: PlayStatus | null = null): string {
   if (!person) return '';
-  const ring = status === 'read' ? ' ring-read' : status === 'reading' ? ' ring-reading' : '';
+  const ring = status === 'completed' ? ' ring-completed' : status === 'playing' ? ' ring-playing' : '';
   const label = status ? `${person.name}: ${statusLabel(status)}` : person.name;
   return `<span class="hkl-dot${ring}" style="--p:${escapeHTML(person.color)}" title="${escapeHTML(label)}" role="img" aria-label="${escapeHTML(label)}">${escapeHTML(initials(person.name))}</span>`;
 }
 
-/** The label of a reading status. Null is "Not read". */
-export function statusLabel(status: ReadingStatus | null): string {
+/** The label of a play status. Null is "Not played". */
+export function statusLabel(status: PlayStatus | null): string {
   return t(`status.${status ?? 'none'}`);
 }
 
 /** A status pill with a text label. */
-export function statusPill(status: ReadingStatus | null): string {
+export function statusPill(status: PlayStatus | null): string {
   return `<span class="hkl-pill st-${status ?? 'none'}">${escapeHTML(statusLabel(status))}</span>`;
 }
 

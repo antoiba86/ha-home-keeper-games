@@ -1,6 +1,6 @@
 // The state that the tab views read. The views are free functions over `ViewCtx`.
 
-import type { ImportSummary, Lib, ScanResult } from './types';
+import type { ImportSummary, Lib, Platform, ScanResult } from './types';
 import type { Index, TabRoute } from './utils';
 
 export interface ScanEntry {
@@ -42,8 +42,8 @@ export interface ImportState {
   fileName: string;
   content: string;
   rowCount: number;
-  importNotes: boolean;
-  replaceReading: boolean;
+  importReview: boolean;
+  replaceProgress: boolean;
   summary: ImportSummary | null;
   busy: boolean;
   error: string;
@@ -54,7 +54,9 @@ export interface UiState {
   limit: number;
   notesTab: 'shared' | 'private';
   editNotes: boolean;
-  readingPerson: string | null;
+  /** The person and the platform that the progress form of a game edits. */
+  progressPerson: string | null;
+  progressPlatform: Platform | null;
   scan: ScanSession;
   import: ImportState;
   todoEntities: Array<{ entity_id: string; name?: string }>;

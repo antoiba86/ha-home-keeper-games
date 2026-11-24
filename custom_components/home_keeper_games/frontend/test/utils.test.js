@@ -18,21 +18,25 @@ const game = (id, extra = {}) => ({
   created_at: '2026-01-01T00:00:00+00:00',
   updated_at: '2026-01-01T00:00:00+00:00',
   wishlist: null,
-  reading: {},
+  progress: {},
   owned: true,
   cover_url: null,
   ...extra,
 });
-const row = (status, extra = {}) => ({
-  status,
-  rating: null,
-  page: null,
-  started: null,
-  finished: null,
-  read_count: 0,
-  private_notes: '',
-  updated_at: '2026-01-01T00:00:00+00:00',
-  ...extra,
+// The progress rows of 1 person: 1 row on *platform*.
+const row = (status, extra = {}, platform = 'other') => ({
+  [platform]: {
+    play_status: status,
+    rating: null,
+    playtime_minutes: null,
+    started_at: null,
+    completed_at: null,
+    last_played_at: null,
+    completion_count: 0,
+    review: '',
+    updated_at: '2026-01-01T00:00:00+00:00',
+    ...extra,
+  },
 });
 const copy = (id, gameId, shelfId, extra = {}) => ({
   id,
@@ -132,15 +136,15 @@ describe('asList and normalizeState', () => {
   it('reads the people map, sorts by name and gives each person the color of its place', () => {
     const l = u.normalizeState({
       people: {
-        zoe: { person_id: 'zoe', name: 'Zoe', entity_id: 'person.zoe', share_reading: false, wishlist_todo: 'todo.x', yearly_goal: 5 },
-        adam: { person_id: 'adam', name: 'Adam', entity_id: null, share_reading: true, yearly_goal: null },
-        bea: { person_id: 'bea', name: 'Bea', entity_id: null, share_reading: true, wishlist_todo: null, yearly_goal: 3 },
+        zoe: { person_id: 'zoe', name: 'Zoe', entity_id: 'person.zoe', share_progress: false, wishlist_todo: 'todo.x', yearly_goal: 5 },
+        adam: { person_id: 'adam', name: 'Adam', entity_id: null, share_progress: true, yearly_goal: null },
+        bea: { person_id: 'bea', name: 'Bea', entity_id: null, share_progress: true, wishlist_todo: null, yearly_goal: 3 },
       },
     });
     expect(l.people).toEqual([
-      { id: 'adam', name: 'Adam', share_reading: true, wishlist_todo: null, yearly_goal: null, color: u.PERSON_COLORS[0] },
-      { id: 'bea', name: 'Bea', share_reading: true, wishlist_todo: null, yearly_goal: 3, color: u.PERSON_COLORS[1] },
-      { id: 'zoe', name: 'Zoe', share_reading: false, wishlist_todo: 'todo.x', yearly_goal: 5, color: u.PERSON_COLORS[2] },
+      { id: 'adam', name: 'Adam', share_progress: true, wishlist_todo: null, yearly_goal: null, color: u.PERSON_COLORS[0] },
+      { id: 'bea', name: 'Bea', share_progress: true, wishlist_todo: null, yearly_goal: 3, color: u.PERSON_COLORS[1] },
+      { id: 'zoe', name: 'Zoe', share_progress: false, wishlist_todo: 'todo.x', yearly_goal: 5, color: u.PERSON_COLORS[2] },
     ]);
   });
 
@@ -150,18 +154,18 @@ describe('asList and normalizeState', () => {
     expect(l[0].color).not.toBe(l[1].color);
   });
 
-  it('uses the key for a person with no id or name, and keeps share_reading when it is missing', () => {
+  it('uses the key for a person with no id or name, and keeps share_progress when it is missing', () => {
     const l = u.normalizeState({ people: { p9: { wishlist_todo: null, yearly_goal: null } } });
     expect(l.people[0].id).toBe('p9');
     expect(l.people[0].name).toBe('p9');
-    expect(l.people[0].share_reading).toBe(true);
+    expect(l.people[0].share_progress).toBe(true);
     expect(u.normalizePeople(undefined)).toEqual([]);
     expect(u.normalizePeople(null)).toEqual([]);
   });
 
   it('fills missing game lists and the defaults of me and currency', () => {
     const l = u.normalizeState({ games: [{ id: 'b' }] });
-    expect(l.games[0]).toMatchObject({ tags: [], genres: [], reading: {} });
+    expect(l.games[0]).toMatchObject({ tags: [], genres: [], progress: {} });
     expect(l.me).toEqual({ person_id: null, name: null, is_admin: false });
     expect(u.normalizeState({ me: { person_id: 'p', name: 'P', is_admin: 'yes' } }).me).toEqual({ person_id: 'p', name: 'P', is_admin: false });
     expect(u.normalizeState({ me: { person_id: 'p', name: 'P', is_admin: true } }).me.is_admin).toBe(true);
@@ -171,9 +175,9 @@ describe('asList and normalizeState', () => {
   });
 
   it('keeps the lists that a game has', () => {
-    const l = u.normalizeState({ games: [{ id: 'b', tags: ['t'], genres: ['s'], reading: { p: row('read') } }], currency: 'EUR', me: { person_id: 'p', is_admin: true } });
+    const l = u.normalizeState({ games: [{ id: 'b', tags: ['t'], genres: ['s'], progress: { p: row('completed') } }], currency: 'EUR', me: { person_id: 'p', is_admin: true } });
     expect(l.games[0]).toMatchObject({ tags: ['t'], genres: ['s'] });
-    expect(l.games[0].reading.p.status).toBe('read');
+    expect(l.games[0].progress.p.other.play_status).toBe('completed');
     expect(l.currency).toBe('EUR');
     expect(l.me.person_id).toBe('p');
   });
@@ -341,37 +345,61 @@ describe('readFilters and hasFilters', () => {
     expect(u.readFilters({})).toEqual({ q: '', status: 'all', room: '', shelf: '', reader: '', genre: '', owned: 'yes', sort: 'title', view: 'grid' });
   });
   it('reads valid values and drops unknown ones', () => {
-    const f = u.readFilters({ q: 'x', status: 'read', room: 'r', shelf: 's', reader: 'p', genre: 'y', owned: 'no', sort: 'rating', view: 'rows' });
-    expect(f).toEqual({ q: 'x', status: 'read', room: 'r', shelf: 's', reader: 'p', genre: 'y', owned: 'no', sort: 'rating', view: 'rows' });
+    const f = u.readFilters({ q: 'x', status: 'completed', room: 'r', shelf: 's', reader: 'p', genre: 'y', owned: 'no', sort: 'rating', view: 'rows' });
+    expect(f).toEqual({ q: 'x', status: 'completed', room: 'r', shelf: 's', reader: 'p', genre: 'y', owned: 'no', sort: 'rating', view: 'rows' });
     expect(u.readFilters({ status: 'bad', owned: 'bad', sort: 'bad', view: 'bad' })).toMatchObject({ status: 'all', owned: 'yes', sort: 'title', view: 'grid' });
   });
   it('says if a filter narrows the list', () => {
     const base = u.readFilters({});
     expect(u.hasFilters(base)).toBe(false);
     expect(u.hasFilters({ ...base, sort: 'title', view: 'rows' })).toBe(false);
-    for (const [k, v] of [['q', 'x'], ['room', 'r'], ['shelf', 's'], ['reader', 'p'], ['genre', 'y'], ['status', 'read'], ['owned', 'all']]) {
+    for (const [k, v] of [['q', 'x'], ['room', 'r'], ['shelf', 's'], ['reader', 'p'], ['genre', 'y'], ['status', 'completed'], ['owned', 'all']]) {
       expect(u.hasFilters({ ...base, [k]: v }), k).toBe(true);
     }
   });
 });
 
-describe('reading helpers and search', () => {
+describe('progress helpers and search', () => {
   const b = game('b', {
     title: 'The Left Hand',
     genres: ['Strategy game'],
     franchise: 'Hainish',
     shared_notes: 'Game club',
     tags: ['hugo'],
-    reading: { me: row('read', { private_notes: 'secret word' }), other: row('reading', { private_notes: 'hidden' }) },
+    progress: { me: row('completed', { review: 'secret word' }), other: row('playing', { review: 'hidden' }) },
   });
 
-  it('reads the row and the status of a person', () => {
-    expect(u.readingOf(b, 'me').status).toBe('read');
-    expect(u.readingOf(b, null)).toBeNull();
-    expect(u.readingOf(b, 'nobody')).toBeNull();
-    expect(u.statusOf(b, 'other')).toBe('reading');
+  it('reads the rows and the status of a person', () => {
+    expect(u.progressOf(b, 'me', 'other').play_status).toBe('completed');
+    expect(u.progressOf(b, 'me', 'ps5')).toBeNull();
+    expect(u.progressOf(b, null, 'other')).toBeNull();
+    expect(u.progressOf(b, 'me', null)).toBeNull();
+    expect(u.progressOf(b, 'nobody', 'other')).toBeNull();
+    expect(u.statusOf(b, 'other')).toBe('playing');
     expect(u.statusOf(b, 'nobody')).toBeNull();
-    expect(u.statusOf(game('x', { reading: { p: { status: null } } }), 'p')).toBeNull();
+    expect(u.statusOf(b, null)).toBeNull();
+    expect(u.progressRows(b, null)).toEqual([]);
+  });
+
+  it('sums up the rows of a person on many platforms', () => {
+    const rows = (...list) => Object.assign({}, ...list);
+    const g = (...list) => game('m', { progress: { p: rows(...list) } });
+    expect(u.statusOf(g(row('abandoned', {}, 'pc'), row('backlog', {}, 'ps5')), 'p')).toBe('backlog');
+    expect(u.statusOf(g(row('backlog', {}, 'pc'), row('completed', {}, 'ps5')), 'p')).toBe('completed');
+    expect(u.statusOf(g(row('completed', {}, 'pc'), row('playing', {}, 'ps5')), 'p')).toBe('playing');
+    expect(u.statusOf(g(row('abandoned', {}, 'pc')), 'p')).toBe('abandoned');
+    const many = g(row('completed', { rating: 2 }, 'pc'), row('playing', { rating: 4 }, 'switch'), row('backlog', {}, 'ps5'));
+    expect(u.progressRows(many, 'p').map(([pl]) => pl)).toEqual(['ps5', 'switch', 'pc']);
+    expect(u.ratingOf(many, 'p')).toBe(4);
+    expect(u.ratingOf(many, 'nobody')).toBe(0);
+  });
+
+  it('picks the platform of the copies', () => {
+    expect(u.copyPlatforms([copy('a', 'g', null, { platform: 'pc' }), copy('b', 'g', null, { platform: 'ps5' }), copy('c', 'g', null, { platform: 'pc' })])).toEqual(['ps5', 'pc']);
+    expect(u.copyPlatforms([copy('a', 'g', null, { platform: '' })])).toEqual(['other']);
+    expect(u.defaultPlatform([copy('a', 'g', null, { platform: 'switch' })])).toBe('switch');
+    expect(u.defaultPlatform([copy('a', 'g', null, { platform: 'pc' }), copy('b', 'g', null, { platform: 'ps5' })])).toBe('other');
+    expect(u.defaultPlatform([])).toBe('other');
   });
 
   it('searches each field', () => {
@@ -385,7 +413,7 @@ describe('reading helpers and search', () => {
     }
   });
 
-  it('needs every word, and reads only my private notes', () => {
+  it('needs every word, and reads only my reviews', () => {
     expect(u.matchesSearch(b, 'left zebra', 'me')).toBe(false);
     expect(u.matchesSearch(b, 'hidden', 'me')).toBe(false);
     expect(u.matchesSearch(b, 'hidden', 'other')).toBe(true);
@@ -438,9 +466,9 @@ describe('filterGames, statusCounts and sortGames', () => {
   beforeAll(() => {
     l = lib({
       games: {
-        a: game('a', { title: 'Alpha', franchise: 'Zed Last', genres: ['SF'], reading: { me: row('read', { rating: 3 }), p2: row('read') }, created_at: '2026-01-03', release_date: '1999' }),
-        b: game('b', { title: 'Beta', franchise: 'Amy Bee', reading: { me: row('reading') }, needs_details: true, created_at: '2026-01-02', release_date: 'May 1970' }),
-        c: game('c', { title: 'Gamma', franchise: 'Amy Bee', owned: false, reading: { me: row('want', { rating: 5 }) }, created_at: '2026-01-01' }),
+        a: game('a', { title: 'Alpha', franchise: 'Zed Last', genres: ['SF'], progress: { me: row('completed', { rating: 3 }), p2: row('completed') }, created_at: '2026-01-03', release_date: '1999' }),
+        b: game('b', { title: 'Beta', franchise: 'Amy Bee', progress: { me: row('playing') }, needs_details: true, created_at: '2026-01-02', release_date: 'May 1970' }),
+        c: game('c', { title: 'Gamma', franchise: 'Amy Bee', owned: false, progress: { me: row('backlog', { rating: 5 }) }, created_at: '2026-01-01' }),
         d: game('d', { title: 'Delta', genres: ['SF', 'Art'], created_at: '2026-01-04', release_date: '2001' }),
       },
       copies: { k1: copy('k1', 'a', 's1', { barcode: '0045496590420' }), k2: copy('k2', 'b', 's3'), k3: copy('k3', 'd', null) },
@@ -462,12 +490,12 @@ describe('filterGames, statusCounts and sortGames', () => {
   });
 
   it('filters by status', () => {
-    expect(ids({ status: 'read' })).toEqual(['a']);
-    expect(ids({ status: 'reading' })).toEqual(['b']);
-    expect(ids({ status: 'unread' })).toEqual(['b', 'd']);
+    expect(ids({ status: 'completed' })).toEqual(['a']);
+    expect(ids({ status: 'playing' })).toEqual(['b']);
+    expect(ids({ status: 'unplayed' })).toEqual(['b', 'd']);
     expect(ids({ status: 'needs' })).toEqual(['b']);
     expect(ids({ status: 'not_on_ol' })).toEqual(['a', 'b', 'd']);
-    expect(u.STATUS_FILTERS).toEqual(['all', 'unread', 'reading', 'read', 'needs']);
+    expect(u.STATUS_FILTERS).toEqual(['all', 'unplayed', 'playing', 'completed', 'needs']);
   });
 
   it('filters by place', () => {
@@ -489,9 +517,9 @@ describe('filterGames, statusCounts and sortGames', () => {
   });
 
   it('counts each status with the other filters on', () => {
-    expect(u.statusCounts(l.games, u.readFilters({}), ctx)).toEqual({ all: 3, unread: 2, reading: 1, read: 1, needs: 1 });
-    expect(u.statusCounts(l.games, u.readFilters({ status: 'read', owned: 'all' }), ctx)).toEqual({ all: 4, unread: 3, reading: 1, read: 1, needs: 1 });
-    expect(u.statusCounts(l.games, u.readFilters({ room: 'r1' }), ctx)).toEqual({ all: 1, unread: 0, reading: 0, read: 1, needs: 0 });
+    expect(u.statusCounts(l.games, u.readFilters({}), ctx)).toEqual({ all: 3, unplayed: 2, playing: 1, completed: 1, needs: 1 });
+    expect(u.statusCounts(l.games, u.readFilters({ status: 'completed', owned: 'all' }), ctx)).toEqual({ all: 4, unplayed: 3, playing: 1, completed: 1, needs: 1 });
+    expect(u.statusCounts(l.games, u.readFilters({ room: 'r1' }), ctx)).toEqual({ all: 1, unplayed: 0, playing: 0, completed: 1, needs: 0 });
   });
 
   it('sorts by each key with the title as the tiebreak', () => {
@@ -686,16 +714,6 @@ describe('dates and numbers', () => {
     expect(u.splitList('')).toEqual([]);
     expect(u.splitList(null)).toEqual([]);
   });
-  it('computes progress', () => {
-    expect(u.progress(112, 304)).toBe(37);
-    expect(u.progress(0, 100)).toBe(0);
-    expect(u.progress(500, 100)).toBe(100);
-    expect(u.progress(-5, 100)).toBe(0);
-    expect(u.progress(10, null)).toBeNull();
-    expect(u.progress(10, 0)).toBeNull();
-    expect(u.progress(null, 100)).toBeNull();
-    expect(u.progress(undefined, 100)).toBeNull();
-  });
 });
 
 describe('cardModel and pickRandom', () => {
@@ -704,25 +722,25 @@ describe('cardModel and pickRandom', () => {
   beforeAll(() => {
     l = lib({
       people: {
-        me: { share_reading: true, wishlist_todo: null, yearly_goal: 10 },
-        sam: { share_reading: true, wishlist_todo: null, yearly_goal: null },
-        shy: { share_reading: false, wishlist_todo: null, yearly_goal: null },
+        me: { share_progress: true, wishlist_todo: null, yearly_goal: 10 },
+        sam: { share_progress: true, wishlist_todo: null, yearly_goal: null },
+        shy: { share_progress: false, wishlist_todo: null, yearly_goal: null },
       },
       games: {
-        a: game('a', { reading: { me: row('read', { finished: '2026-02-01' }), sam: row('read', { updated_at: '2026-10-01' }) } }),
-        b: game('b', { reading: { me: row('read', { finished: '2025-12-31' }), shy: row('reading') } }),
-        c: game('c', { reading: { me: row('read', { finished: '2026-05-01' }), sam: row('want') } }),
-        d: game('d', { reading: { me: row('reading', { updated_at: '2026-01-01' }), sam: row('reading', { updated_at: '2026-10-03' }) } }),
-        e: game('e', { reading: { me: row('reading', { updated_at: '2026-03-01' }) } }),
-        f: game('f', { reading: { me: row('want') } }),
+        a: game('a', { progress: { me: row('completed', { completed_at: '2026-02-01' }), sam: row('completed', { updated_at: '2026-10-01' }) } }),
+        b: game('b', { progress: { me: row('completed', { completed_at: '2025-12-31' }), shy: row('playing') } }),
+        c: game('c', { progress: { me: row('completed', { completed_at: '2026-05-01' }), sam: row('backlog') } }),
+        d: game('d', { progress: { me: row('playing', { updated_at: '2026-01-01' }), sam: row('playing', { updated_at: '2026-10-03' }) } }),
+        e: game('e', { progress: { me: row('playing', { updated_at: '2026-03-01' }) } }),
+        f: game('f', { progress: { me: row('backlog') } }),
       },
     });
   });
 
-  it('collects reading, want, the goal and household activity', () => {
+  it('collects playing, backlog, the goal and household activity', () => {
     const m = u.cardModel(l, 'me', now);
-    expect(m.reading.map((r) => r.game.id)).toEqual(['e', 'd']);
-    expect(m.want.map((b) => b.id)).toEqual(['f']);
+    expect(m.playing.map((r) => `${r.game.id}:${r.platform}`)).toEqual(['e:other', 'd:other']);
+    expect(m.backlog.map((b) => b.id)).toEqual(['f']);
     expect(m.goal).toEqual({ done: 2, goal: 10, year: 2026 });
     expect(m.household.map((a) => `${a.person.id}:${a.game.id}`)).toEqual(['sam:d', 'sam:a']);
   });
@@ -731,7 +749,7 @@ describe('cardModel and pickRandom', () => {
     expect(u.cardModel(l, 'me', now, 1).household).toHaveLength(1);
     const m = u.cardModel(l, null, now);
     expect(m.goal.goal).toBeNull();
-    expect(m.reading).toEqual([]);
+    expect(m.playing).toEqual([]);
     expect(m.household.map((a) => a.game.id).slice(0, 3)).toEqual(['d', 'a', 'e']);
     expect(m.household).toHaveLength(5);
     expect(u.cardModel(l, 'sam', now).goal.goal).toBeNull();

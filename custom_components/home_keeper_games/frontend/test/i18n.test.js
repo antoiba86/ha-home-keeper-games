@@ -57,11 +57,11 @@ describe('setLanguage', () => {
 
 describe('t', () => {
   it('fills tokens and keeps unknown tokens', () => {
-    expect(t('game.page_n', { page: 3 })).toBe('Page 3');
-    expect(t('game.page_n', { page: 0 })).toBe('Page 0');
-    expect(t('game.page_n', { page: null })).toBe('Page {page}');
-    expect(t('game.page_n', { page: '' })).toBe('Page ');
-    expect(t('game.page_n')).toBe('Page {page}');
+    expect(t('game.minutes_n', { n: 3 })).toBe('3 min played');
+    expect(t('game.minutes_n', { n: 0 })).toBe('0 min played');
+    expect(t('game.minutes_n', { n: null })).toBe('{n} min played');
+    expect(t('game.minutes_n', { n: '' })).toBe(' min played');
+    expect(t('game.minutes_n')).toBe('{n} min played');
   });
   it('falls back to English, then to the key', () => {
     withKeys({ 'tmp.en': 'English only' }, () => {

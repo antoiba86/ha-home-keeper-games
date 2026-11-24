@@ -13,9 +13,10 @@ import type {
   Loan,
   Person,
   RawPerson,
+  PlayStatus,
+  Platform,
+  ProgressRow,
   RawState,
-  ReadingRow,
-  ReadingStatus,
   Room,
   ScanResult,
   Shelf,
@@ -77,7 +78,7 @@ export function normalizePeople(raw: Record<string, RawPerson> | null | undefine
     .map(([id, row]) => ({
       id: row.person_id || id,
       name: row.name || id,
-      share_reading: row.share_reading !== false,
+      share_progress: row.share_progress !== false,
       wishlist_todo: row.wishlist_todo ?? null,
       yearly_goal: row.yearly_goal ?? null,
     }))
@@ -91,7 +92,7 @@ export function normalizeState(raw: Partial<RawState>): Lib {
     ...b,
     tags: b.tags ?? [],
     genres: b.genres ?? [],
-    reading: b.reading ?? {},
+    progress: b.progress ?? {},
   }));
   return {
     rooms: asList(raw.rooms).sort(byOrder),
@@ -351,8 +352,8 @@ export function withQuery(
 
 // ── Game filters ─────────────────────────────────────────────────────────────
 
-export type StatusFilter = 'all' | 'unread' | 'reading' | 'read' | 'needs';
-export const STATUS_FILTERS: StatusFilter[] = ['all', 'unread', 'reading', 'read', 'needs'];
+export type StatusFilter = 'all' | 'unplayed' | 'playing' | 'completed' | 'needs';
+export const STATUS_FILTERS: StatusFilter[] = ['all', 'unplayed', 'playing', 'completed', 'needs'];
 export type SortKey = 'title' | 'franchise' | 'added' | 'released' | 'rating';
 export const SORT_KEYS: SortKey[] = ['title', 'franchise', 'added', 'released', 'rating'];
 
@@ -392,15 +393,48 @@ export function hasFilters(f: GameFilters): boolean {
   return Boolean(f.q || f.room || f.shelf || f.reader || f.genre || f.status !== 'all' || f.owned !== 'yes');
 }
 
-/** The reading row of *personId* for *game*, or null. */
-export function readingOf(game: Game, personId: string | null | undefined): ReadingRow | null {
-  if (!personId) return null;
-  return game.reading?.[personId] ?? null;
+/** The play statuses, in the order of the status buttons. */
+export const PLAY_STATUSES: PlayStatus[] = ['backlog', 'playing', 'completed', 'abandoned'];
+// The status that sums up the rows of a person: the first in this list wins.
+const STATUS_RANK: PlayStatus[] = ['playing', 'completed', 'backlog', 'abandoned'];
+
+/** The progress rows of *personId* for *game*, in platform order. */
+export function progressRows(game: Game, personId: string | null | undefined): Array<[Platform, ProgressRow]> {
+  if (!personId) return [];
+  const rows = game.progress?.[personId] ?? {};
+  return PLATFORMS.filter((p) => rows[p]).map((p): [Platform, ProgressRow] => [p, rows[p]!]);
 }
 
-/** The status of *personId* for *game*, or null. */
-export function statusOf(game: Game, personId: string | null | undefined): ReadingStatus | null {
-  return readingOf(game, personId)?.status ?? null;
+/** The progress row of *personId* for *game* on *platform*, or null. */
+export function progressOf(game: Game, personId: string | null | undefined, platform: string | null | undefined): ProgressRow | null {
+  if (!personId || !platform) return null;
+  return game.progress?.[personId]?.[platform as Platform] ?? null;
+}
+
+/** The status that sums up the rows of *personId* for *game*: playing, then completed, backlog, abandoned. */
+export function statusOf(game: Game, personId: string | null | undefined): PlayStatus | null {
+  const have = new Set(progressRows(game, personId).map(([, row]) => row.play_status));
+  return STATUS_RANK.find((s) => have.has(s)) ?? null;
+}
+
+/** The highest rating of *personId* for *game* on any platform, or 0. */
+export function ratingOf(game: Game, personId: string | null | undefined): number {
+  return Math.max(0, ...progressRows(game, personId).map(([, row]) => row.rating ?? 0));
+}
+
+/** The platforms of the copies of a game, in platform order. */
+export function copyPlatforms(copies: Copy[]): Platform[] {
+  const have = new Set(copies.map((c) => c.platform || 'other'));
+  return PLATFORMS.filter((p) => have.has(p));
+}
+
+/**
+ * The platform of a new progress row, as the backend picks it: the platform of the
+ * copies when they all have the same one, else `other`.
+ */
+export function defaultPlatform(copies: Copy[]): Platform {
+  const found = copyPlatforms(copies);
+  return found.length === 1 ? found[0] : 'other';
 }
 
 /** The text that a search reads for a game. */
@@ -412,7 +446,7 @@ export function searchText(game: Game, personId: string | null, extra: Array<str
     ...game.genres,
     game.shared_notes,
     ...game.tags,
-    readingOf(game, personId)?.private_notes,
+    ...progressRows(game, personId).map(([, row]) => row.review),
   ];
   return fold(parts.filter(Boolean).join(' \n '));
 }
@@ -445,12 +479,12 @@ function inPlace(game: Game, f: GameFilters, ctx: FilterContext): boolean {
 function matchesStatus(game: Game, status: StatusFilter, me: string | null): boolean {
   const mine = statusOf(game, me);
   switch (status) {
-    case 'unread':
-      return mine !== 'read';
-    case 'reading':
-      return mine === 'reading';
-    case 'read':
-      return mine === 'read';
+    case 'unplayed':
+      return !progressRows(game, me).some(([, row]) => row.play_status === 'completed');
+    case 'playing':
+      return mine === 'playing';
+    case 'completed':
+      return progressRows(game, me).some(([, row]) => row.play_status === 'completed');
     case 'needs':
       return game.needs_details;
     default:
@@ -463,7 +497,7 @@ export function matchesBase(game: Game, f: GameFilters, ctx: FilterContext): boo
   if (f.owned === 'yes' && !game.owned) return false;
   if (f.owned === 'no' && game.owned) return false;
   if (f.genre && !game.genres.includes(f.genre)) return false;
-  if (f.reader && statusOf(game, f.reader) !== 'read') return false;
+  if (f.reader && !progressRows(game, f.reader).some(([, row]) => row.play_status === 'completed')) return false;
   if (!inPlace(game, f, ctx)) return false;
   // Stryker disable next-line ArrayDeclaration: a string in the fallback maps to an undefined barcode, the same as no copy.
   const codes = (ctx.idx.copiesByGame.get(game.id) ?? []).map((c) => c.barcode);
@@ -478,7 +512,7 @@ export function filterGames(games: Game[], f: GameFilters, ctx: FilterContext): 
 
 /** The count for each status chip, with the other filters applied. */
 export function statusCounts(games: Game[], f: GameFilters, ctx: FilterContext): Record<StatusFilter, number> {
-  const counts: Record<StatusFilter, number> = { all: 0, unread: 0, reading: 0, read: 0, needs: 0 };
+  const counts: Record<StatusFilter, number> = { all: 0, unplayed: 0, playing: 0, completed: 0, needs: 0 };
   for (const game of games) {
     if (!matchesBase(game, f, ctx)) continue;
     for (const s of STATUS_FILTERS) if (matchesStatus(game, s, ctx.me)) counts[s] += 1;
@@ -501,7 +535,7 @@ export function sortGames(games: Game[], key: SortKey, me: string | null): Game[
     franchise: (a, b) => (fold(a.franchise) || '\uffff').localeCompare(fold(b.franchise) || '\uffff'),
     added: (a, b) => String(b.created_at).localeCompare(String(a.created_at)),
     released: (a, b) => (yearOf(a.release_date) ?? 99999) - (yearOf(b.release_date) ?? 99999),
-    rating: (a, b) => (readingOf(b, me)?.rating ?? 0) - (readingOf(a, me)?.rating ?? 0),
+    rating: (a, b) => ratingOf(b, me) - ratingOf(a, me),
   };
   return [...games].sort((a, b) => cmp[key](a, b) || byTitle(a, b));
 }
@@ -727,23 +761,18 @@ export function splitList(value: string): string[] {
     .filter(Boolean);
 }
 
-/** Reading progress from 0 to 100, or null with no page count. */
-export function progress(page: number | null | undefined, pages: number | null | undefined): number | null {
-  if (!pages || page == null) return null;
-  return Math.max(0, Math.min(100, Math.round((page / pages) * 100)));
-}
-
 // ── Card ─────────────────────────────────────────────────────────────────────
 
 export interface Activity {
   person: Person;
   game: Game;
-  row: ReadingRow;
+  platform: Platform;
+  row: ProgressRow;
 }
 
 export interface CardModel {
-  reading: Array<{ game: Game; row: ReadingRow }>;
-  want: Game[];
+  playing: Array<{ game: Game; platform: Platform; row: ProgressRow }>;
+  backlog: Game[];
   goal: { done: number; goal: number | null; year: number };
   household: Activity[];
 }
@@ -751,27 +780,30 @@ export interface CardModel {
 /** The data that the card shows for *personId* at *now*. */
 export function cardModel(lib: Lib, personId: string | null, now: Date, maxActivity = 5): CardModel {
   const year = now.getFullYear();
-  const reading: CardModel['reading'] = [];
-  const want: Game[] = [];
+  const playing: CardModel['playing'] = [];
+  const backlog: Game[] = [];
   let done = 0;
   const household: Activity[] = [];
   const person = new Map(lib.people.map((p) => [p.id, p]));
   for (const game of lib.games) {
-    for (const [pid, row] of Object.entries(game.reading)) {
+    for (const pid of Object.keys(game.progress)) {
+      const rows = progressRows(game, pid);
       if (pid === personId) {
-        if (row.status === 'reading') reading.push({ game, row });
-        if (row.status === 'want') want.push(game);
-        if (row.status === 'read' && yearOf(row.finished) === year) done += 1;
-      } else if (row.status && row.status !== 'want' && person.get(pid)?.share_reading) {
-        household.push({ person: person.get(pid)!, game, row });
+        for (const [platform, row] of rows) if (row.play_status === 'playing') playing.push({ game, platform, row });
+        if (rows.some(([, row]) => row.play_status === 'backlog')) backlog.push(game);
+        if (rows.some(([, row]) => row.play_status === 'completed' && yearOf(row.completed_at) === year)) done += 1;
+      } else if (person.get(pid)?.share_progress) {
+        for (const [platform, row] of rows) {
+          if (row.play_status !== 'backlog') household.push({ person: person.get(pid)!, game, platform, row });
+        }
       }
     }
   }
   household.sort((a, b) => String(b.row.updated_at).localeCompare(String(a.row.updated_at)));
-  reading.sort((a, b) => String(b.row.updated_at).localeCompare(String(a.row.updated_at)));
+  playing.sort((a, b) => String(b.row.updated_at).localeCompare(String(a.row.updated_at)));
   return {
-    reading,
-    want,
+    playing,
+    backlog,
     goal: { done, goal: personId ? (person.get(personId)?.yearly_goal ?? null) : null, year },
     household: household.slice(0, maxActivity),
   };

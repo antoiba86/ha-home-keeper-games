@@ -90,19 +90,20 @@ describe('games view', () => {
     await mount();
     expect($$('.hkl-tile')).toHaveLength(38);
     expect($('[data-k="st-all"]').textContent).toContain('38');
-    expect($('[data-k="st-read"]').textContent).toContain('9');
+    expect($('[data-k="st-completed"]').textContent).toContain('9');
     expect($('[data-k="nav-games"]').getAttribute('aria-current')).toBe('page');
   });
 
   it('reads the filters from the route', async () => {
-    await mount('/games;status=reading;view=rows');
+    await mount('/games;status=playing;view=rows');
     expect($$('.hkl-row').map((r) => r.querySelector('.hkl-row-title').textContent)).toEqual([
       'Every Grain of Rice',
       'Integrated Chinese 1',
       'Project Hail Mary',
+      'The Left Hand of Darkness',
       'The Ministry for the Future',
     ]);
-    expect($('[data-k="st-reading"]').getAttribute('aria-pressed')).toBe('true');
+    expect($('[data-k="st-playing"]').getAttribute('aria-pressed')).toBe('true');
   });
 
   it('includes games with no copy when owned is all', async () => {
@@ -112,10 +113,10 @@ describe('games view', () => {
 
   it('navigates with replace when a chip or a menu changes', async () => {
     await mount();
-    $('[data-k="st-read"]').click();
-    expect(host.navigate).toHaveBeenLastCalledWith('/games;status=read', { replace: true });
+    $('[data-k="st-completed"]').click();
+    expect(host.navigate).toHaveBeenLastCalledWith('/games;status=completed', { replace: true });
     change($('[data-k="f-sort"]'), 'franchise');
-    expect(host.navigate).toHaveBeenLastCalledWith('/games;status=read;sort=franchise', { replace: true });
+    expect(host.navigate).toHaveBeenLastCalledWith('/games;status=completed;sort=franchise', { replace: true });
     $('[data-k="clear"]').click();
     expect(host.navigate).toHaveBeenLastCalledWith('/games;sort=franchise', { replace: true });
   });
@@ -201,10 +202,10 @@ describe('covers', () => {
     await mount('/games');
     const tile = $(`[data-k="b-${game.id}"]`);
     const dots = tile.querySelectorAll('.hkl-tile-readers .hkl-dot');
-    expect([...dots].map((d) => d.getAttribute('aria-label'))).toEqual(['Alex: Read', 'Sam: Reading']);
+    expect([...dots].map((d) => d.getAttribute('aria-label'))).toEqual(['Alex: Playing', 'Sam: Playing']);
     expect(tile.querySelector('.hkl-tile-meta .hkl-dot')).toBeNull();
     expect(dots[0].style.getPropertyValue('--p')).not.toBe(dots[1].style.getPropertyValue('--p'));
-    expect($$('.hkl-legend .hkl-ring').map((r) => r.className)).toEqual(['hkl-ring ring-read', 'hkl-ring ring-reading']);
+    expect($$('.hkl-legend .hkl-ring').map((r) => r.className)).toEqual(['hkl-ring ring-completed', 'hkl-ring ring-playing']);
   });
 });
 
@@ -219,11 +220,35 @@ describe('game detail', () => {
     expect(task).toMatch(/^[0-9a-f]{32}$/);
     expect($('.hkl-task').getAttribute('href')).toBe(`/home-keeper/tasks/${task}`);
     expect(host.taskLink).toHaveBeenCalledWith(task);
-    expect(text()).toContain('Read on Mar 2, 2025 · Read 2 times');
-    expect(text()).toContain('Page 112');
+    expect(text()).toContain('Completed on Mar 2, 2025 · Completed 2 times');
+    expect(text()).toContain('Switch 2 Playing');
     expect(text()).toContain('Hainish Cycle');
-    expect($('[data-k="rs-read"]').getAttribute('aria-pressed')).toBe('true');
+    expect($('[data-k="rs-completed"]').getAttribute('aria-pressed')).toBe('true');
     expect($$('.hkl-star.on')).toHaveLength(4);
+  });
+
+  it('shows 1 chip for each platform and edits the platform of the chip', async () => {
+    const state = fixture();
+    const id = gameId(state, 'The Left Hand of Darkness');
+    const fake = await mount(`/games/${id}`);
+    expect($$('.hkl-plat').map((c) => c.textContent)).toEqual(['Switch 2 · Completed', 'Switch · Playing']);
+    expect($('[data-k="pp-switch2"]').getAttribute('aria-pressed')).toBe('true');
+    expect($('[data-k="r-completion_count"]').value).toBe('2');
+    $('[data-k="pp-switch"]').click();
+    expect($('[data-k="pp-switch"]').getAttribute('aria-pressed')).toBe('true');
+    expect($('[data-k="rs-playing"]').getAttribute('aria-pressed')).toBe('true');
+    expect($('[data-k="r-playtime_minutes"]').value).toBe('95');
+    change($('[data-k="r-last_played_at"]'), '2026-10-04');
+    await flush();
+    expect(fake.calls('set_progress')[0]).toMatchObject({ game_id: id, person_id: ALEX, platform: 'switch', last_played_at: '2026-10-04' });
+    change($('[data-k="pp-add"]'), 'pc');
+    expect($('[data-k="pp-pc"]').getAttribute('aria-pressed')).toBe('true');
+    expect($$('[data-act="set-status"][aria-pressed="true"]')).toHaveLength(0);
+    expect($('[data-k="progress-clear"]')).toBeNull();
+    $('[data-k="pp-switch"]').click();
+    $('[data-k="progress-clear"]').click();
+    await flush();
+    expect(fake.calls('set_progress')[1]).toMatchObject({ game_id: id, platform: 'switch', play_status: 'none' });
   });
 
   it('opens the task with host.openTask, or leaves the link to the browser', async () => {
@@ -241,21 +266,22 @@ describe('game detail', () => {
     expect(host.navigate).not.toHaveBeenCalled();
   });
 
-  it('sets the status, the rating and the page for the person', async () => {
+  it('sets the status, the rating and the play time for the person', async () => {
     const state = fixture();
     const id = gameId(state, 'The Lathe of Heaven');
+    const platform = state.copies.find((c) => c.game_id === id).platform;
     const fake = await mount(`/games/${id}`);
-    $('[data-k="rs-reading"]').click();
+    $('[data-k="rs-playing"]').click();
     await flush();
-    const [msg] = fake.calls('set_reading');
-    expect(msg).toMatchObject({ game_id: id, person_id: ALEX, status: 'reading' });
-    expect(msg.started).toMatch(/^\d{4}-\d\d-\d\d$/);
+    const [msg] = fake.calls('set_progress');
+    expect(msg).toMatchObject({ game_id: id, person_id: ALEX, platform, play_status: 'playing' });
+    expect(msg.started_at).toMatch(/^\d{4}-\d\d-\d\d$/);
     $('[data-k="star-3"]').click();
     await flush();
-    expect(fake.calls('set_reading')[1]).toMatchObject({ game_id: id, rating: 3 });
-    change($('[data-k="r-page"]'), '42');
+    expect(fake.calls('set_progress')[1]).toMatchObject({ game_id: id, platform, rating: 3 });
+    change($('[data-k="r-playtime_minutes"]'), '42');
     await flush();
-    expect(fake.calls('set_reading')[2]).toMatchObject({ page: 42 });
+    expect(fake.calls('set_progress')[2]).toMatchObject({ playtime_minutes: 42 });
   });
 
   it('sets the status of another person', async () => {
@@ -263,9 +289,9 @@ describe('game detail', () => {
     const id = gameId(state, 'Dune');
     const fake = await mount(`/games/${id}`);
     change($('[data-k="rp"]'), SAM);
-    $('[data-k="rs-read"]').click();
+    $('[data-k="rs-completed"]').click();
     await flush();
-    expect(fake.calls('set_reading')[0]).toMatchObject({ person_id: SAM, status: 'read', read_count: 1 });
+    expect(fake.calls('set_progress')[0]).toMatchObject({ person_id: SAM, play_status: 'completed', completion_count: 1 });
   });
 
   it('returns a loan', async () => {
@@ -420,12 +446,12 @@ describe('game detail', () => {
   it('shows the stored status again when a change fails', async () => {
     const state = fixture();
     const id = gameId(state, 'The Lathe of Heaven');
-    await mount(`/games/${id}`, { replies: { set_reading: () => Promise.reject({ message: 'No' }) } });
-    const page = $('[data-k="r-page"]');
-    const before = page.value;
-    change(page, '42');
+    await mount(`/games/${id}`, { replies: { set_progress: () => Promise.reject({ message: 'No' }) } });
+    const time = $('[data-k="r-playtime_minutes"]');
+    const before = time.value;
+    change(time, '42');
     await flush();
-    expect($('[data-k="r-page"]').value).toBe(before);
+    expect($('[data-k="r-playtime_minutes"]').value).toBe(before);
   });
 });
 
@@ -458,7 +484,7 @@ describe('shelves, loans, wishlist and settings', () => {
     expect($$('.hkl-listrow')).toHaveLength(3);
     expect($('[data-k="lt-in"]').textContent).toContain('2');
     await mount('/loans;tab=in');
-    expect(text()).toContain('Seattle Public Library · Alex · Physical · Reading');
+    expect(text()).toContain('Seattle Public Library · Alex · Physical · Playing');
   });
 
   it('lends a copy with a task', async () => {
@@ -651,7 +677,7 @@ describe('scan', () => {
     expect(duneRow.querySelector('[data-k^="from-wish-"]')).toBeNull();
   });
 
-  it('sets Read for me on the scanned games when the box is set', async () => {
+  it('sets Completed for me on the scanned games when the box is set', async () => {
     const state = fixture();
     const shelf = Object.values(state.shelves)[0].id;
     const dune = Object.values(state.games).find((b) => b.title === 'Dune');
@@ -665,7 +691,7 @@ describe('scan', () => {
     change($('[data-k="markread"]'), true);
     $('[data-k="scan-finish"]').click();
     await flush();
-    expect(fake.calls('set_reading')[0]).toMatchObject({ game_id: dune.id, person_id: ALEX, status: 'read' });
+    expect(fake.calls('set_progress')[0]).toMatchObject({ game_id: dune.id, person_id: ALEX, play_status: 'completed' });
   });
 });
 
@@ -1088,7 +1114,7 @@ describe('import', () => {
     Object.defineProperty(input, 'files', { value: [file] });
     input.dispatchEvent(new Event('change', { bubbles: true }));
     await flush(10);
-    expect(fake.calls('import_csv')[0]).toMatchObject({ content: 'title,authors\nA,B\nC,D\nE,F\n', person_id: ALEX, dry_run: true, import_notes: true, replace_reading: false, shelf_id: null });
+    expect(fake.calls('import_csv')[0]).toMatchObject({ content: 'title,authors\nA,B\nC,D\nE,F\n', person_id: ALEX, dry_run: true, import_review: true, replace_progress: false, shelf_id: null });
     expect(text()).toContain('games-export.csv · 3 rows');
     expect(text()).toContain('Already in the library: 1');
     $('[data-k="import-run"]').click();
