@@ -78,7 +78,7 @@ The other keys of each event are in the generated API reference and in
 - The copy events add `copy_id` and `shelf_id`. `copy_moved` adds
   `previous_shelf_id`. `copy_updated` adds `changed_fields`, with the names of
   the fields only, not their values (no price or value).
-- Each progress event adds `platform`, for example `switch` or `pc`.
+- Each progress event adds `platform`, such as `switch` or `pc`.
 - `progress_changed` adds `play_status` and `previous_status`. A removed progress
   row has `play_status: null`.
 - `progress_updated` adds `play_status` and `changed_fields`. It names the changed

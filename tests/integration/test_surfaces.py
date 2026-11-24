@@ -81,8 +81,14 @@ def test_every_service_is_touched(api):
     _service(api, "set_cover", {"game_id": game["id"], "kind": "none"})
     _service(
         api,
-        "set_reading",
-        {"game_id": game["id"], "person_id": person, "status": "reading", "page": 3},
+        "set_progress",
+        {
+            "game_id": game["id"],
+            "person_id": person,
+            "platform": "pc",
+            "play_status": "playing",
+            "playtime_minutes": 30,
+        },
     )
     _service(api, "set_person_settings", {"person_id": person, "yearly_goal": 12})
     _service(api, "set_settings", {"currency": "EUR"})

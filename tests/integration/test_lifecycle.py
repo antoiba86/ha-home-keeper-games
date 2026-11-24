@@ -23,7 +23,7 @@ SERVICES = (
     "add_room",
     "add_game",
     "scan_barcode",
-    "set_reading",
+    "set_progress",
     "lend_game",
     "borrow_game",
     "import_csv",
