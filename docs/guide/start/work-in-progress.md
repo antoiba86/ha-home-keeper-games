@@ -13,6 +13,7 @@ console, and the play status of each person.
 - A barcode scan into a shelf. A new barcode asks for the title.
 - Copies with a platform, a physical or digital format, and the barcode of the case.
 - [Play progress](#play-progress) for each person on each platform.
+- [IGDB game](#igdb-game): correct the IGDB details of a game.
 - Loans with a Home Keeper task, and a wishlist for each person.
 - A CSV import and export in the format of Home Keeper Games.
 - The [dashboard card](../views/dashboard-card.md), the sensors and the
@@ -43,3 +44,24 @@ of completions goes up by 1.
 The Home Keeper export holds the section of Home Keeper Games. 1 export and 1 import move
 Home Keeper and Home Keeper Games together. The import adds a record or updates the record
 that matches, and never deletes a record that is not in the file.
+
+## IGDB game
+
+With the [IGDB keys](installation.md#igdb-keys), a game gets its details and its cover
+from IGDB. If an automation added the wrong game, or IGDB did not find the title, correct
+the game in the tab:
+
+1. Open the game in the **Games** tab.
+2. Select **Change IGDB game**. For a game that needs details, you can also select
+   **Find in IGDB** in the banner.
+3. The dialog searches the title of the game, on the platform of its copies. To search
+   again, change the text or the platform and select **Search**.
+4. Select the correct game, then select **Use this game**.
+
+The title, summary, genres, release date, franchise and cover come from IGDB. The tags,
+notes, copies, progress and loans do not change. A cover that you uploaded stays. A game
+that is already in the library shows **In library**, and you cannot select it.
+
+![The Change IGDB game dialog with 3 results](../../images/igdb-dialog-desktop.png)
+
+![The Change IGDB game dialog at phone width](../../images/igdb-dialog-mobile.png)

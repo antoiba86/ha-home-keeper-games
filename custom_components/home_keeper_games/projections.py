@@ -200,8 +200,12 @@ def project_state(
     currency: str,
     tab: bool,
     revision: int,
+    igdb: bool = False,
 ) -> dict[str, Any]:
-    """The reply of ``home_keeper_games/get_state`` for the viewer."""
+    """The reply of ``home_keeper_games/get_state`` for the viewer.
+
+    ``igdb`` tells the tab if the IGDB keys are set. The keys never go out.
+    """
     counts = {game_id: len(rows) for game_id, rows in copies_by_game(state).items()}
     games = [
         project_game(
@@ -235,6 +239,7 @@ def project_state(
         "me": {"person_id": viewer, "name": viewer_name, "is_admin": is_admin},
         "currency": currency,
         "home_keeper": {"tab": tab},
+        "igdb": igdb,
     }
     return reply
 

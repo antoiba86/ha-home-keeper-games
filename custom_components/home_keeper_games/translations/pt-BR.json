@@ -380,6 +380,20 @@
         }
       }
     },
+    "set_igdb_game": {
+      "name": "Definir jogo do IGDB",
+      "description": "Atribui a um jogo outro jogo do IGDB. Título, resumo, gêneros, data de lançamento, franquia e capa vêm do IGDB. Uma capa enviada é mantida.",
+      "fields": {
+        "game_id": {
+          "name": "Jogo",
+          "description": "O ID do jogo."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "O ID do jogo correto no IGDB."
+        }
+      }
+    },
     "delete_game": {
       "name": "Excluir livro",
       "description": "Excluir um livro com seus exemplares, status de leitura, empréstimos e capa.",
@@ -1172,6 +1186,9 @@
     },
     "igdb_not_found": {
       "message": "O IGDB não tem nenhum jogo com o ID {igdb_id}."
+    },
+    "igdb_in_use": {
+      "message": "{title} já tem este jogo do IGDB."
     }
   }
 }

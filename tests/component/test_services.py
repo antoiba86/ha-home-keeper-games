@@ -27,6 +27,7 @@ _ADMIN_DATA = {
     "delete_shelf": {"shelf_id": "x"},
     "add_game": {"title": "x"},
     "update_game": {"game_id": "x"},
+    "set_igdb_game": {"game_id": "x", "igdb_id": 1},
     "delete_game": {"game_id": "x"},
     "scan_barcode": {"barcode": "0711719505012"},
     "add_copy": {"game_id": "x"},

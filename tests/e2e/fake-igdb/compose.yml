@@ -1,0 +1,16 @@
+# The fake IGDB of the e2e stack. ci/e2e-compose.sh adds this file to
+# tests/integration/docker-compose.yml, so the relative paths start there.
+# The integration tier does not use it: with no keys, no IGDB call goes out.
+services:
+  igdb:
+    image: python:3.13-alpine
+    command: ["python", "/srv/server.py"]
+    volumes:
+      - ../e2e/fake-igdb:/srv:ro
+  homeassistant:
+    depends_on:
+      - igdb
+    environment:
+      - HOME_KEEPER_GAMES_IGDB_API_URL=http://igdb:8080/v4
+      - HOME_KEEPER_GAMES_IGDB_TOKEN_URL=http://igdb:8080/oauth2/token
+      - HOME_KEEPER_GAMES_IGDB_IMAGES_URL=http://igdb:8080/images

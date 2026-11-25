@@ -200,6 +200,10 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
         ),
     },
     "update_game": {vol.Required("game_id"): cv.string, **_GAME_FIELDS},
+    "set_igdb_game": {
+        vol.Required("game_id"): cv.string,
+        vol.Required("igdb_id"): vol.Coerce(int),
+    },
     "delete_game": {vol.Required("game_id"): cv.string},
     "scan_barcode": {
         vol.Required("barcode"): cv.string,
@@ -500,6 +504,32 @@ async def _search_catalog(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
 async def _update_game(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
     game = await ctx.store.update_game(data["game_id"], _clean(data, "game_id"))
     return {"game": ctx.game_reply(game)}
+
+
+async def _set_igdb_game(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+    """Give a stored game another IGDB game: its details and its cover.
+
+    The IGDB fields and the title are replaced, and ``needs_details`` is cleared.
+    The tags, notes, copies, progress and loans stay. An uploaded cover stays.
+    An IGDB id that another game has is ``igdb_in_use``.
+    """
+    game_id = data["game_id"]
+    ctx.store.game(game_id)
+    igdb_id = models.game_field("igdb_id", data["igdb_id"])
+    raw = await ctx.coordinator.igdb.async_game(igdb_id)
+    if raw is None:
+        raise LibraryError("igdb_not_found", igdb_id=igdb_id)
+    # Read after the request: another call can add the game in the meantime.
+    other = models.find_game_by_igdb_id(ctx.store.state, igdb_id)
+    if other is not None and other["id"] != game_id:
+        raise LibraryError("igdb_in_use", title=other["title"])
+    await ctx.store.update_game(game_id, catalog.replacement_fields(raw))
+    if image := catalog.image_id(raw):
+        await async_store_igdb_cover(ctx.hass, ctx.coordinator, game_id, image)
+    elif (ctx.store.game(game_id).get("cover") or {}).get("kind") == "igdb":
+        # The old IGDB cover shows the other game.
+        await ctx.store.set_cover(game_id, "none", None)
+    return {"game": ctx.game_reply(ctx.store.game(game_id))}
 
 
 async def _delete_game(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
@@ -1047,6 +1077,7 @@ SERVICE_HANDLERS: dict[str, Handler] = {
     "add_game": _add_game_service,
     "search_catalog": _search_catalog,
     "update_game": _update_game,
+    "set_igdb_game": _set_igdb_game,
     "delete_game": _delete_game,
     "scan_barcode": _scan_barcode,
     "add_copy": _add_copy,

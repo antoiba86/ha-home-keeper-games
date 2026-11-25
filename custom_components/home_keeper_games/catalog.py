@@ -147,6 +147,22 @@ def game_fields(raw: dict[str, Any]) -> dict[str, Any]:
     return fields
 
 
+def replacement_fields(raw: dict[str, Any]) -> dict[str, Any]:
+    """The fields that a stored game gets when an admin gives it another IGDB game.
+
+    A field that the new record does not have becomes empty, because its old value
+    came from the other game. The game no longer needs details.
+    """
+    return {
+        "summary": "",
+        "genres": [],
+        "release_date": "",
+        "franchise": None,
+        **game_fields(raw),
+        "needs_details": False,
+    }
+
+
 def candidate(
     raw: dict[str, Any], images_url: str, in_library: str | None
 ) -> dict[str, Any]:

@@ -380,6 +380,20 @@
         }
       }
     },
+    "set_igdb_game": {
+      "name": "Задать игру IGDB",
+      "description": "Назначает игре другую игру из IGDB. Название, описание, жанры, дата выхода, серия и обложка берутся из IGDB. Загруженная обложка остаётся.",
+      "fields": {
+        "game_id": {
+          "name": "Игра",
+          "description": "ID игры."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "ID правильной игры в IGDB."
+        }
+      }
+    },
     "delete_game": {
       "name": "Удалить книгу",
       "description": "Удалить книгу с её экземплярами, статусом чтения, выдачами и обложкой.",
@@ -1172,6 +1186,9 @@
     },
     "igdb_not_found": {
       "message": "В IGDB нет игры с ID {igdb_id}."
+    },
+    "igdb_in_use": {
+      "message": "У «{title}» уже есть эта игра IGDB."
     }
   }
 }

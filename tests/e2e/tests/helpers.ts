@@ -1,3 +1,4 @@
+import { resolve } from 'node:path';
 import { test as base, expect, type BrowserContext, type Locator, type Page } from '@playwright/test';
 import { library, withWs } from '../ha-ws';
 
@@ -17,10 +18,23 @@ export async function noServiceWorker(context: BrowserContext): Promise<void> {
   });
 }
 
+/**
+ * Answer the cover requests of the fake IGDB (tests/e2e/fake-igdb).
+ *
+ * Home Assistant reaches the fake at `http://igdb:8080` in Docker, so the search
+ * results have cover URLs on that host. The browser runs outside Docker, so a
+ * route gives it the same image.
+ */
+export async function fakeIgdbCovers(context: BrowserContext): Promise<void> {
+  const cover = resolve(__dirname, '../fake-igdb/cover.jpg');
+  await context.route('http://igdb:8080/images/**', (route) => route.fulfill({ path: cover, contentType: 'image/jpeg' }));
+}
+
 /** The Playwright `test` with no Home Assistant service worker in each context. */
 export const test = base.extend({
   context: async ({ context }, use) => {
     await noServiceWorker(context);
+    await fakeIgdbCovers(context);
     await use(context);
   },
 });

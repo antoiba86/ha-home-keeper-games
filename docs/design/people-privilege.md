@@ -5,7 +5,7 @@ implements:
   - custom_components/home_keeper_games/people.py
   - custom_components/home_keeper_games/projections.py
 related: [events-api, entities, architecture]
-source_hash: 4e225d9cb3e8
+source_hash: 0294d2d75a49
 ---
 
 # People and privilege
@@ -72,6 +72,9 @@ each signed-in user, because covers are not private.
 - the settings of another person drop `wishlist_todo`;
 - the wishlist entry of another person drops `PRIVATE_WISHLIST_FIELDS` (`todo_entity`,
   `todo_uid`).
+
+`project_state` tells each viewer only if the IGDB keys are set (`igdb`). The keys never
+go out.
 
 `projections.project_export` drops the same fields from the section of a Home Keeper
 export for a non-admin viewer. `export_data` is admin-only, so an admin reads it full.

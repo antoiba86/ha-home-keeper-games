@@ -5,12 +5,22 @@
 import { t } from './i18n';
 import { formatOptions, ICONS, options, personOptions, platformOptions, shelfOptions } from './markup';
 import type { ViewCtx } from './tab-types';
-import type { Copy } from './types';
-import { escapeHTML, locationLabel } from './utils';
+import type { Candidate, Copy } from './types';
+import { escapeHTML, locationLabel, PLATFORMS, platformLabel } from './utils';
 
 export type Dialog =
   | { kind: 'add-game' }
   | { kind: 'edit-game'; gameId: string }
+  /** Search IGDB and give the game another IGDB game. `results` is null before the first reply. */
+  | {
+      kind: 'igdb-game';
+      gameId: string;
+      query: string;
+      platform: string;
+      results: Candidate[] | null;
+      searching: boolean;
+      picked: number | null;
+    }
   | { kind: 'copy'; gameId: string; copyId: string | null }
   | { kind: 'move'; copyId: string }
   | { kind: 'set-shelf' }
@@ -102,6 +112,47 @@ function scanTitleBody(ctx: ViewCtx, d: Extract<Dialog, { kind: 'scan-title' }>)
   };
 }
 
+type IgdbDialog = Extract<Dialog, { kind: 'igdb-game' }>;
+
+/** True when another game of the library has this IGDB game. */
+export const takenByOther = (c: Candidate, gameId: string): boolean => c.in_library !== null && c.in_library !== gameId;
+
+function candidateRow(c: Candidate, d: IgdbDialog): string {
+  const other = takenByOther(c, d.gameId);
+  const meta = [c.release_year === null ? '' : String(c.release_year), ...c.platforms.map(platformLabel)].filter(Boolean).join(' · ');
+  const img = c.cover_url
+    ? `<img class="hkl-igdb-cover" src="${escapeHTML(c.cover_url)}" alt="" loading="lazy" referrerpolicy="no-referrer" />`
+    : '<span class="hkl-igdb-cover none" aria-hidden="true"></span>';
+  const mark = other ? t('igdb.in_library') : c.in_library === d.gameId ? t('igdb.this_game') : '';
+  const id = escapeHTML(String(c.igdb_id));
+  return `<label class="hkl-igdb-row${other ? ' off' : ''}" data-k="d-igdb-row-${id}"><input type="radio" name="igdb_id" value="${id}"${d.picked === c.igdb_id ? ' checked' : ''}${other ? ' disabled' : ''} />${img}<span class="hkl-igdb-text"><strong>${escapeHTML(c.title)}</strong>${meta ? `<span class="hkl-muted small">${escapeHTML(meta)}</span>` : ''}</span>${mark ? `<span class="hkl-pill">${escapeHTML(mark)}</span>` : ''}</label>`;
+}
+
+function igdbBody(ctx: ViewCtx, d: IgdbDialog): DialogBody {
+  const platforms: Array<[string, string]> = [
+    ['', t('igdb.any_platform')],
+    ...PLATFORMS.filter((p) => p !== 'other').map((p): [string, string] => [p, platformLabel(p)]),
+  ];
+  const status = (text: string) => `<p class="hkl-muted" data-k="d-igdb-status">${escapeHTML(text)}</p>`;
+  const list = d.searching
+    ? status(t('igdb.searching'))
+    : d.results?.length === 0
+      ? status(t('igdb.no_results'))
+      : (d.results ?? []).map((c) => candidateRow(c, d)).join('');
+  const upload = ctx.idx.game.get(d.gameId)?.cover?.kind === 'custom' ? ` ${t('igdb.upload_stays')}` : '';
+  return {
+    title: t('igdb.change'),
+    submit: t('igdb.use'),
+    html: `<div class="hkl-igdb-search">
+        ${field(t('igdb.search'), `<input name="igdb_query" value="${escapeHTML(d.query)}" data-k="d-igdb-query" data-input="igdb-query" autocomplete="off" enterkeyhint="search" />`, 'wide')}
+        ${field(t('copy.platform'), `<select name="igdb_platform" data-k="d-igdb-platform">${options(platforms, d.platform)}</select>`)}
+        <button type="button" class="hkl-btn outline" data-act="igdb-search" data-k="d-igdb-search"${d.searching ? ' disabled' : ''}>${escapeHTML(t('igdb.search_action'))}</button>
+      </div>
+      <div class="hkl-igdb-list" role="radiogroup" aria-label="${escapeHTML(t('igdb.results'))}" aria-busy="${d.searching}">${list}</div>
+      <p class="hkl-muted small" data-k="d-igdb-note">${escapeHTML(t('igdb.what_changes') + upload)}</p>`,
+  };
+}
+
 function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBody {
   switch (d.kind) {
     case 'add-game':
@@ -118,6 +169,8 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
       };
     case 'scan-title':
       return scanTitleBody(ctx, d);
+    case 'igdb-game':
+      return igdbBody(ctx, d);
     case 'edit-game': {
       const b = ctx.idx.game.get(d.gameId);
       return {

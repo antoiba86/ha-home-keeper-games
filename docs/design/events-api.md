@@ -7,7 +7,7 @@ implements:
   - custom_components/home_keeper_games/websocket_api.py
   - custom_components/home_keeper_games/events.py
 related: [people-privilege, store-models, entities, architecture]
-source_hash: 0732a66f7830
+source_hash: f5a2b05d3577
 ---
 
 # Services, websocket commands, events and the API surface
@@ -60,7 +60,7 @@ not a read of the store.
 that is not a read service:
 
 - `home_keeper_games/get_state` returns the projected document, the caller (`me`), the
-  currency, the tab state and the revision.
+  currency, the tab state, the revision and `igdb`, true when the IGDB keys are set.
 - `home_keeper_games/subscribe` sends `{"type": "changed", "revision": n}` after each
   store change. The client then calls `get_state` again. The command listens to the
   dispatcher signal `const.SIGNAL_STORE_CHANGED`, so a subscription stays after a reload

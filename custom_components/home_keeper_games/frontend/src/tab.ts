@@ -15,13 +15,13 @@ import { wireCovers } from './markup';
 import { camLogLines, logCam, Scanner } from './scanner';
 import { STYLES } from './styles';
 import { gamesPath, progressTarget, renderGame, renderGames } from './tab-games';
-import { renderDialog, type Dialog, type DialogState } from './tab-dialogs';
+import { renderDialog, takenByOther, type Dialog, type DialogState } from './tab-dialogs';
 import { renderImport } from './tab-import';
 import { renderLoans, renderSettings, renderWishlist } from './tab-lists';
 import { cameraBlocked, isBorrowedMode, renderScan, routeShelf } from './tab-scan';
 import { renderShelves } from './tab-shelves';
 import type { ImportState, ScanEntry, UiState, ViewCtx } from './tab-types';
-import type { Game, HomeAssistant, ImportSummary, Lib, Platform, PlayStatus, RawState, ScanResult, TabHost } from './types';
+import type { Candidate, Game, HomeAssistant, ImportSummary, Lib, Platform, PlayStatus, RawState, ScanResult, TabHost } from './types';
 import {
   buildIndex,
   buildPath,
@@ -474,6 +474,58 @@ export class HomeKeeperGamesTab extends HTMLElement {
     if (sheet && !this._dialog) this._main.querySelector<HTMLElement>('[data-k="barcode-input"]')?.focus();
   }
 
+  /** Open the Change IGDB game dialog. It searches the title, on the platform of the copies if they have 1. */
+  private _openIgdb(game: Game): void {
+    const copies = this._idx?.copiesByGame.get(game.id) ?? [];
+    const platforms = [...new Set(copies.map((c) => c.platform).filter((p) => p && p !== 'other'))];
+    this._openDialog({
+      kind: 'igdb-game',
+      gameId: game.id,
+      query: game.title,
+      platform: platforms.length === 1 ? platforms[0] : '',
+      results: null,
+      searching: false,
+      picked: null,
+    });
+    void this._igdbSearch();
+  }
+
+  /** Search IGDB with the text and the platform of the open Change IGDB game dialog. */
+  private async _igdbSearch(): Promise<void> {
+    const state = this._dialog;
+    if (state?.dialog.kind !== 'igdb-game' || state.dialog.searching || !this._api) return;
+    const d = state.dialog;
+    const form = this._dlg.querySelector<HTMLFormElement>('form[data-form="dialog"]');
+    if (form) {
+      const data = new FormData(form);
+      d.query = String(data.get('igdb_query') ?? '').trim();
+      d.platform = String(data.get('igdb_platform') ?? '');
+    }
+    state.error = '';
+    if (!d.query) {
+      state.error = t('dialog.need_title');
+      this._renderDialog();
+      return;
+    }
+    d.searching = true;
+    d.results = null;
+    d.picked = null;
+    this._renderDialog();
+    try {
+      const reply = await this._api.call<{ candidates?: Candidate[] }>('search_catalog', {
+        query: d.query,
+        ...(d.platform ? { platform: d.platform } : {}),
+      });
+      d.results = reply?.candidates ?? [];
+      d.picked = d.results.find((c) => !takenByOther(c, d.gameId))?.igdb_id ?? null;
+    } catch (err) {
+      state.error = errorText(err);
+    }
+    d.searching = false;
+    // The user can close the dialog during the search.
+    if (this._dialog === state) this._renderDialog();
+  }
+
   /** True when the open dialog is a sheet that only a submit or a remove can close. */
   private _sheetOpen(): boolean {
     return this._dialog?.dialog.kind === 'scan-title';
@@ -497,6 +549,12 @@ export class HomeKeeperGamesTab extends HTMLElement {
   }
 
   private _onKey(ev: KeyboardEvent): void {
+    // Enter in the IGDB search field searches. It does not submit the dialog.
+    if (ev.key === 'Enter' && (ev.composedPath()[0] as HTMLElement | undefined)?.dataset?.input === 'igdb-query') {
+      ev.preventDefault();
+      void this._igdbSearch();
+      return;
+    }
     if (ev.key !== 'Escape') return;
     if (this._sheetOpen()) {
       ev.stopPropagation();
@@ -699,6 +757,12 @@ export class HomeKeeperGamesTab extends HTMLElement {
         return;
       case 'scan-details':
         this._openDialog({ kind: 'edit-game', gameId: id });
+        return;
+      case 'igdb-game':
+        if (game) this._openIgdb(game);
+        return;
+      case 'igdb-search':
+        void this._igdbSearch();
         return;
       case 'add-copy':
         if (game) this._openDialog({ kind: 'copy', gameId: game.id, copyId: null });
@@ -907,6 +971,13 @@ export class HomeKeeperGamesTab extends HTMLElement {
             });
           }
           if (gameId) after = `/games/${encodeURIComponent(gameId)}`;
+          break;
+        }
+        case 'igdb-game': {
+          const picked = str('igdb_id');
+          if (!picked) throw new Error(t('igdb.pick'));
+          await api.call('set_igdb_game', { game_id: d.gameId, igdb_id: Number(picked) });
+          this._toast(t('igdb.done'));
           break;
         }
         case 'edit-game': {

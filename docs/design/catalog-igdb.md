@@ -1,18 +1,20 @@
 ---
 title: IGDB catalog
-summary: How the integration keeps the IGDB keys, searches IGDB and adds a game with its IGDB details and cover.
+summary: How the integration keeps the IGDB keys, searches IGDB, adds a game with its IGDB details and cover, and gives a stored game another IGDB game.
 implements:
   - custom_components/home_keeper_games/catalog.py
   - custom_components/home_keeper_games/igdb.py
-related: [covers, events-api, people-privilege, store-models, architecture]
-source_hash: 97b8ec6624a2
+related: [covers, events-api, people-privilege, store-models, architecture, frontend-tab-card]
+source_hash: be5e2667472e
 ---
 
 # IGDB catalog
 
 IGDB is the game database of Twitch. With a Twitch client ID and client secret, the
 integration finds games by title and adds a game with its title, summary, genres, release
-date, franchise and cover. `catalog.py` is the pure part: the queries and the mapping.
+date, franchise and cover. An admin can give a stored game another IGDB game, to correct a
+wrong match or a game that needs details. `catalog.py` is the pure part: the queries and the
+mapping.
 `igdb.py` is the HTTP client.
 
 ## Goals
@@ -27,7 +29,7 @@ date, franchise and cover. `catalog.py` is the pure part: the queries and the ma
 ## Non-goals
 
 - A write to IGDB.
-- Details from IGDB for a game that is already in the library. A later step can add it.
+- An automatic refresh of the stored games. An admin changes 1 game at a time.
 - A barcode lookup. IGDB has no barcode search ([IDEAS](../../IDEAS.md)).
 - A cache of searches. The rate limit protects the quota.
 
@@ -96,9 +98,25 @@ reads never see them. The options flow writes them with `async_update_entry`.
 - **`add_game`** with `lookup: true` and `title`: the title is the search text, with the
   optional `platform`. A match adds the IGDB game, with the IGDB title. No match adds the
   title with `needs_details: true`.
+- **`set_igdb_game`** (admin) with `game_id` and `igdb_id`: the client reads the game.
+  `catalog.replacement_fields` gives the title and the IGDB fields, an empty value for a
+  field that the IGDB game does not have, and `needs_details: false`. The tags, notes,
+  copies, progress and loans stay. The IGDB cover replaces an IGDB cover, and an IGDB game
+  with no cover removes it. An uploaded cover stays. An `igdb_id` of another game is
+  `igdb_in_use` (`{title}`). The check runs after the read, so a game that another call
+  adds during the read is also found.
 - A barcode that a copy has wins over both, as in a plain `add_game`. A field that the
   caller gives wins over the IGDB value. After the add, the cover download runs
   ([covers](covers.md)). The store fires `game_added`, and `game_updated` for the cover.
+
+### Tab
+
+`get_state` has `igdb`, true when the keys are set. Then the game detail has "Change IGDB
+game", and "Find in IGDB" in the banner of a game that needs details. Both open 1 dialog
+(`tab-dialogs.ts`). It searches the title on the platform of the copies, if they have 1,
+when it opens. Enter in the search field searches again. It selects the first result that no
+other game has, and a result of another game cannot be selected. "Use this game" sends
+`set_igdb_game`. The cover images of the results load from IGDB, with no referrer.
 
 ## Trade-offs
 
@@ -107,14 +125,16 @@ reads never see them. The options flow writes them with `async_update_entry`.
   the quota.
 - **Exact title match** over **the first result**: the Telegram bot adds a game with 1
   call, and a wrong game is hard to see. The cost is more games that need details.
+- **Clear the old fields** over **keep them** in `set_igdb_game`: the old values came from
+  the wrong game. The cost is a field that an admin typed and the new game does not have.
 - **Keys in the entry data** over **a service to set them**: a service field goes into
   `call_service` events and the recorder.
 
 ## One-way doors
 
 - The entry data keys `igdb_client_id` and `igdb_client_secret`.
-- The `search_catalog` fields and reply keys, and the `add_game` fields `igdb_id`,
-  `lookup` and `platform`.
-- The error keys `igdb_not_configured`, `igdb_unavailable`, `invalid_igdb_auth` and
-  `igdb_not_found`.
+- The `search_catalog` fields and reply keys, the `add_game` fields `igdb_id`, `lookup`
+  and `platform`, the `set_igdb_game` fields, and the `igdb` key of `get_state`.
+- The error keys `igdb_not_configured`, `igdb_unavailable`, `invalid_igdb_auth`,
+  `igdb_not_found` and `igdb_in_use`.
 - The 3 environment variable names.

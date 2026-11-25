@@ -520,3 +520,95 @@ async def test_options_flow_refuses_bad_keys(hass, setup_entry, aioclient_mock) 
 async def test_the_secret_is_not_in_the_diagnostics(hass, igdb_entry) -> None:
     found = await async_get_config_entry_diagnostics(hass, igdb_entry)
     assert "s3cret-value" not in json.dumps(found, default=str)
+
+
+# ── set_igdb_game ────────────────────────────────────────────────────────────
+
+
+async def test_set_igdb_game_replaces_the_details_and_the_cover(
+    hass, igdb_entry, call, aioclient_mock
+) -> None:
+    _igdb(aioclient_mock)
+    old = {"title": "Zeldaa", "summary": "Old", "tags": ["x"], "needs_details": True}
+    game = (await call("add_game", old))["game"]
+    await call("add_copy", {"game_id": game["id"], "platform": "switch"})
+    reply = await call("set_igdb_game", {"game_id": game["id"], "igdb_id": 7346})
+    new = reply["game"]
+    assert new["id"] == game["id"]
+    assert new["title"] == "The Legend of Zelda: Breath of the Wild"
+    assert new["summary"] == "Step into a world of discovery."
+    assert new["franchise"] == "The Legend of Zelda"
+    assert new["igdb_id"] == 7346
+    assert new["tags"] == ["x"]
+    assert new["needs_details"] is False
+    store = igdb_entry.runtime_data.store
+    assert store.game(game["id"])["cover"]["kind"] == "igdb"
+    assert len(store.state["copies"]) == 1
+
+
+async def test_set_igdb_game_clears_what_the_new_game_does_not_have(
+    hass, igdb_entry, call, aioclient_mock
+) -> None:
+    _igdb(aioclient_mock)
+    store = igdb_entry.runtime_data.store
+    game = (await call("add_game", {"igdb_id": 7346}))["game"]
+    assert store.game(game["id"])["cover"]["kind"] == "igdb"
+    new = (await call("set_igdb_game", {"game_id": game["id"], "igdb_id": 113112}))[
+        "game"
+    ]
+    assert new["title"] == "Hades"
+    assert new["igdb_id"] == 113112
+    assert new["summary"] == ""
+    assert new["genres"] == []
+    assert new["release_date"] == ""
+    assert new["franchise"] is None
+    assert store.game(game["id"])["cover"] == {"kind": "none", "file": None}
+
+
+async def test_set_igdb_game_keeps_an_uploaded_cover(
+    hass, igdb_entry, call, aioclient_mock
+) -> None:
+    _igdb(aioclient_mock)
+    store = igdb_entry.runtime_data.store
+    game = (await call("add_game", {"title": "Mine"}))["game"]
+    await store.set_cover(game["id"], "custom", "f.jpg")
+    await call("set_igdb_game", {"game_id": game["id"], "igdb_id": 113112})
+    assert store.game(game["id"])["cover"] == {"kind": "custom", "file": "f.jpg"}
+    await call("set_igdb_game", {"game_id": game["id"], "igdb_id": 7346})
+    assert store.game(game["id"])["cover"] == {"kind": "custom", "file": "f.jpg"}
+    assert _calls(aioclient_mock, COVER) == []
+
+
+async def test_set_igdb_game_refuses_an_igdb_game_of_another_game(
+    hass, igdb_entry, call, aioclient_mock
+) -> None:
+    _igdb(aioclient_mock)
+    zelda = (await call("add_game", {"igdb_id": 7346}))["game"]
+    other = (await call("add_game", {"title": "Other"}))["game"]
+    data = {"game_id": other["id"], "igdb_id": 7346}
+    with pytest.raises(ServiceValidationError) as info:
+        await call("set_igdb_game", data)
+    assert info.value.translation_key == "igdb_in_use"
+    assert info.value.translation_placeholders == {"title": zelda["title"]}
+    assert igdb_entry.runtime_data.store.game(other["id"])["title"] == "Other"
+    # The same game can get its own IGDB game again.
+    data = {"game_id": zelda["id"], "igdb_id": 7346}
+    assert (await call("set_igdb_game", data))["game"]["igdb_id"] == 7346
+
+
+async def test_set_igdb_game_errors(hass, igdb_entry, call, aioclient_mock) -> None:
+    _igdb(aioclient_mock)
+    game = (await call("add_game", {"title": "Mine"}))["game"]
+    data = {"game_id": game["id"], "igdb_id": 999}
+    assert await _key(call, "set_igdb_game", data) == "igdb_not_found"
+    data = {"game_id": "nope", "igdb_id": 7346}
+    assert await _key(call, "set_igdb_game", data) == "game_not_found"
+    data = {"game_id": game["id"], "igdb_id": 0}
+    assert await _key(call, "set_igdb_game", data) == "out_of_range"
+    assert igdb_entry.runtime_data.store.game(game["id"])["title"] == "Mine"
+
+
+async def test_set_igdb_game_needs_the_keys(hass, setup_entry, call) -> None:
+    game = (await call("add_game", {"title": "Mine"}))["game"]
+    data = {"game_id": game["id"], "igdb_id": 7346}
+    assert await _key(call, "set_igdb_game", data) == "igdb_not_configured"

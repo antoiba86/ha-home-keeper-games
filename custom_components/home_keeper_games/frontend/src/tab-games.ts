@@ -359,12 +359,14 @@ export function renderGame(ctx: ViewCtx, game: Game | undefined): string {
   const wish = game.wishlist
     ? `<div class="hkl-banner">${escapeHTML(t('game.on_wishlist', { name: ctx.idx.person.get(game.wishlist.person_id)?.name ?? '' }))}${button(escapeHTML(t('action.got_it')), 'got-it', 'tonal', `data-id="${escapeHTML(game.id)}" data-k="got-it"`)}</div>`
     : '';
+  const igdb = ctx.lib.igdb;
   const needs = game.needs_details
-    ? `<div class="hkl-banner warn">${escapeHTML(t('game.needs_details'))}${button(escapeHTML(t('action.add_details')), 'edit-game', 'tonal', 'data-k="needs-edit"')}</div>`
+    ? `<div class="hkl-banner warn">${escapeHTML(t('game.needs_details'))}${igdb ? button(escapeHTML(t('igdb.find')), 'igdb-game', 'tonal', 'data-k="needs-igdb"') : ''}${button(escapeHTML(t('action.add_details')), 'edit-game', igdb ? 'text' : 'tonal', 'data-k="needs-edit"')}</div>`
     : '';
   const badge = game.cover?.kind === 'custom' ? `<span class="hkl-cover-badge">${escapeHTML(t('game.custom_cover'))}</span>` : '';
   const actions = [
     button(escapeHTML(t('action.edit')), 'edit-game', 'tonal', 'data-k="edit-game"'),
+    igdb ? button(escapeHTML(t('igdb.change')), 'igdb-game', 'tonal', 'data-k="igdb-game"') : '',
     copies.some((c) => !ctx.idx.loanByCopy.has(c.id)) ? button(escapeHTML(t('action.lend')), 'lend', 'tonal', `data-game="${escapeHTML(game.id)}" data-k="lend"`) : '',
     game.wishlist ? '' : button(escapeHTML(t('action.add_to_wishlist')), 'wish-this', 'text', 'data-k="wish-this"'),
     button(escapeHTML(t('action.delete')), 'delete-game', 'danger', 'data-k="delete-game"'),

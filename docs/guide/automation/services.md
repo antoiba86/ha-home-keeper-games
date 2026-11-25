@@ -44,7 +44,7 @@ actions:
 
 ## IGDB
 
-With the [IGDB keys](../start/installation.md#igdb-keys), 2 services read game details
+With the [IGDB keys](../start/installation.md#igdb-keys), 3 services read game details
 from IGDB:
 
 - `search_catalog` returns up to 20 IGDB games for a title, best first. Each user can
@@ -55,6 +55,9 @@ from IGDB:
 - `add_game` with `title` and `lookup: true` adds the IGDB game with the same title. If
   no IGDB game has the same title, it adds the title only and marks the game as
   incomplete. Add `platform` to match only a game on that platform.
+- `set_igdb_game` with `game_id` and `igdb_id` gives a game in the library another IGDB
+  game. The title, summary, genres, release date, franchise and cover come from IGDB.
+  The tags, notes, copies, progress and loans do not change.
 
 Example: add a game from its title.
 

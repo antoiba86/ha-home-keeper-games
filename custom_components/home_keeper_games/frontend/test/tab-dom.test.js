@@ -317,7 +317,7 @@ describe('game detail', () => {
 
   it('shows the gone notice for a deleted game', async () => {
     await mount('/games/nope');
-    expect(text()).toContain('This book is not in the library.');
+    expect(text()).toContain('This game is not in the library.');
   });
 
   it('saves the shared notes', async () => {
@@ -1142,5 +1142,92 @@ describe('no Open Library', () => {
     expect($('[data-k="ol-card"]')).toBeNull();
     expect($('[data-k="ex-format"]')).toBeNull();
     expect(text()).not.toContain('Open Library');
+  });
+});
+
+describe('change IGDB game', () => {
+  const HIT = { igdb_id: 11, title: 'Dune', release_year: 1965, platforms: ['pc'], cover_url: 'https://images.example/t_cover_big/co1.jpg', in_library: null };
+  const TAKEN = { igdb_id: 10, title: 'Dune II', release_year: null, platforms: [], cover_url: null, in_library: 'other-game' };
+  const dlg = () => el.shadowRoot.getElementById('dlg');
+
+  it('shows no IGDB button with no IGDB keys', async () => {
+    const state = fixture();
+    await mount(`/games/${gameId(state, 'Dune')}`, { state });
+    expect($('[data-k="igdb-game"]')).toBeNull();
+  });
+
+  it('searches the title on the platform of the copies and sets the selected game', async () => {
+    const state = fixture();
+    state.igdb = true;
+    const id = gameId(state, 'Dune');
+    const platforms = [...new Set(state.copies.filter((c) => c.game_id === id).map((c) => c.platform))].filter((p) => p !== 'other');
+    const fake = await mount(`/games/${id}`, { state, replies: { search_catalog: { candidates: [TAKEN, HIT] } } });
+    $('[data-k="igdb-game"]').click();
+    await flush();
+    expect(fake.calls('search_catalog')[0]).toEqual({
+      type: 'home_keeper_games/search_catalog',
+      query: 'Dune',
+      ...(platforms.length === 1 ? { platform: platforms[0] } : {}),
+    });
+    const taken = dlg().querySelector('[data-k="d-igdb-row-10"] input');
+    expect(taken.disabled).toBe(true);
+    expect(dlg().querySelector('[data-k="d-igdb-row-10"]').textContent).toContain('In library');
+    expect(dlg().querySelector('[data-k="d-igdb-row-11"] input').checked).toBe(true);
+    expect(dlg().querySelector('[data-k="d-igdb-row-11"] img').getAttribute('referrerpolicy')).toBe('no-referrer');
+    expect(dlg().querySelector('[data-k="d-igdb-row-11"]').textContent).toContain('1965 · PC');
+    dlg().querySelector('[data-k="d-submit"]').click();
+    await flush();
+    expect(fake.calls('set_igdb_game')[0]).toMatchObject({ game_id: id, igdb_id: 11 });
+    expect(host.showToast).toHaveBeenCalledWith('The game has the IGDB details now.');
+    expect(dlg().innerHTML).toBe('');
+  });
+
+  it('searches again on Enter, and shows an empty result, an error and a missing pick', async () => {
+    const state = fixture();
+    state.igdb = true;
+    let reply = { candidates: [] };
+    const fake = await mount(`/games/${gameId(state, 'Dune')}`, {
+      state,
+      replies: {
+        search_catalog: () => {
+          if (reply instanceof Error) throw reply;
+          return reply;
+        },
+      },
+    });
+    $('[data-k="igdb-game"]').click();
+    await flush();
+    expect(dlg().querySelector('[data-k="d-igdb-status"]').textContent).toBe('IGDB has no game for this search.');
+    const query = dlg().querySelector('[data-k="d-igdb-query"]');
+    query.value = 'Dune Messiah';
+    dlg().querySelector('[data-k="d-igdb-platform"]').value = '';
+    reply = new Error('IGDB is not available now.');
+    const enter = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true, cancelable: true });
+    query.dispatchEvent(enter);
+    await flush();
+    expect(enter.defaultPrevented).toBe(true);
+    expect(fake.calls('search_catalog')[1]).toEqual({ type: 'home_keeper_games/search_catalog', query: 'Dune Messiah' });
+    expect(dlg().querySelector('.hkl-error').textContent).toContain('IGDB is not available now.');
+    expect(dlg().querySelector('[data-k="d-igdb-status"]')).toBeNull();
+    dlg().querySelector('[data-k="d-submit"]').click();
+    await flush();
+    expect(dlg().querySelector('.hkl-error').textContent).toBe('Select a game in the list.');
+    expect(fake.calls('set_igdb_game')).toEqual([]);
+    dlg().querySelector('[data-k="d-igdb-query"]').value = ' ';
+    dlg().querySelector('[data-k="d-igdb-search"]').click();
+    await flush();
+    expect(fake.calls('search_catalog')).toHaveLength(2);
+  });
+
+  it('offers IGDB in the banner of a game that needs details, and says that an upload stays', async () => {
+    const state = fixture();
+    state.igdb = true;
+    const game = state.games.find((g) => g.needs_details);
+    game.cover = { kind: 'custom', file: 'x.jpg' };
+    await mount(`/games/${game.id}`, { state });
+    expect($('[data-k="needs-edit"]').classList.contains('text')).toBe(true);
+    $('[data-k="needs-igdb"]').click();
+    await flush();
+    expect(dlg().querySelector('[data-k="d-igdb-note"]').textContent).toContain('Your uploaded cover stays.');
   });
 });

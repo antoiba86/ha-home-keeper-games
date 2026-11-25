@@ -96,8 +96,10 @@ def test_admin_reads_everything() -> None:
         currency="EUR",
         tab=True,
         revision=7,
+        igdb=True,
     )
     assert reply["revision"] == 7 and reply["currency"] == "EUR"
+    assert reply["igdb"] is True
     assert reply["me"] == {"person_id": "alice", "name": "Alice", "is_admin": True}
     assert reply["home_keeper"] == {"tab": True}
     assert [r["id"] for r in reply["rooms"]] == ["q", "r"]
@@ -127,6 +129,7 @@ def test_non_admin_projection_never_leaks() -> None:
         tab=False,
         revision=1,
     )
+    assert reply["igdb"] is False
     text = json.dumps(reply)
     for secret in ("Zed", "Shop", '"price"', '"value"', '"party"'):
         assert secret not in text, secret

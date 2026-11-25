@@ -380,6 +380,20 @@
         }
       }
     },
+    "set_igdb_game": {
+      "name": "Set IGDB game",
+      "description": "Give a game another IGDB game. The title, summary, genres, release date, franchise and cover come from IGDB. An uploaded cover stays.",
+      "fields": {
+        "game_id": {
+          "name": "Game",
+          "description": "The ID of the game."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "The ID of the correct game in IGDB."
+        }
+      }
+    },
     "delete_game": {
       "name": "Delete book",
       "description": "Delete a book with its copies, reading status, loans and cover.",
@@ -1172,6 +1186,9 @@
     },
     "igdb_not_found": {
       "message": "IGDB has no game with the ID {igdb_id}."
+    },
+    "igdb_in_use": {
+      "message": "{title} already has this IGDB game."
     }
   }
 }

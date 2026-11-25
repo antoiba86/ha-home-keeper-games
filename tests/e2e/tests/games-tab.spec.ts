@@ -1,3 +1,4 @@
+import { library } from '../ha-ws';
 import { adminState, gameByTitle, expect, libraryTab, openTab, restoreProgress, test, trackErrors } from './helpers';
 
 /**
@@ -137,5 +138,42 @@ test.describe('Game detail', { tag: '@responsive' }, () => {
     await expect(tab.locator('[data-k="pp-switch"]')).toHaveAttribute('aria-pressed', 'true');
     await expect(tab.locator('[data-k="rs-playing"]')).toHaveAttribute('aria-pressed', 'true');
     await expect(tab.locator('[data-k="pp-add"]')).toBeVisible();
+  });
+});
+
+test.describe('Change IGDB game', { tag: '@responsive' }, () => {
+  // The test adds its own game, so the seed does not change. The fake IGDB
+  // (tests/e2e/fake-igdb) finds 3 games for "Hade".
+  let gameId = '';
+
+  test.beforeEach(async () => {
+    const reply = await library<{ game: { id: string } }>('add_game', { title: 'Hade', needs_details: true });
+    gameId = reply.game.id;
+  });
+
+  test.afterEach(async () => {
+    if (gameId) await library('delete_game', { game_id: gameId });
+  });
+
+  test('the IGDB search gives a game its details and its cover', async ({ page }) => {
+    const errors = trackErrors(page);
+    const tab = await openTab(page, `/games/${gameId}`);
+    await tab.locator('[data-k="needs-igdb"]').click();
+    const row = tab.locator('[data-k="d-igdb-row-1001"]');
+    await expect(row.locator('input')).toBeChecked();
+    await expect(row).toContainText('2020');
+    await expect(row.locator('img')).toHaveJSProperty('naturalWidth', 264);
+    await expect(tab.locator('[data-k="d-igdb-row-1003"]')).toBeVisible();
+    await tab.locator('[data-k="d-submit"]').click();
+    await expect(tab.locator('.hkl-detail-info h1')).toHaveText('Hades');
+    await expect(tab.locator('[data-k="needs-igdb"]')).toHaveCount(0);
+    await expect(tab.locator('[data-k="igdb-game"]')).toBeVisible();
+    await expect
+      .poll(async () => {
+        const game = (await adminState()).games.find((g: any) => g.id === gameId);
+        return [game.igdb_id, game.needs_details, game.genres, Boolean(game.cover_url)];
+      })
+      .toEqual([1001, false, ['Role-playing (RPG)', 'Indie'], true]);
+    expect(errors).toEqual([]);
   });
 });

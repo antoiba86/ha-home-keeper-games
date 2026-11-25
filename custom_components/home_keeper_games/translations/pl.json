@@ -380,6 +380,20 @@
         }
       }
     },
+    "set_igdb_game": {
+      "name": "Ustaw grę IGDB",
+      "description": "Przypisuje grze inną grę z IGDB. Tytuł, opis, gatunki, data wydania, seria i okładka pochodzą z IGDB. Przesłana okładka zostaje.",
+      "fields": {
+        "game_id": {
+          "name": "Gra",
+          "description": "ID gry."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "ID właściwej gry w IGDB."
+        }
+      }
+    },
     "delete_game": {
       "name": "Usuń książkę",
       "description": "Usuń książkę z jej egzemplarzami, stanem czytania, wypożyczeniami i okładką.",
@@ -1172,6 +1186,9 @@
     },
     "igdb_not_found": {
       "message": "IGDB nie ma gry o identyfikatorze {igdb_id}."
+    },
+    "igdb_in_use": {
+      "message": "{title} ma już tę grę IGDB."
     }
   }
 }
