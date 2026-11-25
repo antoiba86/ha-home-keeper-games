@@ -196,10 +196,13 @@ class IgdbClient:
     async def async_search(
         self, text: str, platform: str | None, limit: int
     ) -> list[dict[str, Any]]:
-        """The game records whose title matches *text*, best first."""
-        self._keys_or_error()
+        """The game records whose title matches *text*, best first.
+
+        A text with nothing to search finds nothing, with no request and no key check.
+        """
         if not catalog.clean_query(text):
             return []
+        self._keys_or_error()
         found = await self._query("games", catalog.search_body(text, platform, limit))
         return catalog.records(found)
 

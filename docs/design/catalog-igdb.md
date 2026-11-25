@@ -5,7 +5,7 @@ implements:
   - custom_components/home_keeper_games/catalog.py
   - custom_components/home_keeper_games/igdb.py
 related: [covers, events-api, people-privilege, store-models, architecture]
-source_hash: 51b3bdfd233e
+source_hash: 97b8ec6624a2
 ---
 
 # IGDB catalog
@@ -59,7 +59,8 @@ reads never see them. The options flow writes them with `async_update_entry`.
 - **Queries.** A POST of an Apicalypse body to `/v4/games`, with the `Client-ID` and the
   bearer token. An async lock and a gap of 0.25 s keep the 4 requests each second of
   IGDB. Each request has a timeout of 10 s.
-- **Errors.** No keys is `igdb_not_configured`. A token request that gets a 400, 401 or
+- **Errors.** No keys is `igdb_not_configured`, but a search text with nothing to search
+  returns no candidates before the key check. A token request that gets a 400, 401 or
   403, or a query that gets a 403 or a second 401, is `invalid_igdb_auth`. A network
   error, a timeout, a 429, a 5xx or a reply that is not JSON is `igdb_unavailable`. A log
   line names only the type of the error.

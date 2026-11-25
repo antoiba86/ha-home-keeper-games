@@ -128,13 +128,10 @@ def test_every_service_is_touched(api):
 
     for name in ("list_games", "list_locations", "list_loans"):
         _service(api, name)
-    # The container has no IGDB keys, so the search stops before the network.
-    search = "search_catalog"
-    resp = api.post(
-        f"/api/services/{DOMAIN}/{search}?return_response", json={"query": "x"}
-    )
-    assert resp.status_code == 400, resp.text
-    assert "IGDB" in resp.text, resp.text
+    # A text with nothing to search sends no request, so the container needs no IGDB
+    # keys. The component tier checks the search itself and its errors.
+    found = _service(api, "search_catalog", {"query": '"'})
+    assert found == {"candidates": []}, found
     _service(api, "get_game", {"game_id": game["id"]})
     csv_text = _service(api, "export_csv")["content"]
     _service(

@@ -102,6 +102,8 @@ async def test_search_needs_the_keys(hass, setup_entry, call, aioclient_mock) ->
     assert (
         await _key(call, "search_catalog", {"query": "zelda"}) == "igdb_not_configured"
     )
+    # A text with nothing to search needs no keys.
+    assert await call("search_catalog", {"query": '"'}) == {"candidates": []}
     assert aioclient_mock.call_count == 0
 
 
