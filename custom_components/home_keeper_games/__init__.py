@@ -3,7 +3,7 @@
 Setup order:
 
 1. Load the string tables and the store.
-2. Make the coordinator and the syncs.
+2. Make the coordinator, the IGDB client and the syncs.
 3. Register the frontend, the websocket commands and the cover views.
 4. Set up the entity platforms and register the services.
 5. Start the to-do and loan syncs and the overdue check.
@@ -12,6 +12,7 @@ Setup order:
 
 from __future__ import annotations
 
+import os
 from datetime import timedelta
 from functools import partial
 from typing import Any
@@ -27,6 +28,7 @@ from . import backend_i18n, card, covers, frontend_assets, home_keeper, websocke
 from .api_surface import SERVICE_NAMES
 from .const import DOMAIN, OVERDUE_CHECK_INTERVAL_S, PLATFORMS, SIGNAL_STORE_CHANGED
 from .coordinator import LibraryCoordinator
+from .igdb import IgdbClient, igdb_urls
 from .loan_sync import LoanSync
 from .services import async_register_services
 from .store import LibraryStore, today
@@ -51,6 +53,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: LibraryConfigEntry) -> b
     store.on_cover_released = partial(covers.release_cover, hass)
 
     coordinator = LibraryCoordinator(hass, entry, store)
+    coordinator.igdb = IgdbClient(
+        hass, lambda: coordinator.igdb_keys, **igdb_urls(os.environ)
+    )
     coordinator.wishlist_sync = WishlistSync(hass, coordinator)
     coordinator.loan_sync = LoanSync(hass, coordinator)
     await coordinator.async_config_entry_first_refresh()

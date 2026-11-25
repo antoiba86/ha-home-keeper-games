@@ -5,6 +5,15 @@ Each change that a user can see is in this file. The format is based on
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). `manifest.json` `version`
 is the single source of truth (see `RELEASE.md`).
 
+## [0.5.0b6] - 2026-11-25
+
+### Added
+
+- **[Game details from IGDB](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/services#igdb).**
+  Enter a Twitch client ID and secret in the options, then find games with
+  `search_catalog` and add a game with its summary, genres, release date, franchise and
+  cover in 1 call to `add_game`.
+
 ## [0.5.0b5] - 2026-11-24
 
 ### Changed

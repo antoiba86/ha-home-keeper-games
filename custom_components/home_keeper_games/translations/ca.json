@@ -5,15 +5,22 @@
         "title": "Home Keeper Games",
         "description": "Defineix la moneda dels preus i dels valors dels exemplars.",
         "data": {
-          "currency": "Moneda"
+          "currency": "Moneda",
+          "igdb_client_id": "ID de client de Twitch",
+          "igdb_client_secret": "Secret de client de Twitch"
         },
         "data_description": {
-          "currency": "Un codi de 3 lletres, per exemple EUR o USD."
+          "currency": "Un codi de 3 lletres, per exemple EUR o USD.",
+          "igdb_client_id": "Opcional. Crea una aplicació a dev.twitch.tv per obtenir les claus d'IGDB.",
+          "igdb_client_secret": "Opcional. Deixa-ho buit per conservar el secret desat."
         }
       }
     },
     "error": {
-      "invalid_currency": "Introdueix un codi de moneda de 3 lletres."
+      "invalid_currency": "Introdueix un codi de moneda de 3 lletres.",
+      "invalid_igdb_auth": "Twitch no accepta l'ID de client i el secret de client.",
+      "cannot_connect": "No es pot connectar amb Twitch. Torna-ho a provar més tard.",
+      "igdb_keys_incomplete": "Introdueix l'ID de client i el secret de client."
     },
     "abort": {
       "already_configured": "Home Keeper Games ja està configurat.",
@@ -28,15 +35,22 @@
       "init": {
         "title": "Opcions de la biblioteca",
         "data": {
-          "currency": "Moneda"
+          "currency": "Moneda",
+          "igdb_client_id": "ID de client de Twitch",
+          "igdb_client_secret": "Secret de client de Twitch"
         },
         "data_description": {
-          "currency": "Un codi de 3 lletres, per exemple EUR o USD."
+          "currency": "Un codi de 3 lletres, per exemple EUR o USD.",
+          "igdb_client_id": "Opcional. Crea una aplicació a dev.twitch.tv per obtenir les claus d'IGDB.",
+          "igdb_client_secret": "Opcional. Deixa-ho buit per conservar el secret desat."
         }
       }
     },
     "error": {
-      "invalid_currency": "Introdueix un codi de moneda de 3 lletres."
+      "invalid_currency": "Introdueix un codi de moneda de 3 lletres.",
+      "invalid_igdb_auth": "Twitch no accepta l'ID de client i el secret de client.",
+      "cannot_connect": "No es pot connectar amb Twitch. Torna-ho a provar més tard.",
+      "igdb_keys_incomplete": "Introdueix l'ID de client i el secret de client."
     }
   },
   "entity": {
@@ -291,6 +305,32 @@
         "needs_details": {
           "name": "Falten detalls",
           "description": "Marca el llibre com a incomplet."
+        },
+        "lookup": {
+          "name": "Cerca a IGDB",
+          "description": "Cerca el títol a IGDB. Fes servir el joc d'IGDB només si el títol és el mateix. Si no, afegeix només el títol i marca el joc com a incomplet."
+        },
+        "platform": {
+          "name": "Plataforma",
+          "description": "Amb Cerca a IGDB, només coincideix un joc d'aquesta plataforma."
+        }
+      }
+    },
+    "search_catalog": {
+      "name": "Cerca al catàleg",
+      "description": "Cerca jocs a IGDB pel títol. La resposta dona els candidats, el millor primer.",
+      "fields": {
+        "query": {
+          "name": "Cerca de text",
+          "description": "El títol del joc, o una part."
+        },
+        "platform": {
+          "name": "Plataforma",
+          "description": "Només jocs d'aquesta plataforma."
+        },
+        "limit": {
+          "name": "Límit",
+          "description": "El nombre màxim de candidats, d'1 a 20."
         }
       }
     },
@@ -1120,6 +1160,18 @@
     },
     "digital_copy_no_shelf": {
       "message": "Una còpia digital no té prestatge."
+    },
+    "igdb_not_configured": {
+      "message": "Introdueix primer les claus d'IGDB, a les opcions de Home Keeper Games."
+    },
+    "igdb_unavailable": {
+      "message": "IGDB no està disponible ara. Torna-ho a provar més tard."
+    },
+    "invalid_igdb_auth": {
+      "message": "Twitch no accepta les claus d'IGDB. Canvia-les a les opcions de Home Keeper Games."
+    },
+    "igdb_not_found": {
+      "message": "IGDB no té cap joc amb l'ID {igdb_id}."
     }
   }
 }

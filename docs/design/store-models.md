@@ -5,7 +5,7 @@ implements:
   - custom_components/home_keeper_games/store.py
   - custom_components/home_keeper_games/models.py
 related: [architecture, events-api, people-privilege, csv-import-export]
-source_hash: 97c69ba27b0c
+source_hash: 97a42922f327
 ---
 
 # Store and models
@@ -68,6 +68,10 @@ storage version stays 1.1.
   `digital_copy_no_shelf`.
 - `models.title_key` folds the whole title for a match with no barcode. The part after
   `:` counts, because it often names another game of 1 franchise.
+- `models.find_game_by_igdb_id` returns the oldest game with an `igdb_id`, so
+  `add_game` from IGDB does not add 1 game 2 times ([catalog-igdb](catalog-igdb.md)).
+- A cover `kind` is `custom` (an upload), `igdb` (a download) or `none`. `set_cover`
+  takes only `models.SET_COVER_KINDS`, `custom` and `none` ([covers](covers.md)).
 
 ### The write path
 

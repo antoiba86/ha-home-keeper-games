@@ -15,11 +15,18 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import CONF_CURRENCY, DEFAULT_CURRENCY, DOMAIN
+from .const import (
+    CONF_CURRENCY,
+    CONF_IGDB_CLIENT_ID,
+    CONF_IGDB_CLIENT_SECRET,
+    DEFAULT_CURRENCY,
+    DOMAIN,
+)
 from .store import LibraryStore
 
 if TYPE_CHECKING:
     from .home_keeper import HomeKeeperLink
+    from .igdb import IgdbClient
     from .loan_sync import LoanSync
     from .wishlist_sync import WishlistSync
 
@@ -39,6 +46,7 @@ class LibraryCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         # Set by async_setup_entry.
         self.wishlist_sync: WishlistSync
         self.loan_sync: LoanSync
+        self.igdb: IgdbClient
         self.home_keeper: HomeKeeperLink
         self.tab_registered = False
         self._currency_seen = self.currency
@@ -49,6 +57,21 @@ class LibraryCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         entry = self.config_entry
         value = entry.options.get(CONF_CURRENCY) or entry.data.get(CONF_CURRENCY)
         return str(value or self.hass.config.currency or DEFAULT_CURRENCY)
+
+    @property
+    def igdb_keys(self) -> tuple[str, str] | None:
+        """The IGDB keys of the entry data, or None if 1 of them is missing."""
+        data = self.config_entry.data
+        client_id = data.get(CONF_IGDB_CLIENT_ID)
+        secret = data.get(CONF_IGDB_CLIENT_SECRET)
+        if (
+            isinstance(client_id, str)
+            and client_id
+            and isinstance(secret, str)
+            and secret
+        ):
+            return client_id, secret
+        return None
 
     @callback
     def async_check_settings(self) -> None:

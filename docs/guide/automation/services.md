@@ -42,6 +42,32 @@ actions:
     response_variable: detail
 ```
 
+## IGDB
+
+With the [IGDB keys](../start/installation.md#igdb-keys), 2 services read game details
+from IGDB:
+
+- `search_catalog` returns up to 20 IGDB games for a title, best first. Each user can
+  call it.
+- `add_game` with `igdb_id` adds that game with its summary, genres, release date,
+  franchise and cover. If a game in the library has the same IGDB ID, the service
+  returns that game.
+- `add_game` with `title` and `lookup: true` adds the IGDB game with the same title. If
+  no IGDB game has the same title, it adds the title only and marks the game as
+  incomplete. Add `platform` to match only a game on that platform.
+
+Example: add a game from its title.
+
+```yaml
+actions:
+  - action: home_keeper_games.add_game
+    data:
+      title: "Hades"
+      lookup: true
+      platform: pc
+    response_variable: result
+```
+
 ## Events
 
 The library fires an event for each change, such as

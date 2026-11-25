@@ -163,6 +163,7 @@ SERVICES: tuple[ServiceSpec, ...] = (
     ServiceSpec("update_shelf", response="optional", **_ADMIN),
     ServiceSpec("delete_shelf", response="optional", **_ADMIN),
     ServiceSpec("add_game", response="optional", **_ADMIN),
+    ServiceSpec("search_catalog", response="only"),
     ServiceSpec("update_game", response="optional", **_ADMIN),
     ServiceSpec("delete_game", response="optional", **_ADMIN),
     ServiceSpec("scan_barcode", response="optional", **_ADMIN),

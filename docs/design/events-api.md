@@ -7,7 +7,7 @@ implements:
   - custom_components/home_keeper_games/websocket_api.py
   - custom_components/home_keeper_games/events.py
 related: [people-privilege, store-models, entities, architecture]
-source_hash: df6674e42a02
+source_hash: 0732a66f7830
 ---
 
 # Services, websocket commands, events and the API surface
@@ -50,7 +50,9 @@ integrator view is [INTEGRATING.md](../INTEGRATING.md) and [EVENTS.md](../EVENTS
 A handler raises `models.LibraryError`. The service wrapper turns it into a
 `ServiceValidationError` with the key and the placeholders. A reply that holds a game goes
 through `projections.project_game` for the caller. A mutation returns its record when the
-caller asks for a response.
+caller asks for a response. `search_catalog` is open and returns only IGDB data and game
+ids ([catalog-igdb](catalog-igdb.md#services)). It has a websocket twin, because it is
+not a read of the store.
 
 ### Websocket commands
 

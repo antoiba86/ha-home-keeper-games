@@ -41,6 +41,7 @@ no user, as Home Assistant does. An automation makes that kind of call.
 | `add_unit`, `update_unit`, `delete_unit` | Admin |
 | `add_shelf`, `update_shelf`, `delete_shelf` | Admin |
 | `add_game`, `update_game`, `delete_game` | Admin |
+| `search_catalog` | Open. The reply has only IGDB data and game ids. A rate limit protects the IGDB quota. |
 | `scan_barcode`, `add_copy`, `update_copy`, `move_copy`, `delete_copy`, `set_cover` | Admin |
 | `lend_game`, `borrow_game`, `return_loan`, `update_loan`, `delete_loan` | Admin |
 | `add_to_wishlist`, `update_wishlist`, `remove_from_wishlist`, `got_wishlist_game` | Admin |
@@ -95,6 +96,10 @@ projection:
 The game records, the shared notes and the covers are open to every user. Only an admin
 can download the diagnostics. The download redacts the loan
 parties, the notes and `acquired_from`.
+
+The IGDB keys come in only through the config flow and the options flow. They are in the
+config entry data. No service field, event, reply, log line or diagnostics download has
+the secret. The client sends the secret only in the body of the Twitch token request.
 
 ## Entities
 

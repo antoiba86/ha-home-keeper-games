@@ -7,7 +7,7 @@ implements:
   - custom_components/home_keeper_games/sensor.py
   - custom_components/home_keeper_games/todo.py
 related: [store-models, people-privilege, events-api]
-source_hash: a0cd718e21ac
+source_hash: be2aa7e7d398
 ---
 
 # Coordinator and entities
@@ -39,9 +39,9 @@ person.
 `LibraryCoordinator` is a `DataUpdateCoordinator` with no interval. The store calls
 `async_store_changed` after each change, and the coordinator sends the document with
 `async_set_updated_data`. The coordinator also holds the parts of the loaded entry that
-the services, the websocket commands and the views use: the store, the 2 syncs, the Home
-Keeper link and the currency option. `async_check_settings` fires `settings_updated` for a
-new currency
+the services, the websocket commands and the views use: the store, the IGDB client, the 2
+syncs, the Home Keeper link, the currency option and the IGDB keys of the entry data.
+`async_check_settings` fires `settings_updated` for a new currency
 ([events-api](events-api.md#events)).
 `coordinator.find_coordinator` returns it for a call, or None while no entry is loaded.
 

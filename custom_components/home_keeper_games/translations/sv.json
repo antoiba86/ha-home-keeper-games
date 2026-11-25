@@ -5,15 +5,22 @@
         "title": "Home Keeper Games",
         "description": "Ange valutan för exemplarens priser och värden.",
         "data": {
-          "currency": "Valuta"
+          "currency": "Valuta",
+          "igdb_client_id": "Twitch-klient-ID",
+          "igdb_client_secret": "Twitch-klienthemlighet"
         },
         "data_description": {
-          "currency": "En kod med 3 bokstäver, till exempel EUR eller USD."
+          "currency": "En kod med 3 bokstäver, till exempel EUR eller USD.",
+          "igdb_client_id": "Valfritt. Skapa ett program på dev.twitch.tv för att få IGDB-nycklarna.",
+          "igdb_client_secret": "Valfritt. Lämna tomt för att behålla den sparade hemligheten."
         }
       }
     },
     "error": {
-      "invalid_currency": "Ange en valutakod med 3 bokstäver."
+      "invalid_currency": "Ange en valutakod med 3 bokstäver.",
+      "invalid_igdb_auth": "Twitch godtar inte klient-ID:t och klienthemligheten.",
+      "cannot_connect": "Det går inte att ansluta till Twitch. Försök igen senare.",
+      "igdb_keys_incomplete": "Ange klient-ID:t och klienthemligheten."
     },
     "abort": {
       "already_configured": "Home Keeper Games är redan konfigurerat.",
@@ -28,15 +35,22 @@
       "init": {
         "title": "Biblioteksalternativ",
         "data": {
-          "currency": "Valuta"
+          "currency": "Valuta",
+          "igdb_client_id": "Twitch-klient-ID",
+          "igdb_client_secret": "Twitch-klienthemlighet"
         },
         "data_description": {
-          "currency": "En kod med 3 bokstäver, till exempel EUR eller USD."
+          "currency": "En kod med 3 bokstäver, till exempel EUR eller USD.",
+          "igdb_client_id": "Valfritt. Skapa ett program på dev.twitch.tv för att få IGDB-nycklarna.",
+          "igdb_client_secret": "Valfritt. Lämna tomt för att behålla den sparade hemligheten."
         }
       }
     },
     "error": {
-      "invalid_currency": "Ange en valutakod med 3 bokstäver."
+      "invalid_currency": "Ange en valutakod med 3 bokstäver.",
+      "invalid_igdb_auth": "Twitch godtar inte klient-ID:t och klienthemligheten.",
+      "cannot_connect": "Det går inte att ansluta till Twitch. Försök igen senare.",
+      "igdb_keys_incomplete": "Ange klient-ID:t och klienthemligheten."
     }
   },
   "entity": {
@@ -291,6 +305,32 @@
         "needs_details": {
           "name": "Uppgifter saknas",
           "description": "Markera boken som ofullständig."
+        },
+        "lookup": {
+          "name": "Slå upp i IGDB",
+          "description": "Söker efter titeln i IGDB. Använder IGDB-spelet bara om titeln är densamma. Annars läggs bara titeln till och spelet markeras som ofullständigt."
+        },
+        "platform": {
+          "name": "Plattform",
+          "description": "Med Slå upp i IGDB matchar bara ett spel på denna plattform."
+        }
+      }
+    },
+    "search_catalog": {
+      "name": "Sök i katalogen",
+      "description": "Söker efter spel i IGDB efter titel. Svaret ger kandidaterna, den bästa först.",
+      "fields": {
+        "query": {
+          "name": "Sök",
+          "description": "Spelets titel, eller en del av den."
+        },
+        "platform": {
+          "name": "Plattform",
+          "description": "Endast spel på denna plattform."
+        },
+        "limit": {
+          "name": "Gräns",
+          "description": "Det största antalet kandidater, från 1 till 20."
         }
       }
     },
@@ -1120,6 +1160,18 @@
     },
     "digital_copy_no_shelf": {
       "message": "Ett digitalt exemplar har inget hyllplan."
+    },
+    "igdb_not_configured": {
+      "message": "Ange IGDB-nycklarna först, i alternativen för Home Keeper Games."
+    },
+    "igdb_unavailable": {
+      "message": "IGDB är inte tillgängligt nu. Försök igen senare."
+    },
+    "invalid_igdb_auth": {
+      "message": "Twitch godtar inte IGDB-nycklarna. Ändra dem i alternativen för Home Keeper Games."
+    },
+    "igdb_not_found": {
+      "message": "IGDB har inget spel med ID:t {igdb_id}."
     }
   }
 }

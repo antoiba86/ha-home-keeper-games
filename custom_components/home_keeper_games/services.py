@@ -33,13 +33,15 @@ from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_registry as er
 
-from . import csv_io, import_export, models, people, projections
+from . import catalog, csv_io, import_export, models, people, projections
 from .api_surface import SERVICES, ServiceSpec
 from .backend_i18n import resolve_exception
 from .config_flow import clean_currency, merge_flow_input
 from .const import (
     CONF_CURRENCY,
     DOMAIN,
+    IGDB_SEARCH_DEFAULT,
+    IGDB_SEARCH_MAX,
     MAX_CSV_BYTES,
     MAX_IMPORT_ROW_RESULTS,
     PANEL_VERSION,
@@ -47,6 +49,7 @@ from .const import (
 from .coordinator import LibraryCoordinator, find_coordinator
 from .covers import (
     async_bundle_cover,
+    async_store_igdb_cover,
     async_use_upload,
     copy_covers_out,
     covers_dir,
@@ -183,7 +186,19 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
         vol.Required("shelf_id"): cv.string,
         vol.Optional("force", default=False): cv.boolean,
     },
-    "add_game": {**_GAME_FIELDS, vol.Optional("barcode"): _OPT_STR},
+    "add_game": {
+        **_GAME_FIELDS,
+        vol.Optional("barcode"): _OPT_STR,
+        vol.Optional("lookup", default=False): cv.boolean,
+        vol.Optional("platform"): _PLATFORM,
+    },
+    "search_catalog": {
+        vol.Required("query"): cv.string,
+        vol.Optional("platform"): _PLATFORM,
+        vol.Optional("limit", default=IGDB_SEARCH_DEFAULT): vol.All(
+            vol.Coerce(int), vol.Range(min=1, max=IGDB_SEARCH_MAX)
+        ),
+    },
     "update_game": {vol.Required("game_id"): cv.string, **_GAME_FIELDS},
     "delete_game": {vol.Required("game_id"): cv.string},
     "scan_barcode": {
@@ -204,7 +219,7 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
     "delete_copy": {vol.Required("copy_id"): cv.string},
     "set_cover": {
         vol.Required("game_id"): cv.string,
-        vol.Required("kind"): vol.In(models.COVER_KINDS),
+        vol.Required("kind"): vol.In(models.SET_COVER_KINDS),
         vol.Optional("file_id"): cv.string,
     },
     "set_progress": {
@@ -418,8 +433,68 @@ async def _delete_shelf(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
 
 
 async def _add_game_service(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
-    game, existing = await _add_game(ctx, data)
-    return {"game": ctx.game_reply(game), "existing": existing}
+    """Add a game, from IGDB with ``igdb_id`` or ``lookup``.
+
+    A barcode that a copy has, or an IGDB id that a game has, returns that game
+    with ``existing: true``. With ``lookup``, the title is the search text, and
+    only an exact title match (on the platform, if given) is used. With no match,
+    the game gets the title only and ``needs_details``.
+    """
+    data = dict(data)
+    lookup = data.pop("lookup", False)
+    platform = data.pop("platform", None)
+    igdb_id = data.pop("igdb_id", None)
+    if igdb_id is None and not (lookup and data.get("title")):
+        game, existing = await _add_game(ctx, data)
+        return {"game": ctx.game_reply(game), "existing": existing}
+    state = ctx.store.state
+    code = models.barcode(data.pop("barcode", None))
+    if code is not None and (found := models.find_game_by_barcode(state, code)):
+        return {"game": ctx.game_reply(dict(found)), "existing": True}
+    if igdb_id is not None:
+        igdb_id = models.game_field("igdb_id", igdb_id)
+        if found := models.find_game_by_igdb_id(state, igdb_id):
+            return {"game": ctx.game_reply(dict(found)), "existing": True}
+        raw = await ctx.coordinator.igdb.async_game(igdb_id)
+        if raw is None:
+            raise LibraryError("igdb_not_found", igdb_id=igdb_id)
+    else:
+        title = data.pop("title")
+        found_list = await ctx.coordinator.igdb.async_search(
+            title, platform, IGDB_SEARCH_DEFAULT
+        )
+        raw = catalog.best_match(found_list, title, platform)
+        if raw is None:
+            game, existing = await _add_game(
+                ctx, {"needs_details": True, **data, "title": title}
+            )
+            return {"game": ctx.game_reply(game), "existing": existing}
+        if found := models.find_game_by_igdb_id(state, raw["id"]):
+            return {"game": ctx.game_reply(dict(found)), "existing": True}
+    given = {key: value for key, value in data.items() if value is not None}
+    game, existing = await ctx.store.add_game({**catalog.game_fields(raw), **given})
+    if image := catalog.image_id(raw):
+        await async_store_igdb_cover(ctx.hass, ctx.coordinator, game["id"], image)
+    return {"game": ctx.game_reply(ctx.store.game(game["id"])), "existing": existing}
+
+
+async def _search_catalog(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+    """The IGDB games that match the search text, best first."""
+    client = ctx.coordinator.igdb
+    found = await client.async_search(
+        data["query"], data.get("platform"), data.get("limit", IGDB_SEARCH_DEFAULT)
+    )
+    state = ctx.store.state
+    return {
+        "candidates": [
+            catalog.candidate(
+                raw,
+                client.images_url,
+                (models.find_game_by_igdb_id(state, raw["id"]) or {}).get("id"),
+            )
+            for raw in found
+        ]
+    }
 
 
 async def _update_game(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
@@ -970,6 +1045,7 @@ SERVICE_HANDLERS: dict[str, Handler] = {
     "update_shelf": _update_shelf,
     "delete_shelf": _delete_shelf,
     "add_game": _add_game_service,
+    "search_catalog": _search_catalog,
     "update_game": _update_game,
     "delete_game": _delete_game,
     "scan_barcode": _scan_barcode,

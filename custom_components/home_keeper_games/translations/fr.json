@@ -5,15 +5,22 @@
         "title": "Home Keeper Games",
         "description": "Définir la devise des prix et des valeurs des exemplaires.",
         "data": {
-          "currency": "Devise"
+          "currency": "Devise",
+          "igdb_client_id": "ID client Twitch",
+          "igdb_client_secret": "Secret client Twitch"
         },
         "data_description": {
-          "currency": "Un code de 3 lettres, par exemple EUR ou USD."
+          "currency": "Un code de 3 lettres, par exemple EUR ou USD.",
+          "igdb_client_id": "Facultatif. Créez une application sur dev.twitch.tv pour obtenir les clés IGDB.",
+          "igdb_client_secret": "Facultatif. Laissez vide pour garder le secret enregistré."
         }
       }
     },
     "error": {
-      "invalid_currency": "Saisissez un code de devise de 3 lettres."
+      "invalid_currency": "Saisissez un code de devise de 3 lettres.",
+      "invalid_igdb_auth": "Twitch n'accepte pas l'ID client et le secret client.",
+      "cannot_connect": "Impossible de se connecter à Twitch. Réessayez plus tard.",
+      "igdb_keys_incomplete": "Saisissez l'ID client et le secret client."
     },
     "abort": {
       "already_configured": "Home Keeper Games est déjà configuré.",
@@ -28,15 +35,22 @@
       "init": {
         "title": "Options de la bibliothèque",
         "data": {
-          "currency": "Devise"
+          "currency": "Devise",
+          "igdb_client_id": "ID client Twitch",
+          "igdb_client_secret": "Secret client Twitch"
         },
         "data_description": {
-          "currency": "Un code de 3 lettres, par exemple EUR ou USD."
+          "currency": "Un code de 3 lettres, par exemple EUR ou USD.",
+          "igdb_client_id": "Facultatif. Créez une application sur dev.twitch.tv pour obtenir les clés IGDB.",
+          "igdb_client_secret": "Facultatif. Laissez vide pour garder le secret enregistré."
         }
       }
     },
     "error": {
-      "invalid_currency": "Saisissez un code de devise de 3 lettres."
+      "invalid_currency": "Saisissez un code de devise de 3 lettres.",
+      "invalid_igdb_auth": "Twitch n'accepte pas l'ID client et le secret client.",
+      "cannot_connect": "Impossible de se connecter à Twitch. Réessayez plus tard.",
+      "igdb_keys_incomplete": "Saisissez l'ID client et le secret client."
     }
   },
   "entity": {
@@ -291,6 +305,32 @@
         "needs_details": {
           "name": "Détails manquants",
           "description": "Marquer le livre comme incomplet."
+        },
+        "lookup": {
+          "name": "Rechercher dans IGDB",
+          "description": "Recherche le titre dans IGDB. Utilise le jeu IGDB seulement si son titre est le même. Sinon, ajoute seulement le titre et marque le jeu comme incomplet."
+        },
+        "platform": {
+          "name": "Plateforme",
+          "description": "Avec Rechercher dans IGDB, seul un jeu de cette plateforme correspond."
+        }
+      }
+    },
+    "search_catalog": {
+      "name": "Rechercher dans le catalogue",
+      "description": "Recherche des jeux dans IGDB par titre. La réponse donne les candidats, le meilleur en premier.",
+      "fields": {
+        "query": {
+          "name": "Recherche",
+          "description": "Le titre du jeu, ou une partie."
+        },
+        "platform": {
+          "name": "Plateforme",
+          "description": "Seulement les jeux de cette plateforme."
+        },
+        "limit": {
+          "name": "Limite",
+          "description": "Le nombre maximal de candidats, de 1 à 20."
         }
       }
     },
@@ -1120,6 +1160,18 @@
     },
     "digital_copy_no_shelf": {
       "message": "Un exemplaire numérique n'a pas d'étagère."
+    },
+    "igdb_not_configured": {
+      "message": "Saisissez d'abord les clés IGDB, dans les options de Home Keeper Games."
+    },
+    "igdb_unavailable": {
+      "message": "IGDB n'est pas disponible pour le moment. Réessayez plus tard."
+    },
+    "invalid_igdb_auth": {
+      "message": "Twitch n'accepte pas les clés IGDB. Changez-les dans les options de Home Keeper Games."
+    },
+    "igdb_not_found": {
+      "message": "IGDB n'a aucun jeu avec l'ID {igdb_id}."
     }
   }
 }

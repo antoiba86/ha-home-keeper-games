@@ -49,6 +49,11 @@ def test_options_flow_steps(api):
     base = "/api/config/config_entries/options/flow"
     form = api.post(base, json={"handler": entry_id}).json()
     assert form["type"] == "form" and form["step_id"] == "init", form
+    # A client ID with no secret: the form comes back with no request to Twitch.
+    again = api.post(
+        f"{base}/{form['flow_id']}", json={"currency": "EUR", "igdb_client_id": "x"}
+    ).json()
+    assert again["errors"] == {"base": "igdb_keys_incomplete"}, again
     done = api.post(f"{base}/{form['flow_id']}", json={"currency": "EUR"})
     assert done.json()["type"] == "create_entry", done.text
 
@@ -123,6 +128,13 @@ def test_every_service_is_touched(api):
 
     for name in ("list_games", "list_locations", "list_loans"):
         _service(api, name)
+    # The container has no IGDB keys, so the search stops before the network.
+    search = "search_catalog"
+    resp = api.post(
+        f"/api/services/{DOMAIN}/{search}?return_response", json={"query": "x"}
+    )
+    assert resp.status_code == 400, resp.text
+    assert "IGDB" in resp.text, resp.text
     _service(api, "get_game", {"game_id": game["id"]})
     csv_text = _service(api, "export_csv")["content"]
     _service(

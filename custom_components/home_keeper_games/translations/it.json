@@ -5,15 +5,22 @@
         "title": "Home Keeper Games",
         "description": "Imposta la valuta dei prezzi e dei valori delle copie.",
         "data": {
-          "currency": "Valuta"
+          "currency": "Valuta",
+          "igdb_client_id": "ID client Twitch",
+          "igdb_client_secret": "Segreto client Twitch"
         },
         "data_description": {
-          "currency": "Un codice di 3 lettere, per esempio EUR o USD."
+          "currency": "Un codice di 3 lettere, per esempio EUR o USD.",
+          "igdb_client_id": "Facoltativo. Crea un'applicazione su dev.twitch.tv per ottenere le chiavi IGDB.",
+          "igdb_client_secret": "Facoltativo. Lascia vuoto per mantenere il segreto salvato."
         }
       }
     },
     "error": {
-      "invalid_currency": "Inserisci un codice valuta di 3 lettere."
+      "invalid_currency": "Inserisci un codice valuta di 3 lettere.",
+      "invalid_igdb_auth": "Twitch non accetta l'ID client e il segreto client.",
+      "cannot_connect": "Impossibile connettersi a Twitch. Riprova più tardi.",
+      "igdb_keys_incomplete": "Inserisci l'ID client e il segreto client."
     },
     "abort": {
       "already_configured": "Home Keeper Games è già configurato.",
@@ -28,15 +35,22 @@
       "init": {
         "title": "Opzioni della biblioteca",
         "data": {
-          "currency": "Valuta"
+          "currency": "Valuta",
+          "igdb_client_id": "ID client Twitch",
+          "igdb_client_secret": "Segreto client Twitch"
         },
         "data_description": {
-          "currency": "Un codice di 3 lettere, per esempio EUR o USD."
+          "currency": "Un codice di 3 lettere, per esempio EUR o USD.",
+          "igdb_client_id": "Facoltativo. Crea un'applicazione su dev.twitch.tv per ottenere le chiavi IGDB.",
+          "igdb_client_secret": "Facoltativo. Lascia vuoto per mantenere il segreto salvato."
         }
       }
     },
     "error": {
-      "invalid_currency": "Inserisci un codice valuta di 3 lettere."
+      "invalid_currency": "Inserisci un codice valuta di 3 lettere.",
+      "invalid_igdb_auth": "Twitch non accetta l'ID client e il segreto client.",
+      "cannot_connect": "Impossibile connettersi a Twitch. Riprova più tardi.",
+      "igdb_keys_incomplete": "Inserisci l'ID client e il segreto client."
     }
   },
   "entity": {
@@ -291,6 +305,32 @@
         "needs_details": {
           "name": "Dettagli mancanti",
           "description": "Segna il libro come incompleto."
+        },
+        "lookup": {
+          "name": "Cerca in IGDB",
+          "description": "Cerca il titolo in IGDB. Usa il gioco IGDB solo se il titolo è lo stesso. Altrimenti aggiunge solo il titolo e segna il gioco come incompleto."
+        },
+        "platform": {
+          "name": "Piattaforma",
+          "description": "Con Cerca in IGDB, corrisponde solo un gioco su questa piattaforma."
+        }
+      }
+    },
+    "search_catalog": {
+      "name": "Cerca nel catalogo",
+      "description": "Cerca giochi in IGDB per titolo. La risposta fornisce i candidati, il migliore per primo.",
+      "fields": {
+        "query": {
+          "name": "Ricerca",
+          "description": "Il titolo del gioco, o una sua parte."
+        },
+        "platform": {
+          "name": "Piattaforma",
+          "description": "Solo giochi su questa piattaforma."
+        },
+        "limit": {
+          "name": "Limite",
+          "description": "Il numero massimo di candidati, da 1 a 20."
         }
       }
     },
@@ -1120,6 +1160,18 @@
     },
     "digital_copy_no_shelf": {
       "message": "Una copia digitale non ha un ripiano."
+    },
+    "igdb_not_configured": {
+      "message": "Inserisci prima le chiavi IGDB, nelle opzioni di Home Keeper Games."
+    },
+    "igdb_unavailable": {
+      "message": "IGDB non è disponibile ora. Riprova più tardi."
+    },
+    "invalid_igdb_auth": {
+      "message": "Twitch non accetta le chiavi IGDB. Cambiale nelle opzioni di Home Keeper Games."
+    },
+    "igdb_not_found": {
+      "message": "IGDB non ha nessun gioco con l'ID {igdb_id}."
     }
   }
 }

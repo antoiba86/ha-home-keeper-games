@@ -693,3 +693,23 @@ def test_derived_reads() -> None:
     assert m.find_game_by_barcode(state, "9780000000002") is None
     assert m.find_game_by_barcode(state, None) is None
     assert m.find_game_by_barcode(state, "") is None
+
+
+def test_find_game_by_igdb_id_returns_the_oldest_game() -> None:
+    state = m.empty_state()
+    for game_id, created in (
+        ("b", "2026-02-01"),
+        ("a", "2026-01-01"),
+        ("c", "2026-01-01"),
+    ):
+        game = m.build_game({"title": game_id, "igdb_id": 7}, now=created)
+        game["id"] = game_id
+        state["games"][game_id] = game
+    other = m.build_game({"title": "x", "igdb_id": 1}, now=NOW)
+    state["games"][other["id"]] = other
+    assert m.find_game_by_igdb_id(state, 7)["id"] == "a"
+    assert m.find_game_by_igdb_id(state, 1) is other
+    assert m.find_game_by_igdb_id(state, 9) is None
+    assert m.find_game_by_igdb_id(state, True) is None
+    assert m.find_game_by_igdb_id(state, "7") is None
+    assert m.find_game_by_igdb_id(state, None) is None

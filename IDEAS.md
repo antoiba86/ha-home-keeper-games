@@ -30,8 +30,8 @@ Nothing here is committed scope. When an item ships, remove it. The design docs 
   with a CSV or PDF download for an insurance claim. Admin-only.
 - **Phone walkthrough tour.** A second walkthrough capture at phone width: scan a shelf
   with **Enter barcode**, read the summary, set a status in the card.
-- **Game details from IGDB.** Read the title, the cover and the genres of a game from
-  IGDB, with a title search for a scan of a new barcode.
+- **IGDB details for a stored game.** Fill the empty fields and the cover of a game
+  that is already in the library, such as a game that a scan added with no title.
 - **Barcode lookup.** Turn the EAN of a game case into a title with a product lookup
   service, then search the catalog.
 

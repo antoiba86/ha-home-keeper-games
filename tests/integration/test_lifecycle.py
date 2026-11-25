@@ -22,6 +22,7 @@ HOME_KEEPER = Path(__file__).resolve().parent / ".home_keeper" / "custom_compone
 SERVICES = (
     "add_room",
     "add_game",
+    "search_catalog",
     "scan_barcode",
     "set_progress",
     "lend_game",

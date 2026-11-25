@@ -1,16 +1,17 @@
 ---
 title: Covers
-summary: How the integration uploads, stores and serves the cover file of a game.
+summary: How the integration uploads, downloads, stores and serves the cover file of a game.
 implements:
   - custom_components/home_keeper_games/covers.py
-related: [scan-and-barcode, store-models, people-privilege, import-export]
-source_hash: 641115d1c7ee
+related: [scan-and-barcode, store-models, people-privilege, import-export, catalog-igdb]
+source_hash: 3ca41bf2d931
 ---
 
 # Covers
 
-A cover is a photo that an admin uploads. The file is a JPEG next to the storage document,
-and an authenticated view serves it.
+A cover is a photo that an admin uploads, or the IGDB cover of a game that `add_game` adds
+from IGDB. The file is a JPEG next to the storage document, and an authenticated view
+serves it.
 
 ## Goals
 
@@ -18,10 +19,10 @@ and an authenticated view serves it.
   1200 px, whatever the source.
 - **G2. No stale image.** A new cover gets a new URL, so a browser cache never shows the
   old one.
+- **G3. An upload wins.** An IGDB cover never replaces a cover that an admin uploaded.
 
 ## Non-goals
 
-- A cover from an online catalog. A catalog is later work ([IDEAS](../../IDEAS.md)).
 - A cover gallery with more than 1 cover for each game.
 - Private covers. The cover view serves each signed-in user.
 
@@ -40,6 +41,12 @@ file. The token changes with each new cover. `cover_url` is
   count. The reply is a `file_id` in a pending folder. `set_cover` with `kind: custom`
   moves the file onto the game. A pending file that no game takes is deleted after 24
   hours, at setup.
+- **IGDB.** `covers.async_store_igdb_cover` downloads the IGDB cover of a new game
+  ([catalog-igdb](catalog-igdb.md)). The client builds the URL from the IGDB image id, so
+  a caller cannot make the integration read another host. The bytes get the same type
+  check and the same `reencode`, and the game gets `kind: igdb`. A game with
+  `kind: custom` keeps its cover, also when an upload comes during the download. A
+  failure leaves the game with no cover. `set_cover` does not take `kind: igdb`.
 - **Remove.** `set_cover` with `kind: none` removes the cover of a game.
 - **Serve.** `CoverView` returns the file of a game to each signed-in user, with a long
   private cache time. An `<img>` element cannot send a token, so the client signs the
@@ -59,4 +66,4 @@ file. The token changes with each new cover. `cover_url` is
 - The cover URL path `/api/home_keeper_games/cover/{game_id}` and the upload path
   `/api/home_keeper_games/upload`.
 - The covers directory `home_keeper_games_covers`.
-- The cover `kind` values `custom` and `none`, and the file name format.
+- The cover `kind` values `custom`, `igdb` and `none`, and the file name format.

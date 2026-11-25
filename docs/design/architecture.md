@@ -9,7 +9,7 @@ implements:
   - custom_components/home_keeper_games/backend_i18n.py
   - custom_components/home_keeper_games/manifest.json
 related: [store-models, people-privilege, events-api, home-keeper-dependency, frontend-tab-card]
-source_hash: 34ee5e0fa829
+source_hash: e773b382d977
 ---
 
 # Architecture
@@ -39,8 +39,9 @@ and updates their own play progress through a card, native entities and services
 - A sidebar panel of its own. The admin UI is a tab in the Home Keeper panel
   ([home-keeper-dependency](home-keeper-dependency.md)).
 - More than 1 config entry. The manifest sets `single_config_entry`.
-- A cloud service or a cloud account, or a sync between homes. The integration reads
-  and writes only local data.
+- A cloud account of the integration, or a sync between homes. The integration writes
+  only local data. Its 1 outside read is IGDB, with keys that the admin gives
+  ([catalog-igdb](catalog-igdb.md)).
 
 ## Design
 
@@ -48,9 +49,9 @@ and updates their own play progress through a card, native entities and services
 
 | Layer | Modules | Rule |
 |---|---|---|
-| Pure core | `const.py`, `models.py`, `events.py`, `projections.py`, `csv_io.py`, `import_export.py`, `wishlist.py`, `loan_tasks.py`, `card_resource.py`, `backend_i18n.py`, `api_surface.py` | No `homeassistant` import. Time comes in as an argument. |
+| Pure core | `const.py`, `models.py`, `catalog.py`, `events.py`, `projections.py`, `csv_io.py`, `import_export.py`, `wishlist.py`, `loan_tasks.py`, `card_resource.py`, `backend_i18n.py`, `api_surface.py` | No `homeassistant` import. Time comes in as an argument. |
 | Boundary | `store.py`, `coordinator.py`, `people.py` | Talks to Home Assistant storage, the bus and the person registry. |
-| Glue | `__init__.py`, `services.py`, `websocket_api.py`, `covers.py`, `home_keeper.py`, `loan_sync.py`, `wishlist_sync.py`, `frontend_assets.py`, `card.py`, `config_flow.py`, `diagnostics.py` | Registers surfaces and runs the syncs. |
+| Glue | `__init__.py`, `services.py`, `websocket_api.py`, `covers.py`, `igdb.py`, `home_keeper.py`, `loan_sync.py`, `wishlist_sync.py`, `frontend_assets.py`, `card.py`, `config_flow.py`, `diagnostics.py` | Registers surfaces and runs the syncs. |
 | Platforms | `sensor.py`, `todo.py`, with `entity.py` | `const.PLATFORMS` lists them. |
 
 The mutation allowlist (`only_mutate` in `pyproject.toml`) holds the pure modules with
@@ -68,10 +69,10 @@ resource.
 
 1. Read the string tables of every language of the integration in an executor job
    (`backend_i18n.preload`, 640 KB), so no lookup reads a file, and load the store.
-2. Make `LibraryCoordinator` and give it the 2 syncs. Store it as `entry.runtime_data`. A
-   store listener sends the dispatcher signal `const.SIGNAL_STORE_CHANGED` for the
-   websocket subscriptions. An update listener of the entry fires `settings_updated` when
-   the currency changes.
+2. Make `LibraryCoordinator` and give it the IGDB client and the 2 syncs. Store it as
+   `entry.runtime_data`. A store listener sends the dispatcher signal
+   `const.SIGNAL_STORE_CHANGED` for the websocket subscriptions. An update listener of the
+   entry fires `settings_updated` when the currency changes.
 3. Register the static path, the card delivery, the websocket commands and the cover
    views ([frontend-tab-card](frontend-tab-card.md#delivery)).
 4. Forward `const.PLATFORMS` and register the services.
@@ -92,9 +93,10 @@ resource when the integration is removed.
 ### Config entry
 
 The config flow checks Home Keeper first and aborts with the reason if the check fails.
-Then it asks for the currency, with the currency of Home Assistant as the default. The
-options flow has 1 step that changes the currency. It returns
-`config_flow.merge_flow_input`, so no stored key is lost.
+Then it asks for the currency, with the currency of Home Assistant as the default, and the
+optional IGDB keys. The options flow has 1 step with the same fields. It returns
+`config_flow.merge_flow_input`, so no stored key is lost. The keys are entry data, not
+options ([catalog-igdb](catalog-igdb.md#keys)).
 
 ### Localized text
 
@@ -108,8 +110,8 @@ is not an exception, such as the tab title and the loan task names, is in
 ### Diagnostics
 
 `diagnostics.async_get_config_entry_diagnostics` returns the options, the tab state, the
-revision, the counts and the library document. It redacts the names of loan parties, the
-notes and `acquired_from`.
+revision, the counts and the library document, never the entry data with the IGDB keys.
+It redacts the names of loan parties, the notes and `acquired_from`.
 
 ### Design doc index
 
@@ -119,6 +121,7 @@ notes and `acquired_from`.
 | [people-privilege](people-privilege.md) | The caller, the admin gate and the read projections |
 | [events-api](events-api.md) | Services, websocket commands, events and the API surface model |
 | [covers](covers.md) | The cover files, the upload and the cover view |
+| [catalog-igdb](catalog-igdb.md) | The IGDB keys, the client, `search_catalog` and `add_game` |
 | [scan-and-barcode](scan-and-barcode.md) | Barcode rules, the camera scanner and the scan service |
 | [csv-import-export](csv-import-export.md) | The CSV format of the integration |
 | [loans-home-keeper](loans-home-keeper.md) | Loans and their Home Keeper tasks |

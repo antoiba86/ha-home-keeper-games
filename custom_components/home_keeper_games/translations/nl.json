@@ -5,15 +5,22 @@
         "title": "Home Keeper Games",
         "description": "De valuta van de prijzen en waarden van de exemplaren instellen.",
         "data": {
-          "currency": "Valuta"
+          "currency": "Valuta",
+          "igdb_client_id": "Twitch-client-ID",
+          "igdb_client_secret": "Twitch-clientgeheim"
         },
         "data_description": {
-          "currency": "Een code van 3 letters, bijvoorbeeld EUR of USD."
+          "currency": "Een code van 3 letters, bijvoorbeeld EUR of USD.",
+          "igdb_client_id": "Optioneel. Maak een applicatie op dev.twitch.tv om de IGDB-sleutels te krijgen.",
+          "igdb_client_secret": "Optioneel. Laat leeg om het opgeslagen geheim te houden."
         }
       }
     },
     "error": {
-      "invalid_currency": "Voer een valutacode van 3 letters in."
+      "invalid_currency": "Voer een valutacode van 3 letters in.",
+      "invalid_igdb_auth": "Twitch accepteert de client-ID en het clientgeheim niet.",
+      "cannot_connect": "Kan geen verbinding maken met Twitch. Probeer het later opnieuw.",
+      "igdb_keys_incomplete": "Voer de client-ID en het clientgeheim in."
     },
     "abort": {
       "already_configured": "Home Keeper Games is al ingesteld.",
@@ -28,15 +35,22 @@
       "init": {
         "title": "Bibliotheekopties",
         "data": {
-          "currency": "Valuta"
+          "currency": "Valuta",
+          "igdb_client_id": "Twitch-client-ID",
+          "igdb_client_secret": "Twitch-clientgeheim"
         },
         "data_description": {
-          "currency": "Een code van 3 letters, bijvoorbeeld EUR of USD."
+          "currency": "Een code van 3 letters, bijvoorbeeld EUR of USD.",
+          "igdb_client_id": "Optioneel. Maak een applicatie op dev.twitch.tv om de IGDB-sleutels te krijgen.",
+          "igdb_client_secret": "Optioneel. Laat leeg om het opgeslagen geheim te houden."
         }
       }
     },
     "error": {
-      "invalid_currency": "Voer een valutacode van 3 letters in."
+      "invalid_currency": "Voer een valutacode van 3 letters in.",
+      "invalid_igdb_auth": "Twitch accepteert de client-ID en het clientgeheim niet.",
+      "cannot_connect": "Kan geen verbinding maken met Twitch. Probeer het later opnieuw.",
+      "igdb_keys_incomplete": "Voer de client-ID en het clientgeheim in."
     }
   },
   "entity": {
@@ -291,6 +305,32 @@
         "needs_details": {
           "name": "Details ontbreken",
           "description": "Het boek als onvolledig markeren."
+        },
+        "lookup": {
+          "name": "Opzoeken in IGDB",
+          "description": "Zoekt de titel in IGDB. Gebruikt de IGDB-game alleen als de titel gelijk is. Anders wordt alleen de titel toegevoegd en de game als onvolledig gemarkeerd."
+        },
+        "platform": {
+          "name": "Platform",
+          "description": "Met Opzoeken in IGDB past alleen een game op dit platform."
+        }
+      }
+    },
+    "search_catalog": {
+      "name": "Catalogus doorzoeken",
+      "description": "Zoekt games in IGDB op titel. Het antwoord geeft de kandidaten, de beste eerst.",
+      "fields": {
+        "query": {
+          "name": "Zoeken",
+          "description": "De titel van de game, of een deel ervan."
+        },
+        "platform": {
+          "name": "Platform",
+          "description": "Alleen games op dit platform."
+        },
+        "limit": {
+          "name": "Maximum",
+          "description": "Het maximale aantal kandidaten, van 1 tot 20."
         }
       }
     },
@@ -1120,6 +1160,18 @@
     },
     "digital_copy_no_shelf": {
       "message": "Een digitaal exemplaar heeft geen plank."
+    },
+    "igdb_not_configured": {
+      "message": "Voer eerst de IGDB-sleutels in, in de opties van Home Keeper Games."
+    },
+    "igdb_unavailable": {
+      "message": "IGDB is nu niet beschikbaar. Probeer het later opnieuw."
+    },
+    "invalid_igdb_auth": {
+      "message": "Twitch accepteert de IGDB-sleutels niet. Wijzig ze in de opties van Home Keeper Games."
+    },
+    "igdb_not_found": {
+      "message": "IGDB heeft geen game met de ID {igdb_id}."
     }
   }
 }

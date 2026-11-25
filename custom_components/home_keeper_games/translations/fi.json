@@ -5,15 +5,22 @@
         "title": "Home Keeper Games",
         "description": "Aseta kappaleiden hintojen ja arvojen valuutta.",
         "data": {
-          "currency": "Valuutta"
+          "currency": "Valuutta",
+          "igdb_client_id": "Twitch-asiakastunnus",
+          "igdb_client_secret": "Twitch-asiakassalaisuus"
         },
         "data_description": {
-          "currency": "3 kirjaimen koodi, esimerkiksi EUR tai USD."
+          "currency": "3 kirjaimen koodi, esimerkiksi EUR tai USD.",
+          "igdb_client_id": "Valinnainen. Luo sovellus osoitteessa dev.twitch.tv saadaksesi IGDB-avaimet.",
+          "igdb_client_secret": "Valinnainen. Jätä tyhjäksi, niin tallennettu salaisuus säilyy."
         }
       }
     },
     "error": {
-      "invalid_currency": "Anna 3 kirjaimen valuuttakoodi."
+      "invalid_currency": "Anna 3 kirjaimen valuuttakoodi.",
+      "invalid_igdb_auth": "Twitch ei hyväksy asiakastunnusta ja asiakassalaisuutta.",
+      "cannot_connect": "Yhteyttä Twitchiin ei voi muodostaa. Yritä myöhemmin uudelleen.",
+      "igdb_keys_incomplete": "Anna asiakastunnus ja asiakassalaisuus."
     },
     "abort": {
       "already_configured": "Home Keeper Games on jo määritetty.",
@@ -28,15 +35,22 @@
       "init": {
         "title": "Kirjaston asetukset",
         "data": {
-          "currency": "Valuutta"
+          "currency": "Valuutta",
+          "igdb_client_id": "Twitch-asiakastunnus",
+          "igdb_client_secret": "Twitch-asiakassalaisuus"
         },
         "data_description": {
-          "currency": "3 kirjaimen koodi, esimerkiksi EUR tai USD."
+          "currency": "3 kirjaimen koodi, esimerkiksi EUR tai USD.",
+          "igdb_client_id": "Valinnainen. Luo sovellus osoitteessa dev.twitch.tv saadaksesi IGDB-avaimet.",
+          "igdb_client_secret": "Valinnainen. Jätä tyhjäksi, niin tallennettu salaisuus säilyy."
         }
       }
     },
     "error": {
-      "invalid_currency": "Anna 3 kirjaimen valuuttakoodi."
+      "invalid_currency": "Anna 3 kirjaimen valuuttakoodi.",
+      "invalid_igdb_auth": "Twitch ei hyväksy asiakastunnusta ja asiakassalaisuutta.",
+      "cannot_connect": "Yhteyttä Twitchiin ei voi muodostaa. Yritä myöhemmin uudelleen.",
+      "igdb_keys_incomplete": "Anna asiakastunnus ja asiakassalaisuus."
     }
   },
   "entity": {
@@ -291,6 +305,32 @@
         "needs_details": {
           "name": "Tiedot puuttuvat",
           "description": "Merkitse kirja keskeneräiseksi."
+        },
+        "lookup": {
+          "name": "Hae IGDB:stä",
+          "description": "Hakee nimen IGDB:stä. Käyttää IGDB-peliä vain, jos sen nimi on sama. Muuten lisää vain nimen ja merkitsee pelin keskeneräiseksi."
+        },
+        "platform": {
+          "name": "Alusta",
+          "description": "Kun Hae IGDB:stä on käytössä, vain tämän alustan peli täsmää."
+        }
+      }
+    },
+    "search_catalog": {
+      "name": "Hae luettelosta",
+      "description": "Hakee pelejä IGDB:stä nimen perusteella. Vastaus antaa ehdokkaat, paras ensin.",
+      "fields": {
+        "query": {
+          "name": "Haku",
+          "description": "Pelin nimi tai osa siitä."
+        },
+        "platform": {
+          "name": "Alusta",
+          "description": "Vain tämän alustan pelit."
+        },
+        "limit": {
+          "name": "Raja",
+          "description": "Ehdokkaiden enimmäismäärä, 1–20."
         }
       }
     },
@@ -1120,6 +1160,18 @@
     },
     "digital_copy_no_shelf": {
       "message": "Digitaalisella kappaleella ei ole hyllytasoa."
+    },
+    "igdb_not_configured": {
+      "message": "Anna ensin IGDB-avaimet Home Keeper Gamesin asetuksissa."
+    },
+    "igdb_unavailable": {
+      "message": "IGDB ei ole nyt käytettävissä. Yritä myöhemmin uudelleen."
+    },
+    "invalid_igdb_auth": {
+      "message": "Twitch ei hyväksy IGDB-avaimia. Vaihda ne Home Keeper Gamesin asetuksissa."
+    },
+    "igdb_not_found": {
+      "message": "IGDB:ssä ei ole peliä tunnuksella {igdb_id}."
     }
   }
 }
