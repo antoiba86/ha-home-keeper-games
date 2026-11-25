@@ -1,6 +1,6 @@
 ---
 title: Tab and card
-summary: How the Library tab runs inside the Home Keeper panel, how the card shows the reading of a person, and how both read the state, route, render, translate and ship.
+summary: How the Library tab runs inside the Home Keeper panel, how the card shows the play progress of a person, and how both read the state, route, render, translate and ship.
 implements:
   - custom_components/home_keeper_games/frontend_assets.py
   - custom_components/home_keeper_games/card.py
@@ -25,15 +25,14 @@ implements:
   - custom_components/home_keeper_games/frontend/src/styles.ts
   - custom_components/home_keeper_games/frontend/src/global.d.ts
 related: [home-keeper-dependency, scan-and-barcode, csv-import-export, people-privilege]
-source_hash: 89265ab0ec70
+source_hash: 73cc18ef3f02
 ---
 
 # Tab and card
 
-The frontend is 2 ES modules: the Library tab, which the Home Keeper panel loads for
-admins, and the card, which any user adds to a dashboard. Both are plain custom elements
-with no runtime framework. The rules for a change are in
-[frontend.md](../../.amazonq/rules/frontend.md).
+The frontend is 2 ES modules: the Library tab, which the Home Keeper panel loads for admins, and the
+card, which any user adds to a dashboard. Both are plain custom elements with no runtime framework.
+The rules for a change are in [frontend.md](../../.amazonq/rules/frontend.md).
 
 ## Goals
 
@@ -47,7 +46,7 @@ with no runtime framework. The rules for a change are in
 
 ## Non-goals
 
-- Management in the card. The card sets the reading status of its person and no more.
+- Management in the card. The card sets the play progress of its person and no more.
 - A router or a component framework.
 - Offline edits. Each change is a websocket call.
 
@@ -67,10 +66,10 @@ inlined, and the zxing decoder as a separate chunk. `card.async_register_card` d
 - **Frontend module.** With `resource_mode: yaml` (the field is `mode` before Home Assistant
   2026.2), or if the resource write fails, the card goes to `frontend.add_extra_js_url`.
 
-Only 1 path runs. Home Assistant 2026.9 puts a scoped custom element registry in front
-of `window.customElements`, and an app shell import that runs first puts the card in the
-native registry, where the dashboard does not find it. The write waits for Lovelace, off
-the setup path. The removal of the entry deletes the resource, and an unload keeps it.
+Only 1 path runs. Home Assistant 2026.9 puts a scoped custom element registry in front of
+`window.customElements`, and an app shell import that runs first puts the card in the native
+registry, where the dashboard does not find it. The write waits for Lovelace, off the setup path.
+The removal of the entry deletes the resource, and an unload keeps it.
 
 ### State
 
@@ -84,14 +83,13 @@ closes a websocket that gets a message of 4 MB or more.
 
 ### The tab
 
-The Home Keeper panel sets `hass`, `narrow`, `route` and `host` on
-`home-keeper-games-tab`. `route.path` is the path after `/home-keeper/games`.
-`utils.parseRoute` turns it into a view, an id and the filters, and `utils.buildPath` is
-the inverse. The host gives the tab only the path and drops a `?query`. So the filters
-are `;key=value` parameters on the last segment, as in `/games;q=le%20guin;status=read`.
-`parseRoute` also reads a `?query`, and a parameter wins over it. The tab moves only with
-`host.navigate` and shows notices with `host.showToast`. A loan links to the URL of
-`host.taskLink`, and a click uses `host.openTask` if the host has it.
+The Home Keeper panel sets `hass`, `narrow`, `route` and `host` on `home-keeper-games-tab`.
+`route.path` is the path after `/home-keeper/games`. `utils.parseRoute` turns it into a view, an id
+and the filters, and `utils.buildPath` is the inverse. The host gives the tab only the path and
+drops a `?query`. So the filters are `;key=value` parameters on the last segment, as in
+`/games;q=zelda;status=playing`. `parseRoute` also reads a `?query`, and a parameter wins over it.
+The tab moves only with `host.navigate` and shows notices with `host.showToast`. A loan links to the
+URL of `host.taskLink`, and a click uses `host.openTask` if the host has it.
 
 | Path | View | Module |
 |---|---|---|
@@ -101,22 +99,24 @@ are `;key=value` parameters on the last segment, as in `/games;q=le%20guin;statu
 | `/wishlist`, `/settings` | Wishlist, people settings | `tab-lists.ts` |
 | `/scan`, `/import` | Scan flow, import | `tab-scan.ts`, `tab-import.ts` |
 
-The game filters are `q`, `status`, `room`, `shelf`, `reader`, `genre`, `owned`, `sort` and
-`view`. `utils.filterGames` and `sortGames` apply them. Each view is a free function over
-`ViewCtx` (`tab-types.ts`) that returns HTML. `tab.ts` renders it with
-`dom.renderKeepFocus`. It keeps the focus, the caret, the typed text and the camera video.
-A delegated listener for each event type reads the `data-act`, `data-chg`, `data-input`
-and `data-form` attributes. The dialogs of `tab-dialogs.ts` are a separate layer, so a
-data push does not clear a form. An error keeps the typed input. A failed command shows
-the stored values. A [sheet](scan-and-barcode.md#title-sheet) has no close button.
+The game filters are `q`, `status`, `room`, `shelf`, `reader`, `genre`, `owned`, `sort` and `view`.
+`utils.filterGames` and `sortGames` apply them. Each view is a free function over `ViewCtx`
+(`tab-types.ts`) that returns HTML. `tab.ts` renders it with `dom.renderKeepFocus`. It keeps the
+focus, the caret, the typed text and the camera video. A delegated listener for each event type
+reads the `data-act`, `data-chg`, `data-input` and `data-form` attributes. The dialogs of
+`tab-dialogs.ts` are a separate layer, so a data push does not clear a form. An error keeps the
+typed input. A failed command shows the stored values. A [sheet](scan-and-barcode.md#title-sheet)
+has no close button. The Progress part of a game edits 1 row: 1 person on 1 platform
+(`tab-games.progressTarget`). A chip for each platform with a row or a copy is over the form, and a
+select adds another. The form sends `set_progress` with that `platform`.
 
 ### The card
 
 `home-keeper-games-card` shows the person of the user, or the `person` of the config for an admin.
-Its sections are search with the location of each result, Reading with the page and a Read button,
-Want to read with a random pick, the yearly goal and the household activity of the people who share
-their reading. Each section has a toggle in the visual editor. The card calls `set_reading` with no
-`person_id` for its own person.
+Its sections are search with the location of each result, Playing with the play time and a Completed
+button for each platform, Backlog with a random pick, the yearly goal and the household activity of
+the people who share their progress. Each section has a toggle in the visual editor. The card calls
+`set_progress` with no `person_id` for its own person, and with the `platform` of the row.
 
 ### Markup, text and style
 
@@ -146,5 +146,5 @@ their reading. Each section has a toggle in the visual editor. The card calls `s
   bundle names `games-tab.js` and `games-card.js`.
 - The tab paths and the `;key=value` filter keys, because a user can bookmark them.
 - The Lovelace resource of type `module` at `/home_keeper_games_static/games-card.js`.
-- The card config keys `person`, `title`, `search`, `reading`, `want`, `goal` and
+- The card config keys `person`, `title`, `search`, `playing`, `backlog`, `goal` and
   `household`.

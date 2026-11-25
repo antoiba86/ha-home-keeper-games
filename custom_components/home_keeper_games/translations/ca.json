@@ -50,16 +50,16 @@
       "loans_overdue": {
         "name": "Préstecs vençuts"
       },
-      "games_read_this_year": {
-        "name": "{person} llibres llegits aquest any"
+      "games_completed_this_year": {
+        "name": "{person} jocs completats aquest any"
       },
-      "reading_now": {
-        "name": "{person} llegint ara"
+      "playing_now": {
+        "name": "{person} jugant ara"
       }
     },
     "todo": {
-      "to_read": {
-        "name": "{person} per llegir"
+      "backlog": {
+        "name": "{person} pendents"
       }
     }
   },
@@ -550,45 +550,53 @@
         }
       }
     },
-    "set_reading": {
-      "name": "Defineix l'estat de lectura",
-      "description": "Defineix l'estat de lectura d'un llibre per a una persona. Un usuari no administrador només pot definir el seu propi estat.",
+    "set_progress": {
+      "name": "Posar progrés",
+      "description": "Posa el progrés d'un joc en una plataforma per a una persona. Un usuari que no és administrador només pot posar el seu propi progrés.",
       "fields": {
         "game_id": {
-          "name": "Llibre",
-          "description": "L'ID del llibre."
+          "name": "Joc",
+          "description": "L'ID del joc."
         },
         "person_id": {
           "name": "Persona",
           "description": "L'ID de la persona de Home Assistant."
         },
-        "status": {
-          "name": "Estat de lectura",
-          "description": "L'estat de lectura."
+        "platform": {
+          "name": "Plataforma",
+          "description": "La consola. Buit per usar la plataforma de les còpies del joc."
+        },
+        "play_status": {
+          "name": "Estat de joc",
+          "description": "L'estat de joc. none treu el progrés."
         },
         "rating": {
           "name": "Puntuació",
           "description": "Una puntuació de 1 a 5."
         },
-        "page": {
-          "name": "Pàgina",
-          "description": "La pàgina actual."
+        "playtime_minutes": {
+          "name": "Temps de joc",
+          "description": "El temps de joc en minuts."
         },
-        "started": {
+        "started_at": {
           "name": "Començat",
           "description": "La data d'inici."
         },
-        "finished": {
-          "name": "Acabat",
-          "description": "La data en què es va acabar el llibre."
+        "completed_at": {
+          "name": "Completat",
+          "description": "La data en què es va completar el joc."
         },
-        "read_count": {
-          "name": "Vegades llegit",
-          "description": "El nombre de vegades que s'ha llegit el llibre."
+        "last_played_at": {
+          "name": "Última partida",
+          "description": "La data en què es va jugar al joc per última vegada."
         },
-        "private_notes": {
-          "name": "Notes privades",
-          "description": "Notes que només la persona pot llegir."
+        "completion_count": {
+          "name": "Vegades completat",
+          "description": "El nombre de vegades que es va completar el joc."
+        },
+        "review": {
+          "name": "Ressenya",
+          "description": "Una ressenya que només la persona pot llegir."
         }
       }
     },
@@ -806,13 +814,13 @@
           "name": "Persona",
           "description": "L'ID de la persona de Home Assistant."
         },
-        "share_reading": {
-          "name": "Comparteix l'estat de lectura",
-          "description": "Els altres usuaris veuen l'estat. Si està desactivat, els sensors i la llista de tasques de la persona no estan disponibles."
+        "share_progress": {
+          "name": "Compartir progrés",
+          "description": "Altres usuaris poden veure el progrés. Si està desactivat, els sensors i la llista de tasques de la persona no estan disponibles."
         },
         "yearly_goal": {
           "name": "Objectiu anual",
-          "description": "El nombre de llibres a llegir aquest any."
+          "description": "El nombre de jocs per completar aquest any."
         },
         "wishlist_todo": {
           "name": "Llista de desitjos",
@@ -846,13 +854,13 @@
           "name": "Prestatge",
           "description": "L'ID del prestatge. Buit per a cap prestatge."
         },
-        "import_notes": {
-          "name": "Importa les notes",
-          "description": "Importa les ressenyes i notes com a notes privades."
+        "import_review": {
+          "name": "Importar ressenyes",
+          "description": "Importar les ressenyes del fitxer com a ressenyes privades."
         },
-        "replace_reading": {
-          "name": "Substitueix l'estat de lectura",
-          "description": "Substitueix un estat de lectura existent."
+        "replace_progress": {
+          "name": "Substituir progrés",
+          "description": "Substituir el progrés que ja existeix."
         },
         "dry_run": {
           "name": "Prova",
@@ -890,9 +898,9 @@
           "name": "En propietat",
           "description": "Només llibres amb un exemplar, o només llibres sense exemplar."
         },
-        "status": {
-          "name": "Estat de lectura",
-          "description": "L'estat de lectura."
+        "play_status": {
+          "name": "Estat de joc",
+          "description": "L'estat de joc de la persona en una plataforma."
         },
         "person_id": {
           "name": "Persona",
@@ -1013,6 +1021,9 @@
     },
     "person_not_found": {
       "message": "Cap persona té l'ID {id}."
+    },
+    "platform_required": {
+      "message": "Tria la plataforma. Les còpies del joc són en més d'1 plataforma, o el joc no té cap còpia."
     },
     "no_person": {
       "message": "El teu usuari no té cap persona de Home Assistant. Vincula una persona a l'usuari."

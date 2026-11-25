@@ -34,45 +34,49 @@ describe('card', () => {
     expect(customElements.get('home-keeper-games-card').getStubConfig()).toEqual({ type: 'custom:home-keeper-games-card' });
   });
 
-  it('shows the reading, want to read, goal and household of the caller', async () => {
+  it('shows the playing games, the backlog, the goal and the household of the caller', async () => {
     const fake = await mount();
     expect(fake.calls('get_state')).toHaveLength(1);
     expect($('h2').textContent).toBe('Library: Alex');
     expect(text()).toContain('38 books');
     expect(text()).toContain('Project Hail Mary');
-    expect(text()).toContain('Page 210');
-    expect(text()).toContain('Want to read · 2');
-    expect(text()).toContain('6 of 24 books in 2026');
+    expect(text()).toContain('210 min played');
+    expect(text()).toContain('Switch · 95 min played');
+    expect(text()).toContain('Backlog · 2');
+    expect(text()).toContain('6 of 24 games in 2026');
     expect(text()).toContain('Goal: 24');
-    expect(text()).not.toContain('pages');
-    expect(text()).toContain('Sam: reading The Left Hand of Darkness');
+    expect(text()).toContain('Sam: playing The Left Hand of Darkness');
     expect(text()).toContain('2 days ago');
   });
 
   it('hides the household rows of a person who does not share', async () => {
     const state = fixture();
-    state.people[SAM].share_reading = false;
+    state.people[SAM].share_progress = false;
     await mount({}, { state });
-    expect(text()).not.toContain('Sam: reading');
-    expect(text()).toContain('Jo: reading The Tombs of Atuan');
+    expect(text()).not.toContain('Sam: playing');
+    expect(text()).toContain('Jo: playing The Tombs of Atuan');
   });
 
-  it('sets the page and the read status for the caller, with no person_id', async () => {
+  it('sets the play time and the completed status for the caller, with no person_id', async () => {
     const state = fixture();
     const id = gameId(state, 'Project Hail Mary');
     const fake = await mount();
-    $(`[data-k="sp-${id}"]`).click();
-    const input = $(`[data-k="page-${id}"]`);
+    $(`[data-k="st-${id}:pc"]`).click();
+    const input = $(`[data-k="time-${id}:pc"]`);
     input.value = '250';
     input.form.requestSubmit();
     await flush();
-    expect(fake.calls('set_reading')[0]).toEqual({ type: 'home_keeper_games/set_reading', game_id: id, page: 250 });
-    $(`[data-k="rd-${id}"]`).click();
+    expect(fake.calls('set_progress')[0]).toEqual({ type: 'home_keeper_games/set_progress', game_id: id, platform: 'pc', playtime_minutes: 250 });
+    $(`[data-k="cp-${id}:pc"]`).click();
     await flush();
-    expect(fake.calls('set_reading')[1]).toEqual({ type: 'home_keeper_games/set_reading', game_id: id, status: 'read', finished: '2026-10-05', read_count: 1 });
+    expect(fake.calls('set_progress')[1]).toEqual({ type: 'home_keeper_games/set_progress', game_id: id, platform: 'pc', play_status: 'completed', completed_at: '2026-10-05', completion_count: 1 });
+    const left = gameId(state, 'The Left Hand of Darkness');
+    $(`[data-k="cp-${left}:switch"]`).click();
+    await flush();
+    expect(fake.calls('set_progress')[2]).toMatchObject({ game_id: left, platform: 'switch', completion_count: 1 });
   });
 
-  it('searches and adds a game to want to read', async () => {
+  it('searches and adds a game to the backlog', async () => {
     const state = fixture();
     const fake = await mount();
     const input = $('[data-k="q"]');
@@ -84,7 +88,7 @@ describe('card', () => {
     expect(el.shadowRoot.activeElement?.dataset.k).toBe('q');
     $(`[data-k="w-${gameId(state, 'Lavinia')}"]`).click();
     await flush();
-    expect(fake.calls('set_reading')[0]).toMatchObject({ game_id: gameId(state, 'Lavinia'), status: 'want' });
+    expect(fake.calls('set_progress')[0]).toMatchObject({ game_id: gameId(state, 'Lavinia'), platform: 'switch2', play_status: 'backlog' });
   });
 
   it('shows another person for an admin, with person_id in the call', async () => {
@@ -92,9 +96,9 @@ describe('card', () => {
     const fake = await mount({ person: SAM });
     expect($('h2').textContent).toBe('Library: Sam');
     const id = gameId(state, 'The Left Hand of Darkness');
-    $(`[data-k="rd-${id}"]`).click();
+    $(`[data-k="cp-${id}:switch2"]`).click();
     await flush();
-    expect(fake.calls('set_reading')[0]).toMatchObject({ game_id: id, person_id: SAM, status: 'read' });
+    expect(fake.calls('set_progress')[0]).toMatchObject({ game_id: id, platform: 'switch2', person_id: SAM, play_status: 'completed' });
   });
 
   it('ignores the person option for a non-admin user', async () => {
@@ -111,7 +115,7 @@ describe('card', () => {
     expect(text()).toContain('No person is linked to this user.');
   });
 
-  it('picks a random game to read', async () => {
+  it('picks a random game from the backlog', async () => {
     const rnd = vi.spyOn(Math, 'random').mockReturnValue(0.99);
     await mount();
     $('[data-k="random"]').click();
@@ -121,16 +125,16 @@ describe('card', () => {
   });
 
   it('hides the sections that are off', async () => {
-    await mount({ search: false, reading: false, want: false, household: false, title: 'Games' });
+    await mount({ search: false, playing: false, backlog: false, household: false, title: 'Games' });
     expect($('h2').textContent).toBe('Games');
     expect($('[data-k="q"]')).toBeNull();
     expect(text()).not.toContain('Project Hail Mary');
-    expect(text()).toContain('6 of 24 books in 2026');
+    expect(text()).toContain('6 of 24 games in 2026');
     expect(text()).not.toContain('Household');
   });
 
   it('reads the section toggles', () => {
-    expect(sectionsOn({ type: 'x' })).toEqual({ search: true, reading: true, want: true, goal: true, household: true });
+    expect(sectionsOn({ type: 'x' })).toEqual({ search: true, playing: true, backlog: true, goal: true, household: true });
     expect(sectionsOn({ type: 'x', goal: false }).goal).toBe(false);
   });
 });

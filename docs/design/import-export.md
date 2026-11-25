@@ -4,7 +4,7 @@ summary: How the library joins the combined export and import of Home Keeper, wh
 implements:
   - custom_components/home_keeper_games/import_export.py
 related: [csv-import-export, home-keeper-dependency, store-models, events-api]
-source_hash: bc1e99ef4337
+source_hash: 0fa890075e50
 ---
 
 # Home Keeper export and import
@@ -36,13 +36,14 @@ The contract is section 11 of the `INTEGRATING.md` of Home Keeper.
 ### Section
 
 `import_export.build_export` makes the `data`: `format` and 1 list for each of `rooms`,
-`units`, `shelves`, `games`, `copies`, `loans`, `reading` and `people`. A record is
+`units`, `shelves`, `games`, `copies`, `loans`, `progress` and `people`. A record is
 the stored record, with these changes:
 
 - A room has `area_name`. A loan has `person_name`. The wishlist entry of a game has
   `person_name`.
-- `reading` has 1 entry for each person: `person_id`, `person_name` and `games`, the
-  rows with their `game_id`.
+- `progress` has 1 entry for each person: `person_id`, `person_name` and `games`, 1 row
+  for each platform with its `game_id` and `platform`. On import, a platform that is not
+  in `models.PLATFORMS` is an error, and a missing one becomes `other`.
 - `people` has the settings of each stored person with `person_name` and
   `wishlist_todo_name`.
 - `game.cover` is `{kind, file}` with a relative path in a bundle, else `null`.

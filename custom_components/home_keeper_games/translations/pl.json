@@ -50,16 +50,16 @@
       "loans_overdue": {
         "name": "Zaległe wypożyczenia"
       },
-      "games_read_this_year": {
-        "name": "{person} przeczytane książki w tym roku"
+      "games_completed_this_year": {
+        "name": "{person} gry ukończone w tym roku"
       },
-      "reading_now": {
-        "name": "{person} czyta teraz"
+      "playing_now": {
+        "name": "{person} gra teraz"
       }
     },
     "todo": {
-      "to_read": {
-        "name": "{person} do przeczytania"
+      "backlog": {
+        "name": "{person} gry do zagrania"
       }
     }
   },
@@ -550,45 +550,53 @@
         }
       }
     },
-    "set_reading": {
-      "name": "Ustaw stan czytania",
-      "description": "Ustaw stan czytania książki dla osoby. Użytkownik bez uprawnień administratora może ustawić tylko własny stan.",
+    "set_progress": {
+      "name": "Ustaw postęp",
+      "description": "Ustawia postęp gry na platformie dla osoby. Użytkownik bez uprawnień administratora może ustawić tylko własny postęp.",
       "fields": {
         "game_id": {
-          "name": "Książka",
-          "description": "ID książki."
+          "name": "Gra",
+          "description": "ID gry."
         },
         "person_id": {
           "name": "Osoba",
           "description": "ID osoby w Home Assistant."
         },
-        "status": {
-          "name": "Stan czytania",
-          "description": "Stan czytania."
+        "platform": {
+          "name": "Platforma",
+          "description": "Konsola. Puste, aby użyć platformy kopii gry."
+        },
+        "play_status": {
+          "name": "Status gry",
+          "description": "Status gry. none usuwa postęp."
         },
         "rating": {
           "name": "Ocena",
           "description": "Ocena od 1 do 5."
         },
-        "page": {
-          "name": "Strona",
-          "description": "Bieżąca strona."
+        "playtime_minutes": {
+          "name": "Czas gry",
+          "description": "Czas gry w minutach."
         },
-        "started": {
+        "started_at": {
           "name": "Rozpoczęto",
           "description": "Data rozpoczęcia."
         },
-        "finished": {
+        "completed_at": {
           "name": "Ukończono",
-          "description": "Data ukończenia książki."
+          "description": "Data ukończenia gry."
         },
-        "read_count": {
-          "name": "Liczba przeczytań",
-          "description": "Ile razy książka została przeczytana."
+        "last_played_at": {
+          "name": "Ostatnio grano",
+          "description": "Data, kiedy ostatnio grano w grę."
         },
-        "private_notes": {
-          "name": "Prywatne notatki",
-          "description": "Notatki, które może czytać tylko ta osoba."
+        "completion_count": {
+          "name": "Liczba ukończeń",
+          "description": "Liczba ukończeń gry."
+        },
+        "review": {
+          "name": "Recenzja",
+          "description": "Recenzja, którą może przeczytać tylko ta osoba."
         }
       }
     },
@@ -806,13 +814,13 @@
           "name": "Osoba",
           "description": "ID osoby w Home Assistant."
         },
-        "share_reading": {
-          "name": "Udostępniaj stan czytania",
-          "description": "Inni użytkownicy widzą stan. Gdy wyłączone, czujniki i lista zadań osoby są niedostępne."
+        "share_progress": {
+          "name": "Udostępnij postęp",
+          "description": "Inni użytkownicy widzą postęp. Gdy wyłączone, czujniki i lista zadań osoby są niedostępne."
         },
         "yearly_goal": {
           "name": "Cel roczny",
-          "description": "Liczba książek do przeczytania w tym roku."
+          "description": "Liczba gier do ukończenia w tym roku."
         },
         "wishlist_todo": {
           "name": "Lista życzeń",
@@ -846,13 +854,13 @@
           "name": "Półka",
           "description": "ID półki. Puste dla braku półki."
         },
-        "import_notes": {
-          "name": "Importuj notatki",
-          "description": "Importuj recenzje i notatki jako prywatne notatki."
+        "import_review": {
+          "name": "Importuj recenzje",
+          "description": "Importuj recenzje z pliku jako prywatne recenzje."
         },
-        "replace_reading": {
-          "name": "Zastąp stan czytania",
-          "description": "Zastąp istniejący stan czytania."
+        "replace_progress": {
+          "name": "Zastąp postęp",
+          "description": "Zastąp istniejący postęp."
         },
         "dry_run": {
           "name": "Próba",
@@ -890,9 +898,9 @@
           "name": "Posiadane",
           "description": "Tylko książki z egzemplarzem albo tylko książki bez egzemplarza."
         },
-        "status": {
-          "name": "Stan czytania",
-          "description": "Stan czytania."
+        "play_status": {
+          "name": "Status gry",
+          "description": "Status gry osoby na platformie."
         },
         "person_id": {
           "name": "Osoba",
@@ -1013,6 +1021,9 @@
     },
     "person_not_found": {
       "message": "Żadna osoba nie ma ID {id}."
+    },
+    "platform_required": {
+      "message": "Wybierz platformę. Kopie gry są na więcej niż 1 platformie lub gra nie ma kopii."
     },
     "no_person": {
       "message": "Twój użytkownik nie ma osoby w Home Assistant. Połącz osobę z użytkownikiem."

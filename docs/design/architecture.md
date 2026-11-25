@@ -9,16 +9,16 @@ implements:
   - custom_components/home_keeper_games/backend_i18n.py
   - custom_components/home_keeper_games/manifest.json
 related: [store-models, people-privilege, events-api, home-keeper-dependency, frontend-tab-card]
-source_hash: 65a9ff77b689
+source_hash: 34ee5e0fa829
 ---
 
 # Architecture
 
 Home Keeper Games is a Home Assistant integration for the games of a household. It
-records the rooms, units and shelves of the home, the games and their copies, the
-reading status of each person, the loans and a wishlist. It is a companion of Home
-Keeper: admins manage the library in a tab of the Home Keeper panel. Every user reads and
-updates their own reading status through a card, native entities and services.
+records the rooms, units and shelves of the home, the games and their copies, the play
+progress of each person on each platform, the loans and a wishlist. It is a companion of
+Home Keeper: admins manage the library in a tab of the Home Keeper panel. Every user reads
+and updates their own play progress through a card, native entities and services.
 
 ## Goals
 
@@ -29,7 +29,7 @@ updates their own reading status through a card, native entities and services.
   the input, saves the change and fires its events ([store-models](store-models.md)).
 - **G3. Services first.** Each data action is a `home_keeper_games.*` service, so
   automations, scripts, voice and other integrations can do what the tab does.
-- **G4. Per-person privacy.** A non-admin user changes only their own reading data, and
+- **G4. Per-person privacy.** A non-admin user changes only their own progress data, and
   reads only what the projections allow ([people-privilege](people-privilege.md)).
 - **G5. Useful without the tab.** If Home Keeper is missing or too old, the store, the
   services, the card and the entities still work.
@@ -123,7 +123,7 @@ notes and `acquired_from`.
 | [csv-import-export](csv-import-export.md) | The CSV format of the integration |
 | [loans-home-keeper](loans-home-keeper.md) | Loans and their Home Keeper tasks |
 | [wishlist-todo-sync](wishlist-todo-sync.md) | The wishlist and its per-person to-do list |
-| [entities](entities.md) | The coordinator, the sensors and the To read lists |
+| [entities](entities.md) | The coordinator, the sensors and the Backlog lists |
 | [home-keeper-dependency](home-keeper-dependency.md) | The check, the tab, the companion and the repairs |
 | [frontend-tab-card](frontend-tab-card.md) | The tab, the card, routing, i18n and the bundles |
 

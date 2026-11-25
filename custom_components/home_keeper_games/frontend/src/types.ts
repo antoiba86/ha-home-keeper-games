@@ -4,7 +4,7 @@
 // sections 2 and 5). `utils.normalizeState` turns the raw reply into `Lib`,
 // which has arrays in display order.
 
-export type ReadingStatus = 'want' | 'reading' | 'read' | 'dnf';
+export type PlayStatus = 'backlog' | 'playing' | 'completed' | 'abandoned';
 export type CopyFormat = 'physical' | 'digital' | 'other';
 export type Platform = 'ps5' | 'ps4' | 'ps3' | 'switch2' | 'switch' | 'xbox_series' | 'xbox_one' | 'pc' | 'other';
 export type CopyCondition = 'new' | 'fine' | 'good' | 'fair' | 'poor';
@@ -31,16 +31,22 @@ export interface Shelf {
   order: number;
 }
 
-export interface ReadingRow {
-  status: ReadingStatus | null;
+/** The progress of 1 person on 1 platform of a game. */
+export interface ProgressRow {
+  play_status: PlayStatus;
   rating: number | null;
-  page: number | null;
-  started: string | null;
-  finished: string | null;
-  read_count: number;
-  private_notes?: string;
+  playtime_minutes: number | null;
+  started_at: string | null;
+  completed_at: string | null;
+  last_played_at: string | null;
+  completion_count: number;
+  /** Absent for a non-admin user who reads the row of another person. */
+  review?: string;
   updated_at: string;
 }
+
+/** The progress rows of 1 person on a game, by platform. */
+export type PlatformRows = Partial<Record<Platform, ProgressRow>>;
 
 export interface Wishlist {
   person_id: string;
@@ -68,7 +74,8 @@ export interface Game {
   created_at: string;
   updated_at: string;
   wishlist: Wishlist | null;
-  reading: Record<string, ReadingRow>;
+  /** By person id, then by platform. */
+  progress: Record<string, PlatformRows>;
   owned: boolean;
   copy_count: number;
   cover_url: string | null;
@@ -110,7 +117,7 @@ export interface Loan {
 }
 
 export interface PersonSettings {
-  share_reading: boolean;
+  share_progress: boolean;
   /** Not in the reply for another person when the viewer is not an admin. */
   wishlist_todo?: string | null;
   yearly_goal: number | null;
@@ -126,7 +133,7 @@ export interface RawPerson extends PersonSettings {
 export interface Person {
   id: string;
   name: string;
-  share_reading: boolean;
+  share_progress: boolean;
   wishlist_todo: string | null;
   yearly_goal: number | null;
   /** The avatar color, from the person order (`utils.PERSON_COLORS`). */

@@ -5,7 +5,7 @@ implements:
   - custom_components/home_keeper_games/store.py
   - custom_components/home_keeper_games/models.py
 related: [architecture, events-api, people-privilege, csv-import-export]
-source_hash: fb03d0d13e00
+source_hash: 97c69ba27b0c
 ---
 
 # Store and models
@@ -20,7 +20,7 @@ only code that changes the document.
   input with `models`, changes the document, saves it, fires the events and tells the
   listeners, in that order.
 - **G2. A game is the title, a copy is the thing.** A game with 0 copies is valid: a
-  library game in the reading history, an ebook, or a wishlist entry.
+  game in the play history of a person, a borrowed game, or a wishlist entry.
 - **G3. Stable ids.** Every record id is a uuid4 hex string. A person is a Home Assistant
   person by its collection id, never by its entity id.
 - **G4. Safe loads.** A missing or damaged section loads as empty. A new section needs no
@@ -43,7 +43,7 @@ only code that changes the document.
 | `shelves` | `{id: shelf}` | `unit_id`, `name`, `order` |
 | `games` | `{id: game}` | `models.GAME_FIELDS`, `cover`, `wishlist`, time stamps |
 | `copies` | `{id: copy}` | `game_id` and `models.COPY_FIELDS` |
-| `reading` | `{person_id: {game_id: row}}` | `models.READING_FIELDS` and `updated_at` |
+| `progress` | `{person_id: {game_id: {platform: row}}}` | `models.PROGRESS_FIELDS`, `updated_at` |
 | `loans` | `{id: loan}` | `direction`, `game_id`, `copy_id`, `party`, dates, `hk_task_id` |
 | `people` | `{person_id: settings}` | `models.PERSON_FIELDS` |
 | `todo_orphans` | `[{entity_id, uid}]` | To-do items that the wishlist sync must remove |
@@ -87,10 +87,13 @@ listener. A listener that fails is logged and the others still run. The listener
 - **Locations.** A room with units, a unit with shelves and a shelf with copies
   fail to delete with a localized error, unless `force: true`. With `force`, each child
   is removed and each copy moves to no shelf.
-- **Game delete.** Deleting a game deletes its copies, reading rows and loans, and the
+- **Game delete.** Deleting a game deletes its copies, progress rows and loans, and the
   cover file. Its wishlist to-do item goes to `todo_orphans`.
-- **Reading.** `set_reading` with status `none` removes the row. A borrowed game sets the
-  status of the person to `reading` if it is `want` or absent.
+- **Progress.** A person has 1 row for each platform of a game. `set_progress` with
+  `play_status: none` removes the row. With no `platform`, the store uses the platform of
+  the copies if they have only 1, else it refuses with `platform_required`. `completed`
+  sets `completed_at` and adds 1 to `completion_count`; `playing` sets `started_at`.
+  A loan does not change the progress.
 - **Loans.** A copy has at most 1 open loan. A lent copy keeps its shelf.
 - **Overdue.** `fire_overdue` marks each loan that passed its due date with
   `overdue_fired`, so `loan_overdue` fires once for each due date.
@@ -120,6 +123,6 @@ listener. A listener that fails is logged and the others still run. The listener
 ## One-way doors
 
 - The storage key, the section names and the field names of each record.
-- The enum values: `models.FORMATS`, `models.CONDITIONS`, `models.STATUSES`,
-  `models.DIRECTIONS` and `models.COVER_KINDS`.
+- The enum values: `models.FORMATS`, `models.CONDITIONS`, `models.PLATFORMS`,
+  `models.PLAY_STATUSES`, `models.DIRECTIONS` and `models.COVER_KINDS`.
 - Dates as `YYYY-MM-DD` and time stamps as aware ISO 8601.

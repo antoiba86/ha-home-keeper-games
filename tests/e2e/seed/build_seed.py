@@ -310,56 +310,63 @@ COPIES = [
     ("tomorrow", "a4", "hardcover", "fine", "2022-07-05", "", 28, None, False, False, ""),
 ]
 
-# (game, person, status, rating, page, started, finished, read_count, private notes,
-#  updated_at)
-READING = [
-    ("left_hand", ALEX, "read", 4, None, "2025-02-01", "2025-03-02", 2,
+# (game, person, play status, rating, play time in minutes, started, completed,
+#  completion count, review, updated_at). Each row is on the platform of the first
+#  copy of the game (``other`` with no copy), except the rows in PROGRESS_PLATFORM.
+PROGRESS = [
+    ("left_hand", ALEX, "completed", 4, None, "2025-02-01", "2025-03-02", 2,
      "Reread before the club.", "2026-09-20T10:00:00+00:00"),
-    ("left_hand", SAM, "reading", None, 112, "2026-09-01", None, 0, "",
+    ("left_hand", SAM, "playing", None, 112, "2026-09-01", None, 0, "",
      "2026-10-03T19:30:00+00:00"),
-    ("earthsea", ALEX, "read", 5, None, None, "2026-02-11", 1, "", "2026-02-11T21:00:00+00:00"),
-    ("earthsea", JO, "read", 4, None, None, "2026-08-30", 1, "", "2026-08-30T19:00:00+00:00"),
-    ("dispossessed", ALEX, "read", 5, None, None, "2026-04-20", 1, "",
+    ("earthsea", ALEX, "completed", 5, None, None, "2026-02-11", 1, "", "2026-02-11T21:00:00+00:00"),
+    ("earthsea", JO, "completed", 4, None, None, "2026-08-30", 1, "", "2026-08-30T19:00:00+00:00"),
+    ("dispossessed", ALEX, "completed", 5, None, None, "2026-04-20", 1, "",
      "2026-04-20T22:00:00+00:00"),
-    ("lathe", ALEX, "want", None, None, None, None, 0, "", "2026-05-01T10:00:00+00:00"),
-    ("atuan", JO, "reading", None, 40, "2026-09-28", None, 0, "", "2026-10-02T18:00:00+00:00"),
-    ("atuan", ALEX, "want", None, None, None, None, 0, "", "2026-08-31T10:00:00+00:00"),
-    ("word_world", SAM, "read", 3, None, None, "2026-06-01", 1, "", "2026-06-01T20:00:00+00:00"),
-    ("piranesi", ALEX, "read", 5, None, "2026-09-20", "2026-10-03", 1, "",
+    ("lathe", ALEX, "backlog", None, None, None, None, 0, "", "2026-05-01T10:00:00+00:00"),
+    ("atuan", JO, "playing", None, 40, "2026-09-28", None, 0, "", "2026-10-02T18:00:00+00:00"),
+    ("atuan", ALEX, "backlog", None, None, None, None, 0, "", "2026-08-31T10:00:00+00:00"),
+    ("word_world", SAM, "completed", 3, None, None, "2026-06-01", 1, "", "2026-06-01T20:00:00+00:00"),
+    ("piranesi", ALEX, "completed", 5, None, "2026-09-20", "2026-10-03", 1, "",
      "2026-10-03T21:45:00+00:00"),
-    ("piranesi", SAM, "want", None, None, None, None, 0, "", "2026-10-04T08:00:00+00:00"),
-    ("hail_mary", ALEX, "reading", None, 210, "2026-09-25", None, 0, "",
+    ("piranesi", SAM, "backlog", None, None, None, None, 0, "", "2026-10-04T08:00:00+00:00"),
+    ("hail_mary", ALEX, "playing", None, 210, "2026-09-25", None, 0, "",
      "2026-10-04T07:10:00+00:00"),
-    ("hail_mary", SAM, "want", None, None, None, None, 0, "", "2026-09-26T10:00:00+00:00"),
-    ("fifth_season", ALEX, "read", 5, None, None, "2026-05-14", 1, "",
+    ("hail_mary", SAM, "backlog", None, None, None, None, 0, "", "2026-09-26T10:00:00+00:00"),
+    ("fifth_season", ALEX, "completed", 5, None, None, "2026-05-14", 1, "",
      "2026-05-14T22:00:00+00:00"),
-    ("dune", ALEX, "read", 4, None, None, "2024-12-01", 1, "", "2024-12-01T22:00:00+00:00"),
-    ("dune", JO, "dnf", None, 140, None, None, 0, "", "2026-07-12T10:00:00+00:00"),
-    ("klara", SAM, "read", 4, None, None, "2026-09-28", 1, "", "2026-09-28T21:00:00+00:00"),
-    ("grain_rice", ALEX, "reading", None, 80, "2026-08-01", None, 0, "",
+    ("dune", ALEX, "completed", 4, None, None, "2024-12-01", 1, "", "2024-12-01T22:00:00+00:00"),
+    ("dune", JO, "abandoned", None, 140, None, None, 0, "", "2026-07-12T10:00:00+00:00"),
+    ("klara", SAM, "completed", 4, None, None, "2026-09-28", 1, "", "2026-09-28T21:00:00+00:00"),
+    ("grain_rice", ALEX, "playing", None, 80, "2026-08-01", None, 0, "",
      "2026-09-12T18:00:00+00:00"),
-    ("geb", ALEX, "dnf", 3, 320, None, None, 0, "Try again one day.",
+    ("geb", ALEX, "abandoned", 3, 320, None, None, 0, "Try again one day.",
      "2025-11-11T10:00:00+00:00"),
-    ("overstory", SAM, "read", 5, None, None, "2026-03-03", 1, "", "2026-03-03T21:00:00+00:00"),
-    ("hobbit", JO, "read", 5, None, None, "2026-07-07", 1, "", "2026-07-07T19:00:00+00:00"),
-    ("hobbit", ALEX, "read", None, None, None, "2019-01-01", 1, "", "2019-01-01T10:00:00+00:00"),
-    ("wild_things", JO, "read", None, None, None, "2026-01-02", 12, "",
+    ("overstory", SAM, "completed", 5, None, None, "2026-03-03", 1, "", "2026-03-03T21:00:00+00:00"),
+    ("hobbit", JO, "completed", 5, None, None, "2026-07-07", 1, "", "2026-07-07T19:00:00+00:00"),
+    ("hobbit", ALEX, "completed", None, None, None, "2019-01-01", 1, "", "2019-01-01T10:00:00+00:00"),
+    ("wild_things", JO, "completed", None, None, None, "2026-01-02", 12, "",
      "2026-01-02T19:00:00+00:00"),
-    ("chinese_1", ALEX, "reading", None, 150, "2026-01-08", None, 0, "",
+    ("chinese_1", ALEX, "playing", None, 150, "2026-01-08", None, 0, "",
      "2026-09-30T18:00:00+00:00"),
-    ("pragmatic", ALEX, "read", 4, None, None, "2026-07-20", 1, "", "2026-07-20T22:00:00+00:00"),
-    ("sapiens", SAM, "dnf", None, 120, None, None, 0, "", "2026-04-04T10:00:00+00:00"),
-    ("memory_empire", ALEX, "read", 4, None, None, "2026-08-08", 1, "",
+    ("pragmatic", ALEX, "completed", 4, None, None, "2026-07-20", 1, "", "2026-07-20T22:00:00+00:00"),
+    ("sapiens", SAM, "abandoned", None, 120, None, None, 0, "", "2026-04-04T10:00:00+00:00"),
+    ("memory_empire", ALEX, "completed", 4, None, None, "2026-08-08", 1, "",
      "2026-08-08T22:00:00+00:00"),
-    ("ministry", ALEX, "reading", None, 300, "2026-09-01", None, 0, "",
+    ("ministry", ALEX, "playing", None, 300, "2026-09-01", None, 0, "",
      "2026-09-29T21:00:00+00:00"),
-    ("tomorrow", SAM, "reading", None, 20, "2026-10-01", None, 0, "",
+    ("tomorrow", SAM, "playing", None, 20, "2026-10-01", None, 0, "",
      "2026-10-01T22:00:00+00:00"),
-    ("spinning", ALEX, "reading", None, 64, "2026-09-21", None, 0, "",
+    ("spinning", ALEX, "playing", None, 64, "2026-09-21", None, 0, "",
      "2026-10-01T20:00:00+00:00"),
-    ("sea_tranquility", SAM, "want", None, None, None, None, 0, "",
+    ("sea_tranquility", SAM, "backlog", None, None, None, None, 0, "",
      "2026-09-25T10:00:00+00:00"),
+    ("left_hand", ALEX, "playing", None, 95, "2026-10-01", None, 0, "",
+     "2026-10-04T09:00:00+00:00"),
 ]
+
+# (game, person, index in PROGRESS of that game and person) to platform, for a
+# person with rows on more than 1 platform.
+PROGRESS_PLATFORM = {("left_hand", ALEX, 1): "switch"}
 
 # (key, direction, game, copy index of the game or None, party, person, format,
 #  started, due, returned, note)
@@ -387,9 +394,9 @@ WISHLIST = [
 ]
 
 PEOPLE = {
-    ALEX: {"share_reading": True, "wishlist_todo": "todo.alex_books", "yearly_goal": 24},
-    SAM: {"share_reading": True, "wishlist_todo": None, "yearly_goal": 12},
-    JO: {"share_reading": True, "wishlist_todo": None, "yearly_goal": None},
+    ALEX: {"share_progress": True, "wishlist_todo": "todo.alex_books", "yearly_goal": 24},
+    SAM: {"share_progress": True, "wishlist_todo": None, "yearly_goal": 12},
+    JO: {"share_progress": True, "wishlist_todo": None, "yearly_goal": None},
 }
 
 # fmt: on
@@ -484,31 +491,39 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
         copy["id"] = seed_id("copy", f"{game}:{index}")
         copy_ids[game].append(copy["id"])
         state["copies"][copy["id"]] = copy
+    seen: dict[tuple[str, str], int] = {}
     for (
         game,
         person,
         status,
         rating,
-        page,
+        minutes,
         started,
-        finished,
+        completed,
         count,
-        notes,
+        review,
         at,
-    ) in READING:
-        row = models.empty_reading(now=at)
+    ) in PROGRESS:
+        index = seen.get((game, person), 0)
+        seen[(game, person)] = index + 1
+        first = copy_ids.get(game, [None])[0]
+        platform = PROGRESS_PLATFORM.get((game, person, index)) or (
+            state["copies"][first]["platform"] if first else "other"
+        )
+        row = models.empty_progress(now=at)
         row.update(
             {
-                "status": status,
+                "play_status": status,
                 "rating": rating,
-                "page": page,
-                "started": started,
-                "finished": finished,
-                "read_count": count,
-                "private_notes": notes,
+                "playtime_minutes": minutes,
+                "started_at": started,
+                "completed_at": completed,
+                "completion_count": count,
+                "review": review,
             }
         )
-        state["reading"].setdefault(person, {})[seed_id("book", game)] = row
+        games = state["progress"].setdefault(person, {})
+        games.setdefault(seed_id("book", game), {})[platform] = row
     for (
         key,
         direction,

@@ -5,6 +5,17 @@ Each change that a user can see is in this file. The format is based on
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). `manifest.json` `version`
 is the single source of truth (see `RELEASE.md`).
 
+## [0.5.0b5] - 2026-11-24
+
+### Changed
+
+- **[Play progress for each platform](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/work-in-progress#play-progress).**
+  In place of a reading status, each person has a play status, a rating, the play time,
+  dates, a completion count and a private review for each platform of a game. The card,
+  the Backlog to-do list and the sensors use it, and `set_reading` is now `set_progress`
+  with a `platform` field, so update each automation that uses the reading services,
+  events or entities.
+
 ## [0.5.0b4] - 2026-11-23
 
 ### Changed

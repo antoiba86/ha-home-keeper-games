@@ -50,16 +50,16 @@
       "loans_overdue": {
         "name": "Loans overdue"
       },
-      "games_read_this_year": {
-        "name": "{person} books read this year"
+      "games_completed_this_year": {
+        "name": "{person} games completed this year"
       },
-      "reading_now": {
-        "name": "{person} reading now"
+      "playing_now": {
+        "name": "{person} playing now"
       }
     },
     "todo": {
-      "to_read": {
-        "name": "{person} to read"
+      "backlog": {
+        "name": "{person} backlog"
       }
     }
   },
@@ -550,45 +550,53 @@
         }
       }
     },
-    "set_reading": {
-      "name": "Set reading status",
-      "description": "Set the reading status of a book for a person. A non-admin user can set only their own status.",
+    "set_progress": {
+      "name": "Set progress",
+      "description": "Set the progress of a game on a platform for a person. A non-admin user can set only their own progress.",
       "fields": {
         "game_id": {
-          "name": "Book",
-          "description": "The ID of the book."
+          "name": "Game",
+          "description": "The ID of the game."
         },
         "person_id": {
           "name": "Person",
           "description": "The ID of the Home Assistant person."
         },
-        "status": {
-          "name": "Status",
-          "description": "The reading status."
+        "platform": {
+          "name": "Platform",
+          "description": "The console. Empty to use the platform of the copies of the game."
+        },
+        "play_status": {
+          "name": "Play status",
+          "description": "The play status. none removes the progress."
         },
         "rating": {
           "name": "Rating",
           "description": "A rating from 1 to 5."
         },
-        "page": {
-          "name": "Page",
-          "description": "The current page."
+        "playtime_minutes": {
+          "name": "Play time",
+          "description": "The play time in minutes."
         },
-        "started": {
+        "started_at": {
           "name": "Started",
           "description": "The start date."
         },
-        "finished": {
-          "name": "Finished",
-          "description": "The date when the book was finished."
+        "completed_at": {
+          "name": "Completed",
+          "description": "The date when the game was completed."
         },
-        "read_count": {
-          "name": "Read count",
-          "description": "The number of times that the book was read."
+        "last_played_at": {
+          "name": "Last played",
+          "description": "The date when the game was last played."
         },
-        "private_notes": {
-          "name": "Private notes",
-          "description": "Notes that only the person can read."
+        "completion_count": {
+          "name": "Completions",
+          "description": "The number of times that the game was completed."
+        },
+        "review": {
+          "name": "Review",
+          "description": "A review that only the person can read."
         }
       }
     },
@@ -806,13 +814,13 @@
           "name": "Person",
           "description": "The ID of the Home Assistant person."
         },
-        "share_reading": {
-          "name": "Share reading status",
-          "description": "Other users can see the status. When off, the sensors and the to-do list of the person are unavailable."
+        "share_progress": {
+          "name": "Share progress",
+          "description": "Other users can see the progress. When off, the sensors and the to-do list of the person are unavailable."
         },
         "yearly_goal": {
           "name": "Yearly goal",
-          "description": "The number of books to read this year."
+          "description": "The number of games to complete this year."
         },
         "wishlist_todo": {
           "name": "Wishlist list",
@@ -846,13 +854,13 @@
           "name": "Shelf",
           "description": "The ID of the shelf. Empty for no shelf."
         },
-        "import_notes": {
-          "name": "Import notes",
-          "description": "Import the reviews and notes as private notes."
+        "import_review": {
+          "name": "Import reviews",
+          "description": "Import the reviews of the file as private reviews."
         },
-        "replace_reading": {
-          "name": "Replace reading status",
-          "description": "Replace a reading status that exists."
+        "replace_progress": {
+          "name": "Replace progress",
+          "description": "Replace the progress that exists."
         },
         "dry_run": {
           "name": "Dry run",
@@ -890,9 +898,9 @@
           "name": "Owned",
           "description": "Only books with a copy, or only books with no copy."
         },
-        "status": {
-          "name": "Status",
-          "description": "The reading status."
+        "play_status": {
+          "name": "Play status",
+          "description": "The play status of the person on a platform."
         },
         "person_id": {
           "name": "Person",
@@ -1013,6 +1021,9 @@
     },
     "person_not_found": {
       "message": "No person has the ID {id}."
+    },
+    "platform_required": {
+      "message": "Select the platform. The copies of the game are on more than 1 platform, or the game has no copy."
     },
     "no_person": {
       "message": "Your user has no Home Assistant person. Link a person to the user."

@@ -7,24 +7,25 @@ events to react to a change.
 ## Services
 
 The services are in **Developer tools → Actions**, with a description of each field.
-Most services are admin-only. `set_reading`, `set_person_settings` and the read services
+Most services are admin-only. `set_progress`, `set_person_settings` and the read services
 are open to every user, for their own person
 ([People and privacy](../start/people-and-privacy.md)).
 
-Example: set the status Read when an NFC tag on the unit is scanned.
+Example: set the status Completed when an NFC tag on the unit is scanned.
 
 ```yaml
 automation:
-  - alias: Finished a game
+  - alias: Completed a game
     triggers:
       - trigger: tag
-        tag_id: bedside-game
+        tag_id: console-shelf
     actions:
-      - action: home_keeper_games.set_reading
+      - action: home_keeper_games.set_progress
         data:
           game_id: "5f0c1b2a9d8e4f7a8b6c5d4e3f2a1b0c"
           person_id: "alice"
-          status: read
+          platform: switch
+          play_status: completed
 ```
 
 A read service returns a response. Example: find the shelf of a game.
@@ -44,7 +45,7 @@ actions:
 ## Events
 
 The library fires an event for each change, such as
-`home_keeper_games_game_finished`, `home_keeper_games_loan_started` and
+`home_keeper_games_game_completed`, `home_keeper_games_loan_started` and
 `home_keeper_games_loan_overdue`. Use them with an **Event** trigger.
 
 ```yaml
@@ -66,11 +67,11 @@ automation:
 | **Games** | The games with 1 copy or more |
 | **Loans out** | The open loans of lent copies |
 | **Loans overdue** | The open loans past their due date |
-| *Person* **games read this year** | The games read this year, with the goal |
-| *Person* **reading now** | The games with status Reading, with their titles |
-| *Person* **to read** | A to-do list of the games with status Want to read |
+| *Person* **games completed this year** | The games completed this year on any platform, with the goal |
+| *Person* **playing now** | The games with status Playing, with their titles |
+| *Person* **backlog** | A to-do list of the games with status Backlog, 1 item for each platform |
 
-Complete an item of a **to read** list to set the status Read. Add an item to add a game
+Complete an item of a **backlog** list to set the status Completed on that platform. Add an item to add a game
 to the list. The per-person entities follow the privacy rules in
 [People and privacy](../start/people-and-privacy.md#entities).
 

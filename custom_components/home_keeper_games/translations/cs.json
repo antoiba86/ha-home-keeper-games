@@ -50,16 +50,16 @@
       "loans_overdue": {
         "name": "Výpůjčky po termínu"
       },
-      "games_read_this_year": {
-        "name": "{person} přečtené knihy letos"
+      "games_completed_this_year": {
+        "name": "{person} hry dohrané letos"
       },
-      "reading_now": {
-        "name": "{person} právě čte"
+      "playing_now": {
+        "name": "{person} právě hraje"
       }
     },
     "todo": {
-      "to_read": {
-        "name": "{person} chce číst"
+      "backlog": {
+        "name": "{person} hry k zahrání"
       }
     }
   },
@@ -550,45 +550,53 @@
         }
       }
     },
-    "set_reading": {
-      "name": "Nastavit stav čtení",
-      "description": "Nastavit stav čtení knihy pro osobu. Uživatel bez práv správce může nastavit jen svůj vlastní stav.",
+    "set_progress": {
+      "name": "Nastavit postup",
+      "description": "Nastaví postup hry na platformě pro osobu. Uživatel bez práv správce může nastavit jen svůj postup.",
       "fields": {
         "game_id": {
-          "name": "Kniha",
-          "description": "ID knihy."
+          "name": "Hra",
+          "description": "ID hry."
         },
         "person_id": {
           "name": "Osoba",
           "description": "ID osoby v Home Assistant."
         },
-        "status": {
-          "name": "Stav čtení",
-          "description": "Stav čtení."
+        "platform": {
+          "name": "Platforma",
+          "description": "Konzole. Prázdné pro použití platformy kopií hry."
+        },
+        "play_status": {
+          "name": "Stav hraní",
+          "description": "Stav hraní. none odebere postup."
         },
         "rating": {
           "name": "Hodnocení",
           "description": "Hodnocení od 1 do 5."
         },
-        "page": {
-          "name": "Strana",
-          "description": "Aktuální strana."
+        "playtime_minutes": {
+          "name": "Herní čas",
+          "description": "Herní čas v minutách."
         },
-        "started": {
+        "started_at": {
           "name": "Začato",
           "description": "Datum začátku."
         },
-        "finished": {
-          "name": "Dočteno",
-          "description": "Datum, kdy byla kniha dočtena."
+        "completed_at": {
+          "name": "Dohráno",
+          "description": "Datum, kdy byla hra dohrána."
         },
-        "read_count": {
-          "name": "Počet přečtení",
-          "description": "Kolikrát byla kniha přečtena."
+        "last_played_at": {
+          "name": "Naposledy hráno",
+          "description": "Datum, kdy byla hra naposledy hrána."
         },
-        "private_notes": {
-          "name": "Soukromé poznámky",
-          "description": "Poznámky, které může číst jen tato osoba."
+        "completion_count": {
+          "name": "Počet dohrání",
+          "description": "Kolikrát byla hra dohrána."
+        },
+        "review": {
+          "name": "Recenze",
+          "description": "Recenze, kterou může číst jen tato osoba."
         }
       }
     },
@@ -806,13 +814,13 @@
           "name": "Osoba",
           "description": "ID osoby v Home Assistant."
         },
-        "share_reading": {
-          "name": "Sdílet stav čtení",
-          "description": "Ostatní uživatelé vidí stav. Když je vypnuto, senzory a seznam úkolů osoby nejsou dostupné."
+        "share_progress": {
+          "name": "Sdílet postup",
+          "description": "Ostatní uživatelé vidí postup. Když je vypnuto, senzory a seznam úkolů osoby nejsou dostupné."
         },
         "yearly_goal": {
           "name": "Roční cíl",
-          "description": "Počet knih k přečtení v tomto roce."
+          "description": "Počet her, které letos dohrát."
         },
         "wishlist_todo": {
           "name": "Seznam přání",
@@ -846,13 +854,13 @@
           "name": "Police",
           "description": "ID police. Prázdné pro žádnou polici."
         },
-        "import_notes": {
-          "name": "Importovat poznámky",
-          "description": "Importovat recenze a poznámky jako soukromé poznámky."
+        "import_review": {
+          "name": "Importovat recenze",
+          "description": "Importovat recenze ze souboru jako soukromé recenze."
         },
-        "replace_reading": {
-          "name": "Nahradit stav čtení",
-          "description": "Nahradit existující stav čtení."
+        "replace_progress": {
+          "name": "Nahradit postup",
+          "description": "Nahradit existující postup."
         },
         "dry_run": {
           "name": "Zkušební běh",
@@ -890,9 +898,9 @@
           "name": "Vlastněno",
           "description": "Jen knihy s výtiskem, nebo jen knihy bez výtisku."
         },
-        "status": {
-          "name": "Stav čtení",
-          "description": "Stav čtení."
+        "play_status": {
+          "name": "Stav hraní",
+          "description": "Stav hraní osoby na platformě."
         },
         "person_id": {
           "name": "Osoba",
@@ -1013,6 +1021,9 @@
     },
     "person_not_found": {
       "message": "Žádná osoba nemá ID {id}."
+    },
+    "platform_required": {
+      "message": "Vyberte platformu. Kopie hry jsou na více než 1 platformě, nebo hra nemá kopii."
     },
     "no_person": {
       "message": "Váš uživatel nemá osobu v Home Assistant. Propojte osobu s uživatelem."

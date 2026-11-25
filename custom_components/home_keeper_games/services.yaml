@@ -483,7 +483,7 @@ set_cover:
       selector:
         text:
 
-set_reading:
+set_progress:
   fields:
     game_id:
       required: true
@@ -492,14 +492,27 @@ set_reading:
     person_id:
       selector:
         text:
-    status:
+    platform:
       selector:
         select:
           options:
-            - want
-            - reading
-            - read
-            - dnf
+            - ps5
+            - ps4
+            - ps3
+            - switch2
+            - switch
+            - xbox_series
+            - xbox_one
+            - pc
+            - other
+    play_status:
+      selector:
+        select:
+          options:
+            - backlog
+            - playing
+            - completed
+            - abandoned
             - none
     rating:
       selector:
@@ -507,25 +520,28 @@ set_reading:
           min: 1
           max: 5
           mode: "slider"
-    page:
+    playtime_minutes:
       selector:
         number:
           min: 0
-          max: 100000
+          max: 10000000
           mode: "box"
-    started:
+    started_at:
       selector:
         date:
-    finished:
+    completed_at:
       selector:
         date:
-    read_count:
+    last_played_at:
+      selector:
+        date:
+    completion_count:
       selector:
         number:
           min: 0
-          max: 100000
+          max: 1000
           mode: "box"
-    private_notes:
+    review:
       selector:
         text:
           multiline: true
@@ -723,7 +739,7 @@ set_person_settings:
       required: true
       selector:
         text:
-    share_reading:
+    share_progress:
       selector:
         boolean:
     yearly_goal:
@@ -758,10 +774,10 @@ import_csv:
     shelf_id:
       selector:
         text:
-    import_notes:
+    import_review:
       selector:
         boolean:
-    replace_reading:
+    replace_progress:
       selector:
         boolean:
     dry_run:
@@ -807,14 +823,14 @@ list_games:
     owned:
       selector:
         boolean:
-    status:
+    play_status:
       selector:
         select:
           options:
-            - want
-            - reading
-            - read
-            - dnf
+            - backlog
+            - playing
+            - completed
+            - abandoned
     person_id:
       selector:
         text:

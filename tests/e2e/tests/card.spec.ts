@@ -2,7 +2,7 @@ import { expect, openCard, test, userState } from './helpers';
 
 /**
  * The card on a dashboard for Sam, a user who is not an admin. The card shows the
- * reading of Sam, the shared reading of the household, and nothing private: the
+ * progress of Sam, the shared progress of the household, and nothing private: the
  * backend projection leaves out the prices, the values and the loan parties.
  */
 test.describe('Card for a user who is not an admin', { tag: '@responsive' }, () => {
@@ -12,11 +12,11 @@ test.describe('Card for a user who is not an admin', { tag: '@responsive' }, () 
     const card = await openCard(page);
     await expect(card.locator('.head h2')).toHaveText('Library: Sam');
     await expect(card).toContainText('The Left Hand of Darkness');
-    await expect(card).toContainText('Page 112');
+    await expect(card).toContainText('112 min played');
     await expect(card).toContainText('Tomorrow, and Tomorrow, and Tomorrow');
-    // The reading of Alex shows only as household activity, never as Sam's.
-    await expect(card.locator('.sec').filter({ hasText: 'Reading' }).first()).not.toContainText('Project Hail Mary');
-    await expect(card).toContainText('Alex: read Piranesi');
+    // The progress of Alex shows only as household activity, never as Sam's.
+    await expect(card.locator('.sec').filter({ hasText: 'Playing' }).first()).not.toContainText('Project Hail Mary');
+    await expect(card).toContainText('Alex: completed Piranesi');
     await expect(card).not.toContainText('€');
 
     const state = await userState();
@@ -28,8 +28,10 @@ test.describe('Card for a user who is not an admin', { tag: '@responsive' }, () 
     }
     for (const loan of state.loans) expect(loan).not.toHaveProperty('party');
     for (const game of state.games) {
-      for (const [pid, row] of Object.entries(game.reading as Record<string, Record<string, unknown>>)) {
-        if (pid !== 'sam') expect(row).not.toHaveProperty('private_notes');
+      const people = game.progress as Record<string, Record<string, Record<string, unknown>>>;
+      for (const [pid, rows] of Object.entries(people)) {
+        if (pid === 'sam') continue;
+        for (const row of Object.values(rows)) expect(row).not.toHaveProperty('review');
       }
     }
   });

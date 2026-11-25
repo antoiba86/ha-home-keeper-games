@@ -5,9 +5,9 @@
  *   bash ci/capture-video.sh        # writes docs/videos/walkthrough.{webm,mp4,gif}
  *
  * The tour: open the Library tab in Home Keeper, browse the grid, search, open a
- * game, set the reading status, scan a stored barcode and a new barcode into a shelf,
- * give the title of the new game, lend a game with a Home Keeper task, see the loan, and
- * open the card on a dashboard. `BEAT` pauses
+ * game, set the play status on a platform, add another platform chip, scan a stored
+ * barcode and a new barcode into a shelf, give the title of the new game, lend a game
+ * with a Home Keeper task, see the loan, and open the card on a dashboard. `BEAT` pauses
  * let each step read in the video. The tour puts the seed back at the end.
  *
  * The recording needs its own context: `recordVideo` is set when a context is made.
@@ -15,7 +15,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { resolve } from 'node:path';
 import { library } from './ha-ws';
-import { adminState, gameByTitle, gamesWithCode, noServiceWorker, openCard, openTab, restoreReading } from './tests/helpers';
+import { adminState, gameByTitle, gamesWithCode, noServiceWorker, openCard, openTab, restoreProgress } from './tests/helpers';
 import { DESKTOP } from './viewports';
 
 const OUT = process.env.VIDEO_DIR || '/tmp/home-keeper-games-video';
@@ -47,7 +47,7 @@ async function cleanUp(): Promise<void> {
 test('record the Library walkthrough', async ({ browser }) => {
   await cleanUp();
   const status = await gameByTitle(STATUS_TITLE);
-  const seedRow = status.reading.alex;
+  const seedRow = status.progress.alex?.ps4;
   const context = await browser.newContext({
     storageState: './.auth/state.json',
     viewport: DESKTOP,
@@ -71,12 +71,21 @@ test('record the Library walkthrough', async ({ browser }) => {
     await expect(tab.locator('h1')).toHaveText(STATUS_TITLE);
     await beat(page);
 
-    // 3. Set the reading status and a rating.
-    await tab.locator('[data-k="rs-reading"]').click();
-    await expect(tab.locator('[data-k="rs-reading"]')).toHaveAttribute('aria-pressed', 'true');
+    // 3. Set the play status and a rating on the PS4 chip.
+    await expect(tab.locator('[data-k="pp-ps4"]')).toHaveAttribute('aria-pressed', 'true');
+    await tab.locator('[data-k="rs-playing"]').click();
+    await expect(tab.locator('[data-k="rs-playing"]')).toHaveAttribute('aria-pressed', 'true');
     await beat(page);
     await tab.locator('[data-k="star-4"]').click();
     await expect(tab.locator('.hkl-star.on')).toHaveCount(4);
+    await beat(page);
+
+    // 3a. Each platform has its own progress: add a PC chip, then go back to PS4.
+    await tab.locator('[data-k="pp-add"]').selectOption('pc');
+    await expect(tab.locator('[data-k="pp-pc"]')).toHaveAttribute('aria-pressed', 'true');
+    await beat(page, 2);
+    await tab.locator('[data-k="pp-ps4"]').click();
+    await expect(tab.locator('[data-k="rs-playing"]')).toHaveAttribute('aria-pressed', 'true');
     await beat(page);
 
     // 3b. A copy has a platform, a format and the barcode of its case.
@@ -172,6 +181,6 @@ test('record the Library walkthrough', async ({ browser }) => {
     await context.close();
     if (video) await video.saveAs(resolve(OUT, 'walkthrough.webm'));
     await cleanUp();
-    await restoreReading(status.id, 'alex', seedRow);
+    await restoreProgress(status.id, 'alex', 'ps4', seedRow);
   }
 });

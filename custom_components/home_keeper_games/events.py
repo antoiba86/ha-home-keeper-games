@@ -104,48 +104,57 @@ def copy_moved_event_data(
     }
 
 
-def reading_changed_event_data(
+def progress_changed_event_data(
     game: dict[str, Any],
     person_id: str,
-    status: str | None,
+    platform: str,
+    play_status: str | None,
     previous_status: str | None,
     origin: str | None,
 ) -> dict[str, Any]:
-    """The payload of ``reading_changed``. ``status`` is None for a removed row."""
+    """The payload of ``progress_changed``. ``play_status`` is None for no row."""
     return {
         **game_event_data(game, origin, person_id),
-        "status": status,
+        "platform": platform,
+        "play_status": play_status,
         "previous_status": previous_status,
     }
 
 
-def reading_updated_event_data(
+def progress_updated_event_data(
     game: dict[str, Any],
     person_id: str,
-    status: str,
+    platform: str,
+    play_status: str,
     changed_fields: list[str],
     origin: str | None,
 ) -> dict[str, Any]:
-    """The payload of ``reading_updated``: a change that keeps the status.
+    """The payload of ``progress_updated``: a change that keeps the play status.
 
-    It names the fields, so the private notes of a person never go on the bus.
+    It names the fields, so the private review of a person never goes on the bus.
     """
     return {
         **game_event_data(game, origin, person_id),
-        "status": status,
+        "platform": platform,
+        "play_status": play_status,
         "changed_fields": list(changed_fields),
     }
 
 
-def game_finished_event_data(
-    game: dict[str, Any], person_id: str, row: dict[str, Any], origin: str | None
+def game_completed_event_data(
+    game: dict[str, Any],
+    person_id: str,
+    platform: str,
+    row: dict[str, Any],
+    origin: str | None,
 ) -> dict[str, Any]:
-    """The payload of ``game_finished``."""
+    """The payload of ``game_completed``."""
     return {
         **game_event_data(game, origin, person_id),
-        "finished": row.get("finished"),
+        "platform": platform,
+        "completed_at": row.get("completed_at"),
         "rating": row.get("rating"),
-        "read_count": row.get("read_count", 0),
+        "completion_count": row.get("completion_count", 0),
     }
 
 
@@ -202,7 +211,7 @@ def import_completed_event_data(
         "games_added": int(summary.get("games_added", 0)),
         "games_matched": int(summary.get("games_matched", 0)),
         "copies_added": int(summary.get("copies_added", 0)),
-        "reading_set": int(summary.get("reading_set", 0)),
+        "progress_set": int(summary.get("progress_set", 0)),
         "wishlist_added": int(summary.get("wishlist_added", 0)),
         "errors": int(summary.get("errors", 0)),
         "origin": origin,

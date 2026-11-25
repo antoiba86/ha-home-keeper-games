@@ -25,8 +25,8 @@ async def test_get_state_shape_and_projection(hass, setup_entry, call, ws) -> No
     copy = (await call("add_copy", {"game_id": game["id"], "price": 9}))["copy"]
     await call("lend_game", {"copy_id": copy["id"], "party": "Zed"})
     await call(
-        "set_reading",
-        {"game_id": game["id"], "person_id": CAROL, "private_notes": "secret"},
+        "set_progress",
+        {"game_id": game["id"], "person_id": CAROL, "review": "secret"},
     )
     admin = await ws("admin")
     reply = await _send(admin, type=WS + "get_state")
@@ -49,13 +49,13 @@ async def test_get_state_shape_and_projection(hass, setup_entry, call, ws) -> No
     assert result["currency"] == "EUR" and result["home_keeper"] == {"tab": True}
     assert result["copies"][0]["price"] == 9 and result["loans"][0]["party"] == "Zed"
     assert result["games"][0]["owned"] is True
-    assert result["games"][0]["reading"][CAROL]["private_notes"] == "secret"
+    assert result["games"][0]["progress"][CAROL]["other"]["review"] == "secret"
     user = await ws("user")
     reply = await _send(user, type=WS + "get_state")
     result = reply["result"]
     assert result["me"]["person_id"] == BOB and result["me"]["is_admin"] is False
     assert "price" not in result["copies"][0] and "party" not in result["loans"][0]
-    assert "private_notes" not in result["games"][0]["reading"][CAROL]
+    assert "review" not in result["games"][0]["progress"][CAROL]["other"]
 
 
 async def test_subscribe_pushes_changes(hass, setup_entry, call, ws) -> None:
@@ -95,9 +95,10 @@ async def test_twin_commands_share_the_gate(hass, setup_entry, ws) -> None:
     assert reply["error"]["code"] == "unauthorized"
     game = await _send(admin, type=WS + "add_game", title="Dune")
     game_id = game["result"]["game"]["id"]
-    reply = await _send(user, type=WS + "set_reading", game_id=game_id, status="read")
+    key = {"type": WS + "set_progress", "game_id": game_id, "platform": "pc"}
+    reply = await _send(user, **key, play_status="completed")
     assert reply["success"] and reply["result"]["person_id"] == BOB
-    reply = await _send(user, type=WS + "set_reading", game_id=game_id, person_id=ALICE)
+    reply = await _send(user, **key, person_id=ALICE)
     assert reply["error"]["code"] == "unauthorized"
     reply = await _send(user, type=WS + "list_todo_entities")
     assert reply["error"]["code"] == "unauthorized"
@@ -118,26 +119,40 @@ async def test_sensors(hass, setup_entry, call) -> None:
     await call("add_copy", {"game_id": game["id"]})
     await call("set_person_settings", {"person_id": ALICE, "yearly_goal": 12})
     await call(
-        "set_reading", {"game_id": game["id"], "person_id": ALICE, "status": "read"}
+        "set_progress",
+        {"game_id": game["id"], "person_id": ALICE, "play_status": "completed"},
     )
     other = await _game(call, title="Emma")
-    await call(
-        "set_reading", {"game_id": other["id"], "person_id": BOB, "status": "reading"}
-    )
+    for platform in ("pc", "ps5"):
+        await call(
+            "set_progress",
+            {
+                "game_id": other["id"],
+                "person_id": BOB,
+                "platform": platform,
+                "play_status": "playing",
+            },
+        )
     assert hass.states.get("sensor.home_keeper_games_books").state == "1"
-    read = hass.states.get("sensor.home_keeper_games_alice_books_read_this_year")
-    assert read.state == "1"
-    assert read.attributes["goal"] == 12 and "pages" not in read.attributes
-    assert read.attributes["person_id"] == ALICE
-    now = hass.states.get("sensor.home_keeper_games_bob_reading_now")
+    done = hass.states.get("sensor.home_keeper_games_alice_games_completed_this_year")
+    assert done.state == "1"
+    assert done.attributes["goal"] == 12 and "pages" not in done.attributes
+    assert done.attributes["person_id"] == ALICE
+    now = hass.states.get("sensor.home_keeper_games_bob_playing_now")
     assert now.state == "1" and now.attributes["games"] == ["Emma"]
 
 
-async def test_to_read_list(hass, setup_entry, call) -> None:
-    entity = "todo.home_keeper_games_bob_to_read"
+async def test_backlog_list(hass, setup_entry, call) -> None:
+    entity = "todo.home_keeper_games_bob_backlog"
     game = await _game(call)
     await call(
-        "set_reading", {"game_id": game["id"], "person_id": BOB, "status": "want"}
+        "set_progress",
+        {
+            "game_id": game["id"],
+            "person_id": BOB,
+            "platform": "pc",
+            "play_status": "backlog",
+        },
     )
     items = await hass.services.async_call(
         TODO,
@@ -149,7 +164,7 @@ async def test_to_read_list(hass, setup_entry, call) -> None:
     )
     assert items[entity]["items"] == [
         {
-            "uid": game["id"],
+            "uid": f"{game['id']}:pc",
             "summary": "Dune",
             "status": "needs_action",
         }
@@ -158,16 +173,23 @@ async def test_to_read_list(hass, setup_entry, call) -> None:
     await hass.services.async_call(
         TODO,
         "update_item",
-        {"item": game["id"], "status": "completed"},
+        {"item": f"{game['id']}:pc", "status": "completed"},
         target={"entity_id": entity},
         blocking=True,
     )
     store = setup_entry.runtime_data.store
-    assert store.reading_row(BOB, game["id"])["status"] == "read"
+    assert store.progress_row(BOB, game["id"], "pc")["play_status"] == "completed"
+    # A game with no copy goes on the other platform.
     await hass.services.async_call(
         TODO, "add_item", {"item": "dune"}, target={"entity_id": entity}, blocking=True
     )
-    assert store.reading_row(BOB, game["id"])["status"] == "want"
+    assert store.progress_row(BOB, game["id"], "other")["play_status"] == "backlog"
+    # A game with copies on 1 platform goes on that platform.
+    await call("add_copy", {"game_id": game["id"], "platform": "switch"})
+    await hass.services.async_call(
+        TODO, "add_item", {"item": "Dune"}, target={"entity_id": entity}, blocking=True
+    )
+    assert store.progress_row(BOB, game["id"], "switch")["play_status"] == "backlog"
     await hass.services.async_call(
         TODO,
         "add_item",
@@ -177,15 +199,16 @@ async def test_to_read_list(hass, setup_entry, call) -> None:
     )
     new = next(b for b in store.state["games"].values() if b["title"] == "A new game")
     assert new["needs_details"] is True
-    assert store.reading_row(BOB, new["id"])["status"] == "want"
+    assert store.progress_row(BOB, new["id"], "other")["play_status"] == "backlog"
     await hass.services.async_call(
         TODO,
         "remove_item",
-        {"item": [new["id"]]},
+        {"item": [f"{new['id']}:other"]},
         target={"entity_id": entity},
         blocking=True,
     )
-    assert store.reading_row(BOB, new["id"]) is None
+    assert store.progress_row(BOB, new["id"], "other") is None
+    assert store.progress_row(BOB, game["id"], "pc")["play_status"] == "completed"
 
 
 async def test_wishlist_sync(hass, setup_entry, call, todo_list) -> None:
@@ -300,7 +323,7 @@ def _todo_entity(hass, entity_id: str):
     return hass.data[DATA_COMPONENT].get_entity(entity_id)
 
 
-async def test_to_read_list_refuses_other_users(
+async def test_backlog_list_refuses_other_users(
     hass, setup_entry, call, persons
 ) -> None:
     from homeassistant.components.todo import TodoItem, TodoItemStatus
@@ -310,48 +333,54 @@ async def test_to_read_list_refuses_other_users(
     store = setup_entry.runtime_data.store
     game = await _game(call)
     bob_id = persons["user"].id
-    own = _todo_entity(hass, "todo.home_keeper_games_bob_to_read")
-    other = _todo_entity(hass, "todo.home_keeper_games_alice_to_read")
+    own = _todo_entity(hass, "todo.home_keeper_games_bob_backlog")
+    other = _todo_entity(hass, "todo.home_keeper_games_alice_backlog")
+    uid = f"{game['id']}:other"
     # Bob changes his own list.
     own.async_set_context(Context(user_id=bob_id))
     await own.async_create_todo_item(TodoItem(summary="Dune"))
-    assert store.reading_row(BOB, game["id"])["status"] == "want"
+    assert store.progress_row(BOB, game["id"], "other")["play_status"] == "backlog"
     # Bob cannot change the list of Alice.
     await call(
-        "set_reading", {"game_id": game["id"], "person_id": ALICE, "status": "want"}
+        "set_progress",
+        {
+            "game_id": game["id"],
+            "person_id": ALICE,
+            "platform": "other",
+            "play_status": "backlog",
+        },
     )
     other.async_set_context(Context(user_id=bob_id))
     for attempt in (
         other.async_create_todo_item(TodoItem(summary="Dune")),
         other.async_update_todo_item(
-            TodoItem(uid=game["id"], status=TodoItemStatus.COMPLETED)
+            TodoItem(uid=uid, status=TodoItemStatus.COMPLETED)
         ),
-        other.async_delete_todo_items([game["id"]]),
+        other.async_delete_todo_items([uid]),
     ):
         with pytest.raises(HomeAssistantError) as info:
             await attempt
         assert info.value.translation_key == "todo_not_allowed"
         assert info.value.translation_placeholders == {"person": "Alice"}
-    assert store.reading_row(ALICE, game["id"])["status"] == "want"
+    assert store.progress_row(ALICE, game["id"], "other")["play_status"] == "backlog"
     # The admin user changes any list.
     own.async_set_context(Context(user_id=persons["admin"].id))
-    await own.async_update_todo_item(
-        TodoItem(uid=game["id"], status=TodoItemStatus.COMPLETED)
-    )
-    assert store.reading_row(BOB, game["id"])["status"] == "read"
+    await own.async_update_todo_item(TodoItem(uid=uid, status=TodoItemStatus.COMPLETED))
+    row = store.progress_row(BOB, game["id"], "other")
+    assert row["play_status"] == "completed"
     # Through the todo service, a user with no person cannot change the list.
     dan = await hass.auth.async_create_user("Dan", group_ids=["system-users"])
     with pytest.raises(HomeAssistantError) as info:
         await hass.services.async_call(
             TODO,
             "remove_item",
-            {"item": [game["id"]]},
-            target={"entity_id": "todo.home_keeper_games_alice_to_read"},
+            {"item": [uid]},
+            target={"entity_id": "todo.home_keeper_games_alice_backlog"},
             blocking=True,
             context=Context(user_id=dan.id),
         )
     assert info.value.translation_key == "todo_not_allowed"
-    assert store.reading_row(ALICE, game["id"])["status"] == "want"
+    assert store.progress_row(ALICE, game["id"], "other")["play_status"] == "backlog"
 
 
 async def test_entities_are_unavailable_while_sharing_is_off(
@@ -359,15 +388,21 @@ async def test_entities_are_unavailable_while_sharing_is_off(
 ) -> None:
     game = await _game(call)
     await call(
-        "set_reading", {"game_id": game["id"], "person_id": BOB, "status": "want"}
+        "set_progress",
+        {
+            "game_id": game["id"],
+            "person_id": BOB,
+            "platform": "pc",
+            "play_status": "backlog",
+        },
     )
     ids = (
-        "todo.home_keeper_games_bob_to_read",
-        "sensor.home_keeper_games_bob_books_read_this_year",
-        "sensor.home_keeper_games_bob_reading_now",
+        "todo.home_keeper_games_bob_backlog",
+        "sensor.home_keeper_games_bob_games_completed_this_year",
+        "sensor.home_keeper_games_bob_playing_now",
     )
     assert all(hass.states.get(e).state != "unavailable" for e in ids)
-    await call("set_person_settings", {"person_id": BOB, "share_reading": False})
+    await call("set_person_settings", {"person_id": BOB, "share_progress": False})
     await hass.async_block_till_done()
     for entity_id in ids:
         state = hass.states.get(entity_id)
@@ -378,10 +413,10 @@ async def test_entities_are_unavailable_while_sharing_is_off(
     client = await ws("admin")
     reply = await _send(client, type="todo/item/list", entity_id=ids[0])
     assert reply["result"] == {"items": []}
-    # Alice still shares her reading.
-    alice = hass.states.get("sensor.home_keeper_games_alice_reading_now")
+    # Alice still shares her progress.
+    alice = hass.states.get("sensor.home_keeper_games_alice_playing_now")
     assert alice.state == "0"
-    await call("set_person_settings", {"person_id": BOB, "share_reading": True})
+    await call("set_person_settings", {"person_id": BOB, "share_progress": True})
     await hass.async_block_till_done()
     assert hass.states.get(ids[0]).state == "1"
     assert hass.states.get(ids[2]).state == "0"

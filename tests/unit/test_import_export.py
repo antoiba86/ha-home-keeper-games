@@ -84,15 +84,15 @@ def _state() -> dict:
     )
     borrowed["id"] = LOAN_IN
     state["loans"] = {LOAN_OUT: out, LOAN_IN: borrowed}
-    row, _ = m.apply_reading(
-        None, {"status": "read", "rating": 5}, now=NOW, today="2026-10-03"
+    row, _ = m.apply_progress(
+        None, {"play_status": "completed", "rating": 5}, now=NOW, today="2026-10-03"
     )
-    row["private_notes"] = "Mine"
-    state["reading"] = {ALICE: {DUNE: row}}
+    row["review"] = "Mine"
+    state["progress"] = {ALICE: {DUNE: {"ps5": row}}}
     state["people"] = {
-        ALICE: {"share_reading": False, "wishlist_todo": None, "yearly_goal": 20},
+        ALICE: {"share_progress": False, "wishlist_todo": None, "yearly_goal": 20},
         BOB: {
-            "share_reading": True,
+            "share_progress": True,
             "wishlist_todo": "todo.books",
             "yearly_goal": None,
         },
@@ -148,18 +148,19 @@ def test_export_shape_and_names() -> None:
         "person_name": "Bob",
     }
     assert data["games"][0]["wishlist"] is None
-    assert data["reading"] == [
+    row = _state()["progress"][ALICE][DUNE]["ps5"]
+    assert data["progress"] == [
         {
             "person_id": ALICE,
             "person_name": "Alice",
-            "games": [{"game_id": DUNE, **_state()["reading"][ALICE][DUNE]}],
+            "games": [{"game_id": DUNE, "platform": "ps5", **row}],
         }
     ]
     assert data["people"] == [
         {
             "person_id": ALICE,
             "person_name": "Alice",
-            "share_reading": False,
+            "share_progress": False,
             "wishlist_todo": None,
             "yearly_goal": 20,
             "wishlist_todo_name": None,
@@ -167,7 +168,7 @@ def test_export_shape_and_names() -> None:
         {
             "person_id": BOB,
             "person_name": "Bob",
-            "share_reading": True,
+            "share_progress": True,
             "wishlist_todo": "todo.books",
             "yearly_goal": None,
             "wishlist_todo_name": "Books to buy",
@@ -244,7 +245,7 @@ def test_round_trip_into_an_empty_library() -> None:
     assert counts["games"] == {"created": 2, "updated": 0, "skipped": 0}
     assert counts["copies"]["created"] == 1
     assert counts["loans"]["created"] == 2
-    assert counts["reading"]["created"] == 1
+    assert counts["progress"]["created"] == 1
     assert counts["people"]["created"] == 2
     # The syncs make the install-only values again.
     assert plan.state["loans"][LOAN_OUT]["hk_task_id"] is None
@@ -387,7 +388,7 @@ def test_person_matches_by_name_on_another_install() -> None:
     data, _ = _export(_state())
     plan = _plan(m.empty_state(), data, persons={"p_new_alice": "ALICE", BOB: "Bob"})
     assert plan.ok
-    assert set(plan.state["reading"]) == {"p_new_alice"}
+    assert set(plan.state["progress"]) == {"p_new_alice"}
     assert "p_new_alice" in plan.state["people"]
 
 
@@ -420,11 +421,11 @@ def test_unknown_person_warns_and_skips_the_rows() -> None:
 def test_unknown_reader_skips_each_row() -> None:
     data, _ = _export(_state())
     plan = _plan(m.empty_state(), data, persons={BOB: "Bob"})
-    assert plan.counts["reading"] == {"created": 0, "updated": 0, "skipped": 1}
-    assert ("warning", "reading[0].person_id", "import_person_not_found") in (
+    assert plan.counts["progress"] == {"created": 0, "updated": 0, "skipped": 1}
+    assert ("warning", "progress[0].person_id", "import_person_not_found") in (
         _problems(plan)
     )
-    assert plan.state["reading"] == {}
+    assert plan.state["progress"] == {}
 
 
 def test_two_people_with_one_name_match_neither() -> None:
@@ -505,17 +506,36 @@ def test_wishlist_update_keeps_the_todo_binding() -> None:
     assert entry["todo_uid"] == "uid-1"
 
 
-def test_reading_row_update_moves_the_time_stamp() -> None:
+def test_progress_row_update_moves_the_time_stamp() -> None:
     state = _state()
     data, _ = _export(state)
-    row = data["reading"][0]["games"][0]
+    row = data["progress"][0]["games"][0]
     row["rating"] = 3
     del row["updated_at"]
     plan = _plan(state, data)
-    stored = plan.state["reading"][ALICE][DUNE]
+    stored = plan.state["progress"][ALICE][DUNE]["ps5"]
     assert stored["rating"] == 3
     assert stored["updated_at"] == LATER
-    assert stored["private_notes"] == "Mine"
+    assert stored["review"] == "Mine"
+
+
+def test_progress_row_platform() -> None:
+    state = _state()
+    data, _ = _export(state)
+    rows = data["progress"][0]["games"]
+    rows.append({**rows[0], "platform": None, "play_status": "playing"})
+    rows.append({**rows[0], "platform": "switch", "updated_at": ""})
+    plan = _plan(state, data)
+    stored = plan.state["progress"][ALICE][DUNE]
+    assert set(stored) == {"ps5", "other", "switch"}
+    assert stored["other"]["play_status"] == "playing"
+    assert stored["switch"]["updated_at"] == LATER
+    assert stored["ps5"] == state["progress"][ALICE][DUNE]["ps5"]
+    rows.append({**rows[0], "platform": "gameboy"})
+    plan = _plan(state, data)
+    assert ("error", "progress[0].games[3].platform", "invalid_choice") in (
+        _problems(plan)
+    )
 
 
 def test_copy_on_a_missing_shelf_goes_to_no_shelf() -> None:
@@ -543,7 +563,7 @@ def test_copy_update_by_id() -> None:
 def test_existing_person_settings_update() -> None:
     plan = _plan(_state(), {"people": [{"person_id": ALICE, "yearly_goal": 30}]})
     assert plan.state["people"][ALICE]["yearly_goal"] == 30
-    assert plan.state["people"][ALICE]["share_reading"] is False
+    assert plan.state["people"][ALICE]["share_progress"] is False
     assert plan.records[0]["action"] == "update"
 
 
@@ -598,12 +618,12 @@ def test_document_must_be_an_object() -> None:
 def test_section_and_record_shapes() -> None:
     plan = _plan(
         m.empty_state(),
-        {"rooms": "x", "games": ["x"], "reading": [{"person_id": ALICE, "games": 1}]},
+        {"rooms": "x", "games": ["x"], "progress": [{"person_id": ALICE, "games": 1}]},
     )
     assert _problems(plan) == [
         ("error", "rooms", "import_not_a_list"),
         ("error", "games[0]", "import_not_an_object"),
-        ("error", "reading[0].games", "import_not_a_list"),
+        ("error", "progress[0].games", "import_not_a_list"),
     ]
 
 
@@ -617,7 +637,7 @@ def test_field_errors_name_the_path_and_block_the_import() -> None:
         ],
         "copies": [{"game_id": "nope", "format": "scroll"}],
         "loans": [{"direction": "out", "game_id": "nope", "copy_id": "nope"}],
-        "reading": [
+        "progress": [
             {"person_id": ALICE, "games": [{"game_id": "nope", "rating": 9}, "x"]}
         ],
         "people": [{"person_id": ALICE, "yearly_goal": 0}],
@@ -633,9 +653,9 @@ def test_field_errors_name_the_path_and_block_the_import() -> None:
         ("error", "copies[0].format", "invalid_choice"),
         ("error", "loans[0].game_id", "import_reference_missing"),
         ("error", "loans[0].copy_id", "import_reference_missing"),
-        ("error", "reading[0].games[0].game_id", "import_reference_missing"),
-        ("error", "reading[0].games[0].rating", "out_of_range"),
-        ("error", "reading[0].games[1]", "import_not_an_object"),
+        ("error", "progress[0].games[0].game_id", "import_reference_missing"),
+        ("error", "progress[0].games[0].rating", "out_of_range"),
+        ("error", "progress[0].games[1]", "import_not_an_object"),
         ("error", "people[0]", "out_of_range"),
     ]
 

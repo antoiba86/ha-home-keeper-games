@@ -16,9 +16,11 @@ import {
   statusPill,
 } from './markup';
 import type { ViewCtx } from './tab-types';
-import type { Game, Copy, Loan, ReadingStatus } from './types';
+import type { Game, Copy, Loan, Platform } from './types';
 import {
   allGenres,
+  copyPlatforms,
+  defaultPlatform,
   gameByline,
   platformLabel,
   buildPath,
@@ -27,13 +29,18 @@ import {
   filterGames,
   hasFilters,
   locationLabel,
+  PLATFORMS,
+  PLAY_STATUSES,
+  progressOf,
+  progressRows,
   readFilters,
-  readingOf,
+  ratingOf,
   shelfPath,
   shortLocation,
   SORT_KEYS,
   STATUS_FILTERS,
   statusCounts,
+  statusOf,
   type GameFilters,
 } from './utils';
 
@@ -51,8 +58,8 @@ function menu(label: string, key: string, items: Array<[string, string]>, value:
 function readerDots(ctx: ViewCtx, game: Game): string {
   return ctx.lib.people
     .map((p) => {
-      const st = readingOf(game, p.id)?.status ?? null;
-      return st === 'read' || st === 'reading' ? personDot(p, st) : '';
+      const st = statusOf(game, p.id);
+      return st === 'completed' || st === 'playing' ? personDot(p, st) : '';
     })
     .join('');
 }
@@ -93,7 +100,7 @@ function row(ctx: ViewCtx, game: Game): string {
     ${cover(game, 'thumb')}
     <span class="hkl-row-main"><span class="hkl-row-title">${escapeHTML(game.title)}</span><span class="hkl-row-sub">${escapeHTML(gameByline(game))}</span><span class="hkl-row-loc">${escapeHTML(loc)}</span></span>
     <span class="hkl-row-dots">${readerDots(ctx, game)}${loanPill(ctx, game)}</span>
-    ${statusPill(readingOf(game, ctx.me)?.status ?? null)}
+    ${statusPill(statusOf(game, ctx.me))}
   </a>`;
 }
 
@@ -102,7 +109,7 @@ function summaryLine(ctx: ViewCtx, f: GameFilters, count: number): string {
   if (f.room) parts.push(ctx.idx.room.get(f.room)?.name ?? '');
   if (f.shelf === 'none') parts.push(t('common.no_shelf'));
   else if (f.shelf) parts.push(ctx.idx.shelf.get(f.shelf)?.name ?? '');
-  if (f.reader) parts.push(t('filter.read_by_name', { name: ctx.idx.person.get(f.reader)?.name ?? '' }));
+  if (f.reader) parts.push(t('filter.completed_by_name', { name: ctx.idx.person.get(f.reader)?.name ?? '' }));
   if (f.genre) parts.push(f.genre);
   if (f.owned === 'no') parts.push(t('filter.owned_no'));
   if (f.owned === 'all') parts.push(t('filter.owned_all'));
@@ -157,7 +164,7 @@ export function renderGames(ctx: ViewCtx): string {
   <div class="hkl-menus">
     ${menu(t('filter.room'), 'room', rooms, f.room)}
     ${menu(t('filter.shelf'), 'shelf', shelves, f.shelf)}
-    ${menu(t('filter.read_by'), 'reader', readers, f.reader)}
+    ${menu(t('filter.completed_by'), 'reader', readers, f.reader)}
     ${menu(t('filter.genre'), 'genre', genres, f.genre)}
     ${menu(t('filter.owned'), 'owned', owned, f.owned)}
     ${menu(t('filter.sort'), 'sort', sorts, f.sort)}
@@ -169,12 +176,10 @@ export function renderGames(ctx: ViewCtx): string {
   </div>
   ${summaryLine(ctx, f, games.length)}
   ${empty}${list}${more}
-  <div class="hkl-legend"><span><span class="hkl-ring ring-read" aria-hidden="true"></span>${escapeHTML(t('status.read'))}</span><span><span class="hkl-ring ring-reading" aria-hidden="true"></span>${escapeHTML(t('status.reading'))}</span></div>`;
+  <div class="hkl-legend"><span><span class="hkl-ring ring-completed" aria-hidden="true"></span>${escapeHTML(t('status.completed'))}</span><span><span class="hkl-ring ring-playing" aria-hidden="true"></span>${escapeHTML(t('status.playing'))}</span></div>`;
 }
 
 // ── Game detail ──────────────────────────────────────────────────────────────
-
-const STATUSES: ReadingStatus[] = ['want', 'reading', 'read', 'dnf'];
 
 function stars(rating: number | null): string {
   const out: string[] = [];
@@ -248,49 +253,85 @@ function copyDetails(ctx: ViewCtx, copies: Copy[]): string {
   return `<section class="hkl-card"><h2>${escapeHTML(t('game.copy_details'))}</h2>${blocks}${button(escapeHTML(t('action.add_copy')), 'add-copy', 'text', 'data-k="add-copy"')}</section>`;
 }
 
-function readingSection(ctx: ViewCtx, game: Game): string {
-  const pid = ctx.ui.readingPerson ?? ctx.me;
-  const row = readingOf(game, pid);
-  const st = row?.status ?? null;
-  const seg = STATUSES.map((s) => {
+/** The person and the platform that the progress form edits. */
+export function progressTarget(ctx: ViewCtx, game: Game): { pid: string | null; platform: Platform; chips: Platform[] } {
+  const pid = ctx.ui.progressPerson ?? ctx.me;
+  const copies = ctx.idx.copiesByGame.get(game.id) ?? [];
+  const have = new Set<Platform>([...progressRows(game, pid).map(([p]) => p), ...copyPlatforms(copies)]);
+  const wanted = ctx.ui.progressPlatform;
+  if (wanted) have.add(wanted);
+  const chips = PLATFORMS.filter((p) => have.has(p));
+  return { pid, platform: wanted ?? chips[0] ?? defaultPlatform(copies), chips };
+}
+
+function field(label: string, key: string, type: 'number' | 'date', value: unknown): string {
+  const num = type === 'number' ? ' min="0" inputmode="numeric"' : '';
+  return `<label class="hkl-field small">${escapeHTML(label)}<input type="${type}"${num} data-chg="progress-field" data-key="${key}" data-k="r-${key}" value="${escapeHTML(value ?? '')}" /></label>`;
+}
+
+function progressSection(ctx: ViewCtx, game: Game): string {
+  const { pid, platform, chips } = progressTarget(ctx, game);
+  const row = progressOf(game, pid, platform);
+  const st = row?.play_status ?? null;
+  const plats = chips
+    .map((p) => {
+      const on = p === platform;
+      const r = progressOf(game, pid, p);
+      const label = r ? `${platformLabel(p)} · ${statusLabel(r.play_status)}` : platformLabel(p);
+      return `<button class="hkl-plat${on ? ' on' : ''}" data-act="progress-platform" data-value="${p}" data-k="pp-${p}" aria-pressed="${on}">${escapeHTML(label)}</button>`;
+    })
+    .join('');
+  const rest = PLATFORMS.filter((p) => !chips.includes(p));
+  const add = rest.length
+    ? `<select class="hkl-plat-add" data-chg="progress-platform" data-k="pp-add" aria-label="${escapeHTML(t('game.add_platform'))}"><option value="">+ ${escapeHTML(t('game.platform'))}</option>${options(rest.map((p): [string, string] => [p, platformLabel(p)]), null)}</select>`
+    : '';
+  const seg = PLAY_STATUSES.map((s) => {
     const on = st === s;
     return `<button class="hkl-seg${on ? ' on' : ''}" data-act="set-status" data-value="${s}" data-k="rs-${s}" aria-pressed="${on}">${on ? ICONS.check : ''}${escapeHTML(statusLabel(s))}</button>`;
   }).join('');
   const facts: string[] = [];
-  if (row?.status === 'read' && row.finished) facts.push(t('game.read_on', { date: formatDate(row.finished) }));
-  if (row && row.read_count > 1) facts.push(tn('game.read_times', row.read_count));
+  if (row?.play_status === 'completed' && row.completed_at) facts.push(t('game.completed_on', { date: formatDate(row.completed_at) }));
+  if (row && row.completion_count > 1) facts.push(tn('game.completed_times', row.completion_count));
   const people = ctx.lib.people.filter((p) => p.id !== pid);
   const household = people
     .map((p) => {
-      const r = readingOf(game, p.id);
-      const page = r?.status === 'reading' && r.page != null ? t('game.page_n', { page: r.page }) : '';
-      const stars = r?.rating ? ` · ${tn('game.stars', r.rating)}` : '';
-      return `<div class="hkl-hh">${personDot(p)}<span class="hkl-hh-name">${escapeHTML(p.name)}</span><span class="hkl-pill st-${r?.status ?? 'none'}">${escapeHTML(statusLabel(r?.status ?? null))}</span><span class="hkl-muted">${escapeHTML(page + stars)}</span></div>`;
+      const rows = progressRows(game, p.id);
+      const text = rows.map(([plat, r]) => `${platformLabel(plat)} ${statusLabel(r.play_status)}`).join(' · ');
+      const rating = ratingOf(game, p.id);
+      const stars = rating ? ` · ${tn('game.stars', rating)}` : '';
+      const pill = rows.length ? '' : statusPill(null);
+      return `<div class="hkl-hh">${personDot(p)}<span class="hkl-hh-name">${escapeHTML(p.name)}</span>${pill}<span class="hkl-muted">${escapeHTML(text + stars)}</span></div>`;
     })
     .join('');
   const pick = ctx.lib.people.length > 1
-    ? `<label class="hkl-inline">${escapeHTML(t('common.person'))} <select data-chg="reading-person" data-k="rp">${options(ctx.lib.people.map((p) => [p.id, p.name]), pid)}</select></label>`
+    ? `<label class="hkl-inline">${escapeHTML(t('common.person'))} <select data-chg="progress-person" data-k="rp">${options(ctx.lib.people.map((p) => [p.id, p.name]), pid)}</select></label>`
     : `<span class="hkl-muted">${escapeHTML(t('common.person'))} ${escapeHTML(ctx.idx.person.get(pid ?? '')?.name ?? '')}</span>`;
-  const pageField = `<label class="hkl-field small">${escapeHTML(t('game.page'))}<input type="number" min="0" inputmode="numeric" data-chg="reading-field" data-key="page" data-k="r-page" value="${escapeHTML(row?.page ?? '')}" /></label>`;
-  const started = `<label class="hkl-field small">${escapeHTML(t('game.started'))}<input type="date" data-chg="reading-field" data-key="started" data-k="r-started" value="${escapeHTML(row?.started ?? '')}" /></label>`;
-  const finished = `<label class="hkl-field small">${escapeHTML(t('game.finished'))}<input type="date" data-chg="reading-field" data-key="finished" data-k="r-finished" value="${escapeHTML(row?.finished ?? '')}" /></label>`;
-  const count = `<label class="hkl-field small">${escapeHTML(t('game.read_count'))}<input type="number" min="0" data-chg="reading-field" data-key="read_count" data-k="r-count" value="${escapeHTML(row?.read_count ?? 0)}" /></label>`;
+  const fields = [
+    field(t('game.playtime'), 'playtime_minutes', 'number', row?.playtime_minutes),
+    field(t('game.started'), 'started_at', 'date', row?.started_at),
+    field(t('game.completed_at'), 'completed_at', 'date', row?.completed_at),
+    field(t('game.last_played'), 'last_played_at', 'date', row?.last_played_at),
+    field(t('game.completions'), 'completion_count', 'number', row?.completion_count ?? 0),
+  ].join('');
+  const clear = row ? button(escapeHTML(t('game.remove_platform')), 'progress-clear', 'text', 'data-k="progress-clear"') : '';
   return `<section class="hkl-card">
-    <div class="hkl-card-head"><h2>${escapeHTML(t('game.reading_status'))}</h2>${pick}</div>
-    <div class="hkl-reading">
-      <div class="hkl-segs" role="group" aria-label="${escapeHTML(t('game.reading_status'))}">${seg}</div>
+    <div class="hkl-card-head"><h2>${escapeHTML(t('game.progress'))}</h2>${pick}</div>
+    <div class="hkl-plats" role="group" aria-label="${escapeHTML(t('game.platform'))}">${plats}${add}</div>
+    <div class="hkl-progress">
+      <div class="hkl-segs" role="group" aria-label="${escapeHTML(t('game.progress'))}">${seg}</div>
       ${stars(row?.rating ?? null)}
       ${facts.length ? `<span class="hkl-muted">${escapeHTML(facts.join(' · '))}</span>` : ''}
     </div>
-    <div class="hkl-fields">${pageField}${started}${finished}${count}</div>
+    <div class="hkl-fields">${fields}</div>
+    ${clear}
     ${household ? `<span class="hkl-eyebrow">${escapeHTML(t('game.household'))}</span><div class="hkl-household">${household}</div>` : ''}
   </section>`;
 }
 
 function notesSection(ctx: ViewCtx, game: Game): string {
-  const pid = ctx.ui.readingPerson ?? ctx.me;
+  const { pid, platform } = progressTarget(ctx, game);
   const tab = ctx.ui.notesTab;
-  const text = tab === 'shared' ? game.shared_notes : (readingOf(game, pid)?.private_notes ?? '');
+  const text = tab === 'shared' ? game.shared_notes : (progressOf(game, pid, platform)?.review ?? '');
   const tabs = (['shared', 'private'] as const)
     .map((k) => `<button class="hkl-subtab${tab === k ? ' on' : ''}" data-act="notes-tab" data-value="${k}" data-k="nt-${k}" aria-pressed="${tab === k}">${escapeHTML(t(`game.notes_${k}`))}</button>`)
     .join('');
@@ -346,7 +387,7 @@ export function renderGame(ctx: ViewCtx, game: Game | undefined): string {
       ${game.summary ? `<p class="hkl-desc">${escapeHTML(game.summary)}</p>` : ''}
     </div>
   </div>
-  ${readingSection(ctx, game)}
+  ${progressSection(ctx, game)}
   <div class="hkl-two">${notesSection(ctx, game)}${copyDetails(ctx, copies)}</div>
   <div class="hkl-detail-actions">${actions}</div>`;
 }

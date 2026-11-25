@@ -59,22 +59,26 @@ def test_game_payloads() -> None:
     assert moved["shelf_id"] == "s1" and moved["previous_shelf_id"] == "s0"
 
 
-def test_reading_payloads() -> None:
-    changed = ev.reading_changed_event_data(GAME, "p1", "read", "reading", "o")
+def test_progress_payloads() -> None:
+    changed = ev.progress_changed_event_data(
+        GAME, "p1", "ps5", "completed", "playing", "o"
+    )
     assert changed == {
         "game_id": "b1",
         "title": "Dune",
         "person_id": "p1",
         "origin": "o",
-        "status": "read",
-        "previous_status": "reading",
+        "platform": "ps5",
+        "play_status": "completed",
+        "previous_status": "playing",
     }
-    finished = ev.game_finished_event_data(
-        GAME, "p1", {"finished": "2026-10-05", "rating": 4, "read_count": 2}, None
-    )
-    assert finished["finished"] == "2026-10-05"
-    assert finished["rating"] == 4 and finished["read_count"] == 2
-    assert ev.game_finished_event_data(GAME, "p1", {}, None)["read_count"] == 0
+    row = {"completed_at": "2026-10-05", "rating": 4, "completion_count": 2}
+    completed = ev.game_completed_event_data(GAME, "p1", "switch", row, None)
+    assert completed["platform"] == "switch"
+    assert completed["completed_at"] == "2026-10-05"
+    assert completed["rating"] == 4 and completed["completion_count"] == 2
+    empty = ev.game_completed_event_data(GAME, "p1", "ps5", {}, None)
+    assert empty["completion_count"] == 0
 
 
 def test_loan_and_wishlist_payloads() -> None:
@@ -99,7 +103,7 @@ def test_import_payload() -> None:
         "games_added": 2,
         "games_matched": 0,
         "copies_added": 0,
-        "reading_set": 0,
+        "progress_set": 0,
         "wishlist_added": 0,
         "errors": 1,
         "origin": None,
@@ -118,13 +122,14 @@ def test_change_payloads_name_the_fields() -> None:
         "shelf_id": "s1",
         "changed_fields": ["note", "price"],
     }
-    reading = ev.reading_updated_event_data(GAME, "p1", "read", fields, "o")
-    assert reading == {
+    progress = ev.progress_updated_event_data(GAME, "p1", "pc", "playing", fields, "o")
+    assert progress == {
         "game_id": "b1",
         "title": "Dune",
         "person_id": "p1",
         "origin": "o",
-        "status": "read",
+        "platform": "pc",
+        "play_status": "playing",
         "changed_fields": ["note", "price"],
     }
     loan = ev.loan_updated_event_data(GAME, LOAN, fields, "o")
@@ -134,7 +139,7 @@ def test_change_payloads_name_the_fields() -> None:
     settings = ev.settings_event_data(fields, "EUR", None)
     assert settings == {"changed_fields": fields, "currency": "EUR", "origin": None}
     fields.append("x")
-    for payload in (copy, reading, loan, person, settings):
+    for payload in (copy, progress, loan, person, settings):
         assert payload["changed_fields"] == ["note", "price"], "no alias"
 
 

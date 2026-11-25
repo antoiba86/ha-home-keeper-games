@@ -6,9 +6,9 @@ summary: The access of admins and of non-admin users to each surface of Home Kee
 # Security model
 
 In Home Keeper Games, an admin manages the library. Each signed-in user keeps the
-reading of their own person. Admins manage the locations, the games and their copies, the
-loans and the wishlist. A non-admin user sets the reading status, the rating and the
-notes of their own person, and reads what the projections allow.
+play progress of their own person. Admins manage the locations, the games and their copies,
+the loans and the wishlist. A non-admin user sets the play progress, the rating and the
+review of their own person, and reads what the projections allow.
 
 ## The rule
 
@@ -19,8 +19,8 @@ For the library, a guest account must not:
 
 - delete games or move copies;
 - read the price and the value of a copy, or the names of the people who borrowed a game;
-- read the private notes of another person;
-- read the reading status of a person who does not share it.
+- read the review of another person;
+- read the progress of a person who does not share it.
 
 The admin UI is the Library tab of the Home Keeper panel, and that panel is admin-only.
 Every user can use the card and the entities. Every user can also call the services that
@@ -46,7 +46,7 @@ no user, as Home Assistant does. An automation makes that kind of call.
 | `add_to_wishlist`, `update_wishlist`, `remove_from_wishlist`, `got_wishlist_game` | Admin |
 | `set_settings`, `import_csv`, `export_csv` | Admin |
 | `export_data`, `import_data` | Admin |
-| `set_reading` | Open, for the caller's own person. An admin can name any person. |
+| `set_progress` | Open, for the caller's own person. An admin can name any person. |
 | `set_person_settings` | Open, for the caller's own person, with no `wishlist_todo`. An admin can set each field of any person. |
 | `list_games`, `get_game`, `list_locations`, `list_loans`, `list_people` | Open, projected |
 
@@ -88,7 +88,7 @@ projection:
 |---|---|
 | Copy | `price`, `value`, `acquired_from` |
 | Loan | `party` |
-| Reading row of another person | The whole row if that person has `share_reading: false`, else `private_notes` |
+| Progress row of another person | The whole row if that person has `share_progress: false`, else `review` |
 | Settings of another person | `wishlist_todo` |
 | Wishlist entry of another person | `todo_entity`, `todo_uid` |
 
@@ -102,14 +102,13 @@ Home Assistant shows each entity to each user, and lets each user call the `todo
 services on each to-do list. So the per-person entities apply the privacy rules of the
 library:
 
-- The To read list of a person takes a change only from the user of that person or
+- The Backlog list of a person takes a change only from the user of that person or
   from an admin user. A call with no user, such as an automation, is trusted. A change
   from another user fails with the error `todo_not_allowed`.
-- If a person has `share_reading: false`, the 3 entities of that person are unavailable:
-  the To read list and the sensors that show the games read this year and the games that
-  the person reads now. The list gives
-  no items, also over the `todo/item/list` websocket command. They come back when the
-  person shares the reading again.
+- If a person has `share_progress: false`, the 3 entities of that person are unavailable:
+  the Backlog list and the sensors that show the games completed this year and the games
+  that the person plays now. The list gives no items, also over the `todo/item/list`
+  websocket command. They come back when the person shares the progress again.
 
 The library sensors show only counts, with no title and no person.
 

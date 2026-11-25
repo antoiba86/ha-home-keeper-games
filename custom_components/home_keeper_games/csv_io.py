@@ -8,9 +8,10 @@ Import has 2 steps:
    result for each row. It changes no argument, so a dry run is the same call
    with the result thrown away.
 
-Export writes every game and copy field. ``rows_from_state`` makes the rows, and
-``write(rows)`` writes them, so ``parse(write(rows))`` gives the rows back (a
-property test checks this).
+Export writes every game and copy field. The ``platform`` column is the
+platform of the copy and of the progress on the row. ``rows_from_state`` makes
+the rows, and ``write(rows)`` writes them, so ``parse(write(rows))`` gives the
+rows back (a property test checks this).
 
 This module imports no Home Assistant code.
 """
@@ -25,8 +26,10 @@ from typing import Any
 
 from .models import (
     COPY_FIELDS,
+    DEFAULT_PLATFORM,
     FORMATS,
-    STATUSES,
+    PLATFORMS,
+    PLAY_STATUSES,
     LibraryError,
     build_copy,
     build_game,
@@ -34,7 +37,7 @@ from .models import (
     clean_barcode,
     clone,
     copy_field,
-    empty_reading,
+    empty_progress,
     find_shelf_by_path,
     location_path,
     title_key,
@@ -65,13 +68,14 @@ LIBRARY_COLUMNS = (
     "value",
     "copy_note",
     "location",
-    "status",
+    "play_status",
     "rating",
-    "page",
-    "started",
-    "finished",
-    "read_count",
-    "private_notes",
+    "playtime_minutes",
+    "started_at",
+    "completed_at",
+    "last_played_at",
+    "completion_count",
+    "review",
     "wishlist",
     "wishlist_buy",
 )
@@ -113,15 +117,17 @@ def empty_row(line: int) -> dict[str, Any]:
         "owned": 0,
         "copy": None,
         "location": [],
-        "status": None,
+        "platform": None,
+        "play_status": None,
         "wishlist": False,
         "wishlist_buy": False,
         "rating": None,
-        "page": None,
-        "started": None,
-        "finished": None,
-        "read_count": None,
-        "notes": "",
+        "playtime_minutes": None,
+        "started_at": None,
+        "completed_at": None,
+        "last_played_at": None,
+        "completion_count": None,
+        "review": "",
         "needs_details": True,
     }
 
@@ -228,11 +234,13 @@ def parse_library(text: str) -> list[dict[str, Any]]:
         row["franchise"] = _cell(raw, "franchise") or None
         row["igdb_id"] = _int(_cell(raw, "igdb_id")) or None
         row["barcode"] = clean_barcode(_cell(raw, "barcode")) or None
+        platform = _cell(raw, "platform")
+        row["platform"] = platform if platform in PLATFORMS else None
         fmt = _cell(raw, "format")
         if fmt in FORMATS:
             copy: dict[str, Any] = {"id": _record_id(_cell(raw, "copy_id"))}
             copy["format"] = fmt
-            copy["platform"] = _cell(raw, "platform") or None
+            copy["platform"] = platform or None
             for field in ("storefront", "region", "edition"):
                 copy[field] = _cell(raw, field)
             copy["steelbook"] = _bool_cell(_cell(raw, "steelbook"))
@@ -246,20 +254,23 @@ def parse_library(text: str) -> list[dict[str, Any]]:
             row["owned"] = 1
         location = _cell(raw, "location")
         row["location"] = location.split(PATH_SEP) if location else []
-        status = _cell(raw, "status")
-        row["status"] = status if status in STATUSES else None
-        if row["status"] is not None:
+        status = _cell(raw, "play_status")
+        row["play_status"] = status if status in PLAY_STATUSES else None
+        if row["play_status"] is not None:
             row["rating"] = _rating(_cell(raw, "rating"))
-            row["page"] = _int(_cell(raw, "page"))
-            row["started"] = _date(_cell(raw, "started"))
-            row["finished"] = _date(_cell(raw, "finished"))
-            row["read_count"] = _int(_cell(raw, "read_count"))
-        row["notes"] = _cell(raw, "private_notes")
+            row["playtime_minutes"] = _int(_cell(raw, "playtime_minutes"))
+            for field in _ROW_DATES:
+                row[field] = _date(_cell(raw, field))
+            row["completion_count"] = _int(_cell(raw, "completion_count"))
+        row["review"] = _cell(raw, "review")
         row["wishlist"] = _bool_cell(_cell(raw, "wishlist"))
         row["wishlist_buy"] = _bool_cell(_cell(raw, "wishlist_buy"))
         row["needs_details"] = False
         rows.append(row)
     return rows
+
+
+_ROW_DATES = ("started_at", "completed_at", "last_played_at")
 
 
 def _money_cell(value: str) -> float | int | None:
@@ -342,10 +353,10 @@ ACTION_TITLE_MATCH = "title_match"
 ACTION_ERROR = "error"
 COUNT_KEYS = (
     "rows",
-    "read",
-    "reading",
-    "want",
-    "dnf",
+    "backlog",
+    "playing",
+    "completed",
+    "abandoned",
     "wishlist",
     "copies",
     "tags",
@@ -363,11 +374,8 @@ def summary_of(counts: dict[str, int], kept: int) -> dict[str, int]:
         "games_added": counts["new"],
         "games_matched": counts["existing"] + counts["title_match"],
         "copies_added": counts["copies"],
-        "reading_set": counts["read"]
-        + counts["reading"]
-        + counts["want"]
-        + counts["dnf"],
-        "reading_kept": kept,
+        "progress_set": sum(counts[status] for status in PLAY_STATUSES),
+        "progress_kept": kept,
         "wishlist_added": counts["wishlist"],
         "errors": counts["errors"],
     }
@@ -379,27 +387,27 @@ def apply_import(
     *,
     person_id: str,
     shelf_id: str | None,
-    import_notes: bool,
-    replace_reading: bool,
+    import_review: bool,
+    replace_progress: bool,
     now: str,
 ) -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]]]:
     """Apply import rows to a copy of *state*.
 
     Return ``(new_state, counts, results)``. ``counts`` has the keys of
-    :data:`COUNT_KEYS` and ``reading_kept``. Each result has ``line``, ``title``,
+    :data:`COUNT_KEYS` and ``progress_kept``. Each result has ``line``, ``title``,
     ``barcode``, ``game_id`` and ``action`` (``new``, ``existing``,
     ``title_match`` or ``error``). An error result also has ``error`` (a
     translation key) and ``placeholders``.
     """
     new = clone(state)
     index = _Index(new["games"], new["copies"].values())
-    reading = new["reading"].setdefault(person_id, {})
+    progress = new["progress"].setdefault(person_id, {})
     copy_ids = set(new["copies"])
     owned_games = {c.get("game_id") for c in new["copies"].values()}
-    reading_done: set[str] = set()
+    progress_done: set[tuple[str, str]] = set()
     counts = dict.fromkeys(COUNT_KEYS, 0)
     counts["rows"] = len(rows)
-    counts["reading_kept"] = 0
+    counts["progress_kept"] = 0
     results: list[dict[str, Any]] = []
     for row in rows:
         result: dict[str, Any] = {
@@ -439,14 +447,16 @@ def apply_import(
                 counts["copies"] += 1
                 index.add_barcode(row["barcode"], game_id)
             # A library file has 1 row for each copy. The first row of a game
-            # sets its reading status.
-            if row["status"] and game_id not in reading_done:
-                reading_done.add(game_id)
-                if game_id in reading and not replace_reading:
-                    counts["reading_kept"] += 1
+            # and a platform sets the progress on that platform.
+            platform = row["platform"] or DEFAULT_PLATFORM
+            if row["play_status"] and (game_id, platform) not in progress_done:
+                progress_done.add((game_id, platform))
+                rows_of_game = progress.setdefault(game_id, {})
+                if platform in rows_of_game and not replace_progress:
+                    counts["progress_kept"] += 1
                 else:
-                    reading[game_id] = _reading_row(row, import_notes, now)
-                    counts[row["status"]] += 1
+                    rows_of_game[platform] = _progress_row(row, import_review, now)
+                    counts[row["play_status"]] += 1
             if (
                 row["wishlist"]
                 and game_id not in owned_games
@@ -463,8 +473,10 @@ def apply_import(
             result["placeholders"] = err.placeholders
             counts["errors"] += 1
         results.append(result)
-    if not reading:
-        new["reading"].pop(person_id, None)
+    for game_id in [g for g, rows in progress.items() if not rows]:
+        del progress[game_id]
+    if not progress:
+        new["progress"].pop(person_id, None)
     return new, counts, results
 
 
@@ -507,18 +519,37 @@ def _import_copy(
     return True
 
 
-def _reading_row(row: dict[str, Any], import_notes: bool, now: str) -> dict[str, Any]:
-    reading = empty_reading(now=now)
-    reading["status"] = row["status"]
-    for field in ("rating", "page", "started", "finished"):
-        reading[field] = row.get(field)
-    count = row["read_count"]
+def _progress_row(row: dict[str, Any], import_review: bool, now: str) -> dict[str, Any]:
+    progress = empty_progress(now=now)
+    progress["play_status"] = row["play_status"]
+    for field in ("rating", "playtime_minutes", *_ROW_DATES):
+        progress[field] = row.get(field)
+    count = row["completion_count"]
     if count is None:
-        count = 1 if row["status"] == "read" else 0
-    reading["read_count"] = count
-    if import_notes:
-        reading["private_notes"] = row["notes"]
-    return reading
+        count = 1 if row["play_status"] == "completed" else 0
+    progress["completion_count"] = count
+    if import_review:
+        progress["review"] = row["review"]
+    return progress
+
+
+_ROW_PROGRESS_FIELDS = (
+    "play_status",
+    "rating",
+    "playtime_minutes",
+    *_ROW_DATES,
+    "completion_count",
+    "review",
+)
+
+
+def _set_row_progress(row: dict[str, Any], progress: dict[str, Any] | None) -> None:
+    """Write a progress row into an export row."""
+    if not progress:
+        return
+    for field in _ROW_PROGRESS_FIELDS:
+        row[field] = progress.get(field)
+    row["review"] = progress.get("review", "")
 
 
 # ── Export ───────────────────────────────────────────────────────────────────
@@ -529,15 +560,17 @@ def rows_from_state(
 ) -> list[dict[str, Any]]:
     """Import rows that describe the library, for :func:`write`.
 
-    There is 1 row for each copy, and 1 row for a game with no copy. With no
-    *person_id*, the rows have no reading status.
+    There is 1 row for each copy, and 1 row for a game with no copy. The first
+    row of a platform has the progress of *person_id* on that platform. A
+    platform with progress and no copy gets 1 more row with no copy. With no
+    *person_id*, the rows have no progress.
     """
     copies: dict[str, list[dict[str, Any]]] = {}
     for copy in sorted(
         state["copies"].values(), key=lambda c: (str(c.get("created_at")), c["id"])
     ):
         copies.setdefault(copy["game_id"], []).append(copy)
-    reading = state["reading"].get(person_id, {}) if person_id else {}
+    progress = state["progress"].get(person_id, {}) if person_id else {}
     rows: list[dict[str, Any]] = []
     games = sorted(
         state["games"].values(),
@@ -548,19 +581,14 @@ def rows_from_state(
         for field in (*_ROW_GAME_FIELDS, "needs_details"):
             base[field] = clone(game[field])
         base["game_id"] = game["id"]
-        row_reading = reading.get(game["id"])
-        if row_reading:
-            for field in ("status", "rating", "page", "started", "finished"):
-                base[field] = row_reading.get(field)
-            base["read_count"] = row_reading.get("read_count")
-            base["notes"] = row_reading.get("private_notes", "")
         wish = game["wishlist"]
         if wish and (person_id is None or wish.get("person_id") == person_id):
             base["wishlist"] = True
             base["wishlist_buy"] = bool(wish.get("buy"))
         game_copies = copies.get(game["id"], [])
         base["owned"] = len(game_copies)
-        if not game_copies:
+        left = dict(progress.get(game["id"]) or {})
+        if not game_copies and not left:
             rows.append(base)
             continue
         for copy in game_copies:
@@ -570,8 +598,16 @@ def rows_from_state(
                 "id": copy["id"],
                 **{field: copy.get(field) for field in _COPY_COLUMNS},
             }
+            row["platform"] = copy.get("platform")
+            _set_row_progress(row, left.pop(str(copy.get("platform")), None))
             row["barcode"] = copy.get("barcode")
             row["location"] = location_path(state, copy.get("shelf_id"))
+            rows.append(row)
+        for platform in sorted(left):
+            row = clone(base)
+            row["line"] = len(rows) + 1
+            row["platform"] = platform
+            _set_row_progress(row, left[platform])
             rows.append(row)
     return rows
 
@@ -605,7 +641,7 @@ def _library_cells(row: dict[str, Any]) -> dict[str, str]:
         "tags": LIST_SEP.join(row["tags"] or []),
         "shared_notes": row["shared_notes"],
         "copy_id": copy.get("id") or "",
-        "platform": copy.get("platform") or "",
+        "platform": copy.get("platform") or row["platform"] or "",
         "format": copy.get("format") or "",
         "storefront": copy.get("storefront") or "",
         "region": copy.get("region") or "",
@@ -619,13 +655,14 @@ def _library_cells(row: dict[str, Any]) -> dict[str, str]:
         "value": _num(copy.get("value")),
         "copy_note": copy.get("note") or "",
         "location": PATH_SEP.join(row["location"] or []),
-        "status": row["status"] or "",
+        "play_status": row["play_status"] or "",
         "rating": _num(row["rating"]),
-        "page": _num(row["page"]),
-        "started": row["started"] or "",
-        "finished": row["finished"] or "",
-        "read_count": _num(row["read_count"]),
-        "private_notes": row["notes"],
+        "playtime_minutes": _num(row["playtime_minutes"]),
+        "started_at": row["started_at"] or "",
+        "completed_at": row["completed_at"] or "",
+        "last_played_at": row["last_played_at"] or "",
+        "completion_count": _num(row["completion_count"]),
+        "review": row["review"],
         "wishlist": _bool_text(row["wishlist"]),
         "wishlist_buy": _bool_text(row["wishlist_buy"]),
     }

@@ -93,19 +93,25 @@ export async function homeKeeperTasks(): Promise<Array<Record<string, any>>> {
   });
 }
 
-/** Set the reading row of a person back to what the seed had. */
-export async function restoreReading(gameId: string, personId: string, row: Record<string, any> | undefined): Promise<void> {
+/** Set the progress row of a person on a platform back to what the seed had. */
+export async function restoreProgress(
+  gameId: string,
+  personId: string,
+  platform: string,
+  row: Record<string, any> | undefined,
+): Promise<void> {
   const fields = row
     ? {
-        status: row.status,
+        play_status: row.play_status,
         rating: row.rating,
-        page: row.page,
-        started: row.started,
-        finished: row.finished,
-        read_count: row.read_count,
+        playtime_minutes: row.playtime_minutes,
+        started_at: row.started_at,
+        completed_at: row.completed_at,
+        last_played_at: row.last_played_at,
+        completion_count: row.completion_count,
       }
-    : { status: 'want' };
-  await library('set_reading', { game_id: gameId, person_id: personId, ...fields });
+    : { play_status: 'none' };
+  await library('set_progress', { game_id: gameId, person_id: personId, platform, ...fields });
 }
 
 /** Collect the uncaught page errors and the console errors of the library code. */

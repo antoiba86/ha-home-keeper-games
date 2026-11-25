@@ -34,14 +34,14 @@ Names follow `home_keeper_games_<noun>_<verb>`.
 | `home_keeper_games_shelf_removed` | A shelf is deleted. |
 | `home_keeper_games_game_added` | A game is added. |
 | `home_keeper_games_game_updated` | The fields, the cover or the wishlist entry of a game change. |
-| `home_keeper_games_game_removed` | A game is deleted with its copies, reading rows and loans. |
+| `home_keeper_games_game_removed` | A game is deleted with its copies, progress rows and loans. |
 | `home_keeper_games_copy_added` | A copy is added. |
 | `home_keeper_games_copy_moved` | A copy moves to another shelf, or to no shelf. |
 | `home_keeper_games_copy_updated` | A field of a copy other than its shelf changes. |
 | `home_keeper_games_copy_removed` | A copy is deleted. |
-| `home_keeper_games_reading_changed` | The reading status of a person changes. |
-| `home_keeper_games_reading_updated` | The rating, page, dates, count or notes of a reading row change, and the status stays. |
-| `home_keeper_games_game_finished` | The reading status of a person becomes `read`. |
+| `home_keeper_games_progress_changed` | The play status of a person on a platform changes. |
+| `home_keeper_games_progress_updated` | The rating, play time, dates, count or review of a progress row change, and the play status stays. |
+| `home_keeper_games_game_completed` | The play status of a person on a platform becomes `completed`. |
 | `home_keeper_games_loan_started` | A game is lent or borrowed. |
 | `home_keeper_games_loan_returned` | A loan is returned. |
 | `home_keeper_games_loan_overdue` | An open loan passes its due date. |
@@ -56,7 +56,7 @@ Names follow `home_keeper_games_<noun>_<verb>`.
 
 ## Payloads
 
-The game, copy, reading, loan and wishlist events share 1 spine:
+The game, copy, progress, loan and wishlist events share 1 spine:
 
 ```json
 {
@@ -78,11 +78,12 @@ The other keys of each event are in the generated API reference and in
 - The copy events add `copy_id` and `shelf_id`. `copy_moved` adds
   `previous_shelf_id`. `copy_updated` adds `changed_fields`, with the names of
   the fields only, not their values (no price or value).
-- `reading_changed` adds `status` and `previous_status`. A removed reading row
-  has `status: null`.
-- `reading_updated` adds `status` and `changed_fields`. It names the changed
-  fields and never gives the private notes.
-- `game_finished` adds `finished`, `rating` and `read_count`.
+- Each progress event adds `platform`, such as `switch` or `pc`.
+- `progress_changed` adds `play_status` and `previous_status`. A removed progress
+  row has `play_status: null`.
+- `progress_updated` adds `play_status` and `changed_fields`. It names the changed
+  fields and never gives the review.
+- `game_completed` adds `completed_at`, `rating` and `completion_count`.
 - The loan events add `loan_id`, `direction`, `copy_id`, `party`, `started`,
   `due` and `returned`. `direction` is `out` for a lent copy and `in` for a
   borrowed game. `loan_updated` adds `changed_fields`. `loan_removed` has the
@@ -105,7 +106,7 @@ The other keys of each event are in the generated API reference and in
   each hour. A new due date can fire it again.
 - A CSV import fires only `import_completed`. It fires no event for each row.
 - A Home Keeper import fires only `data_imported`. It fires no event for each record.
-- `game_finished` fires with `reading_changed`, in that order.
+- `game_completed` fires with `progress_changed`, in that order.
 - The first copy of a game on the wishlist takes the game off the wishlist. The
   scan, `add_copy` and `got_wishlist_game` fire `copy_added` and then
   `wishlist_removed`.
@@ -142,16 +143,16 @@ automation:
           message: "{{ trigger.event.data.title }} was due on {{ trigger.event.data.due }}."
 ```
 
-A second example sends a message when a person finishes a game:
+A second example sends a message when a person completes a game:
 
 ```yaml
 automation:
-  - alias: Game finished
+  - alias: Game completed
     triggers:
       - trigger: event
-        event_type: home_keeper_games_game_finished
+        event_type: home_keeper_games_game_completed
     actions:
       - action: notify.notify
         data:
-          message: "Finished {{ trigger.event.data.title }}."
+          message: "Completed {{ trigger.event.data.title }} on {{ trigger.event.data.platform }}."
 ```

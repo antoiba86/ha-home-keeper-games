@@ -50,16 +50,16 @@
       "loans_overdue": {
         "name": "Überfällige Ausleihen"
       },
-      "games_read_this_year": {
-        "name": "{person} Bücher gelesen dieses Jahr"
+      "games_completed_this_year": {
+        "name": "{person} Spiele dieses Jahr abgeschlossen"
       },
-      "reading_now": {
-        "name": "{person} liest gerade"
+      "playing_now": {
+        "name": "{person} spielt gerade"
       }
     },
     "todo": {
-      "to_read": {
-        "name": "{person} will lesen"
+      "backlog": {
+        "name": "{person} Spielstapel"
       }
     }
   },
@@ -550,45 +550,53 @@
         }
       }
     },
-    "set_reading": {
-      "name": "Lesestatus festlegen",
-      "description": "Den Lesestatus eines Buchs für eine Person festlegen. Ein Benutzer ohne Admin-Rechte kann nur seinen eigenen Status festlegen.",
+    "set_progress": {
+      "name": "Fortschritt festlegen",
+      "description": "Legt den Fortschritt eines Spiels auf einer Plattform für eine Person fest. Ein Benutzer ohne Adminrechte kann nur den eigenen Fortschritt festlegen.",
       "fields": {
         "game_id": {
-          "name": "Buch",
-          "description": "Die ID des Buchs."
+          "name": "Spiel",
+          "description": "Die ID des Spiels."
         },
         "person_id": {
           "name": "Person",
           "description": "Die ID der Home-Assistant-Person."
         },
-        "status": {
-          "name": "Lesestatus",
-          "description": "Der Lesestatus."
+        "platform": {
+          "name": "Plattform",
+          "description": "Die Konsole. Leer, um die Plattform der Exemplare des Spiels zu verwenden."
+        },
+        "play_status": {
+          "name": "Spielstatus",
+          "description": "Der Spielstatus. none entfernt den Fortschritt."
         },
         "rating": {
           "name": "Bewertung",
           "description": "Eine Bewertung von 1 bis 5."
         },
-        "page": {
-          "name": "Seite",
-          "description": "Die aktuelle Seite."
+        "playtime_minutes": {
+          "name": "Spielzeit",
+          "description": "Die Spielzeit in Minuten."
         },
-        "started": {
+        "started_at": {
           "name": "Begonnen",
           "description": "Das Startdatum."
         },
-        "finished": {
-          "name": "Beendet",
-          "description": "Das Datum, an dem das Buch beendet wurde."
+        "completed_at": {
+          "name": "Abgeschlossen",
+          "description": "Das Datum, an dem das Spiel abgeschlossen wurde."
         },
-        "read_count": {
-          "name": "Anzahl gelesen",
-          "description": "Wie oft das Buch gelesen wurde."
+        "last_played_at": {
+          "name": "Zuletzt gespielt",
+          "description": "Das Datum, an dem das Spiel zuletzt gespielt wurde."
         },
-        "private_notes": {
-          "name": "Private Notizen",
-          "description": "Notizen, die nur die Person lesen kann."
+        "completion_count": {
+          "name": "Abschlüsse",
+          "description": "Wie oft das Spiel abgeschlossen wurde."
+        },
+        "review": {
+          "name": "Rezension",
+          "description": "Eine Rezension, die nur die Person lesen kann."
         }
       }
     },
@@ -806,13 +814,13 @@
           "name": "Person",
           "description": "Die ID der Home-Assistant-Person."
         },
-        "share_reading": {
-          "name": "Lesestatus teilen",
-          "description": "Andere Benutzer sehen den Status. Wenn aus, sind die Sensoren und die To-do-Liste der Person nicht verfügbar."
+        "share_progress": {
+          "name": "Fortschritt teilen",
+          "description": "Andere Benutzer können den Fortschritt sehen. Wenn aus, sind die Sensoren und die To-do-Liste der Person nicht verfügbar."
         },
         "yearly_goal": {
           "name": "Jahresziel",
-          "description": "Die Anzahl der Bücher, die dieses Jahr gelesen werden sollen."
+          "description": "Die Anzahl der Spiele, die dieses Jahr abgeschlossen werden sollen."
         },
         "wishlist_todo": {
           "name": "Wunschliste",
@@ -846,13 +854,13 @@
           "name": "Regalboden",
           "description": "Die ID des Regalbodens. Leer für keinen Regalboden."
         },
-        "import_notes": {
-          "name": "Notizen importieren",
-          "description": "Die Rezensionen und Notizen als private Notizen importieren."
+        "import_review": {
+          "name": "Rezensionen importieren",
+          "description": "Die Rezensionen der Datei als private Rezensionen importieren."
         },
-        "replace_reading": {
-          "name": "Lesestatus ersetzen",
-          "description": "Einen vorhandenen Lesestatus ersetzen."
+        "replace_progress": {
+          "name": "Fortschritt ersetzen",
+          "description": "Den vorhandenen Fortschritt ersetzen."
         },
         "dry_run": {
           "name": "Probelauf",
@@ -890,9 +898,9 @@
           "name": "Im Besitz",
           "description": "Nur Bücher mit einem Exemplar oder nur Bücher ohne Exemplar."
         },
-        "status": {
-          "name": "Lesestatus",
-          "description": "Der Lesestatus."
+        "play_status": {
+          "name": "Spielstatus",
+          "description": "Der Spielstatus der Person auf einer Plattform."
         },
         "person_id": {
           "name": "Person",
@@ -1013,6 +1021,9 @@
     },
     "person_not_found": {
       "message": "Keine Person hat die ID {id}."
+    },
+    "platform_required": {
+      "message": "Wähle die Plattform. Die Exemplare des Spiels sind auf mehr als 1 Plattform, oder das Spiel hat kein Exemplar."
     },
     "no_person": {
       "message": "Ihr Benutzer hat keine Home-Assistant-Person. Verknüpfen Sie eine Person mit dem Benutzer."

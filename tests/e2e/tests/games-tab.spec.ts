@@ -1,9 +1,9 @@
-import { adminState, gameByTitle, expect, libraryTab, openTab, restoreReading, test, trackErrors } from './helpers';
+import { adminState, gameByTitle, expect, libraryTab, openTab, restoreProgress, test, trackErrors } from './helpers';
 
 /**
  * The Games tab in the real Home Keeper panel: the tab bar, the game grid, the
  * search, the covers and the game detail. The data is the committed seed
- * (tests/e2e/seed/build_seed.py). A test that changes a reading row puts the seed
+ * (tests/e2e/seed/build_seed.py). A test that changes a progress row puts the seed
  * row back after.
  */
 /** A game with a paper copy that is not lent, so the Lend dialog has a copy. */
@@ -100,28 +100,42 @@ test.describe('Game detail', { tag: '@responsive' }, () => {
   test.beforeEach(async () => {
     const game = await gameByTitle(TITLE);
     gameId = game.id;
-    seedRow = game.reading.alex;
+    seedRow = game.progress.alex?.ps4;
   });
 
   test.afterEach(async () => {
-    await restoreReading(gameId, 'alex', seedRow);
+    await restoreProgress(gameId, 'alex', 'ps4', seedRow);
   });
 
-  test('sets the reading status and the rating', async ({ page }) => {
+  test('sets the play status and the rating', async ({ page }) => {
     const tab = await openTab(page, `/games/${gameId}`);
-    await expect(tab.locator('[data-k="rs-want"]')).toHaveAttribute('aria-pressed', 'true');
-    await tab.locator('[data-k="rs-reading"]').click();
-    await expect(tab.locator('[data-k="rs-reading"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(tab.locator('[data-k="pp-ps4"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(tab.locator('[data-k="rs-backlog"]')).toHaveAttribute('aria-pressed', 'true');
+    await tab.locator('[data-k="rs-playing"]').click();
+    await expect(tab.locator('[data-k="rs-playing"]')).toHaveAttribute('aria-pressed', 'true');
     await tab.locator('[data-k="star-4"]').click();
     await expect(tab.locator('.hkl-star.on')).toHaveCount(4);
     await expect
       .poll(async () => {
-        const row = (await gameByTitle(TITLE)).reading.alex;
-        return [row.status, row.rating, Boolean(row.started)];
+        const row = (await gameByTitle(TITLE)).progress.alex.ps4;
+        return [row.play_status, row.rating, Boolean(row.started_at)];
       })
-      .toEqual(['reading', 4, true]);
+      .toEqual(['playing', 4, true]);
     // The card status on the grid follows.
     await libraryTab(page).locator('[data-k="back"]').click();
     await expect(page).toHaveURL(/\/home-keeper\/games\/games$/);
+  });
+
+  test('a chip for each platform picks the row that the form edits', async ({ page }) => {
+    const game = await gameByTitle('The Left Hand of Darkness');
+    const tab = await openTab(page, `/games/${game.id}`);
+    const chips = tab.locator('.hkl-plats .hkl-plat');
+    await expect(chips).toHaveCount(2);
+    await expect(tab.locator('[data-k="pp-switch2"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(tab.locator('[data-k="rs-completed"]')).toHaveAttribute('aria-pressed', 'true');
+    await tab.locator('[data-k="pp-switch"]').click();
+    await expect(tab.locator('[data-k="pp-switch"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(tab.locator('[data-k="rs-playing"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(tab.locator('[data-k="pp-add"]')).toBeVisible();
   });
 });

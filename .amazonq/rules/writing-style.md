@@ -73,7 +73,7 @@ keys the same as the English source (see [testing.md](testing.md#translations)).
 ### Voice
 
 - State the fact first. Start a feature section with what the software supports or
-  does: "The library supports a `todo` list of the games to read for each person."
+  does: "The library supports a `todo` list of the backlog of each person."
   Then say what it is useful for. Do not open with a problem statement or a scene from daily life.
 - Write about the software and the configuration, not about people.
 - Do not personify the software. It does not carry, know, want, learn, remember,
@@ -134,10 +134,11 @@ Use these names and no others for these things.
 | unit | gameshelf, case | A piece of furniture in a room. It holds shelves. |
 | shelf | | 1 shelf of a unit. "No shelf" is the place of a copy with no shelf. |
 | location | place, where it is | The room, unit and shelf of a copy. |
-| reading status | status, progress | Want to read, Reading, Read or Did not finish, for 1 person. |
+| play status | reading status, state | Backlog, Playing, Completed or Abandoned, for 1 person on 1 platform. |
+| progress | reading, play record | The play status, rating, play time and dates of 1 person on 1 platform. |
 | loan | lending, borrow record | A copy that is lent out, or a game that is borrowed. |
 | wishlist | wish list, want list | The games that a person wants to get. |
-| person | member, reader | A Home Assistant `person`. |
+| person | member, player | A Home Assistant `person`. |
 | tab | Library page, admin UI | The Library tab of the Home Keeper panel. |
 | card | dashboard card, Lovelace card | |
 | Home Keeper | HK, the parent integration | The integration that the library requires. |

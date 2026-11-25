@@ -50,16 +50,16 @@
       "loans_overdue": {
         "name": "Te late uitleningen"
       },
-      "games_read_this_year": {
-        "name": "{person} boeken gelezen dit jaar"
+      "games_completed_this_year": {
+        "name": "{person} games uitgespeeld dit jaar"
       },
-      "reading_now": {
-        "name": "{person} leest nu"
+      "playing_now": {
+        "name": "{person} speelt nu"
       }
     },
     "todo": {
-      "to_read": {
-        "name": "{person} wil lezen"
+      "backlog": {
+        "name": "{person} nog te spelen"
       }
     }
   },
@@ -550,45 +550,53 @@
         }
       }
     },
-    "set_reading": {
-      "name": "Leesstatus instellen",
-      "description": "De leesstatus van een boek voor een persoon instellen. Een gebruiker zonder beheerdersrechten kan alleen de eigen status instellen.",
+    "set_progress": {
+      "name": "Voortgang instellen",
+      "description": "Stelt de voortgang van een game op een platform in voor een persoon. Een gebruiker zonder beheerrechten kan alleen de eigen voortgang instellen.",
       "fields": {
         "game_id": {
-          "name": "Boek",
-          "description": "De ID van het boek."
+          "name": "Spel",
+          "description": "De ID van de game."
         },
         "person_id": {
           "name": "Persoon",
           "description": "De ID van de Home Assistant-persoon."
         },
-        "status": {
-          "name": "Leesstatus",
-          "description": "De leesstatus."
+        "platform": {
+          "name": "Platform",
+          "description": "De console. Leeg om het platform van de exemplaren van de game te gebruiken."
+        },
+        "play_status": {
+          "name": "Speelstatus",
+          "description": "De speelstatus. none verwijdert de voortgang."
         },
         "rating": {
           "name": "Beoordeling",
           "description": "Een beoordeling van 1 tot 5."
         },
-        "page": {
-          "name": "Pagina",
-          "description": "De huidige pagina."
+        "playtime_minutes": {
+          "name": "Speeltijd",
+          "description": "De speeltijd in minuten."
         },
-        "started": {
+        "started_at": {
           "name": "Begonnen",
           "description": "De startdatum."
         },
-        "finished": {
-          "name": "Uitgelezen",
-          "description": "De datum waarop het boek is uitgelezen."
+        "completed_at": {
+          "name": "Uitgespeeld",
+          "description": "De datum waarop de game is uitgespeeld."
         },
-        "read_count": {
-          "name": "Aantal keer gelezen",
-          "description": "Het aantal keer dat het boek is gelezen."
+        "last_played_at": {
+          "name": "Laatst gespeeld",
+          "description": "De datum waarop de game het laatst is gespeeld."
         },
-        "private_notes": {
-          "name": "Privénotities",
-          "description": "Notities die alleen de persoon kan lezen."
+        "completion_count": {
+          "name": "Keren uitgespeeld",
+          "description": "Het aantal keren dat de game is uitgespeeld."
+        },
+        "review": {
+          "name": "Recensie",
+          "description": "Een recensie die alleen de persoon kan lezen."
         }
       }
     },
@@ -806,13 +814,13 @@
           "name": "Persoon",
           "description": "De ID van de Home Assistant-persoon."
         },
-        "share_reading": {
-          "name": "Leesstatus delen",
-          "description": "Andere gebruikers zien de status. Als dit uit staat, zijn de sensoren en de takenlijst van de persoon niet beschikbaar."
+        "share_progress": {
+          "name": "Voortgang delen",
+          "description": "Andere gebruikers kunnen de voortgang zien. Als dit uit staat, zijn de sensoren en de takenlijst van de persoon niet beschikbaar."
         },
         "yearly_goal": {
           "name": "Jaardoel",
-          "description": "Het aantal boeken om dit jaar te lezen."
+          "description": "Het aantal games om dit jaar uit te spelen."
         },
         "wishlist_todo": {
           "name": "Verlanglijst",
@@ -846,13 +854,13 @@
           "name": "Plank",
           "description": "De ID van de plank. Leeg voor geen plank."
         },
-        "import_notes": {
-          "name": "Notities importeren",
-          "description": "De recensies en notities als privénotities importeren."
+        "import_review": {
+          "name": "Recensies importeren",
+          "description": "De recensies van het bestand als privérecensies importeren."
         },
-        "replace_reading": {
-          "name": "Leesstatus vervangen",
-          "description": "Een bestaande leesstatus vervangen."
+        "replace_progress": {
+          "name": "Voortgang vervangen",
+          "description": "De bestaande voortgang vervangen."
         },
         "dry_run": {
           "name": "Proefrun",
@@ -890,9 +898,9 @@
           "name": "In bezit",
           "description": "Alleen boeken met een exemplaar, of alleen boeken zonder exemplaar."
         },
-        "status": {
-          "name": "Leesstatus",
-          "description": "De leesstatus."
+        "play_status": {
+          "name": "Speelstatus",
+          "description": "De speelstatus van de persoon op een platform."
         },
         "person_id": {
           "name": "Persoon",
@@ -1013,6 +1021,9 @@
     },
     "person_not_found": {
       "message": "Geen persoon heeft de ID {id}."
+    },
+    "platform_required": {
+      "message": "Kies het platform. De exemplaren van de game staan op meer dan 1 platform, of de game heeft geen exemplaar."
     },
     "no_person": {
       "message": "Je gebruiker heeft geen Home Assistant-persoon. Koppel een persoon aan de gebruiker."

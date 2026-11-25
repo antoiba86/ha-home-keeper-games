@@ -1,6 +1,6 @@
 // The `home-keeper-games-card` dashboard card and its visual editor.
 //
-// Any user can add the card. It shows the reading of the caller's own person.
+// Any user can add the card. It shows the play progress of the caller's own person.
 // An admin can set `person` in the config to show another person. The data
 // comes from `get_state`, which the backend projects for a non-admin user.
 
@@ -9,20 +9,22 @@ import { renderKeepFocus } from './dom';
 import { formatAgo, setLanguage, t, tn } from './i18n';
 import { cover, personDot, statusLabel, wireCovers } from './markup';
 import { TOKENS } from './styles';
-import type { Game, HomeAssistant, Lib } from './types';
+import type { Game, HomeAssistant, Lib, Platform } from './types';
 import {
   buildIndex,
   cardModel,
   daysBetween,
   debounce,
+  defaultPlatform,
   escapeHTML,
   locationLabel,
   matchesSearch,
   normalizeState,
-  gameByline,
   personNames,
   pickRandom,
-  readingOf,
+  platformLabel,
+  progressOf,
+  statusOf,
   todayISO,
   type Index,
 } from './utils';
@@ -32,13 +34,13 @@ export interface CardConfig {
   title?: string;
   person?: string;
   search?: boolean;
-  reading?: boolean;
-  want?: boolean;
+  playing?: boolean;
+  backlog?: boolean;
   goal?: boolean;
   household?: boolean;
 }
 
-export const SECTIONS = ['search', 'reading', 'want', 'goal', 'household'] as const;
+export const SECTIONS = ['search', 'playing', 'backlog', 'goal', 'household'] as const;
 type Section = (typeof SECTIONS)[number];
 
 export const CARD_TAG = 'home-keeper-games-card';
@@ -75,8 +77,8 @@ ha-card { display: block; background: var(--ha-card-background, var(--hkl-surfac
 .ring .fg { stroke: var(--hkl-primary); stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; }
 .ring text { fill: var(--hkl-text); font: 700 18px var(--hkl-font); }
 .act { display: flex; align-items: center; gap: 8px; line-height: 1.35; }
-.page { display: flex; gap: 6px; align-items: center; }
-.page input { width: 80px; height: 32px; border: 1px solid var(--hkl-outline); border-radius: 8px; padding: 0 8px; background: var(--hkl-surface); color: var(--hkl-text); }
+.time { display: flex; gap: 6px; align-items: center; }
+.time input { width: 80px; height: 32px; border: 1px solid var(--hkl-outline); border-radius: 8px; padding: 0 8px; background: var(--hkl-surface); color: var(--hkl-text); }
 .hkl-cover { position: relative; display: flex; flex-direction: column; justify-content: space-between; aspect-ratio: 2 / 3; border-radius: 3px 6px 6px 3px; background: var(--c); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.25), inset 4px 0 0 rgba(0,0,0,.12); padding: 8px 6px 6px 10px; overflow: hidden; }
 .hkl-cover.has-img { padding: 0; }
 .hkl-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -105,7 +107,8 @@ export class HomeKeeperGamesCard extends HTMLElement {
   private _error = '';
   private _q = '';
   private _pick: string | null = null;
-  private _pageFor: string | null = null;
+  /** The `game_id:platform` of the play time form that is open. */
+  private _timeFor: string | null = null;
   private _unsub?: () => void | Promise<void>;
   private _subscribing = false;
   private _lang = '';
@@ -128,7 +131,7 @@ export class HomeKeeperGamesCard extends HTMLElement {
     });
     this._root.addEventListener('submit', (ev) => {
       ev.preventDefault();
-      void this._savePage(ev.target as HTMLFormElement);
+      void this._saveTime(ev.target as HTMLFormElement);
     });
   }
 
@@ -244,21 +247,23 @@ export class HomeKeeperGamesCard extends HTMLElement {
     const parts: string[] = [head];
     if (this._error) parts.push(`<div class="err">${escapeHTML(this._error)}</div>`);
     if (on.search) parts.push(this._searchHtml(lib, idx, pid));
-    if (on.reading) {
-      const rows = model.reading
-        .map(({ game, row }) => {
-          const page = row.page != null ? t('game.page_n', { page: row.page }) : '';
+    if (on.playing) {
+      const rows = model.playing
+        .map(({ game, platform, row }) => {
+          const time = row.playtime_minutes != null ? t('game.minutes_n', { n: row.playtime_minutes }) : '';
+          const meta = [platformLabel(platform), time].filter(Boolean).join(' · ');
           const id = escapeHTML(game.id);
-          const pageForm = this._pageFor === game.id
-            ? `<form class="page" data-game="${id}"><input name="page" type="number" min="0" inputmode="numeric" data-k="page-${id}" value="${escapeHTML(row.page ?? '')}" aria-label="${escapeHTML(t('game.page'))}" /><button class="btn" type="submit">${escapeHTML(t('action.save'))}</button></form>`
-            : `<div class="btns"><button class="btn" data-act="page" data-id="${id}" data-k="sp-${id}">${escapeHTML(t('card.set_page'))}</button><button class="btn" data-act="read" data-id="${id}" data-k="rd-${id}">${escapeHTML(t('status.read'))}</button></div>`;
-          return `<div class="item big">${cover(game, 'thumb')}<div class="main"><b>${escapeHTML(game.title)}</b><span class="muted small">${escapeHTML(gameByline(game))}</span>${page ? `<span class="muted small">${escapeHTML(page)}</span>` : ''}${pageForm}</div></div>`;
+          const key = escapeHTML(`${game.id}:${platform}`);
+          const timeForm = this._timeFor === `${game.id}:${platform}`
+            ? `<form class="time" data-game="${id}" data-platform="${escapeHTML(platform)}"><input name="minutes" type="number" min="0" inputmode="numeric" data-k="time-${key}" value="${escapeHTML(row.playtime_minutes ?? '')}" aria-label="${escapeHTML(t('game.playtime'))}" /><button class="btn" type="submit">${escapeHTML(t('action.save'))}</button></form>`
+            : `<div class="btns"><button class="btn" data-act="time" data-id="${id}" data-platform="${escapeHTML(platform)}" data-k="st-${key}">${escapeHTML(t('card.set_time'))}</button><button class="btn" data-act="completed" data-id="${id}" data-platform="${escapeHTML(platform)}" data-k="cp-${key}">${escapeHTML(t('status.completed'))}</button></div>`;
+          return `<div class="item big">${cover(game, 'thumb')}<div class="main"><b>${escapeHTML(game.title)}</b><span class="muted small">${escapeHTML(meta)}</span>${timeForm}</div></div>`;
         })
         .join('');
-      parts.push(`<div class="sec"><span class="eyebrow">${escapeHTML(t('status.reading'))}</span>${rows || `<span class="muted">${escapeHTML(t('card.no_reading'))}</span>`}</div>`);
+      parts.push(`<div class="sec"><span class="eyebrow">${escapeHTML(t('status.playing'))}</span>${rows || `<span class="muted">${escapeHTML(t('card.no_playing'))}</span>`}</div>`);
     }
-    if (on.want) {
-      const covers = model.want
+    if (on.backlog) {
+      const covers = model.backlog
         .slice(0, 12)
         .map((b) => `<span class="${b.id === this._pick ? 'pick' : ''}" title="${escapeHTML(b.title)}">${cover(b, 'tile')}</span>`)
         .join('');
@@ -267,7 +272,7 @@ export class HomeKeeperGamesCard extends HTMLElement {
       const pickLine = pick
         ? `<span class="small">${escapeHTML(t('card.pick', { title: pick.title }))}${where ? ` · ${escapeHTML(where)}` : ''}</span>`
         : '';
-      parts.push(`<div class="sec"><span class="eyebrow">${escapeHTML(t('status.want'))} · ${model.want.length}</span>${covers ? `<div class="covers">${covers}</div>` : `<span class="muted">${escapeHTML(t('card.no_want'))}</span>`}${model.want.length ? `<div class="btns"><button class="btn" data-act="random" data-k="random">${escapeHTML(t('card.random'))}</button></div>${pickLine}` : ''}</div>`);
+      parts.push(`<div class="sec"><span class="eyebrow">${escapeHTML(t('status.backlog'))} · ${model.backlog.length}</span>${covers ? `<div class="covers">${covers}</div>` : `<span class="muted">${escapeHTML(t('card.no_backlog'))}</span>`}${model.backlog.length ? `<div class="btns"><button class="btn" data-act="random" data-k="random">${escapeHTML(t('card.random'))}</button></div>${pickLine}` : ''}</div>`);
     }
     if (on.goal) {
       const { done, goal, year } = model.goal;
@@ -280,10 +285,10 @@ export class HomeKeeperGamesCard extends HTMLElement {
     }
     if (on.household) {
       const rows = model.household
-        .map(({ person: p, game, row }) => {
+        .map(({ person: p, game, platform, row }) => {
           const days = row.updated_at ? Math.max(0, daysBetween(row.updated_at.slice(0, 10), today)) : null;
-          const extra = [row.rating ? tn('game.stars', row.rating) : '', days != null ? formatAgo(days) : ''].filter(Boolean).join(' · ');
-          return `<div class="act">${personDot(p)}<span>${escapeHTML(t(`card.act_${row.status}`, { name: p.name }))} <b>${escapeHTML(game.title)}</b>${extra ? ` <span class="muted">· ${escapeHTML(extra)}</span>` : ''}</span></div>`;
+          const extra = [platformLabel(platform), row.rating ? tn('game.stars', row.rating) : '', days != null ? formatAgo(days) : ''].filter(Boolean).join(' · ');
+          return `<div class="act">${personDot(p)}<span>${escapeHTML(t(`card.act_${row.play_status}`, { name: p.name }))} <b>${escapeHTML(game.title)}</b>${extra ? ` <span class="muted">· ${escapeHTML(extra)}</span>` : ''}</span></div>`;
         })
         .join('');
       parts.push(`<div class="sec"><span class="eyebrow">${escapeHTML(t('game.household'))}</span>${rows || `<span class="muted">${escapeHTML(t('card.no_activity'))}</span>`}</div>`);
@@ -303,23 +308,23 @@ export class HomeKeeperGamesCard extends HTMLElement {
     const hits = lib.games.filter((b) => matchesSearch(b, this._q, pid)).slice(0, 5);
     const rows = hits
       .map((b) => {
-        const st = readingOf(b, pid)?.status ?? null;
+        const st = statusOf(b, pid);
         const where = this._where(idx, b) || (b.owned ? t('common.no_shelf') : t('game.not_owned'));
         const action = st
           ? `<span class="pill">${escapeHTML(statusLabel(st))}</span>`
-          : `<button class="btn" data-act="want" data-id="${escapeHTML(b.id)}" data-k="w-${escapeHTML(b.id)}">${escapeHTML(t('status.want'))}</button>`;
+          : `<button class="btn" data-act="backlog" data-id="${escapeHTML(b.id)}" data-k="w-${escapeHTML(b.id)}">${escapeHTML(t('status.backlog'))}</button>`;
         return `<div class="item">${cover(b, 'thumb')}<div class="main"><b>${escapeHTML(b.title)}</b><span class="muted small">${escapeHTML(where)}</span></div>${action}</div>`;
       })
       .join('');
     return `<div class="sec">${input}${rows || `<span class="muted">${escapeHTML(t('games.no_match'))}</span>`}</div>`;
   }
 
-  /** `set_reading` for the card person. A caller sends `person_id` only for another person. */
-  private async _setReading(gameId: string, fields: Record<string, unknown>): Promise<void> {
+  /** `set_progress` for the card person. A caller sends `person_id` only for another person. */
+  private async _setProgress(gameId: string, platform: string, fields: Record<string, unknown>): Promise<void> {
     const pid = this._person();
     const self = pid === this._lib?.me.person_id;
     try {
-      await this._api!.call('set_reading', { game_id: gameId, ...(self ? {} : { person_id: pid }), ...fields });
+      await this._api!.call('set_progress', { game_id: gameId, platform, ...(self ? {} : { person_id: pid }), ...fields });
       await this._refresh();
     } catch (err) {
       this._error = errorText(err);
@@ -331,37 +336,39 @@ export class HomeKeeperGamesCard extends HTMLElement {
     const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-act]');
     if (!el || !this._lib) return;
     const id = el.dataset.id ?? '';
+    const platform = (el.dataset.platform ?? '') as Platform;
     switch (el.dataset.act) {
-      case 'want':
-        await this._setReading(id, { status: 'want' });
+      case 'backlog':
+        await this._setProgress(id, defaultPlatform(this._idx?.copiesByGame.get(id) ?? []), { play_status: 'backlog' });
         return;
-      case 'read': {
+      case 'completed': {
         const game = this._idx?.game.get(id);
-        const row = game ? readingOf(game, this._person()) : null;
-        await this._setReading(id, { status: 'read', finished: todayISO(new Date()), read_count: (row?.read_count ?? 0) + 1 });
+        const row = game ? progressOf(game, this._person(), platform) : null;
+        await this._setProgress(id, platform, { play_status: 'completed', completed_at: todayISO(new Date()), completion_count: (row?.completion_count ?? 0) + 1 });
         return;
       }
-      case 'page':
-        this._pageFor = id;
+      case 'time':
+        this._timeFor = `${id}:${platform}`;
         this._render();
-        this._body.querySelector<HTMLInputElement>(`[data-k="page-${CSS.escape(id)}"]`)?.focus();
+        this._body.querySelector<HTMLInputElement>(`[data-k="time-${CSS.escape(`${id}:${platform}`)}"]`)?.focus();
         return;
       case 'random': {
         const model = cardModel(this._lib, this._person(), new Date());
-        this._pick = pickRandom(model.want, Math.random())?.id ?? null;
+        this._pick = pickRandom(model.backlog, Math.random())?.id ?? null;
         this._render();
         return;
       }
     }
   }
 
-  private async _savePage(form: HTMLFormElement): Promise<void> {
+  private async _saveTime(form: HTMLFormElement): Promise<void> {
     const gameId = form.dataset.game;
-    if (!gameId) return;
-    const raw = (form.elements.namedItem('page') as HTMLInputElement).value;
-    const page = raw === '' ? null : Math.max(0, Math.round(Number(raw)));
-    this._pageFor = null;
-    await this._setReading(gameId, { page: Number.isFinite(page) ? page : null });
+    const platform = form.dataset.platform;
+    if (!gameId || !platform) return;
+    const raw = (form.elements.namedItem('minutes') as HTMLInputElement).value;
+    const minutes = raw === '' ? null : Math.max(0, Math.round(Number(raw)));
+    this._timeFor = null;
+    await this._setProgress(gameId, platform, { playtime_minutes: Number.isFinite(minutes) ? minutes : null });
   }
 }
 

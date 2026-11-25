@@ -7,7 +7,7 @@ import type { ImportRow } from './types';
 import { escapeHTML } from './utils';
 
 /** The preview rows: the count keys of `import_csv` and their labels. */
-export const PREVIEW_KEYS = ['read', 'reading', 'want', 'dnf', 'wishlist', 'copies', 'tags', 'errors'] as const;
+export const PREVIEW_KEYS = ['backlog', 'playing', 'completed', 'abandoned', 'wishlist', 'copies', 'tags', 'errors'] as const;
 
 /** The match counts that show as pills. */
 export const MATCH_KEYS = ['existing', 'new', 'title_match'] as const;
@@ -55,8 +55,8 @@ export function renderImport(ctx: ViewCtx): string {
       ${s.busy ? `<div class="hkl-muted">${escapeHTML(t('import.working'))}</div>` : ''}
       ${s.error ? `<div class="hkl-error" role="alert">${escapeHTML(s.error)}</div>` : ''}
       ${preview}
-      <label class="hkl-check"><input type="checkbox" data-chg="import" data-key="importNotes" data-k="im-notes"${s.importNotes ? ' checked' : ''} />${escapeHTML(t('import.notes'))}</label>
-      <label class="hkl-check"><input type="checkbox" data-chg="import" data-key="replaceReading" data-k="im-replace"${s.replaceReading ? ' checked' : ''} />${escapeHTML(t('import.replace', { name: personName }))}</label>
+      <label class="hkl-check"><input type="checkbox" data-chg="import" data-key="importReview" data-k="im-notes"${s.importReview ? ' checked' : ''} />${escapeHTML(t('import.review'))}</label>
+      <label class="hkl-check"><input type="checkbox" data-chg="import" data-key="replaceProgress" data-k="im-replace"${s.replaceProgress ? ' checked' : ''} />${escapeHTML(t('import.replace', { name: personName }))}</label>
       <div class="hkl-dlg-actions">${button(escapeHTML(t('action.cancel')), 'import-close', 'text', 'data-k="import-cancel"')}${go}</div>
     </section>
   </div>`;

@@ -14,14 +14,14 @@ import { ensureMarkdown, wireMarkdown } from './markdown';
 import { wireCovers } from './markup';
 import { camLogLines, logCam, Scanner } from './scanner';
 import { STYLES } from './styles';
-import { gamesPath, renderGame, renderGames } from './tab-games';
+import { gamesPath, progressTarget, renderGame, renderGames } from './tab-games';
 import { renderDialog, type Dialog, type DialogState } from './tab-dialogs';
 import { renderImport } from './tab-import';
 import { renderLoans, renderSettings, renderWishlist } from './tab-lists';
 import { cameraBlocked, isBorrowedMode, renderScan, routeShelf } from './tab-scan';
 import { renderShelves } from './tab-shelves';
 import type { ImportState, ScanEntry, UiState, ViewCtx } from './tab-types';
-import type { Game, HomeAssistant, ImportSummary, Lib, RawState, ReadingStatus, ScanResult, TabHost } from './types';
+import type { Game, HomeAssistant, ImportSummary, Lib, Platform, PlayStatus, RawState, ScanResult, TabHost } from './types';
 import {
   buildIndex,
   buildPath,
@@ -35,8 +35,8 @@ import {
   normalizeState,
   numberOrNull,
   parseRoute,
+  progressOf,
   readFilters,
-  readingOf,
   retailBarcode,
   shelfPath,
   splitList,
@@ -60,8 +60,8 @@ function freshImport(personId: string | null): ImportState {
     fileName: '',
     content: '',
     rowCount: 0,
-    importNotes: true,
-    replaceReading: false,
+    importReview: true,
+    replaceProgress: false,
     summary: null,
     busy: false,
     error: '',
@@ -74,7 +74,8 @@ function freshUi(): UiState {
     limit: PAGE,
     notesTab: 'shared',
     editNotes: false,
-    readingPerson: null,
+    progressPerson: null,
+    progressPlatform: null,
     scan: {
       method: 'camera',
       roomId: null,
@@ -193,7 +194,10 @@ export class HomeKeeperGamesTab extends HTMLElement {
       this._ui.limit = PAGE;
       if (this._route.view === 'import' && prev.view !== 'import') this._ui.import = freshImport(this._lib?.me.person_id ?? null);
     }
-    if (prev.view === 'game' && prev.id !== this._route.id) this._ui.readingPerson = null;
+    if (prev.view === 'game' && prev.id !== this._route.id) {
+      this._ui.progressPerson = null;
+      this._ui.progressPlatform = null;
+    }
     // The title sheet belongs to the scan. If the user leaves, the game keeps its barcode as the title.
     if (this._route.view !== 'scan' && this._sheetOpen()) this._closeDialog();
     this._syncScanner();
@@ -524,13 +528,19 @@ export class HomeKeeperGamesTab extends HTMLElement {
       case 'filter':
         this._setFilter(key, String(value));
         return;
-      case 'reading-person':
-        this._ui.readingPerson = String(value);
+      case 'progress-person':
+        this._ui.progressPerson = String(value);
+        this._ui.progressPlatform = null;
         this._render();
         return;
-      case 'reading-field': {
-        const v = key === 'page' || key === 'read_count' ? intOrNull(value) : String(value) || null;
-        await this._setReading({ [key]: key === 'read_count' ? (v ?? 0) : v });
+      case 'progress-platform':
+        if (value) this._ui.progressPlatform = String(value) as Platform;
+        this._render();
+        return;
+      case 'progress-field': {
+        const num = key === 'playtime_minutes' || key === 'completion_count';
+        const v = num ? intOrNull(value) : String(value) || null;
+        await this._setProgress({ [key]: key === 'completion_count' ? (v ?? 0) : v });
         return;
       }
       case 'cover-file':
@@ -547,7 +557,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
         return;
       case 'person': {
         const fields: Fields = { person_id: id };
-        if (key === 'share_reading') fields.share_reading = Boolean(value);
+        if (key === 'share_progress') fields.share_progress = Boolean(value);
         if (key === 'yearly_goal') fields.yearly_goal = intOrNull(value);
         if (key === 'wishlist_todo') fields.wishlist_todo = String(value) || null;
         await this._run('set_person_settings', fields, t('settings.saved'));
@@ -641,12 +651,21 @@ export class HomeKeeperGamesTab extends HTMLElement {
         this._render();
         return;
       case 'set-status':
-        if (game) await this._setStatus(game, value as ReadingStatus);
+        if (game) await this._setStatus(game, value as PlayStatus);
+        return;
+      case 'progress-platform':
+        this._ui.progressPlatform = value as Platform;
+        this._render();
+        return;
+      case 'progress-clear':
+        if (await this._setProgress({ play_status: 'none' })) this._ui.progressPlatform = null;
+        this._render();
         return;
       case 'rate': {
-        const row = game ? readingOf(game, this._readingPerson()) : null;
+        const { pid, platform } = this._progressTarget();
+        const row = game ? progressOf(game, pid, platform) : null;
         const n = Number(value);
-        await this._setReading({ rating: row?.rating === n ? null : n });
+        await this._setProgress({ rating: row?.rating === n ? null : n });
         return;
       }
       case 'notes-tab':
@@ -776,32 +795,38 @@ export class HomeKeeperGamesTab extends HTMLElement {
     }
   }
 
-  // ── Reading ────────────────────────────────────────────────────────────────
+  // ── Progress ───────────────────────────────────────────────────────────────
 
-  private _readingPerson(): string | null {
-    return this._ui.readingPerson ?? this._lib?.me.person_id ?? null;
+  /** The person and the platform that the progress form of the open game edits. */
+  private _progressTarget(): { pid: string | null; platform: Platform | null } {
+    const ctx = this._ctx();
+    const game = this._game();
+    if (!ctx || !game) return { pid: null, platform: null };
+    const { pid, platform } = progressTarget(ctx, game);
+    return { pid, platform };
   }
 
-  private async _setReading(fields: Fields, gameId?: string, personId?: string | null): Promise<boolean> {
-    const id = gameId ?? this._route.id;
-    const pid = personId ?? this._readingPerson();
+  private async _setProgress(fields: Fields): Promise<boolean> {
+    const id = this._route.id;
+    const { pid, platform } = this._progressTarget();
     if (!id || !pid) {
       this._toast(t('common.no_person'));
       return false;
     }
-    return this._run('set_reading', { game_id: id, person_id: pid, ...fields });
+    return this._run('set_progress', { game_id: id, person_id: pid, platform, ...fields });
   }
 
-  private async _setStatus(game: Game, status: ReadingStatus): Promise<void> {
-    const row = readingOf(game, this._readingPerson());
+  private async _setStatus(game: Game, status: PlayStatus): Promise<void> {
+    const { pid, platform } = this._progressTarget();
+    const row = progressOf(game, pid, platform);
     const today = todayISO(new Date());
-    const fields: Fields = { status };
-    if (status === 'reading' && !row?.started) fields.started = today;
-    if (status === 'read' && row?.status !== 'read') {
-      fields.finished = today;
-      fields.read_count = (row?.read_count ?? 0) + 1;
+    const fields: Fields = { play_status: status };
+    if (status === 'playing' && !row?.started_at) fields.started_at = today;
+    if (status === 'completed' && row?.play_status !== 'completed') {
+      fields.completed_at = today;
+      fields.completion_count = (row?.completion_count ?? 0) + 1;
     }
-    await this._setReading(fields, game.id);
+    await this._setProgress(fields);
   }
 
   private async _saveNotes(form: HTMLFormElement): Promise<void> {
@@ -811,7 +836,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
     const saved =
       this._ui.notesTab === 'shared'
         ? await this._run('update_game', { game_id: game.id, shared_notes: text })
-        : await this._setReading({ private_notes: text });
+        : await this._setProgress({ review: text });
     // If the save fails, the editor stays open with the text.
     if (saved) this._ui.editNotes = false;
     this._render();
@@ -1086,8 +1111,8 @@ export class HomeKeeperGamesTab extends HTMLElement {
       content: s.content,
       person_id: s.personId ?? this._lib?.me.person_id ?? undefined,
       shelf_id: s.shelfId || null,
-      import_notes: s.importNotes,
-      replace_reading: s.replaceReading,
+      import_review: s.importReview,
+      replace_progress: s.replaceProgress,
       dry_run: dryRun,
     };
   }
@@ -1319,16 +1344,19 @@ export class HomeKeeperGamesTab extends HTMLElement {
     const s = this._ui.scan;
     const me = this._lib?.me.person_id;
     if (!s.markRead || !me || isBorrowedMode(this._ctx()!)) return;
-    const games = new Set(
-      s.results
-        .filter((r) => r.res && (r.res.result === 'added' || r.res.result === 'moved') && r.res.game)
-        .map((r) => (r.res as ScanResult).game!.id),
-    );
-    const today = todayISO(new Date());
-    for (const gameId of games) {
-      await this._run('set_reading', { game_id: gameId, person_id: me, status: 'read', finished: today });
+    // 1 row for each game and platform: the platform of the scanned copy.
+    const rows = new Map<string, [string, Platform | undefined]>();
+    for (const r of s.results) {
+      const res = r.res as ScanResult | null;
+      if (!res || (res.result !== 'added' && res.result !== 'moved') || !res.game) continue;
+      const platform = res.copy?.platform;
+      rows.set(`${res.game.id}:${platform ?? ''}`, [res.game.id, platform]);
     }
-    if (games.size) this._toast(tn('scan.marked_read', games.size));
+    const today = todayISO(new Date());
+    for (const [gameId, platform] of rows.values()) {
+      await this._run('set_progress', { game_id: gameId, person_id: me, platform, play_status: 'completed', completed_at: today });
+    }
+    if (rows.size) this._toast(tn('scan.marked_read', rows.size));
   }
 
   private async _scanAct(act: string, el: HTMLElement): Promise<void> {

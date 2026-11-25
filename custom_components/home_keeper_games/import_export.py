@@ -33,10 +33,12 @@ from .csv_io import _Index as GameIndex
 from .models import (
     COPY_FIELDS,
     COVER_KINDS,
+    DEFAULT_PLATFORM,
     GAME_FIELDS,
     MAX_NAME,
     MAX_NOTE,
-    READING_FIELDS,
+    PLATFORMS,
+    PROGRESS_FIELDS,
     LibraryError,
     apply_person_settings,
     boolean,
@@ -46,9 +48,10 @@ from .models import (
     build_room,
     build_shelf,
     build_unit,
+    choice,
     clone,
     copy_field,
-    empty_reading,
+    empty_progress,
     fold,
     game_field,
     integer,
@@ -56,7 +59,7 @@ from .models import (
     new_id,
     next_order,
     person_settings,
-    reading_field,
+    progress_field,
     text,
     title_key,
     update_location,
@@ -73,7 +76,7 @@ SECTIONS = (
     "games",
     "copies",
     "loans",
-    "reading",
+    "progress",
     "people",
 )
 
@@ -242,16 +245,19 @@ def build_export(
         record["person_name"] = person_names.get(person_id) if person_id else None
         loans.append(record)
     data["loans"] = loans
-    data["reading"] = [
+    data["progress"] = [
         {
             "person_id": person_id,
             "person_name": person_names.get(person_id),
             "games": [
-                {"game_id": game_id, **clone(rows[game_id])} for game_id in sorted(rows)
+                {"game_id": game_id, "platform": platform, **clone(rows[platform])}
+                for game_id in sorted(games)
+                for rows in [games[game_id]]
+                for platform in sorted(rows)
             ],
         }
-        for person_id, rows in sorted(state["reading"].items())
-        if rows
+        for person_id, games in sorted(state["progress"].items())
+        if games
     ]
     people = []
     for person_id in sorted(state["people"]):
@@ -768,10 +774,10 @@ class _Planner:
             self.new["loans"][loan["id"]] = loan
             self.record("loans", index, loan["id"], title, ACTION_CREATE, None)
 
-    # ── Reading ──────────────────────────────────────────────────────────────
+    # ── Progress ─────────────────────────────────────────────────────────────
 
-    def reading(self) -> None:
-        for _index, path, entry in self.items("reading"):
+    def progress(self) -> None:
+        for _index, path, entry in self.items("progress"):
             person_id = self.person(entry, path)
             rows = entry.get("games")
             if not isinstance(rows, list):
@@ -780,32 +786,39 @@ class _Planner:
                 )
                 continue
             if person_id is None:
-                self.plan.counts["reading"]["skipped"] += len(rows)
+                self.plan.counts["progress"]["skipped"] += len(rows)
                 continue
             for position, row in enumerate(rows):
-                self.reading_row(person_id, position, row, f"{path}.games[{position}]")
+                self.progress_row(person_id, position, row, f"{path}.games[{position}]")
 
-    def reading_row(self, person_id: str, position: int, row: Any, path: str) -> None:
+    def progress_row(self, person_id: str, position: int, row: Any, path: str) -> None:
         if not isinstance(row, dict):
             self.problem(LEVEL_ERROR, path, "import_not_an_object", field=path)
             return
         game_id = self.required_ref("games", row, "game_id", path)
+        ok, platform = self.check(
+            f"{path}.platform",
+            choice,
+            row.get("platform") or DEFAULT_PLATFORM,
+            "platform",
+            PLATFORMS,
+        )
         values: dict[str, Any] = {}
-        ok = game_id is not None
-        for name in READING_FIELDS:
+        ok = ok and game_id is not None
+        for name in PROGRESS_FIELDS:
             if name in row:
                 good, values[name] = self.check(
-                    f"{path}.{name}", reading_field, name, row[name]
+                    f"{path}.{name}", progress_field, name, row[name]
                 )
                 ok = ok and good
         if not ok or game_id is None:
             return
-        rows = self.new["reading"].setdefault(person_id, {})
-        current = rows.get(game_id)
-        updated = dict(current) if current else empty_reading(now=self.now)
+        rows = self.new["progress"].setdefault(person_id, {}).setdefault(game_id, {})
+        current = rows.get(platform)
+        updated = dict(current) if current else empty_progress(now=self.now)
         updated.update(values)
         if current is None or any(
-            updated.get(name) != current.get(name) for name in READING_FIELDS
+            updated.get(name) != current.get(name) for name in PROGRESS_FIELDS
         ):
             stamp = row.get("updated_at")
             updated["updated_at"] = (
@@ -813,10 +826,10 @@ class _Planner:
             )
         else:
             updated = current
-        rows[game_id] = updated
+        rows[platform] = updated
         title = str(self.new["games"][game_id].get("title", ""))
         action = ACTION_UPDATE if current is not None else ACTION_CREATE
-        self.record("reading", position, game_id, title, action, None)
+        self.record("progress", position, game_id, title, action, None)
 
     # ── People ───────────────────────────────────────────────────────────────
 
@@ -827,7 +840,7 @@ class _Planner:
                 self.skip("people")
                 continue
             data: dict[str, Any] = {
-                k: record[k] for k in ("share_reading", "yearly_goal") if k in record
+                k: record[k] for k in ("share_progress", "yearly_goal") if k in record
             }
             todo = record.get("wishlist_todo")
             todo_name = record.get("wishlist_todo_name")
@@ -875,9 +888,9 @@ class _Planner:
         self.games()
         self.copies()
         self.loans()
-        self.reading()
+        self.progress()
         self.people()
-        self.new["reading"] = {p: r for p, r in self.new["reading"].items() if r}
+        self.new["progress"] = {p: g for p, g in self.new["progress"].items() if g}
         return self.plan
 
 

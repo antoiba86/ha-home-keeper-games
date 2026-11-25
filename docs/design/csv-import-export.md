@@ -5,7 +5,7 @@ implements:
   - custom_components/home_keeper_games/csv_io.py
   - custom_components/home_keeper_games/frontend/src/tab-import.ts
 related: [store-models, events-api, import-export]
-source_hash: 8a8e04bfbee6
+source_hash: cb22750969f8
 ---
 
 # CSV import and export
@@ -19,7 +19,7 @@ the admin sees the counts before a write.
 - **G1. Preview before write.** A dry run is the same pure call as the import, with the
   result thrown away. The preview and the import cannot disagree.
 - **G2. No second game.** A row matches a stored game by id, then barcode, then title.
-- **G3. Keep what is there.** A reading row that the person has now stays, unless the
+- **G3. Keep what is there.** A progress row that the person has now stays, unless the
   admin asks to replace it. A copy id that is already stored is not added again.
 - **G4. Round trips.** `parse(write(rows))` gives the rows back.
 
@@ -48,13 +48,13 @@ the save have no `await` between them, so no other change comes in the middle.
 
 - A change to another field of the same record stays.
 - A record that a user deleted while the plan ran stays deleted.
-- A planned copy or reading row of a deleted game is dropped. A planned copy on a
+- A planned copy or progress row of a deleted game is dropped. A planned copy on a
   deleted shelf goes to no shelf.
 
 ### Columns
 
 The file has every game field, the copy fields, the location as a path of room, unit
-and shelf names, the reading row of the chosen person and the wishlist flags
+and shelf names, the progress of the chosen person and the wishlist flags
 (`csv_io.LIBRARY_COLUMNS`). A list cell separates its items with `; `. The barcode cell
 is cleaned as in [scan-and-barcode](scan-and-barcode.md#barcode-rules). The barcode cell
 is a copy field. A row whose barcode is on a copy of another game is an error row.
@@ -63,14 +63,19 @@ is a copy field. A row whose barcode is on a copy of another game is an error ro
   chosen shelf. A row with no copy id adds a copy only to a game with no copy.
 - A `game_id` or `copy_id` that is not 32 lower-case hex characters is dropped.
 - The import checks the copy of a row first, so a row with a bad copy changes no record.
-- A game has 1 row for each copy. The first row of the game sets the reading status.
+- A game has 1 row for each copy. The `platform` cell is the platform of the copy and of
+  the progress. The first row with a `play_status` for a platform sets the progress on
+  that platform. An empty platform cell gives the progress on `other`.
+- The `review` cell is read only with `import_review: true`. A row that is stored now
+  stays and counts as `progress_kept`, unless `replace_progress: true`.
 - A row with `wishlist` true puts a game with no copy on the wishlist of the person.
 
 ### Export
 
 `csv_io.export` writes 1 row for each copy, and 1 row for a game with no copy. With a
-person, the file has the reading status of that person. With no person, it has all games
-and no reading status. `csv_io.export_filename` names the file with the date.
+person, the first row of each platform has the progress of that person on that platform,
+and a platform with progress and no copy gets 1 more row with no copy. With no person, the
+file has all games and no progress. `csv_io.export_filename` names the file with the date.
 
 ### Tab
 

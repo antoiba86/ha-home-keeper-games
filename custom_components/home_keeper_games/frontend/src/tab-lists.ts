@@ -5,7 +5,7 @@ import { button, cover, navBar, options, personDot, statusLabel, taskLinkHtml } 
 import { navCounts } from './tab-games';
 import type { ViewCtx } from './tab-types';
 import type { Game, Loan } from './types';
-import { buildPath, dueState, escapeHTML, gameByline, loansFor, readingOf, type LoanTab } from './utils';
+import { buildPath, dueState, escapeHTML, gameByline, loansFor, statusOf, type LoanTab } from './utils';
 
 const LOAN_TABS: LoanTab[] = ['out', 'in', 'returned'];
 
@@ -34,7 +34,7 @@ function loanRow(ctx: ViewCtx, loan: Loan): string {
     const person = loan.person_id ? ctx.idx.person.get(loan.person_id) : undefined;
     if (person) meta.push(person.name);
     if (loan.format) meta.push(t(`format.kind_${loan.format}`));
-    if (game && loan.person_id) meta.push(statusLabel(readingOf(game, loan.person_id)?.status ?? null));
+    if (game && loan.person_id) meta.push(statusLabel(statusOf(game, loan.person_id)));
   } else {
     meta.push(t('loan.since', { date: formatDate(loan.started) }));
   }
@@ -117,7 +117,7 @@ export function renderSettings(ctx: ViewCtx): string {
       const items = known || !p.wishlist_todo ? todo : [...todo, [p.wishlist_todo, p.wishlist_todo] as [string, string]];
       return `<tr>
         <th scope="row"><span class="hkl-who">${personDot(p)}<span>${escapeHTML(p.name)}</span></span></th>
-        <td><label class="hkl-check"><input type="checkbox" data-chg="person" data-key="share_reading" data-id="${id}" data-k="ps-${id}"${p.share_reading ? ' checked' : ''} /><span class="hkl-sr">${escapeHTML(t('settings.share_reading'))}</span></label></td>
+        <td><label class="hkl-check"><input type="checkbox" data-chg="person" data-key="share_progress" data-id="${id}" data-k="ps-${id}"${p.share_progress ? ' checked' : ''} /><span class="hkl-sr">${escapeHTML(t('settings.share_progress'))}</span></label></td>
         <td><input class="hkl-input narrow" type="number" min="0" data-chg="person" data-key="yearly_goal" data-id="${id}" data-k="pg-${id}" value="${escapeHTML(p.yearly_goal ?? '')}" aria-label="${escapeHTML(t('settings.yearly_goal'))}" /></td>
         <td><select class="hkl-input" data-chg="person" data-key="wishlist_todo" data-id="${id}" data-k="pt-${id}" aria-label="${escapeHTML(t('settings.wishlist_list'))}">${options(items, p.wishlist_todo ?? '')}</select></td>
       </tr>`;
@@ -129,7 +129,7 @@ export function renderSettings(ctx: ViewCtx): string {
     <h2>${escapeHTML(t('settings.people'))}</h2>
     <p class="hkl-muted small">${escapeHTML(t('settings.people_hint'))}</p>
     <div class="hkl-tablewrap"><table class="hkl-table">
-      <thead><tr><th>${escapeHTML(t('common.person'))}</th><th>${escapeHTML(t('settings.share_reading'))}</th><th>${escapeHTML(t('settings.yearly_goal'))}</th><th>${escapeHTML(t('settings.wishlist_list'))}</th></tr></thead>
+      <thead><tr><th>${escapeHTML(t('common.person'))}</th><th>${escapeHTML(t('settings.share_progress'))}</th><th>${escapeHTML(t('settings.yearly_goal'))}</th><th>${escapeHTML(t('settings.wishlist_list'))}</th></tr></thead>
       <tbody>${rows || `<tr><td colspan="4" class="hkl-muted">${escapeHTML(t('settings.no_people'))}</td></tr>`}</tbody>
     </table></div>
   </section>

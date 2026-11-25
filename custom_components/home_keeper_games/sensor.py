@@ -8,10 +8,10 @@ Global sensors:
 
 Per person (the unique id holds the person id):
 
-* ``games_read_this_year``: the games finished this year, with the attributes
-  ``goal`` and ``year``.
-* ``reading_now``: the number of games with status ``reading``, with the
-  attribute ``games`` (at most 10 titles).
+* ``games_completed_this_year``: the games completed this year on any platform,
+  with the attributes ``goal`` and ``year``.
+* ``playing_now``: the number of games with play status ``playing`` on any
+  platform, with the attribute ``games`` (at most 10 titles).
 """
 
 from __future__ import annotations
@@ -24,16 +24,16 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.util import dt as dt_util
 
 from . import LibraryConfigEntry
-from .const import READING_NOW_MAX_TITLES
+from .const import PLAYING_NOW_MAX_TITLES
 from .coordinator import LibraryCoordinator
 from .entity import LibraryEntity, PersonEntity, async_track_people
 from .models import person_settings
 from .projections import (
-    games_read_in_year,
+    games_completed_in_year,
     loans_out_count,
     loans_overdue_count,
     owned_game_count,
-    reading_now,
+    playing_now,
 )
 from .store import today
 
@@ -55,8 +55,8 @@ async def async_setup_entry(
 
     def _build(person: dict[str, Any]) -> list[SensorEntity]:
         return [
-            GamesReadThisYearSensor(coordinator, person),
-            ReadingNowSensor(coordinator, person),
+            GamesCompletedThisYearSensor(coordinator, person),
+            PlayingNowSensor(coordinator, person),
         ]
 
     entry.async_on_unload(
@@ -109,20 +109,20 @@ class LoansOverdueSensor(LibraryEntity, SensorEntity):
         return loans_overdue_count(self.state_doc, today())
 
 
-class GamesReadThisYearSensor(PersonEntity, SensorEntity):
-    """The games that a person finished this year."""
+class GamesCompletedThisYearSensor(PersonEntity, SensorEntity):
+    """The games that a person completed this year."""
 
-    _attr_translation_key = "games_read_this_year"
-    _attr_icon = "mdi:book-check"
+    _attr_translation_key = "games_completed_this_year"
+    _attr_icon = "mdi:trophy"
     _attr_state_class = SensorStateClass.TOTAL
 
     def __init__(self, coordinator: LibraryCoordinator, person: dict[str, Any]) -> None:
-        super().__init__(coordinator, person, "games_read_this_year")
+        super().__init__(coordinator, person, "games_completed_this_year")
 
     @property
     def native_value(self) -> int:
         year = dt_util.now().year
-        return games_read_in_year(self.state_doc, self.person_id, year)
+        return games_completed_in_year(self.state_doc, self.person_id, year)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
@@ -135,24 +135,24 @@ class GamesReadThisYearSensor(PersonEntity, SensorEntity):
         }
 
 
-class ReadingNowSensor(PersonEntity, SensorEntity):
-    """The number of games that a person reads now."""
+class PlayingNowSensor(PersonEntity, SensorEntity):
+    """The number of games that a person plays now."""
 
-    _attr_translation_key = "reading_now"
-    _attr_icon = "mdi:book-open-page-variant"
+    _attr_translation_key = "playing_now"
+    _attr_icon = "mdi:controller"
     _attr_state_class = SensorStateClass.MEASUREMENT
 
     def __init__(self, coordinator: LibraryCoordinator, person: dict[str, Any]) -> None:
-        super().__init__(coordinator, person, "reading_now")
+        super().__init__(coordinator, person, "playing_now")
 
     @property
     def native_value(self) -> int:
-        return len(reading_now(self.state_doc, self.person_id))
+        return len(playing_now(self.state_doc, self.person_id))
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        titles = reading_now(self.state_doc, self.person_id)
+        titles = playing_now(self.state_doc, self.person_id)
         return {
             **super().extra_state_attributes,
-            "games": titles[:READING_NOW_MAX_TITLES],
+            "games": titles[:PLAYING_NOW_MAX_TITLES],
         }

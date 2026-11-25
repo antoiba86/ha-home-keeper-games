@@ -31,9 +31,9 @@ async def test_import_keeps_changes_made_while_it_runs(
 
     monkeypatch.setattr(csv_io, "apply_import", slow_plan)
     csv_text = (
-        "title,genres,rating,status,tags\n"
-        "Dune,Strategy,4,read,classics\n"
-        "Emma,Puzzle,,reading,\n"
+        "title,genres,rating,play_status,tags\n"
+        "Dune,Strategy,4,completed,classics\n"
+        "Emma,Puzzle,,playing,\n"
     )
     task = hass.async_create_task(
         call(
@@ -45,8 +45,13 @@ async def test_import_keeps_changes_made_while_it_runs(
     # Changes while the import runs.
     room = (await call("add_room", {"name": "Attic"}))["room"]
     await call(
-        "set_reading",
-        {"game_id": hyperion["id"], "person_id": BOB, "status": "reading"},
+        "set_progress",
+        {
+            "game_id": hyperion["id"],
+            "person_id": BOB,
+            "platform": "pc",
+            "play_status": "playing",
+        },
     )
     await call("update_game", {"game_id": dune["id"], "shared_notes": "Signed."})
     release.set()
@@ -55,10 +60,10 @@ async def test_import_keeps_changes_made_while_it_runs(
     state = store.state
     # The concurrent changes survive.
     assert state["rooms"][room["id"]]["name"] == "Attic"
-    assert state["reading"][BOB][hyperion["id"]]["status"] == "reading"
+    assert state["progress"][BOB][hyperion["id"]]["pc"]["play_status"] == "playing"
     assert state["games"][dune["id"]]["shared_notes"] == "Signed."
     # The import is written too.
     assert state["games"][dune["id"]]["tags"] == ["classics"]
-    assert state["reading"][BOB][dune["id"]]["status"] == "read"
+    assert state["progress"][BOB][dune["id"]]["other"]["play_status"] == "completed"
     emma = next(b for b in state["games"].values() if b["title"] == "Emma")
-    assert state["reading"][BOB][emma["id"]]["status"] == "reading"
+    assert state["progress"][BOB][emma["id"]]["other"]["play_status"] == "playing"
