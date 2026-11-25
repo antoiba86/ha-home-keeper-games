@@ -42,7 +42,7 @@ PLATFORMS = ["sensor", "todo"]
 
 # PANEL_VERSION is the same string as the manifest version. release.yml checks it,
 # and rollup.config.mjs reads it.
-PANEL_VERSION = "0.5.0b5"
+PANEL_VERSION = "0.5.0b6"
 
 # The built bundles are in frontend/dist/ and Home Assistant serves them here.
 STATIC_URL = "/home_keeper_games_static"
@@ -73,6 +73,25 @@ STORAGE_MINOR_VERSION = 1
 # The config entry option.
 CONF_CURRENCY = "currency"
 DEFAULT_CURRENCY = "EUR"
+
+# The IGDB keys: a Twitch client ID and client secret. They are config entry data,
+# never options, so no service, event, reply or diagnostics has them.
+CONF_IGDB_CLIENT_ID = "igdb_client_id"
+CONF_IGDB_CLIENT_SECRET = "igdb_client_secret"
+IGDB_API_URL = "https://api.igdb.com/v4"
+IGDB_TOKEN_URL = "https://id.twitch.tv/oauth2/token"
+IGDB_IMAGES_URL = "https://images.igdb.com/igdb/image/upload"
+# Only the test setups set these, to point the client at a fake server.
+IGDB_API_URL_ENV = "HOME_KEEPER_GAMES_IGDB_API_URL"
+IGDB_TOKEN_URL_ENV = "HOME_KEEPER_GAMES_IGDB_TOKEN_URL"
+IGDB_IMAGES_URL_ENV = "HOME_KEEPER_GAMES_IGDB_IMAGES_URL"
+IGDB_TIMEOUT_S = 10
+# IGDB takes at most 4 requests each second.
+IGDB_MIN_INTERVAL_S = 0.25
+# A token is renewed when less than this time is left.
+IGDB_TOKEN_MARGIN_S = 300
+IGDB_SEARCH_DEFAULT = 10
+IGDB_SEARCH_MAX = 20
 
 # The Home Keeper capability of a companion that joins the export and import.
 HOME_KEEPER_CAPABILITY_IMPORT_EXPORT = "import_export"

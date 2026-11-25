@@ -5,15 +5,22 @@
         "title": "Home Keeper Games",
         "description": "Nastavit měnu cen a hodnot výtisků.",
         "data": {
-          "currency": "Měna"
+          "currency": "Měna",
+          "igdb_client_id": "ID klienta Twitch",
+          "igdb_client_secret": "Tajný klíč klienta Twitch"
         },
         "data_description": {
-          "currency": "Kód ze 3 písmen, například EUR nebo USD."
+          "currency": "Kód ze 3 písmen, například EUR nebo USD.",
+          "igdb_client_id": "Volitelné. Vytvořte aplikaci na dev.twitch.tv a získejte klíče IGDB.",
+          "igdb_client_secret": "Volitelné. Nechte prázdné, aby zůstal uložený tajný klíč."
         }
       }
     },
     "error": {
-      "invalid_currency": "Zadejte kód měny ze 3 písmen."
+      "invalid_currency": "Zadejte kód měny ze 3 písmen.",
+      "invalid_igdb_auth": "Twitch nepřijímá ID klienta a tajný klíč klienta.",
+      "cannot_connect": "Nelze se připojit k Twitch. Zkuste to později.",
+      "igdb_keys_incomplete": "Zadejte ID klienta a tajný klíč klienta."
     },
     "abort": {
       "already_configured": "Home Keeper Games je už nastaven.",
@@ -28,15 +35,22 @@
       "init": {
         "title": "Možnosti knihovny",
         "data": {
-          "currency": "Měna"
+          "currency": "Měna",
+          "igdb_client_id": "ID klienta Twitch",
+          "igdb_client_secret": "Tajný klíč klienta Twitch"
         },
         "data_description": {
-          "currency": "Kód ze 3 písmen, například EUR nebo USD."
+          "currency": "Kód ze 3 písmen, například EUR nebo USD.",
+          "igdb_client_id": "Volitelné. Vytvořte aplikaci na dev.twitch.tv a získejte klíče IGDB.",
+          "igdb_client_secret": "Volitelné. Nechte prázdné, aby zůstal uložený tajný klíč."
         }
       }
     },
     "error": {
-      "invalid_currency": "Zadejte kód měny ze 3 písmen."
+      "invalid_currency": "Zadejte kód měny ze 3 písmen.",
+      "invalid_igdb_auth": "Twitch nepřijímá ID klienta a tajný klíč klienta.",
+      "cannot_connect": "Nelze se připojit k Twitch. Zkuste to později.",
+      "igdb_keys_incomplete": "Zadejte ID klienta a tajný klíč klienta."
     }
   },
   "entity": {
@@ -291,6 +305,32 @@
         "needs_details": {
           "name": "Chybí podrobnosti",
           "description": "Označit knihu jako neúplnou."
+        },
+        "lookup": {
+          "name": "Vyhledat v IGDB",
+          "description": "Hledá název v IGDB. Použije hru z IGDB, jen pokud je název stejný. Jinak přidá jen název a označí hru jako neúplnou."
+        },
+        "platform": {
+          "name": "Platforma",
+          "description": "S volbou Vyhledat v IGDB odpovídá jen hra pro tuto platformu."
+        }
+      }
+    },
+    "search_catalog": {
+      "name": "Hledat v katalogu",
+      "description": "Hledá hry v IGDB podle názvu. Odpověď vrací kandidáty, nejlepší jako první.",
+      "fields": {
+        "query": {
+          "name": "Hledat",
+          "description": "Název hry nebo jeho část."
+        },
+        "platform": {
+          "name": "Platforma",
+          "description": "Pouze hry pro tuto platformu."
+        },
+        "limit": {
+          "name": "Omezení",
+          "description": "Maximální počet kandidátů, od 1 do 20."
         }
       }
     },
@@ -1120,6 +1160,18 @@
     },
     "digital_copy_no_shelf": {
       "message": "Digitální kopie nemá polici."
+    },
+    "igdb_not_configured": {
+      "message": "Nejprve zadejte klíče IGDB v možnostech Home Keeper Games."
+    },
+    "igdb_unavailable": {
+      "message": "IGDB teď není dostupné. Zkuste to později."
+    },
+    "invalid_igdb_auth": {
+      "message": "Twitch nepřijímá klíče IGDB. Změňte je v možnostech Home Keeper Games."
+    },
+    "igdb_not_found": {
+      "message": "IGDB nemá žádnou hru s ID {igdb_id}."
     }
   }
 }

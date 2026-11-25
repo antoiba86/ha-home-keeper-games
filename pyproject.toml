@@ -67,6 +67,7 @@ also_copy = [
 # that the parity tests cover. card_resource.py is the pure half of card.py.
 only_mutate = [
     "custom_components/home_keeper_games/models.py",
+    "custom_components/home_keeper_games/catalog.py",
     "custom_components/home_keeper_games/events.py",
     "custom_components/home_keeper_games/projections.py",
     "custom_components/home_keeper_games/csv_io.py",

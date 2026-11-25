@@ -195,6 +195,49 @@ add_game:
     needs_details:
       selector:
         boolean:
+    lookup:
+      selector:
+        boolean:
+    platform:
+      selector:
+        select:
+          options:
+            - ps5
+            - ps4
+            - ps3
+            - switch2
+            - switch
+            - xbox_series
+            - xbox_one
+            - pc
+            - other
+
+search_catalog:
+  fields:
+    query:
+      required: true
+      example: "Breath of the Wild"
+      selector:
+        text:
+    platform:
+      selector:
+        select:
+          options:
+            - ps5
+            - ps4
+            - ps3
+            - switch2
+            - switch
+            - xbox_series
+            - xbox_one
+            - pc
+            - other
+    limit:
+      selector:
+        number:
+          min: 1
+          max: 20
+          mode: "box"
 
 update_game:
   fields:

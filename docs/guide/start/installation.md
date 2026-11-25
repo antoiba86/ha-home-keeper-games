@@ -19,16 +19,34 @@ The Library tab needs Home Keeper version 0.30.0 or later.
    [open it in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=antoiba86&repository=ha-home-keeper-games&category=integration).
 2. Download **Home Keeper Games** and restart Home Assistant.
 3. Go to **Settings → Devices & services → Add integration**, and select **Home Keeper
-   Library**.
-4. Enter the currency of the prices and values of your books, such as `EUR` or `USD`.
+   Games**.
+4. Enter the currency of the prices and values of your games, such as `EUR` or `USD`.
    The default is the currency of Home Assistant.
-5. Select **Submit**.
+5. Optional: enter a **Twitch client ID** and **Twitch client secret** to get game
+   details from IGDB ([IGDB keys](#igdb-keys)).
+6. Select **Submit**.
 
 The Home Keeper panel then has a **Library** tab. Open it from the Home Keeper entry in
 the sidebar.
 
-To change the currency later, open **Settings → Devices & services → Home Keeper
-Library** and select **Configure**.
+To change the currency or the IGDB keys later, open **Settings → Devices & services →
+Home Keeper Games** and select **Configure**.
+
+## IGDB keys
+
+IGDB is the game database of Twitch. With its keys, the library finds a game by title
+and adds it with its summary, genres, release date, franchise and cover.
+
+1. Sign in at [dev.twitch.tv/console](https://dev.twitch.tv/console). Twitch asks for
+   two-factor authentication.
+2. Select **Register Your Application**. Enter a name, the OAuth redirect URL
+   `http://localhost`, and the category **Application Integration**.
+3. Open the application. Copy the **Client ID**, then select **New Secret** and copy the
+   secret.
+4. Enter both in the setup step or in **Configure**.
+
+The library checks the keys before it saves them. In **Configure**, keep the secret
+empty to keep the stored secret, or clear the client ID to remove both keys.
 
 ## Setup messages
 

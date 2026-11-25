@@ -92,7 +92,9 @@ result in the plan's Security section ([pr-workflow.md](pr-workflow.md)).
   the config entry data. It is never a service field, an event value, a reply value or a
   diagnostics value. A service field puts it in `call_service` events and the recorder.
 - **A write to an outside catalog is admin-only and is for 1 record.** It starts only
-  when an admin selects it, as `send_to_catalog` does.
+  when an admin selects it.
+- **A read of an outside catalog can be open** if its reply has no private data and a
+  rate limit protects the quota, as `search_catalog` does.
 - **If no rule fits, ask the maintainer.** Write the answer in the plan, then add the rule
   here.
 
@@ -131,6 +133,9 @@ How the entities work is in [entities](../../docs/design/entities.md).
 
 - The only option is `currency`. The config flow and the options flow ask for it, and
   `set_settings` writes it.
+- The IGDB keys are entry data, not options. The config flow and the options flow ask for
+  them and check them before they save them
+  ([catalog-igdb](../../docs/design/catalog-igdb.md#keys)).
 - **An options flow merges. It never replaces.** Return `config_flow.merge_flow_input`
   from `async_create_entry`, never `user_input`. Home Assistant stores the result as the
   whole options object, so a raw return deletes every key that the form does not show.

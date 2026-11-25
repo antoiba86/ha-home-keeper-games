@@ -5,15 +5,22 @@
         "title": "Home Keeper Games 藏书",
         "description": "设置藏本价格和价值所用的货币。",
         "data": {
-          "currency": "货币"
+          "currency": "货币",
+          "igdb_client_id": "Twitch 客户端 ID",
+          "igdb_client_secret": "Twitch 客户端密钥"
         },
         "data_description": {
-          "currency": "3 个字母的代码，例如 EUR 或 USD。"
+          "currency": "3 个字母的代码，例如 EUR 或 USD。",
+          "igdb_client_id": "可选。在 dev.twitch.tv 创建应用以获取 IGDB 密钥。",
+          "igdb_client_secret": "可选。留空以保留已存储的密钥。"
         }
       }
     },
     "error": {
-      "invalid_currency": "请输入 3 个字母的货币代码。"
+      "invalid_currency": "请输入 3 个字母的货币代码。",
+      "invalid_igdb_auth": "Twitch 不接受该客户端 ID 和客户端密钥。",
+      "cannot_connect": "无法连接到 Twitch。请稍后重试。",
+      "igdb_keys_incomplete": "请输入客户端 ID 和客户端密钥。"
     },
     "abort": {
       "already_configured": "Home Keeper Games 已设置。",
@@ -28,15 +35,22 @@
       "init": {
         "title": "藏书选项",
         "data": {
-          "currency": "货币"
+          "currency": "货币",
+          "igdb_client_id": "Twitch 客户端 ID",
+          "igdb_client_secret": "Twitch 客户端密钥"
         },
         "data_description": {
-          "currency": "3 个字母的代码，例如 EUR 或 USD。"
+          "currency": "3 个字母的代码，例如 EUR 或 USD。",
+          "igdb_client_id": "可选。在 dev.twitch.tv 创建应用以获取 IGDB 密钥。",
+          "igdb_client_secret": "可选。留空以保留已存储的密钥。"
         }
       }
     },
     "error": {
-      "invalid_currency": "请输入 3 个字母的货币代码。"
+      "invalid_currency": "请输入 3 个字母的货币代码。",
+      "invalid_igdb_auth": "Twitch 不接受该客户端 ID 和客户端密钥。",
+      "cannot_connect": "无法连接到 Twitch。请稍后重试。",
+      "igdb_keys_incomplete": "请输入客户端 ID 和客户端密钥。"
     }
   },
   "entity": {
@@ -291,6 +305,32 @@
         "needs_details": {
           "name": "缺少详情",
           "description": "将图书标记为信息不完整。"
+        },
+        "lookup": {
+          "name": "在 IGDB 中查找",
+          "description": "在 IGDB 中搜索该标题。仅当标题相同时才使用 IGDB 游戏。否则仅添加标题，并将游戏标记为不完整。"
+        },
+        "platform": {
+          "name": "平台",
+          "description": "启用“在 IGDB 中查找”时，仅匹配此平台上的游戏。"
+        }
+      }
+    },
+    "search_catalog": {
+      "name": "搜索目录",
+      "description": "按标题在 IGDB 中搜索游戏。回复给出候选项，最佳的排在最前。",
+      "fields": {
+        "query": {
+          "name": "搜索",
+          "description": "游戏标题或其中一部分。"
+        },
+        "platform": {
+          "name": "平台",
+          "description": "仅限此平台上的游戏。"
+        },
+        "limit": {
+          "name": "上限",
+          "description": "候选项的最大数量，1 到 20。"
         }
       }
     },
@@ -1120,6 +1160,18 @@
     },
     "digital_copy_no_shelf": {
       "message": "数字副本没有书架层。"
+    },
+    "igdb_not_configured": {
+      "message": "请先在 Home Keeper Games 的选项中输入 IGDB 密钥。"
+    },
+    "igdb_unavailable": {
+      "message": "IGDB 当前不可用。请稍后重试。"
+    },
+    "invalid_igdb_auth": {
+      "message": "Twitch 不接受 IGDB 密钥。请在 Home Keeper Games 的选项中更改。"
+    },
+    "igdb_not_found": {
+      "message": "IGDB 中没有 ID 为 {igdb_id} 的游戏。"
     }
   }
 }

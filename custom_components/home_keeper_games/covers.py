@@ -12,6 +12,10 @@ shows an old cover.
   request. Pillow writes a new JPEG of at most 1200 px in an executor job, so
   the stored file is always a clean JPEG. The view returns a ``file_id``, and
   the ``set_cover`` service puts that file on a game.
+* ``add_game`` downloads the IGDB cover of a game, with the same type check and
+  the same Pillow re-encode. The client builds the URL from the IGDB image id, so a
+  caller cannot make the integration read another host. An IGDB cover never
+  replaces a cover that an admin uploaded.
 * The cover view serves the cover of a game to each signed-in user. Covers are
   not private. An ``<img>`` element cannot send a token, so the client signs
   the path with the ``auth/sign_path`` websocket command of Home Assistant, or
@@ -194,6 +198,38 @@ async def async_use_upload(
     if not moved:
         raise LibraryError("upload_not_found", file_id=file_id)
     return await coordinator.store.set_cover(game_id, "custom", name)
+
+
+async def async_store_igdb_cover(
+    hass: HomeAssistant, coordinator: LibraryCoordinator, game_id: str, image: str
+) -> bool:
+    """Download the IGDB cover *image* and put it on a game.
+
+    Return whether the game got the cover. A game with an uploaded cover keeps it.
+    A failure returns False and never raises: the game is already added.
+    """
+
+    def keeps_its_cover() -> bool:
+        game = coordinator.store.state["games"].get(game_id)
+        return game is None or (game.get("cover") or {}).get("kind") == "custom"
+
+    if keeps_its_cover():
+        return False
+    data = await coordinator.igdb.async_cover(image)
+    if data is None or sniff_image(data[:SNIFF_BYTES]) is None:
+        return False
+    name = new_cover_name(game_id)
+    try:
+        await hass.async_add_executor_job(reencode, data, covers_dir(hass) / name)
+    except CoverError:
+        return False
+    # The game can change during the download: a user can delete it or upload
+    # a cover.
+    if keeps_its_cover():
+        await hass.async_add_executor_job(_unlink, covers_dir(hass) / name)
+        return False
+    await coordinator.store.set_cover(game_id, "igdb", name)
+    return True
 
 
 # ── Files of a Home Keeper export bundle ────────────────────────────────────

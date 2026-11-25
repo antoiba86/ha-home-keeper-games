@@ -57,7 +57,11 @@ PLAY_STATUSES = ("backlog", "playing", "completed", "abandoned")
 # The ``play_status`` value of ``set_progress`` that removes the progress row.
 STATUS_NONE = "none"
 DIRECTIONS = ("out", "in")
-COVER_KINDS = ("custom", "none")
+# ``custom`` is an upload, ``igdb`` a download from IGDB. An upload replaces an IGDB
+# cover, but an IGDB download never replaces an upload.
+COVER_KINDS = ("custom", "igdb", "none")
+# The kinds that the ``set_cover`` service takes.
+SET_COVER_KINDS = ("custom", "none")
 # A barcode: letters and digits, with no spaces or hyphens.
 MAX_BARCODE = 50
 _BARCODE_RE = re.compile(rf"[0-9A-Z]{{1,{MAX_BARCODE}}}")
@@ -946,6 +950,17 @@ def find_game_by_barcode(
     return None
 
 
+def find_game_by_igdb_id(state: dict[str, Any], igdb_id: Any) -> dict[str, Any] | None:
+    """The oldest game with this IGDB id, or None."""
+    if not isinstance(igdb_id, int) or isinstance(igdb_id, bool):
+        return None
+    games = sorted(
+        (g for g in state["games"].values() if g.get("igdb_id") == igdb_id),
+        key=lambda g: (str(g.get("created_at", "")), g["id"]),
+    )
+    return games[0] if games else None
+
+
 __all__ = [
     "CONDITIONS",
     "COPY_FIELDS",
@@ -955,6 +970,7 @@ __all__ = [
     "GAME_FIELDS",
     "PLATFORMS",
     "PLAY_STATUSES",
+    "SET_COVER_KINDS",
     "STATUS_NONE",
     "LibraryError",
     "apply_person_settings",

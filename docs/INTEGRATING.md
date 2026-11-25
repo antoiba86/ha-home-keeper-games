@@ -26,7 +26,7 @@ Each operation of the tab is a `home_keeper_games.*` service. The groups are:
 | Group | Services |
 |---|---|
 | Locations | `add_room`, `update_room`, `delete_room`, the same 3 for `unit` and `shelf` |
-| Games | `add_game`, `update_game`, `delete_game`, `scan_barcode` |
+| Games | `add_game`, `update_game`, `delete_game`, `scan_barcode`, `search_catalog` |
 | Copies and covers | `add_copy`, `update_copy`, `move_copy`, `delete_copy`, `set_cover` |
 | Progress | `set_progress` |
 | Loans | `lend_game`, `borrow_game`, `return_loan`, `update_loan`, `delete_loan` |
@@ -51,6 +51,29 @@ action:
   # result.game.id is the game id. result.existing is true if a copy has the barcode.
   # The barcode is a copy field: add_copy with barcode puts it on the copy.
 ```
+
+### Add a game from IGDB
+
+`search_catalog` and `add_game` from IGDB need the IGDB keys in the options of the
+integration.
+
+```yaml
+action:
+  - action: home_keeper_games.search_catalog
+    data:
+      query: "breath of the wild"
+      platform: switch
+    response_variable: found
+  # found.candidates[0].igdb_id is the best match. in_library is the game id if the
+  # library has it.
+  - action: home_keeper_games.add_game
+    data:
+      igdb_id: "{{ found.candidates[0].igdb_id }}"
+    response_variable: result
+```
+
+`add_game` with `title` and `lookup: true` does both in 1 call. It uses the IGDB game
+only if the title is the same. Else it adds the title and sets `needs_details`.
 
 ### Mark a game as completed
 

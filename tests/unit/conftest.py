@@ -40,6 +40,7 @@ _PKG = "custom_components.home_keeper_games"
 _PURE_MODULES = (
     "const",
     "models",
+    "catalog",
     "events",
     "projections",
     "csv_io",

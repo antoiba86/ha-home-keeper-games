@@ -5,15 +5,22 @@
         "title": "Home Keeper Games",
         "description": "Angiv valutaen for eksemplarernes priser og værdier.",
         "data": {
-          "currency": "Valuta"
+          "currency": "Valuta",
+          "igdb_client_id": "Twitch-klient-ID",
+          "igdb_client_secret": "Twitch-klienthemmelighed"
         },
         "data_description": {
-          "currency": "En kode på 3 bogstaver, for eksempel EUR eller USD."
+          "currency": "En kode på 3 bogstaver, for eksempel EUR eller USD.",
+          "igdb_client_id": "Valgfri. Opret en applikation på dev.twitch.tv for at få IGDB-nøglerne.",
+          "igdb_client_secret": "Valgfri. Lad feltet være tomt for at beholde den gemte hemmelighed."
         }
       }
     },
     "error": {
-      "invalid_currency": "Indtast en valutakode på 3 bogstaver."
+      "invalid_currency": "Indtast en valutakode på 3 bogstaver.",
+      "invalid_igdb_auth": "Twitch accepterer ikke klient-ID'et og klienthemmeligheden.",
+      "cannot_connect": "Kan ikke oprette forbindelse til Twitch. Prøv igen senere.",
+      "igdb_keys_incomplete": "Indtast klient-ID'et og klienthemmeligheden."
     },
     "abort": {
       "already_configured": "Home Keeper Games er allerede sat op.",
@@ -28,15 +35,22 @@
       "init": {
         "title": "Biblioteksindstillinger",
         "data": {
-          "currency": "Valuta"
+          "currency": "Valuta",
+          "igdb_client_id": "Twitch-klient-ID",
+          "igdb_client_secret": "Twitch-klienthemmelighed"
         },
         "data_description": {
-          "currency": "En kode på 3 bogstaver, for eksempel EUR eller USD."
+          "currency": "En kode på 3 bogstaver, for eksempel EUR eller USD.",
+          "igdb_client_id": "Valgfri. Opret en applikation på dev.twitch.tv for at få IGDB-nøglerne.",
+          "igdb_client_secret": "Valgfri. Lad feltet være tomt for at beholde den gemte hemmelighed."
         }
       }
     },
     "error": {
-      "invalid_currency": "Indtast en valutakode på 3 bogstaver."
+      "invalid_currency": "Indtast en valutakode på 3 bogstaver.",
+      "invalid_igdb_auth": "Twitch accepterer ikke klient-ID'et og klienthemmeligheden.",
+      "cannot_connect": "Kan ikke oprette forbindelse til Twitch. Prøv igen senere.",
+      "igdb_keys_incomplete": "Indtast klient-ID'et og klienthemmeligheden."
     }
   },
   "entity": {
@@ -291,6 +305,32 @@
         "needs_details": {
           "name": "Detaljer mangler",
           "description": "Markér bogen som ufuldstændig."
+        },
+        "lookup": {
+          "name": "Slå op i IGDB",
+          "description": "Søger efter titlen i IGDB. Bruger kun IGDB-spillet, hvis titlen er den samme. Ellers tilføjes kun titlen, og spillet markeres som ufuldstændigt."
+        },
+        "platform": {
+          "name": "Platform",
+          "description": "Med Slå op i IGDB passer kun et spil på denne platform."
+        }
+      }
+    },
+    "search_catalog": {
+      "name": "Søg i kataloget",
+      "description": "Søger efter spil i IGDB efter titel. Svaret giver kandidaterne, den bedste først.",
+      "fields": {
+        "query": {
+          "name": "Søg",
+          "description": "Spillets titel eller en del af den."
+        },
+        "platform": {
+          "name": "Platform",
+          "description": "Kun spil på denne platform."
+        },
+        "limit": {
+          "name": "Grænse",
+          "description": "Det største antal kandidater, fra 1 til 20."
         }
       }
     },
@@ -1120,6 +1160,18 @@
     },
     "digital_copy_no_shelf": {
       "message": "En digital kopi har ingen hylde."
+    },
+    "igdb_not_configured": {
+      "message": "Indtast først IGDB-nøglerne i indstillingerne for Home Keeper Games."
+    },
+    "igdb_unavailable": {
+      "message": "IGDB er ikke tilgængelig nu. Prøv igen senere."
+    },
+    "invalid_igdb_auth": {
+      "message": "Twitch accepterer ikke IGDB-nøglerne. Skift dem i indstillingerne for Home Keeper Games."
+    },
+    "igdb_not_found": {
+      "message": "IGDB har intet spil med ID'et {igdb_id}."
     }
   }
 }

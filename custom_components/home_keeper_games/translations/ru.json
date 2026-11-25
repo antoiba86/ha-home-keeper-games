@@ -5,15 +5,22 @@
         "title": "Home Keeper Games",
         "description": "Задать валюту цен и стоимости экземпляров.",
         "data": {
-          "currency": "Валюта"
+          "currency": "Валюта",
+          "igdb_client_id": "ID клиента Twitch",
+          "igdb_client_secret": "Секрет клиента Twitch"
         },
         "data_description": {
-          "currency": "Код из 3 букв, например EUR или USD."
+          "currency": "Код из 3 букв, например EUR или USD.",
+          "igdb_client_id": "Необязательно. Создайте приложение на dev.twitch.tv, чтобы получить ключи IGDB.",
+          "igdb_client_secret": "Необязательно. Оставьте пустым, чтобы оставить сохранённый секрет."
         }
       }
     },
     "error": {
-      "invalid_currency": "Введите код валюты из 3 букв."
+      "invalid_currency": "Введите код валюты из 3 букв.",
+      "invalid_igdb_auth": "Twitch не принимает ID клиента и секрет клиента.",
+      "cannot_connect": "Не удаётся подключиться к Twitch. Повторите попытку позже.",
+      "igdb_keys_incomplete": "Введите ID клиента и секрет клиента."
     },
     "abort": {
       "already_configured": "Home Keeper Games уже настроен.",
@@ -28,15 +35,22 @@
       "init": {
         "title": "Настройки библиотеки",
         "data": {
-          "currency": "Валюта"
+          "currency": "Валюта",
+          "igdb_client_id": "ID клиента Twitch",
+          "igdb_client_secret": "Секрет клиента Twitch"
         },
         "data_description": {
-          "currency": "Код из 3 букв, например EUR или USD."
+          "currency": "Код из 3 букв, например EUR или USD.",
+          "igdb_client_id": "Необязательно. Создайте приложение на dev.twitch.tv, чтобы получить ключи IGDB.",
+          "igdb_client_secret": "Необязательно. Оставьте пустым, чтобы оставить сохранённый секрет."
         }
       }
     },
     "error": {
-      "invalid_currency": "Введите код валюты из 3 букв."
+      "invalid_currency": "Введите код валюты из 3 букв.",
+      "invalid_igdb_auth": "Twitch не принимает ID клиента и секрет клиента.",
+      "cannot_connect": "Не удаётся подключиться к Twitch. Повторите попытку позже.",
+      "igdb_keys_incomplete": "Введите ID клиента и секрет клиента."
     }
   },
   "entity": {
@@ -291,6 +305,32 @@
         "needs_details": {
           "name": "Нужны сведения",
           "description": "Отметить книгу как неполную."
+        },
+        "lookup": {
+          "name": "Найти в IGDB",
+          "description": "Ищет название в IGDB. Использует игру из IGDB, только если название совпадает. Иначе добавляет только название и отмечает игру как неполную."
+        },
+        "platform": {
+          "name": "Платформа",
+          "description": "С параметром «Найти в IGDB» подходит только игра на этой платформе."
+        }
+      }
+    },
+    "search_catalog": {
+      "name": "Поиск в каталоге",
+      "description": "Ищет игры в IGDB по названию. Ответ содержит кандидатов, лучший первым.",
+      "fields": {
+        "query": {
+          "name": "Поиск",
+          "description": "Название игры или его часть."
+        },
+        "platform": {
+          "name": "Платформа",
+          "description": "Только игры на этой платформе."
+        },
+        "limit": {
+          "name": "Лимит",
+          "description": "Максимальное число кандидатов, от 1 до 20."
         }
       }
     },
@@ -1120,6 +1160,18 @@
     },
     "digital_copy_no_shelf": {
       "message": "У цифрового экземпляра нет полки."
+    },
+    "igdb_not_configured": {
+      "message": "Сначала введите ключи IGDB в параметрах Home Keeper Games."
+    },
+    "igdb_unavailable": {
+      "message": "IGDB сейчас недоступен. Повторите попытку позже."
+    },
+    "invalid_igdb_auth": {
+      "message": "Twitch не принимает ключи IGDB. Измените их в параметрах Home Keeper Games."
+    },
+    "igdb_not_found": {
+      "message": "В IGDB нет игры с ID {igdb_id}."
     }
   }
 }
