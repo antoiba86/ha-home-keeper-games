@@ -380,6 +380,20 @@
         }
       }
     },
+    "set_igdb_game": {
+      "name": "Angiv IGDB-spil",
+      "description": "Giv et spil et andet IGDB-spil. Titel, resumé, genrer, udgivelsesdato, serie og omslag kommer fra IGDB. Et uploadet omslag bliver.",
+      "fields": {
+        "game_id": {
+          "name": "Spil",
+          "description": "Spillets ID."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "ID'et for det rigtige spil i IGDB."
+        }
+      }
+    },
     "delete_game": {
       "name": "Slet bog",
       "description": "Slet en bog med dens eksemplarer, læsestatus, udlån og omslag.",
@@ -1172,6 +1186,9 @@
     },
     "igdb_not_found": {
       "message": "IGDB har intet spil med ID'et {igdb_id}."
+    },
+    "igdb_in_use": {
+      "message": "{title} har allerede dette IGDB-spil."
     }
   }
 }

@@ -380,6 +380,20 @@
         }
       }
     },
+    "set_igdb_game": {
+      "name": "IGDB-game instellen",
+      "description": "Geeft een game een andere IGDB-game. Titel, samenvatting, genres, releasedatum, franchise en hoes komen uit IGDB. Een geüploade hoes blijft.",
+      "fields": {
+        "game_id": {
+          "name": "Spel",
+          "description": "De ID van het spel."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "De ID van de juiste game in IGDB."
+        }
+      }
+    },
     "delete_game": {
       "name": "Boek verwijderen",
       "description": "Een boek verwijderen met de exemplaren, de leesstatus, de uitleningen en de omslag.",
@@ -1172,6 +1186,9 @@
     },
     "igdb_not_found": {
       "message": "IGDB heeft geen game met de ID {igdb_id}."
+    },
+    "igdb_in_use": {
+      "message": "{title} heeft deze IGDB-game al."
     }
   }
 }

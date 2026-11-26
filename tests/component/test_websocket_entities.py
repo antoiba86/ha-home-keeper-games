@@ -43,10 +43,12 @@ async def test_get_state_shape_and_projection(hass, setup_entry, call, ws) -> No
         "people",
         "me",
         "currency",
+        "igdb",
         "home_keeper",
     }
     assert result["me"] == {"person_id": ALICE, "name": "Alice", "is_admin": True}
     assert result["currency"] == "EUR" and result["home_keeper"] == {"tab": True}
+    assert result["igdb"] is False
     assert result["copies"][0]["price"] == 9 and result["loans"][0]["party"] == "Zed"
     assert result["games"][0]["owned"] is True
     assert result["games"][0]["progress"][CAROL]["other"]["review"] == "secret"

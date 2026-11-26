@@ -63,6 +63,10 @@ with open(path, encoding="utf-8") as handle:
     document = json.load(handle)
 with open(extra, encoding="utf-8") as handle:
     document["data"]["entries"].extend(json.load(handle))
+# The fake IGDB (tests/e2e/fake-igdb) takes any keys.
+for entry in document["data"]["entries"]:
+    if entry["domain"] == "home_keeper_games":
+        entry["data"].update(igdb_client_id="e2e-client", igdb_client_secret="e2e-secret")
 with open(path, "w", encoding="utf-8") as handle:
     json.dump(document, handle, indent=2)
 PY

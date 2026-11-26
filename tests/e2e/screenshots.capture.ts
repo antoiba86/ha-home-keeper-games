@@ -12,7 +12,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { resolve } from 'node:path';
 import { library } from './ha-ws';
-import { adminState, gameByTitle, gamesWithCode, fakeCamera, libraryTab, noServiceWorker, openCard, openTab } from './tests/helpers';
+import { adminState, gameByTitle, gamesWithCode, fakeCamera, fakeIgdbCovers, libraryTab, noServiceWorker, openCard, openTab } from './tests/helpers';
 import { PHONE } from './viewports';
 
 const SHOT_DIR = resolve(__dirname, process.env.SHOT_DIR || '../../docs/images');
@@ -117,6 +117,21 @@ async function scanSession(page: Page, missShot: string, detailsShot?: string, s
   await expect(tab.locator('.hkl-result').filter({ hasText: MISS_TITLE })).toBeVisible();
 }
 
+/**
+ * Add the game "Hade" that needs details, open its Change IGDB game dialog and
+ * wait for the covers of the fake IGDB. Return the id, to delete the game after.
+ */
+async function openIgdbDialog(page: Page): Promise<string> {
+  const reply = await library<{ game: { id: string } }>('add_game', { title: 'Hade', needs_details: true });
+  const tab = await openTab(page, `/games/${reply.game.id}`);
+  await tab.locator('[data-k="needs-igdb"]').click();
+  await expect(tab.locator('[data-k="d-igdb-row-1001"] img')).toHaveJSProperty('naturalWidth', 264);
+  await expect(tab.locator('[data-k="d-igdb-row-1002"] img')).toHaveJSProperty('naturalWidth', 264);
+  // The click scrolls the banner into view. Show the top of the game behind the dialog.
+  await tab.evaluate((el) => el.scrollIntoView({ block: 'start' }));
+  return reply.game.id;
+}
+
 /** Open the Lend dialog of a game with a copy to lend, type a note, and submit with no borrower. */
 async function openLendError(page: Page): Promise<void> {
   const state = await adminState();
@@ -137,6 +152,7 @@ test.describe.configure({ mode: 'serial' });
 test('capture the Library screenshots', async ({ page, browser }) => {
   test.setTimeout(300_000);
   await noServiceWorker(page.context());
+  await fakeIgdbCovers(page.context());
   await deleteScanned();
   await page.setViewportSize(DESKTOP_SHOT);
 
@@ -144,6 +160,11 @@ test('capture the Library screenshots', async ({ page, browser }) => {
   await openTab(page, '/games');
   await coversLoaded(page);
   await shot(page, 'games-desktop');
+
+  // The Change IGDB game dialog of a game that needs details, before a shot scrolls the page.
+  let igdbGame = await openIgdbDialog(page);
+  await shot(page, 'igdb-dialog-desktop');
+  await library('delete_game', { game_id: igdbGame });
 
   // Game detail: a custom cover, a loan with its task, shared notes in Markdown. The
   // window is tall enough to show the notes.
@@ -221,6 +242,10 @@ test('capture the Library screenshots', async ({ page, browser }) => {
 
   await openLendError(page);
   await shot(page, 'dialog-error-mobile');
+
+  igdbGame = await openIgdbDialog(page);
+  await shot(page, 'igdb-dialog-mobile');
+  await library('delete_game', { game_id: igdbGame });
 
   await openTab(page, '/shelves');
   await shot(page, 'shelves-mobile');

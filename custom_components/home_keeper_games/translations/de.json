@@ -380,6 +380,20 @@
         }
       }
     },
+    "set_igdb_game": {
+      "name": "IGDB-Spiel festlegen",
+      "description": "Gibt einem Spiel ein anderes IGDB-Spiel. Titel, Zusammenfassung, Genres, Erscheinungsdatum, Reihe und Cover kommen aus IGDB. Ein hochgeladenes Cover bleibt.",
+      "fields": {
+        "game_id": {
+          "name": "Spiel",
+          "description": "Die ID des Spiels."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "Die ID des richtigen Spiels in IGDB."
+        }
+      }
+    },
     "delete_game": {
       "name": "Buch löschen",
       "description": "Ein Buch mit seinen Exemplaren, dem Lesestatus, den Ausleihen und dem Cover löschen.",
@@ -1172,6 +1186,9 @@
     },
     "igdb_not_found": {
       "message": "IGDB hat kein Spiel mit der ID {igdb_id}."
+    },
+    "igdb_in_use": {
+      "message": "{title} hat dieses IGDB-Spiel bereits."
     }
   }
 }

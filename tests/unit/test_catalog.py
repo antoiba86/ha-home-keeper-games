@@ -195,3 +195,22 @@ def test_best_match_needs_the_platform() -> None:
     assert c.best_match([pc, switch], "Hades", "ps5") is None
     assert c.best_match([pc, switch], "Hades", "other") == pc
     assert c.best_match([pc, switch], "Hades", None) == pc
+
+
+def test_replacement_fields_clear_what_the_new_game_does_not_have() -> None:
+    assert c.replacement_fields({"id": 9, "name": "Tetris"}) == {
+        "igdb_id": 9,
+        "title": "Tetris",
+        "summary": "",
+        "genres": [],
+        "release_date": "",
+        "franchise": None,
+        "needs_details": False,
+    }
+
+
+def test_replacement_fields_of_a_full_record() -> None:
+    assert c.replacement_fields(ZELDA) == {
+        **c.game_fields(ZELDA),
+        "needs_details": False,
+    }

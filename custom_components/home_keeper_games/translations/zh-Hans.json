@@ -380,6 +380,20 @@
         }
       }
     },
+    "set_igdb_game": {
+      "name": "设置 IGDB 游戏",
+      "description": "为游戏指定另一个 IGDB 游戏。标题、简介、类型、发行日期、系列和封面来自 IGDB。上传的封面保留。",
+      "fields": {
+        "game_id": {
+          "name": "游戏",
+          "description": "游戏的 ID。"
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "IGDB 中正确游戏的 ID。"
+        }
+      }
+    },
     "delete_game": {
       "name": "删除图书",
       "description": "删除图书及其藏本、阅读状态、借阅和封面。",
@@ -1172,6 +1186,9 @@
     },
     "igdb_not_found": {
       "message": "IGDB 中没有 ID 为 {igdb_id} 的游戏。"
+    },
+    "igdb_in_use": {
+      "message": "{title} 已有此 IGDB 游戏。"
     }
   }
 }

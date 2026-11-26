@@ -380,6 +380,20 @@
         }
       }
     },
+    "set_igdb_game": {
+      "name": "Nastavit hru IGDB",
+      "description": "Přiřadí hře jinou hru z IGDB. Název, shrnutí, žánry, datum vydání, série a obal pocházejí z IGDB. Nahraný obal zůstane.",
+      "fields": {
+        "game_id": {
+          "name": "Hra",
+          "description": "ID hry."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "ID správné hry v IGDB."
+        }
+      }
+    },
     "delete_game": {
       "name": "Smazat knihu",
       "description": "Smazat knihu s jejími výtisky, stavem čtení, výpůjčkami a obálkou.",
@@ -1172,6 +1186,9 @@
     },
     "igdb_not_found": {
       "message": "IGDB nemá žádnou hru s ID {igdb_id}."
+    },
+    "igdb_in_use": {
+      "message": "{title} již má tuto hru IGDB."
     }
   }
 }

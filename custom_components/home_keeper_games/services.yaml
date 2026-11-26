@@ -282,6 +282,20 @@ update_game:
       selector:
         boolean:
 
+set_igdb_game:
+  fields:
+    game_id:
+      required: true
+      selector:
+        text:
+    igdb_id:
+      required: true
+      example: 113112
+      selector:
+        number:
+          min: 1
+          mode: "box"
+
 delete_game:
   fields:
     game_id:

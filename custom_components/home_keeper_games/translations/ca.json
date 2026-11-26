@@ -380,6 +380,20 @@
         }
       }
     },
+    "set_igdb_game": {
+      "name": "Defineix el joc d'IGDB",
+      "description": "Dona a un joc un altre joc d'IGDB. El títol, el resum, els gèneres, la data de llançament, la franquícia i la portada vénen d'IGDB. Una portada pujada es manté.",
+      "fields": {
+        "game_id": {
+          "name": "Joc",
+          "description": "L'ID del joc."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "L'ID del joc correcte a IGDB."
+        }
+      }
+    },
     "delete_game": {
       "name": "Esborra un llibre",
       "description": "Esborra un llibre amb els exemplars, l'estat de lectura, els préstecs i la coberta.",
@@ -1172,6 +1186,9 @@
     },
     "igdb_not_found": {
       "message": "IGDB no té cap joc amb l'ID {igdb_id}."
+    },
+    "igdb_in_use": {
+      "message": "{title} ja té aquest joc d'IGDB."
     }
   }
 }

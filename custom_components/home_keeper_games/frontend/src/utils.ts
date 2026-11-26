@@ -104,6 +104,7 @@ export function normalizeState(raw: Partial<RawState>): Lib {
     people: normalizePeople(raw.people),
     me: { person_id: raw.me?.person_id ?? null, name: raw.me?.name ?? null, is_admin: raw.me?.is_admin === true },
     currency: raw.currency || 'USD',
+    igdb: raw.igdb === true,
   };
 }
 

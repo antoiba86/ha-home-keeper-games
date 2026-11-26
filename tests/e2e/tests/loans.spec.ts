@@ -25,7 +25,7 @@ test.describe('Loans', { tag: '@responsive' }, () => {
     const tab = await openTab(page, `/games/${game.id}`);
     await tab.locator('[data-k="lend"]').click();
     const dialog = tab.locator('.hkl-dialog');
-    await expect(dialog.locator('h2')).toHaveText('Lend book');
+    await expect(dialog.locator('h2')).toHaveText('Lend game');
     await dialog.locator('[name="party"]').fill(PARTY);
     await dialog.locator('[name="due"]').fill('2026-12-01');
     await expect(dialog.locator('[name="add_task"]')).toBeChecked();

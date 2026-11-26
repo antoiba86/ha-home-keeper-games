@@ -58,7 +58,7 @@ def test_options_flow_steps(api):
     assert done.json()["type"] == "create_entry", done.text
 
 
-def test_every_service_is_touched(api):
+def test_every_service_is_touched(api, ws):
     """Run each service once, from a new room to the delete of it."""
 
     people = _service(api, "list_people")["people"]
@@ -78,6 +78,12 @@ def test_every_service_is_touched(api):
 
     game = _service(api, "add_game", {"title": "Surface game"})["game"]
     _service(api, "update_game", {"game_id": game["id"], "title": "Surface game 2"})
+    # With no IGDB keys, the service refuses before a request goes out. Its websocket
+    # twin gives the refusal as an error reply: a REST refusal is an HTTP 500 and a
+    # log error on the oldest Home Assistant.
+    name = "set_igdb_game"
+    refused = ws(f"{DOMAIN}/{name}", game_id=game["id"], igdb_id=1)
+    assert refused["error"]["code"] == "igdb_not_configured", refused
     copy = _service(api, "add_copy", {"game_id": game["id"], "shelf_id": shelf["id"]})[
         "copy"
     ]

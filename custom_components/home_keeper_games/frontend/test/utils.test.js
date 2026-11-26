@@ -118,6 +118,13 @@ describe('asList and normalizeState', () => {
     expect(u.asList(undefined)).toEqual([]);
   });
 
+  it('reads the IGDB flag: only true is true', () => {
+    expect(u.normalizeState({ igdb: true }).igdb).toBe(true);
+    expect(u.normalizeState({ igdb: false }).igdb).toBe(false);
+    expect(u.normalizeState({ igdb: 'true' }).igdb).toBe(false);
+    expect(u.normalizeState({}).igdb).toBe(false);
+  });
+
   it('sorts rooms, units and shelves by order, then name', () => {
     const l = u.normalizeState({
       rooms: [

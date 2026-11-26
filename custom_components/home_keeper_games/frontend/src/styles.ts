@@ -297,6 +297,17 @@ button { font: inherit; color: inherit; }
 .hkl-scrim { position: fixed; inset: 0; z-index: 10; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; padding: 16px; }
 .hkl-dialog { width: min(560px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; background: var(--hkl-surface); color: var(--hkl-text); border-radius: 16px; padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 12px 40px rgba(0,0,0,.3); }
 .hkl-dialog.wide { width: min(760px, 100%); }
+.hkl-igdb-search { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 10px; }
+.hkl-igdb-search .hkl-field.wide { flex: 1 1 220px; }
+.hkl-igdb-search .hkl-btn { height: 40px; }
+.hkl-igdb-list { display: flex; flex-direction: column; gap: 4px; max-height: 320px; overflow-y: auto; }
+.hkl-igdb-row { display: flex; align-items: center; gap: 12px; padding: 8px; border: 1px solid transparent; border-radius: 10px; cursor: pointer; }
+.hkl-igdb-row:has(input:checked) { border-color: var(--hkl-primary); background: var(--hkl-tonal); }
+.hkl-igdb-row:has(input:focus-visible) { outline: 2px solid var(--hkl-primary); outline-offset: 1px; }
+.hkl-igdb-row.off { cursor: default; color: var(--hkl-muted); }
+.hkl-igdb-row input { flex: none; margin: 0; accent-color: var(--hkl-primary); }
+.hkl-igdb-cover { flex: none; width: 40px; height: 56px; border-radius: 4px; object-fit: cover; background: var(--hkl-chip); }
+.hkl-igdb-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .hkl-dlg-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .hkl-dlg-body { display: flex; flex-direction: column; gap: 12px; }
 .hkl-dlg-actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }

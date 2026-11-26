@@ -138,6 +138,10 @@ Run the cheapest tier first.
 ## Browser tests
 
 - Auth and onboarding are in `tests/e2e/global-setup.ts`. Specs share its saved state.
+- **The browser stack uses a fake IGDB** (`tests/e2e/fake-igdb/`). `ci/e2e-compose.sh`
+  adds its compose file, and `ci/e2e-up.sh` gives the entry e2e keys. Home Assistant
+  reaches it at `http://igdb:8080`. The `test` of `helpers.ts` and the capture scripts
+  answer its cover URLs in the browser with `fakeIgdbCovers`. No test calls the real IGDB.
 - **A spec owns what it creates.** Delete created records after the test, and give
   fixtures stable names, never a `Date.now()` suffix.
 - Mock an online catalog with route interception, so a browser test needs no network.

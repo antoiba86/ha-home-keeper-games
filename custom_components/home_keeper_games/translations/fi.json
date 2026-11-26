@@ -380,6 +380,20 @@
         }
       }
     },
+    "set_igdb_game": {
+      "name": "Aseta IGDB-peli",
+      "description": "Antaa pelille toisen IGDB-pelin. Nimi, tiivistelmä, lajityypit, julkaisupäivä, sarja ja kansikuva tulevat IGDB:stä. Ladattu kansikuva säilyy.",
+      "fields": {
+        "game_id": {
+          "name": "Peli",
+          "description": "Pelin tunnus."
+        },
+        "igdb_id": {
+          "name": "IGDB ID",
+          "description": "Oikean pelin tunnus IGDB:ssä."
+        }
+      }
+    },
     "delete_game": {
       "name": "Poista kirja",
       "description": "Poista kirja ja sen kappaleet, lukutila, lainat ja kansikuva.",
@@ -1172,6 +1186,9 @@
     },
     "igdb_not_found": {
       "message": "IGDB:ssä ei ole peliä tunnuksella {igdb_id}."
+    },
+    "igdb_in_use": {
+      "message": "Pelillä {title} on jo tämä IGDB-peli."
     }
   }
 }

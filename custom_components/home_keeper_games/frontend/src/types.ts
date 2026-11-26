@@ -161,6 +161,8 @@ export interface RawState {
   me: Me;
   currency: string;
   home_keeper: { tab: boolean };
+  /** True when the IGDB keys are set. */
+  igdb: boolean;
 }
 
 /** The normalized library that every view reads. */
@@ -174,6 +176,18 @@ export interface Lib {
   people: Person[];
   me: Me;
   currency: string;
+  igdb: boolean;
+}
+
+/** 1 result of `search_catalog`. */
+export interface Candidate {
+  igdb_id: number;
+  title: string;
+  release_year: number | null;
+  platforms: string[];
+  cover_url: string | null;
+  /** The id of the game in the library that has this IGDB game, or null. */
+  in_library: string | null;
 }
 
 /** The subset of the `hass` object that the tab and the card use. */

@@ -6,7 +6,8 @@
  *
  * The tour: open the Library tab in Home Keeper, browse the grid, search, open a
  * game, set the play status on a platform, add another platform chip, scan a stored
- * barcode and a new barcode into a shelf, give the title of the new game, lend a game
+ * barcode and a new barcode into a shelf, give the title of the new game, give a game
+ * that needs details its IGDB game (from the fake IGDB of tests/e2e/fake-igdb), lend a game
  * with a Home Keeper task, see the loan, and open the card on a dashboard. `BEAT` pauses
  * let each step read in the video. The tour puts the seed back at the end.
  *
@@ -15,7 +16,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { resolve } from 'node:path';
 import { library } from './ha-ws';
-import { adminState, gameByTitle, gamesWithCode, noServiceWorker, openCard, openTab, restoreProgress } from './tests/helpers';
+import { adminState, fakeIgdbCovers, gameByTitle, gamesWithCode, noServiceWorker, openCard, openTab, restoreProgress } from './tests/helpers';
 import { DESKTOP } from './viewports';
 
 const OUT = process.env.VIDEO_DIR || '/tmp/home-keeper-games-video';
@@ -28,6 +29,8 @@ const MISS_TITLE = 'Field Notes on Moss';
 const LEND_TITLE = 'Station Eleven';
 const PARTY = 'Robin';
 const STATUS_TITLE = 'The Lathe of Heaven';
+// The fake IGDB finds "Hades" (IGDB id 1001) for this title.
+const IGDB_TITLE = 'Hade';
 
 async function beat(page: Page, n = 1): Promise<void> {
   await page.waitForTimeout(BEAT * n);
@@ -36,6 +39,9 @@ async function beat(page: Page, n = 1): Promise<void> {
 async function cleanUp(): Promise<void> {
   const state = await adminState();
   for (const game of gamesWithCode(state, [MISS_CODE])) {
+    await library('delete_game', { game_id: game.id });
+  }
+  for (const game of state.games.filter((g: { title: string; igdb_id: number | null }) => g.title === IGDB_TITLE || g.igdb_id === 1001)) {
     await library('delete_game', { game_id: game.id });
   }
   const lent = state.games.find((b: { title: string }) => b.title === LEND_TITLE);
@@ -54,6 +60,7 @@ test('record the Library walkthrough', async ({ browser }) => {
     recordVideo: { dir: OUT, size: DESKTOP },
   });
   await noServiceWorker(context);
+  await fakeIgdbCovers(context);
   const page = await context.newPage();
   try {
     // 1. The Library tab in the Home Keeper panel, with the game grid.
@@ -142,6 +149,17 @@ test('record the Library walkthrough', async ({ browser }) => {
     // Done opens the room of the shelf, with the new spine on it.
     await tab.locator('[data-k="scan-finish"]').click();
     await expect(tab.locator('.hkl-room h1')).toHaveText('Office');
+    await beat(page, 2);
+
+    // 4a. A game from Telegram that IGDB did not match: find the correct IGDB game.
+    const added = await library<{ game: { id: string } }>('add_game', { title: IGDB_TITLE, needs_details: true });
+    await openTab(page, `/games/${added.game.id}`);
+    await beat(page);
+    await tab.locator('[data-k="needs-igdb"]').click();
+    await expect(tab.locator('[data-k="d-igdb-row-1001"] img')).toHaveJSProperty('naturalWidth', 264);
+    await beat(page, 2);
+    await tab.locator('[data-k="d-submit"]').click();
+    await expect(tab.locator('.hkl-detail-info h1')).toHaveText('Hades');
     await beat(page, 2);
 
     // 5. Lend a game. The loan has a due date, so Home Keeper gets a task.

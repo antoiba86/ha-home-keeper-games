@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Run `docker compose` on the browser-test stack: the compose project `hkl-e2e`
-# (override with COMPOSE_PROJECT) with tests/integration/docker-compose.yml. ci/e2e-up.sh, e2e.yml,
+# (override with COMPOSE_PROJECT) with tests/integration/docker-compose.yml and the
+# fake IGDB of tests/e2e/fake-igdb/compose.yml. ci/e2e-up.sh, e2e.yml,
 # walkthrough-preview.yml and ha-beta.yml all start, read and stop the stack
 # through this script, so they cannot use different projects or files.
 #
@@ -9,4 +10,5 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 exec docker compose -p "${COMPOSE_PROJECT:-hkl-e2e}" \
-  -f "$ROOT/tests/integration/docker-compose.yml" "$@"
+  -f "$ROOT/tests/integration/docker-compose.yml" \
+  -f "$ROOT/tests/e2e/fake-igdb/compose.yml" "$@"
