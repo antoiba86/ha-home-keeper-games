@@ -29,12 +29,12 @@
 | custom\_components/home\_keeper\_games/projections.py      |      179 |        1 |       86 |        1 |     99% |       349 |
 | custom\_components/home\_keeper\_games/sensor.py           |       74 |        0 |        0 |        0 |    100% |           |
 | custom\_components/home\_keeper\_games/services.py         |      465 |        7 |      134 |        8 |     97% |372-373, 377-\>376, 381, 677, 723, 826-\>828, 930, 959 |
-| custom\_components/home\_keeper\_games/store.py            |      489 |       30 |      138 |       23 |     91% |81, 118-\>exit, 134-135, 221, 245-\>247, 249, 274-\>276, 278, 293, 407, 418-\>exit, 446, 538-542, 598-\>600, 695, 703, 705-\>707, 760, 762-\>768, 769-772, 774, 804, 823-\>821, 829-\>826, 842-850 |
+| custom\_components/home\_keeper\_games/store.py            |      489 |       25 |      138 |       22 |     92% |81, 118-\>exit, 134-135, 221, 245-\>247, 249, 274-\>276, 278, 293, 407, 418-\>exit, 446, 598-\>600, 695, 703, 705-\>707, 760, 762-\>768, 769-772, 774, 804, 823-\>821, 829-\>826, 842-850 |
 | custom\_components/home\_keeper\_games/todo.py             |       78 |        9 |       14 |        3 |     87% |117, 142-143, 149, 157-158, 168, 175-176 |
 | custom\_components/home\_keeper\_games/websocket\_api.py   |       79 |        6 |       12 |        2 |     91% |101-108, 124-125, 153-154 |
 | custom\_components/home\_keeper\_games/wishlist.py         |      117 |        0 |       44 |        0 |    100% |           |
 | custom\_components/home\_keeper\_games/wishlist\_sync.py   |      103 |        7 |       28 |        3 |     92% |72-\>exit, 92-\>exit, 98, 108-110, 128-130 |
-| **TOTAL**                                                  | **4436** |  **137** | **1386** |   **86** | **96%** |           |
+| **TOTAL**                                                  | **4436** |  **132** | **1386** |   **85** | **96%** |           |
 
 
 ## Setup coverage badge
