@@ -300,7 +300,7 @@ describe('game detail', () => {
     $('[data-act="return-loan"]').click();
     await flush();
     expect(fake.calls('return_loan')).toEqual([{ type: 'home_keeper_games/return_loan', loan_id: expect.any(String) }]);
-    expect(host.showToast).toHaveBeenCalledWith('Book returned.');
+    expect(host.showToast).toHaveBeenCalledWith('Game returned.');
   });
 
   it('deletes after the confirmation and goes back to the list', async () => {
@@ -739,7 +739,7 @@ describe('scan with no match', () => {
     await scan(miss.copy.barcode);
     await flush();
     expect(sheet()).not.toBeNull();
-    expect(sheet().querySelector('h2').textContent).toBe('No book has this barcode');
+    expect(sheet().querySelector('h2').textContent).toBe('No game has this barcode');
     expect(sheet().querySelector('[data-k="d-barcode"]').textContent).toBe('Barcode 9781402894626');
     expect(sheet().querySelector('[data-k="d-x"]')).toBeNull();
     expect(sheet().querySelector('[data-k="d-cancel"]')).toBeNull();
@@ -771,7 +771,7 @@ describe('scan with no match', () => {
     expect(sheet()).toBeNull();
     expect(el.shadowRoot.activeElement).toBe($('[data-k="barcode-input"]'));
     const row = $$('.hkl-result').find((r) => r.textContent.includes('Field Notes on Moss'));
-    expect(row.textContent).toContain('No book has this barcode');
+    expect(row.textContent).toContain('No game has this barcode');
 
     // The scan goes on.
     await scan('9780441478125');
@@ -1108,7 +1108,7 @@ describe('import', () => {
   it('runs a dry run, then the import', async () => {
     const summary = { dry_run: true, counts: { rows: 3, read: 2, wishlist: 1, existing: 1, new: 2, title_match: 0 }, rows: [], truncated: false };
     const fake = await mount('/import', { replies: { import_csv: summary } });
-    expect($('#hkl-import-title').textContent).toBe('Import books');
+    expect($('#hkl-import-title').textContent).toBe('Import games');
     const input = $('[data-k="im-file"]');
     const file = new File(['title,authors\nA,B\nC,D\nE,F\n'], 'games-export.csv', { type: 'text/csv' });
     Object.defineProperty(input, 'files', { value: [file] });

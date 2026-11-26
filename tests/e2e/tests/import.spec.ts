@@ -12,12 +12,12 @@ test.describe('Import', { tag: '@responsive' }, () => {
     const before = await adminState();
     const tab = await openTab(page, '/import');
     const dialog = tab.locator('.hkl-dialog');
-    await expect(dialog.locator('#hkl-import-title')).toHaveText('Import books');
+    await expect(dialog.locator('#hkl-import-title')).toHaveText('Import games');
     await dialog.locator('[data-k="im-file"]').setInputFiles(CSV);
     await expect(dialog.locator('.hkl-file')).toContainText('games_sample.csv · 6 rows');
     await expect(dialog.locator('.hkl-eyebrow').filter({ hasText: 'Preview' })).toBeVisible({ timeout: 30_000 });
     await expect(dialog.locator('.hkl-chips')).toContainText('Already in the library: 2');
-    await expect(dialog.locator('.hkl-chips')).toContainText('New books: 4');
+    await expect(dialog.locator('.hkl-chips')).toContainText('New games: 4');
     await expect(dialog.locator('[data-k="import-run"]')).toHaveText('Import 6 rows');
     await dialog.locator('.hkl-details summary').click();
     await expect(dialog.locator('.hkl-details tr').filter({ hasText: 'Piranesi' })).toContainText('In the library');

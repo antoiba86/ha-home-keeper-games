@@ -74,10 +74,10 @@ describe('t', () => {
 
 describe('tn', () => {
   it('picks the English plural', () => {
-    expect(tn('count.games', 1)).toBe('1 book');
-    expect(tn('count.games', 0)).toBe('0 books');
-    expect(tn('count.games', 7)).toBe('7 books');
-    expect(tn('count.games', 7, { n: 'seven' })).toBe('seven books');
+    expect(tn('count.games', 1)).toBe('1 game');
+    expect(tn('count.games', 0)).toBe('0 games');
+    expect(tn('count.games', 7)).toBe('7 games');
+    expect(tn('count.games', 7, { n: 'seven' })).toBe('seven games');
   });
   it('picks few and many in Polish', () => {
     withKeys({ 'tmp.p.one': '{n} A', 'tmp.p.few': '{n} B', 'tmp.p.many': '{n} C', 'tmp.p.other': '{n} D' }, () => {

@@ -1,6 +1,6 @@
 {
   "tab.title": "Spel",
-  "companion.description": "Böcker, hyllor, lån och lässtatus.",
+  "companion.description": "Spel, hyllor, lån och spelstatus.",
   "loan_task.name_out": "Få tillbaka {title} från {party}",
   "loan_task.name_in": "Lämna tillbaka {title} till {party}",
   "loan_task.completion_prompt": "När uppgiften slutförs återlämnas lånet."

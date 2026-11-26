@@ -38,7 +38,7 @@ describe('card', () => {
     const fake = await mount();
     expect(fake.calls('get_state')).toHaveLength(1);
     expect($('h2').textContent).toBe('Library: Alex');
-    expect(text()).toContain('38 books');
+    expect(text()).toContain('38 games');
     expect(text()).toContain('Project Hail Mary');
     expect(text()).toContain('210 min played');
     expect(text()).toContain('Switch · 95 min played');

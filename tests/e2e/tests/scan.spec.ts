@@ -43,7 +43,7 @@ test.describe('Scan', { tag: '@responsive' }, () => {
 
     const sheet = tab.locator('.hkl-dialog.sheet');
     await expect(sheet).toBeVisible({ timeout: 30_000 });
-    await expect(sheet.locator('h2')).toHaveText('No book has this barcode');
+    await expect(sheet.locator('h2')).toHaveText('No game has this barcode');
     await expect(sheet.locator('[data-k="d-barcode"]')).toHaveText(`Barcode ${MISS_CODE}`);
     await expect(sheet.locator('[name="title"]')).toBeFocused();
     const submit = sheet.locator('[data-k="d-submit"]');
@@ -61,7 +61,7 @@ test.describe('Scan', { tag: '@responsive' }, () => {
     await expect(sheet.locator('[data-k="d-cover-name"]')).toHaveText('13be6b0e5c354e1981a89fe2766196e0-552257a9.jpg');
     await submit.click();
     await expect(sheet).toHaveCount(0);
-    await expect(tab.locator('.hkl-result').filter({ hasText: MISS_TITLE })).toContainText('No book has this barcode');
+    await expect(tab.locator('.hkl-result').filter({ hasText: MISS_TITLE })).toContainText('No game has this barcode');
 
     const state = await adminState();
     const [game] = gamesWithCode(state, [MISS_CODE]);

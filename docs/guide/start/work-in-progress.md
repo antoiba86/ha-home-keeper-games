@@ -1,11 +1,8 @@
 # Work in progress
 
 Home Keeper Games is a change of Home Keeper Library from books to video games. The change
-is in progress, and there is no release yet. The integration still keeps books in this
-version, so this guide does not describe each page of the tab.
-
-The guide for games comes with the games model: each game with its copies for each
-console, and the play status of each person.
+is in progress, and there is no release yet, so this guide does not describe each page of
+the tab. Some action names and descriptions in Home Assistant still say "book".
 
 ## What works now
 

@@ -1,6 +1,6 @@
 {
   "tab.title": "Pelit",
-  "companion.description": "Kirjat, hyllyt, lainat ja lukutila.",
+  "companion.description": "Pelit, hyllyt, lainat ja pelien edistyminen.",
   "loan_task.name_out": "Hae {title} takaisin: {party}",
   "loan_task.name_in": "Palauta {title}: {party}",
   "loan_task.completion_prompt": "Tehtävän suorittaminen palauttaa lainan."

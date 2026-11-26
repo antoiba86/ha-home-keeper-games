@@ -1,6 +1,6 @@
 {
   "tab.title": "Games",
-  "companion.description": "Books, shelves, loans and reading status.",
+  "companion.description": "Games, shelves, loans and play progress.",
   "loan_task.name_out": "Get {title} back from {party}",
   "loan_task.name_in": "Return {title} to {party}",
   "loan_task.completion_prompt": "Completing returns the loan."

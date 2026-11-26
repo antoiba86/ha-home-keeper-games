@@ -1,6 +1,6 @@
 {
   "tab.title": "Jocs",
-  "companion.description": "Llibres, prestatges, préstecs i estat de lectura.",
+  "companion.description": "Jocs, prestatges, préstecs i progrés de joc.",
   "loan_task.name_out": "Recupera {title} de {party}",
   "loan_task.name_in": "Retorna {title} a {party}",
   "loan_task.completion_prompt": "Completar la tasca retorna el préstec."

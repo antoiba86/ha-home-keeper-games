@@ -207,7 +207,7 @@ test('capture the Library screenshots', async ({ page, browser }) => {
   // Import, after the dry run of the sample CSV file.
   tab = await openTab(page, '/import');
   await tab.locator('[data-k="im-file"]').setInputFiles(resolve(__dirname, 'seed/games_sample.csv'));
-  await expect(tab.locator('.hkl-dialog .hkl-chips')).toContainText('New books', { timeout: 30_000 });
+  await expect(tab.locator('.hkl-dialog .hkl-chips')).toContainText('New games', { timeout: 30_000 });
   await tab.locator('.hkl-details summary').click();
   await shot(page, 'import-desktop');
 

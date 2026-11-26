@@ -53,7 +53,7 @@ async def test_companion_registration(hass, setup_entry) -> None:
         "domain": DOMAIN,
         "name": "Home Keeper Games",
         "icon": "mdi:bookshelf",
-        "description": "Books, shelves, loans and reading status.",
+        "description": "Games, shelves, loans and play progress.",
         "config_entry_id": setup_entry.entry_id,
         "docs_url": "https://github.com/antoiba86/ha-home-keeper-games",
         "capabilities": ["import_export"],
