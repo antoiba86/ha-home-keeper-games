@@ -36,6 +36,11 @@ How the surfaces work is in [events-api](../../docs/design/events-api.md). Integ
 - A service that takes a game takes `game_id`. Titles are not unique. `borrow_game` and
   `add_to_wishlist` also take `barcode` or `title`, and add the game when none matches.
 
+- **A blueprint in `blueprints/` calls only declared services.** A unit test reads it
+  against `services.yaml` and the model lists, and a component test runs it in Home
+  Assistant with fake actions of the other integration. Set `min_version` to the first
+  Home Assistant that has each field it uses.
+
 ## Events
 
 - **Every state change fires a `home_keeper_games_<noun>_<verb>` event.** Build the

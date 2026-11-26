@@ -5,6 +5,15 @@ Each change that a user can see is in this file. The format is based on
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). `manifest.json` `version`
 is the single source of truth (see `RELEASE.md`).
 
+## [0.5.0b8] - 2026-11-26
+
+### Added
+
+- **[Telegram blueprint](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/telegram).**
+  Send `/juego Hades switch` to your Telegram bot to add the game with its IGDB details
+  and a copy on that platform. The reply has an Undo button, and an Edit button that
+  opens the game in the tab.
+
 ## [0.5.0b7] - 2026-11-25
 
 ### Added
