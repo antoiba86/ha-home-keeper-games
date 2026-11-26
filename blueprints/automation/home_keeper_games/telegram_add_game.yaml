@@ -1,0 +1,242 @@
+blueprint:
+  name: Home Keeper Games - add a game from Telegram
+  description: >-
+    Add a game to Home Keeper Games with a Telegram command, such as
+    `/juego Hades switch`. The last word, or the last 2 words, can be the platform.
+    The game gets its details and cover from IGDB when IGDB has a game with the same
+    title. The bot replies with an Undo button and, with the Home Assistant URL, an
+    Edit button that opens the game in the Games tab. The Telegram bot integration
+    must be set up first.
+  domain: automation
+  source_url: https://github.com/antoiba86/ha-home-keeper-games/blob/main/blueprints/automation/home_keeper_games/telegram_add_game.yaml
+  homeassistant:
+    # The `chat_id` field of `telegram_bot.send_message` starts in 2026.3.
+    min_version: "2026.3.0"
+  input:
+    command:
+      name: Command
+      description: The Telegram command that adds a game, with the slash.
+      default: /juego
+      selector:
+        text:
+    chat_ids:
+      name: Allowed chats
+      description: >-
+        The chat IDs that can add games. Keep it empty to allow each chat that the
+        Telegram bot integration allows.
+      default: []
+      selector:
+        text:
+          multiple: true
+    default_platform:
+      name: Default platform
+      description: The platform of the copy when the message has no platform.
+      default: other
+      selector:
+        select:
+          options:
+            - label: PS5
+              value: ps5
+            - label: PS4
+              value: ps4
+            - label: PS3
+              value: ps3
+            - label: Switch 2
+              value: switch2
+            - label: Switch
+              value: switch
+            - label: Xbox Series
+              value: xbox_series
+            - label: Xbox One
+              value: xbox_one
+            - label: PC
+              value: pc
+            - label: Other
+              value: other
+    copy_format:
+      name: Format
+      description: The format of the new copy.
+      default: physical
+      selector:
+        select:
+          options:
+            - label: Physical
+              value: physical
+            - label: Digital
+              value: digital
+            - label: Other
+              value: other
+    shelf_id:
+      name: Shelf
+      description: >-
+        The ID of the shelf for a physical copy. Keep it empty for no shelf. A
+        digital copy never has a shelf.
+      default: ""
+      selector:
+        text:
+    ha_url:
+      name: Home Assistant URL
+      description: >-
+        The https URL of your Home Assistant, such as https://home.example.org. The
+        Edit button opens the game at this URL. Keep it empty for no Edit button.
+      default: ""
+      selector:
+        text:
+
+mode: queued
+max: 10
+
+triggers:
+  - trigger: event
+    event_type: telegram_command
+    id: add
+  - trigger: event
+    event_type: telegram_callback
+    id: button
+
+variables:
+  command: !input command
+  chat_ids: !input chat_ids
+  default_platform: !input default_platform
+  copy_format: !input copy_format
+  shelf_id: !input shelf_id
+  ha_url: !input ha_url
+  chat_id: "{{ trigger.event.data.chat_id }}"
+  labels:
+    ps5: PS5
+    ps4: PS4
+    ps3: PS3
+    switch2: Switch 2
+    switch: Switch
+    xbox_series: Xbox Series
+    xbox_one: Xbox One
+    pc: PC
+    other: Other
+
+conditions:
+  - condition: template
+    value_template: >-
+      {{ chat_ids | count == 0
+         or (chat_id | string) in (chat_ids | map('string') | map('trim') | list) }}
+  - condition: template
+    value_template: >-
+      {% if trigger.id == 'add' %}
+        {{ (trigger.event.data.command | default('')).split('@')[0] == command }}
+      {% else %}
+        {{ (trigger.event.data.data | default('')).split(' ')[0] in ['/hkg_g', '/hkg_c'] }}
+      {% endif %}
+
+actions:
+  - choose:
+      - conditions: "{{ trigger.id == 'add' }}"
+        sequence:
+          - variables:
+              words: "{{ trigger.event.data.args | default([], true) | list }}"
+              aliases:
+                ps5: ps5
+                ps4: ps4
+                ps3: ps3
+                switch2: switch2
+                switch 2: switch2
+                ns2: switch2
+                switch: switch
+                xbox series: xbox_series
+                xbox: xbox_series
+                xsx: xbox_series
+                xbox one: xbox_one
+                pc: pc
+                steam: pc
+                other: other
+              last_two: "{{ (words[-2:] | join(' ') | lower) if words | count > 2 else '' }}"
+              last_one: "{{ (words[-1] | lower) if words | count > 1 else '' }}"
+              platform: >-
+                {{ aliases[last_two] if last_two in aliases
+                   else aliases[last_one] if last_one in aliases else default_platform }}
+              title: >-
+                {{ (words[:-2] if last_two in aliases
+                    else words[:-1] if last_one in aliases else words) | join(' ') }}
+          - if: "{{ title | trim == '' }}"
+            then:
+              - action: telegram_bot.send_message
+                data:
+                  chat_id: "{{ chat_id }}"
+                  parse_mode: plain_text
+                  message: "Write the title after the command: {{ command }} Hades switch"
+              - stop: The message has no title.
+          # IGDB can be off or not set up. Then the game gets the title only.
+          - action: home_keeper_games.add_game
+            data:
+              title: "{{ title }}"
+              lookup: true
+              platform: "{{ platform }}"
+            response_variable: added
+            continue_on_error: true
+          - variables:
+              igdb_ok: "{{ added is defined and added.game is defined }}"
+          - if: "{{ not igdb_ok }}"
+            then:
+              - action: home_keeper_games.add_game
+                data:
+                  title: "{{ title }}"
+                  needs_details: true
+                response_variable: added
+          - action: home_keeper_games.add_copy
+            data:
+              game_id: "{{ added.game.id }}"
+              platform: "{{ platform }}"
+              format: "{{ copy_format }}"
+              shelf_id: "{{ shelf_id if shelf_id and copy_format != 'digital' else none }}"
+            response_variable: copied
+          - variables:
+              game: "{{ added.game }}"
+              existing: "{{ added.existing | default(false) }}"
+              # `copied['copy']`: `copied.copy` is the copy method of the dict.
+              undo: >-
+                {{ '/hkg_c ' ~ copied['copy'].id if existing else '/hkg_g ' ~ game.id }}
+              base_url: "{{ ha_url | trim | regex_replace('/+$', '') }}"
+              edit: >-
+                {{ ',Edit:' ~ base_url ~ '/home-keeper/games/games/' ~ game.id
+                   if base_url.startswith('https://') else '' }}
+              lines: >-
+                {{ ([('Copy added: ' if existing else 'Added: ')
+                     ~ game.title ~ ' (' ~ labels[platform] ~ ')']
+                    + (['The game was already in the library.'] if existing else [])
+                    + (['IGDB is not available. Find the game in IGDB later.'] if not igdb_ok
+                       else ['IGDB has no game with this title. Find it with Edit.']
+                       if game.needs_details else []))
+                   | join('\n') }}
+          - action: telegram_bot.send_message
+            data:
+              chat_id: "{{ chat_id }}"
+              parse_mode: plain_text
+              message: "{{ lines }}"
+              inline_keyboard:
+                - "Undo:{{ undo }}{{ edit }}"
+
+      - conditions: "{{ trigger.id == 'button' }}"
+        sequence:
+          - variables:
+              kind: "{{ trigger.event.data.data.split(' ')[0] }}"
+              target: "{{ (trigger.event.data.data.split(' ') + [''])[1] }}"
+          # A game or copy that is already gone is not an error here.
+          - if: "{{ kind == '/hkg_g' }}"
+            then:
+              - action: home_keeper_games.delete_game
+                data:
+                  game_id: "{{ target }}"
+                continue_on_error: true
+            else:
+              - action: home_keeper_games.delete_copy
+                data:
+                  copy_id: "{{ target }}"
+                continue_on_error: true
+          - action: telegram_bot.answer_callback_query
+            data:
+              callback_query_id: "{{ trigger.event.data.id }}"
+              message: Undone.
+          - action: telegram_bot.edit_message
+            data:
+              chat_id: "{{ chat_id }}"
+              message_id: "{{ trigger.event.data.message.message_id }}"
+              parse_mode: plain_text
+              message: "{{ trigger.event.data.message.text | default('') }}\nUndone."

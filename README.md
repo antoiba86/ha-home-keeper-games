@@ -41,6 +41,8 @@ The first release will have these features:
   Assistant.
 - Lend and borrow games, with a Home Keeper task on each due date.
 - Send the wishlist games to buy to a to-do list of the person.
+- Add a game from Telegram with a blueprint: send `/juego Hades switch`
+  ([Telegram](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/telegram)).
 
 ## Install
 
