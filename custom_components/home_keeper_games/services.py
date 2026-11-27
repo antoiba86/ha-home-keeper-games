@@ -241,6 +241,14 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
         vol.Optional("completion_count"): vol.Coerce(int),
         vol.Optional("review"): _OPT_STR,
     },
+    "log_session": {
+        vol.Required("game_id"): cv.string,
+        vol.Optional("person_id"): cv.string,
+        vol.Optional("platform"): _PLATFORM,
+        vol.Required("minutes"): vol.Coerce(int),
+        vol.Optional("date"): _OPT_STR,
+    },
+    "delete_session": {vol.Required("session_id"): cv.string},
     "lend_game": {vol.Required("copy_id"): cv.string, **_LOAN_FIELDS},
     "borrow_game": {
         **_GAME_REF,
@@ -316,6 +324,13 @@ SERVICE_FIELDS: dict[str, dict[Any, Any]] = {
         vol.Optional("direction"): vol.In(models.DIRECTIONS),
     },
     "list_people": {},
+    "list_sessions": {
+        vol.Optional("game_id"): cv.string,
+        vol.Optional("person_id"): cv.string,
+        vol.Optional("limit", default=models.DEFAULT_SESSION_LIST): vol.All(
+            vol.Coerce(int), vol.Range(min=1, max=models.MAX_SESSION_LIST)
+        ),
+    },
 }
 
 
@@ -661,6 +676,37 @@ async def _set_progress(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
         data["game_id"], person_id, _clean(data, "game_id", "person_id")
     )
     return {"game_id": data["game_id"], "person_id": person_id, "progress": row}
+
+
+# ── Play sessions ────────────────────────────────────────────────────────────
+
+
+async def _log_session(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+    person_id = _self_or_admin(ctx, data.get("person_id"))
+    session = await ctx.store.log_session(_clean(data, "person_id"), person_id)
+    row = ctx.store.progress_row(person_id, session["game_id"], session["platform"])
+    return {"session": session, "progress": row}
+
+
+async def _delete_session(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+    session = ctx.store.session(data["session_id"])
+    # A non-admin user deletes only their own sessions, as with set_progress.
+    if not ctx.actor.is_admin and session["person_id"] != ctx.actor.person_id:
+        raise Unauthorized(context=None)
+    return {"session": await ctx.store.delete_session(session["id"])}
+
+
+async def _list_sessions(ctx: Ctx, data: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "sessions": projections.visible_sessions(
+            ctx.store.state,
+            viewer=ctx.actor.person_id,
+            is_admin=ctx.actor.is_admin,
+            game_id=data.get("game_id"),
+            person_id=data.get("person_id"),
+            limit=data["limit"],
+        )
+    }
 
 
 # ── Loans ────────────────────────────────────────────────────────────────────
@@ -1086,6 +1132,8 @@ SERVICE_HANDLERS: dict[str, Handler] = {
     "delete_copy": _delete_copy,
     "set_cover": _set_cover,
     "set_progress": _set_progress,
+    "log_session": _log_session,
+    "delete_session": _delete_session,
     "lend_game": _lend_game,
     "borrow_game": _borrow_game,
     "return_loan": _return_loan,
@@ -1106,6 +1154,7 @@ SERVICE_HANDLERS: dict[str, Handler] = {
     "list_locations": _list_locations,
     "list_loans": _list_loans,
     "list_people": _list_people,
+    "list_sessions": _list_sessions,
 }
 
 _RESPONSES = {

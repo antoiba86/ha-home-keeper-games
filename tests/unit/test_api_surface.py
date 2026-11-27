@@ -213,6 +213,14 @@ def test_every_event_has_a_summary_and_a_known_payload() -> None:
 
 _GAME = {"id": "b1", "title": "Dune"}
 _COPY = {"id": "c1", "shelf_id": "s1"}
+_SESSION = {
+    "id": "x1",
+    "person_id": "p1",
+    "platform": "ps5",
+    "source": "manual",
+    "date": "2026-10-01",
+    "minutes": 45,
+}
 _LOAN = {
     "id": "l1",
     "direction": "out",
@@ -265,6 +273,8 @@ def _built() -> dict[str, dict[str, Any]]:
         const.EVENT_GAME_COMPLETED: events.game_completed_event_data(
             _GAME, "p1", "ps5", {"completed_at": "2026-10-01", "rating": 5}, None
         ),
+        const.EVENT_SESSION_LOGGED: events.session_event_data(_GAME, _SESSION, None),
+        const.EVENT_SESSION_DELETED: events.session_event_data(_GAME, _SESSION, None),
         const.EVENT_LOAN_STARTED: events.loan_event_data(_GAME, _LOAN, None),
         const.EVENT_LOAN_RETURNED: events.loan_event_data(_GAME, _LOAN, None),
         const.EVENT_LOAN_OVERDUE: events.loan_event_data(_GAME, _LOAN, None),

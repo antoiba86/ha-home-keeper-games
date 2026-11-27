@@ -141,6 +141,20 @@ def progress_updated_event_data(
     }
 
 
+def session_event_data(
+    game: dict[str, Any], session: dict[str, Any], origin: str | None
+) -> dict[str, Any]:
+    """The payload of ``session_logged`` and ``session_deleted``."""
+    return {
+        **game_event_data(game, origin, session["person_id"]),
+        "session_id": session["id"],
+        "platform": session["platform"],
+        "source": session["source"],
+        "date": session["date"],
+        "minutes": session["minutes"],
+    }
+
+
 def game_completed_event_data(
     game: dict[str, Any],
     person_id: str,

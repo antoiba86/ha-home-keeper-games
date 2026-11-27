@@ -101,6 +101,14 @@ def test_every_service_is_touched(api, ws):
             "playtime_minutes": 30,
         },
     )
+    session = _service(
+        api,
+        "log_session",
+        {"game_id": game["id"], "person_id": person, "platform": "pc", "minutes": 15},
+    )["session"]
+    listed = _service(api, "list_sessions", {"game_id": game["id"]})["sessions"]
+    assert [s["id"] for s in listed] == [session["id"]], listed
+    _service(api, "delete_session", {"session_id": session["id"]})
     _service(api, "set_person_settings", {"person_id": person, "yearly_goal": 12})
     _service(api, "set_settings", {"currency": "EUR"})
 

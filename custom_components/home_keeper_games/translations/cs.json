@@ -654,6 +654,42 @@
         }
       }
     },
+    "log_session": {
+      "name": "Zapsat herní relaci",
+      "description": "Přidat herní relaci osoby. Její minuty se přičtou k herní době postupu. Uživatel, který není správce, může zapsat jen své relace.",
+      "fields": {
+        "game_id": {
+          "name": "Hra",
+          "description": "ID hry."
+        },
+        "person_id": {
+          "name": "Osoba",
+          "description": "ID osoby v Home Assistant."
+        },
+        "platform": {
+          "name": "Platforma",
+          "description": "Konzole. Prázdné pro použití platformy kopií hry."
+        },
+        "minutes": {
+          "name": "Minuty",
+          "description": "Délka relace v minutách."
+        },
+        "date": {
+          "name": "Datum",
+          "description": "Datum relace. Prázdné pro dnešek."
+        }
+      }
+    },
+    "delete_session": {
+      "name": "Smazat herní relaci",
+      "description": "Smazat herní relaci a odečíst její minuty z herní doby. Uživatel, který není správce, může smazat jen své relace.",
+      "fields": {
+        "session_id": {
+          "name": "Relace",
+          "description": "ID herní relace."
+        }
+      }
+    },
     "lend_game": {
       "name": "Půjčit hru",
       "description": "Půjčit výtisk jiné osobě.",
@@ -998,6 +1034,24 @@
       "name": "Vypsat osoby",
       "description": "Vrátit osoby a jejich nastavení knihovny."
     },
+    "list_sessions": {
+      "name": "Vypsat herní relace",
+      "description": "Vrátit herní relace, nejnovější první. Uživatel, který není správce, dostane své relace a relace osob, které sdílejí svůj postup.",
+      "fields": {
+        "game_id": {
+          "name": "Hra",
+          "description": "Jen relace této hry."
+        },
+        "person_id": {
+          "name": "Osoba",
+          "description": "Jen relace této osoby."
+        },
+        "limit": {
+          "name": "Omezení",
+          "description": "Největší počet relací."
+        }
+      }
+    },
     "export_data": {
       "name": "Exportovat data",
       "description": "Exportovat část knihovny z exportu Home Keeper.",
@@ -1072,6 +1126,9 @@
     },
     "loan_not_found": {
       "message": "Žádná výpůjčka nemá ID {id}."
+    },
+    "session_not_found": {
+      "message": "Žádná herní relace nemá ID {id}."
     },
     "person_not_found": {
       "message": "Žádná osoba nemá ID {id}."

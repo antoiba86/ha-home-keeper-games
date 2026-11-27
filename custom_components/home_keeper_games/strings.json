@@ -654,6 +654,42 @@
         }
       }
     },
+    "log_session": {
+      "name": "Log play session",
+      "description": "Add a play session of a person. Its minutes go on the play time of the progress. A non-admin user can log only their own sessions.",
+      "fields": {
+        "game_id": {
+          "name": "Game",
+          "description": "The ID of the game."
+        },
+        "person_id": {
+          "name": "Person",
+          "description": "The ID of the Home Assistant person."
+        },
+        "platform": {
+          "name": "Platform",
+          "description": "The console. Empty to use the platform of the copies of the game."
+        },
+        "minutes": {
+          "name": "Minutes",
+          "description": "The length of the session in minutes."
+        },
+        "date": {
+          "name": "Date",
+          "description": "The date of the session. Empty for today."
+        }
+      }
+    },
+    "delete_session": {
+      "name": "Delete play session",
+      "description": "Delete a play session and take its minutes off the play time. A non-admin user can delete only their own sessions.",
+      "fields": {
+        "session_id": {
+          "name": "Session",
+          "description": "The ID of the play session."
+        }
+      }
+    },
     "lend_game": {
       "name": "Lend game",
       "description": "Lend a copy to another person.",
@@ -998,6 +1034,24 @@
       "name": "List people",
       "description": "Return the people and their library settings."
     },
+    "list_sessions": {
+      "name": "List play sessions",
+      "description": "Return the play sessions, the newest first. A non-admin user gets their own sessions and the sessions of the people who share their progress.",
+      "fields": {
+        "game_id": {
+          "name": "Game",
+          "description": "Only the sessions of this game."
+        },
+        "person_id": {
+          "name": "Person",
+          "description": "Only the sessions of this person."
+        },
+        "limit": {
+          "name": "Limit",
+          "description": "The maximum number of sessions."
+        }
+      }
+    },
     "export_data": {
       "name": "Export data",
       "description": "Export the library section of the Home Keeper export.",
@@ -1072,6 +1126,9 @@
     },
     "loan_not_found": {
       "message": "No loan has the ID {id}."
+    },
+    "session_not_found": {
+      "message": "No play session has the ID {id}."
     },
     "person_not_found": {
       "message": "No person has the ID {id}."

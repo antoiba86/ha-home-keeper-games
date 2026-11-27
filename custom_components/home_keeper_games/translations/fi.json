@@ -654,6 +654,42 @@
         }
       }
     },
+    "log_session": {
+      "name": "Kirjaa pelisessio",
+      "description": "Lisää henkilön pelisessio. Sen minuutit lisätään edistymisen peliaikaan. Käyttäjä, joka ei ole ylläpitäjä, voi kirjata vain omat sessionsa.",
+      "fields": {
+        "game_id": {
+          "name": "Peli",
+          "description": "Pelin tunnus."
+        },
+        "person_id": {
+          "name": "Henkilö",
+          "description": "Home Assistant -henkilön ID."
+        },
+        "platform": {
+          "name": "Alusta",
+          "description": "Konsoli. Tyhjä käyttää pelin kopioiden alustaa."
+        },
+        "minutes": {
+          "name": "Minuutit",
+          "description": "Session pituus minuutteina."
+        },
+        "date": {
+          "name": "Päivämäärä",
+          "description": "Session päivämäärä. Tyhjä tarkoittaa tätä päivää."
+        }
+      }
+    },
+    "delete_session": {
+      "name": "Poista pelisessio",
+      "description": "Poista pelisessio ja vähennä sen minuutit peliajasta. Käyttäjä, joka ei ole ylläpitäjä, voi poistaa vain omat sessionsa.",
+      "fields": {
+        "session_id": {
+          "name": "Sessio",
+          "description": "Pelisession ID."
+        }
+      }
+    },
     "lend_game": {
       "name": "Lainaa peli",
       "description": "Lainaa kappale toiselle henkilölle.",
@@ -998,6 +1034,24 @@
       "name": "Luettele henkilöt",
       "description": "Palauta henkilöt ja heidän kirjastoasetuksensa."
     },
+    "list_sessions": {
+      "name": "Luettele pelisessiot",
+      "description": "Palauta pelisessiot uusimmat ensin. Käyttäjä, joka ei ole ylläpitäjä, saa omat sessionsa ja niiden henkilöiden sessiot, jotka jakavat edistymisensä.",
+      "fields": {
+        "game_id": {
+          "name": "Peli",
+          "description": "Vain tämän pelin sessiot."
+        },
+        "person_id": {
+          "name": "Henkilö",
+          "description": "Vain tämän henkilön sessiot."
+        },
+        "limit": {
+          "name": "Raja",
+          "description": "Sessioiden enimmäismäärä."
+        }
+      }
+    },
     "export_data": {
       "name": "Vie tiedot",
       "description": "Vie Home Keeperin viennin kirjasto-osa.",
@@ -1072,6 +1126,9 @@
     },
     "loan_not_found": {
       "message": "Millään lainalla ei ole ID:tä {id}."
+    },
+    "session_not_found": {
+      "message": "Millään pelisessiolla ei ole ID:tä {id}."
     },
     "person_not_found": {
       "message": "Millään henkilöllä ei ole ID:tä {id}."

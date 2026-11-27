@@ -42,7 +42,7 @@ PLATFORMS = ["sensor", "todo"]
 
 # PANEL_VERSION is the same string as the manifest version. release.yml checks it,
 # and rollup.config.mjs reads it.
-PANEL_VERSION = "0.5.0b10"
+PANEL_VERSION = "0.5.0b11"
 
 # The built bundles are in frontend/dist/ and Home Assistant serves them here.
 STATIC_URL = "/home_keeper_games_static"
@@ -131,6 +131,8 @@ EVENT_COPY_REMOVED = f"{DOMAIN}_copy_removed"
 EVENT_PROGRESS_CHANGED = f"{DOMAIN}_progress_changed"
 EVENT_PROGRESS_UPDATED = f"{DOMAIN}_progress_updated"
 EVENT_GAME_COMPLETED = f"{DOMAIN}_game_completed"
+EVENT_SESSION_LOGGED = f"{DOMAIN}_session_logged"
+EVENT_SESSION_DELETED = f"{DOMAIN}_session_deleted"
 EVENT_LOAN_STARTED = f"{DOMAIN}_loan_started"
 EVENT_LOAN_RETURNED = f"{DOMAIN}_loan_returned"
 EVENT_LOAN_OVERDUE = f"{DOMAIN}_loan_overdue"

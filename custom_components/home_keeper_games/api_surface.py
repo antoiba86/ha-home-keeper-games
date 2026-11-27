@@ -174,6 +174,8 @@ SERVICES: tuple[ServiceSpec, ...] = (
     ServiceSpec("delete_copy", response="optional", **_ADMIN),
     ServiceSpec("set_cover", response="optional", **_ADMIN),
     ServiceSpec("set_progress", response="optional", caller_scoped=True),
+    ServiceSpec("log_session", response="optional", caller_scoped=True),
+    ServiceSpec("delete_session", response="optional", caller_scoped=True),
     ServiceSpec("lend_game", response="optional", **_ADMIN),
     ServiceSpec("borrow_game", response="optional", **_ADMIN),
     ServiceSpec("return_loan", response="optional", **_ADMIN),
@@ -194,6 +196,7 @@ SERVICES: tuple[ServiceSpec, ...] = (
     ServiceSpec("list_locations", response="only"),
     ServiceSpec("list_loans", response="only"),
     ServiceSpec("list_people", response="only"),
+    ServiceSpec("list_sessions", response="only"),
 )
 
 #: The services that ``async_unload_entry`` removes.
@@ -285,6 +288,13 @@ _LOAN = (
     Field("returned", "str | None", "YYYY-MM-DD."),
 )
 _WISH = (Field("buy", "bool"), Field("bought", "bool"))
+_SESSION = (
+    Field("session_id", "str"),
+    Field("platform", "str"),
+    Field("source", "str", "manual for a session that a person logs."),
+    Field("date", "str", "YYYY-MM-DD."),
+    Field("minutes", "int | None", "None for a session that is still open."),
+)
 
 
 def _event(
@@ -361,6 +371,18 @@ EVENTS: tuple[EventSpec, ...] = (
             Field("rating", "int | None"),
             Field("completion_count", "int"),
         ),
+    ),
+    _event(
+        "EVENT_SESSION_LOGGED",
+        "game",
+        "A play session was added. Its minutes went on the progress row.",
+        _SESSION,
+    ),
+    _event(
+        "EVENT_SESSION_DELETED",
+        "game",
+        "A play session was deleted. Its minutes left the progress row.",
+        _SESSION,
     ),
     _event("EVENT_LOAN_STARTED", "game", "A game was lent or borrowed.", _LOAN),
     _event("EVENT_LOAN_RETURNED", "game", "A loan was returned.", _LOAN),

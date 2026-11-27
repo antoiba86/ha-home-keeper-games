@@ -654,6 +654,42 @@
         }
       }
     },
+    "log_session": {
+      "name": "Registrér spilsession",
+      "description": "Tilføj en spilsession for en person. Minutterne lægges til spilletiden i fremskridtet. En bruger, der ikke er administrator, kan kun registrere sine egne sessioner.",
+      "fields": {
+        "game_id": {
+          "name": "Spil",
+          "description": "Spillets ID."
+        },
+        "person_id": {
+          "name": "Person",
+          "description": "ID for personen i Home Assistant."
+        },
+        "platform": {
+          "name": "Platform",
+          "description": "Konsollen. Tom for at bruge platformen for spillets eksemplarer."
+        },
+        "minutes": {
+          "name": "Minutter",
+          "description": "Sessionens længde i minutter."
+        },
+        "date": {
+          "name": "Dato",
+          "description": "Sessionens dato. Tom for i dag."
+        }
+      }
+    },
+    "delete_session": {
+      "name": "Slet spilsession",
+      "description": "Slet en spilsession og træk dens minutter fra spilletiden. En bruger, der ikke er administrator, kan kun slette sine egne sessioner.",
+      "fields": {
+        "session_id": {
+          "name": "Spilsession",
+          "description": "Spilsessionens ID."
+        }
+      }
+    },
     "lend_game": {
       "name": "Lån spil ud",
       "description": "Lån et eksemplar ud til en anden person.",
@@ -998,6 +1034,24 @@
       "name": "Vis personer",
       "description": "Returnér personerne og deres biblioteksindstillinger."
     },
+    "list_sessions": {
+      "name": "Vis spilsessioner",
+      "description": "Returnér spilsessionerne, de nyeste først. En bruger, der ikke er administrator, får sine egne sessioner og sessionerne for de personer, der deler deres fremskridt.",
+      "fields": {
+        "game_id": {
+          "name": "Spil",
+          "description": "Kun sessionerne for dette spil."
+        },
+        "person_id": {
+          "name": "Person",
+          "description": "Kun sessionerne for denne person."
+        },
+        "limit": {
+          "name": "Grænse",
+          "description": "Det højeste antal sessioner."
+        }
+      }
+    },
     "export_data": {
       "name": "Eksportér data",
       "description": "Eksportér biblioteksdelen af Home Keeper-eksporten.",
@@ -1072,6 +1126,9 @@
     },
     "loan_not_found": {
       "message": "Intet udlån har ID {id}."
+    },
+    "session_not_found": {
+      "message": "Ingen spilsession har ID {id}."
     },
     "person_not_found": {
       "message": "Ingen person har ID {id}."

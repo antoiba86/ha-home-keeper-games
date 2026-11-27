@@ -654,6 +654,42 @@
         }
       }
     },
+    "log_session": {
+      "name": "记录游戏时段",
+      "description": "添加某人的一个游戏时段。其分钟数会计入进度的游戏时间。非管理员用户只能记录自己的时段。",
+      "fields": {
+        "game_id": {
+          "name": "游戏",
+          "description": "游戏的 ID。"
+        },
+        "person_id": {
+          "name": "人员",
+          "description": "Home Assistant 人员的 ID。"
+        },
+        "platform": {
+          "name": "平台",
+          "description": "主机。留空则使用游戏副本的平台。"
+        },
+        "minutes": {
+          "name": "分钟",
+          "description": "时段的时长（分钟）。"
+        },
+        "date": {
+          "name": "日期",
+          "description": "时段的日期。留空表示今天。"
+        }
+      }
+    },
+    "delete_session": {
+      "name": "删除游戏时段",
+      "description": "删除一个游戏时段，并从游戏时间中减去其分钟数。非管理员用户只能删除自己的时段。",
+      "fields": {
+        "session_id": {
+          "name": "时段",
+          "description": "游戏时段的 ID。"
+        }
+      }
+    },
     "lend_game": {
       "name": "借出游戏",
       "description": "将藏本借给另一个人。",
@@ -998,6 +1034,24 @@
       "name": "列出人员",
       "description": "返回人员及其藏书设置。"
     },
+    "list_sessions": {
+      "name": "列出游戏时段",
+      "description": "返回游戏时段，最新的在前。非管理员用户会得到自己的时段，以及共享进度的人员的时段。",
+      "fields": {
+        "game_id": {
+          "name": "游戏",
+          "description": "只显示此游戏的时段。"
+        },
+        "person_id": {
+          "name": "人员",
+          "description": "只显示此人员的时段。"
+        },
+        "limit": {
+          "name": "上限",
+          "description": "时段的最大数量。"
+        }
+      }
+    },
     "export_data": {
       "name": "导出数据",
       "description": "导出 Home Keeper 导出中的书库部分。",
@@ -1072,6 +1126,9 @@
     },
     "loan_not_found": {
       "message": "没有 ID 为 {id} 的借阅。"
+    },
+    "session_not_found": {
+      "message": "没有 ID 为 {id} 的游戏时段。"
     },
     "person_not_found": {
       "message": "没有 ID 为 {id} 的人员。"

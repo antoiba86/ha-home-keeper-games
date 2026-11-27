@@ -17,6 +17,11 @@ Nothing here is committed scope. When an item ships, remove it. The design docs 
 - **Query of a tab path.** Home Keeper's host drops a `?query` from a tab path. Ask Home
   Keeper to keep it, then the `;key=value` form of the tab filters can go
   (see `docs/design/frontend-tab-card.md`).
+- **Play sessions in the export.** `export_data` and `import_data` do not hold the play
+  sessions (`import_export.EXCLUDED_KEYS`). Add a `sessions` section to the export
+  format, with a check of the game and the person of each session.
+- **Play sessions in the tab.** The game page can show the sessions of a person, with a
+  delete button. Today only `list_sessions` reads them.
 
 ## Product ideas
 

@@ -42,6 +42,8 @@ Names follow `home_keeper_games_<noun>_<verb>`.
 | `home_keeper_games_progress_changed` | The play status of a person on a platform changes. |
 | `home_keeper_games_progress_updated` | The rating, play time, dates, count or review of a progress row change, and the play status stays. |
 | `home_keeper_games_game_completed` | The play status of a person on a platform becomes `completed`. |
+| `home_keeper_games_session_logged` | A play session is added. Its minutes go on the play time. |
+| `home_keeper_games_session_deleted` | A play session is deleted. Its minutes leave the play time. |
 | `home_keeper_games_loan_started` | A game is lent or borrowed. |
 | `home_keeper_games_loan_returned` | A loan is returned. |
 | `home_keeper_games_loan_overdue` | An open loan passes its due date. |
@@ -84,6 +86,9 @@ The other keys of each event are in the generated API reference and in
 - `progress_updated` adds `play_status` and `changed_fields`. It names the changed
   fields and never gives the review.
 - `game_completed` adds `completed_at`, `rating` and `completion_count`.
+- The session events add `session_id`, `platform`, `source`, `date` and `minutes`.
+  A session that changes the play time also fires `progress_updated`, or
+  `progress_changed` when a backlog game becomes `playing`.
 - The loan events add `loan_id`, `direction`, `copy_id`, `party`, `started`,
   `due` and `returned`. `direction` is `out` for a lent copy and `in` for a
   borrowed game. `loan_updated` adds `changed_fields`. `loan_removed` has the

@@ -5,7 +5,7 @@ implements:
   - custom_components/home_keeper_games/store.py
   - custom_components/home_keeper_games/models.py
 related: [architecture, events-api, people-privilege, csv-import-export]
-source_hash: 97a42922f327
+source_hash: 6ef37f691705
 ---
 
 # Store and models
@@ -46,6 +46,7 @@ only code that changes the document.
 | `progress` | `{person_id: {game_id: {platform: row}}}` | `models.PROGRESS_FIELDS`, `updated_at` |
 | `loans` | `{id: loan}` | `direction`, `game_id`, `copy_id`, `party`, dates, `hk_task_id` |
 | `people` | `{person_id: settings}` | `models.PERSON_FIELDS` |
+| `sessions` | `{id: session}` | `person_id`, `game_id`, `platform`, `source`, `started_at`, `ended_at`, `date`, `minutes` |
 | `todo_orphans` | `[{entity_id, uid}]` | To-do items that the wishlist sync must remove |
 
 `models.normalize_state` runs on every load and in the storage migration hook. It gives
@@ -91,13 +92,18 @@ listener. A listener that fails is logged and the others still run. The listener
 - **Locations.** A room with units, a unit with shelves and a shelf with copies
   fail to delete with a localized error, unless `force: true`. With `force`, each child
   is removed and each copy moves to no shelf.
-- **Game delete.** Deleting a game deletes its copies, progress rows and loans, and the
-  cover file. Its wishlist to-do item goes to `todo_orphans`.
+- **Game delete.** Deleting a game deletes its copies, progress rows, loans and play
+  sessions, and the cover file. Its wishlist to-do item goes to `todo_orphans`.
 - **Progress.** A person has 1 row for each platform of a game. `set_progress` with
   `play_status: none` removes the row. With no `platform`, the store uses the platform of
   the copies if they have only 1, else it refuses with `platform_required`. `completed`
   sets `completed_at` and adds 1 to `completion_count`; `playing` sets `started_at`.
   A loan does not change the progress.
+- **Play sessions.** `log_session` adds a closed session with `source: manual`, and
+  `models.session_progress` adds its minutes to the progress row of that person and
+  platform. A new or `backlog` row becomes `playing`, and `last_played_at` takes the later
+  date. `delete_session` takes the minutes off, down to 0. `get_state` does not hold the
+  sessions; `list_sessions` reads them, the newest first.
 - **Loans.** A copy has at most 1 open loan. A lent copy keeps its shelf.
 - **Overdue.** `fire_overdue` marks each loan that passed its due date with
   `overdue_fired`, so `loan_overdue` fires once for each due date.

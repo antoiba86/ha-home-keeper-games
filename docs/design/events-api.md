@@ -7,7 +7,7 @@ implements:
   - custom_components/home_keeper_games/websocket_api.py
   - custom_components/home_keeper_games/events.py
 related: [people-privilege, store-models, entities, architecture]
-source_hash: f5a2b05d3577
+source_hash: aa500e3d44e5
 ---
 
 # Services, websocket commands, events and the API surface
@@ -94,6 +94,8 @@ value of a setting of a person:
 | `copy_updated` | `events.copy_updated_event_data` | `copy_id`, `shelf_id`, `changed_fields` |
 | `progress_updated` | `events.progress_updated_event_data` | `platform`, `play_status`, `changed_fields` |
 | `loan_updated` | `events.loan_updated_event_data` | the loan keys, `changed_fields` |
+| `session_logged` | `events.session_event_data` | `session_id`, `platform`, `source`, `date`, `minutes` |
+| `session_deleted` | `events.session_event_data` | the session keys, as before the delete |
 | `loan_removed` | `events.loan_event_data` | the loan keys, as before the delete |
 | `person_settings_updated` | `events.person_settings_event_data` | no spine: `person_id`, `changed_fields`, `origin` |
 | `settings_updated` | `events.settings_event_data` | no spine: `changed_fields`, `currency`, `origin` |

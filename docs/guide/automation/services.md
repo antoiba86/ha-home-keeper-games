@@ -7,8 +7,8 @@ events to react to a change.
 ## Services
 
 The services are in **Developer tools → Actions**, with a description of each field.
-Most services are admin-only. `set_progress`, `set_person_settings` and the read services
-are open to every user, for their own person
+Most services are admin-only. `set_progress`, `log_session`, `delete_session`,
+`set_person_settings` and the read services are open to every user, for their own person
 ([People and privacy](../start/people-and-privacy.md)).
 
 Example: set the status Completed when an NFC tag on the unit is scanned.
@@ -26,6 +26,24 @@ automation:
           person_id: "alice"
           platform: switch
           play_status: completed
+```
+
+### Play sessions
+
+`log_session` adds a play session of a person: the game, the platform, the minutes and
+the date. The minutes go on the play time of that game and platform, and a game in the
+backlog becomes **Playing**. `delete_session` takes the minutes off again.
+`list_sessions` returns the sessions, the newest first. Example: log 45 minutes when a
+script stops.
+
+```yaml
+actions:
+  - action: home_keeper_games.log_session
+    data:
+      game_id: "5f0c1b2a9d8e4f7a8b6c5d4e3f2a1b0c"
+      person_id: "alice"
+      platform: ps5
+      minutes: 45
 ```
 
 A read service returns a response. Example: find the shelf of a game.

@@ -654,6 +654,42 @@
         }
       }
     },
+    "log_session": {
+      "name": "Registrar sesión de juego",
+      "description": "Añadir una sesión de juego de una persona. Sus minutos se suman al tiempo de juego del progreso. Un usuario que no es administrador solo puede registrar sus propias sesiones.",
+      "fields": {
+        "game_id": {
+          "name": "Juego",
+          "description": "El ID del juego."
+        },
+        "person_id": {
+          "name": "Persona",
+          "description": "El ID de la persona de Home Assistant."
+        },
+        "platform": {
+          "name": "Plataforma",
+          "description": "La consola. Vacío para usar la plataforma de las copias del juego."
+        },
+        "minutes": {
+          "name": "Minutos",
+          "description": "La duración de la sesión en minutos."
+        },
+        "date": {
+          "name": "Fecha",
+          "description": "La fecha de la sesión. Vacío para hoy."
+        }
+      }
+    },
+    "delete_session": {
+      "name": "Borrar sesión de juego",
+      "description": "Borrar una sesión de juego y restar sus minutos del tiempo de juego. Un usuario que no es administrador solo puede borrar sus propias sesiones.",
+      "fields": {
+        "session_id": {
+          "name": "Sesión",
+          "description": "El ID de la sesión de juego."
+        }
+      }
+    },
     "lend_game": {
       "name": "Prestar juego",
       "description": "Prestar un ejemplar a otra persona.",
@@ -998,6 +1034,24 @@
       "name": "Listar personas",
       "description": "Devolver las personas y sus ajustes de biblioteca."
     },
+    "list_sessions": {
+      "name": "Listar sesiones de juego",
+      "description": "Devolver las sesiones de juego, primero las más nuevas. Un usuario que no es administrador recibe sus propias sesiones y las de las personas que comparten su progreso.",
+      "fields": {
+        "game_id": {
+          "name": "Juego",
+          "description": "Solo las sesiones de este juego."
+        },
+        "person_id": {
+          "name": "Persona",
+          "description": "Solo las sesiones de esta persona."
+        },
+        "limit": {
+          "name": "Límite",
+          "description": "El número máximo de sesiones."
+        }
+      }
+    },
     "export_data": {
       "name": "Exportar datos",
       "description": "Exportar la sección de la biblioteca de la exportación de Home Keeper.",
@@ -1072,6 +1126,9 @@
     },
     "loan_not_found": {
       "message": "Ningún préstamo tiene el ID {id}."
+    },
+    "session_not_found": {
+      "message": "Ninguna sesión de juego tiene el ID {id}."
     },
     "person_not_found": {
       "message": "Ninguna persona tiene el ID {id}."
