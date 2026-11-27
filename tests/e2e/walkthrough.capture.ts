@@ -8,7 +8,8 @@
  * game, set the play status on a platform, add another platform chip, scan a stored
  * barcode and a new barcode into a shelf, give the title of the new game, give a game
  * that needs details its IGDB game (from the fake IGDB of tests/e2e/fake-igdb), lend a game
- * with a Home Keeper task, see the loan, and open the card on a dashboard. `BEAT` pauses
+ * with a Home Keeper task, see the loan, open the sessions of a game in the Play log, and
+ * open the card on a dashboard. `BEAT` pauses
  * let each step read in the video. The tour puts the seed back at the end.
  *
  * The recording needs its own context: `recordVideo` is set when a context is made.
@@ -189,6 +190,15 @@ test('record the Library walkthrough', async ({ browser }) => {
     // Home Keeper 0.30.0 loads a task that a companion added only on a page load.
     await page.reload();
     await expect(page.locator('home-keeper-panel')).toContainText(`Get ${LEND_TITLE} back from ${PARTY}`, { timeout: 30_000 });
+    await beat(page, 2);
+
+    // 6a. The Play log: the play time of each game and platform, then the sessions of 1.
+    const outer = await gameByTitle('Outer Wilds');
+    const log = await openTab(page, '/playlog');
+    await expect(log.locator('.hkl-logrow').first()).toBeVisible();
+    await beat(page, 2);
+    await log.locator(`[data-k="pl-${outer.id}|pc"]`).click();
+    await expect(log.locator('.hkl-session')).toHaveCount(3);
     await beat(page, 2);
 
     // 7. The card on a dashboard.

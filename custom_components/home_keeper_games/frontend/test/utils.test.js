@@ -901,3 +901,81 @@ describe('CoverUrls', () => {
     expect(sign).not.toHaveBeenCalled();
   });
 });
+
+describe('play log', () => {
+  const prog = (minutes, last, status = 'playing') => ({
+    play_status: status,
+    rating: null,
+    playtime_minutes: minutes,
+    started_at: null,
+    completed_at: null,
+    last_played_at: last,
+    completion_count: 0,
+    updated_at: '2026-01-01T00:00:00+00:00',
+  });
+  const session = (id, gameId, platform, date, minutes, person = 'me', created = `${date}T10:00:00+00:00`) => ({
+    id, person_id: person, game_id: gameId, platform, source: 'manual', external_id: null,
+    started_at: null, ended_at: null, date, minutes, created_at: created, title: '',
+  });
+
+  it('formats a play time', () => {
+    expect(u.formatPlaytime(0)).toBe('0 min');
+    expect(u.formatPlaytime(45)).toBe('45 min');
+    expect(u.formatPlaytime(60)).toBe('1 h');
+    expect(u.formatPlaytime(125)).toBe('2 h 5 min');
+  });
+
+  it('has 1 row for each game and platform with play time or sessions', () => {
+    const games = [
+      game('a', { title: 'Alpha', progress: { me: { ps5: prog(100, '2026-10-01'), switch: prog(0, '2026-10-09'), pc: prog(null, null) } } }),
+      game('b', { title: 'beta', progress: { other: { ps5: prog(50, '2026-10-05') } } }),
+      game('c', { title: 'Gamma', progress: { me: { pc: prog(30, '2026-09-01', 'completed') } } }),
+    ];
+    const sessions = [
+      session('s1', 'b', 'ps5', '2026-10-02', 20),
+      session('s2', 'b', 'ps5', '2026-10-04', 15),
+      session('s3', 'a', 'ps5', '2026-10-03', 40, 'me', '2026-10-03T08:00:00+00:00'),
+      session('s4', 'a', 'ps5', '2026-10-03', 10, 'me', '2026-10-03T09:00:00+00:00'),
+      session('s5', 'a', 'ps5', '2026-10-03', 10, 'other'),
+      session('s6', 'gone', 'ps5', '2026-10-03', 10),
+      session('s7', 'b', 'switch', '2026-10-06', null),
+    ];
+    const rows = u.playLog(games, 'me', sessions);
+    expect(rows.map((r) => r.key)).toEqual(['b|switch', 'b|ps5', 'a|ps5', 'c|pc']);
+    const [open, bPs5, aPs5, cPc] = rows;
+    // No progress row: the minutes are the sum of the closed sessions.
+    expect([open.minutes, open.status, open.last]).toEqual([0, null, '2026-10-06']);
+    expect([bPs5.minutes, bPs5.status, bPs5.last]).toEqual([35, null, '2026-10-04']);
+    expect(bPs5.sessions.map((s) => s.id)).toEqual(['s2', 's1']);
+    // A progress row wins: its play time, and the later of its date and the sessions.
+    expect([aPs5.minutes, aPs5.status, aPs5.last]).toEqual([100, 'playing', '2026-10-03']);
+    expect(aPs5.sessions.map((s) => s.id)).toEqual(['s4', 's3']);
+    expect([cPc.minutes, cPc.status, cPc.last, cPc.sessions]).toEqual([30, 'completed', '2026-09-01', []]);
+    expect(cPc.game.title).toBe('Gamma');
+    expect(cPc.platform).toBe('pc');
+  });
+
+  it('keeps a later progress date and sorts a tie by title', () => {
+    const games = [
+      game('z', { title: 'Zeta', progress: { me: { ps5: prog(10, '2026-10-09') } } }),
+      game('y', { title: 'éta', progress: { me: { ps4: prog(10, '2026-10-09'), ps5: prog(5, '2026-10-09') } } }),
+      game('x', { title: 'Xi', progress: { me: { pc: prog(5, null) } } }),
+    ];
+    const rows = u.playLog(games, 'me', [session('s', 'z', 'ps5', '2026-10-01', 5)]);
+    expect(rows.map((r) => r.key)).toEqual(['y|ps4', 'y|ps5', 'z|ps5', 'x|pc']);
+    expect(rows[2].last).toBe('2026-10-09');
+    expect(rows[3].last).toBe(null);
+  });
+
+  it('uses the sessions when the progress row has no play time', () => {
+    const games = [game('a', { progress: { me: { ps5: prog(null, null, 'completed') } } })];
+    const [row] = u.playLog(games, 'me', [session('s', 'a', 'ps5', '2026-10-04', 95)]);
+    expect([row.minutes, row.status, row.last]).toEqual([95, 'completed', '2026-10-04']);
+  });
+
+  it('is empty with no person', () => {
+    const games = [game('a', { progress: { me: { ps5: prog(10, null) } } })];
+    expect(u.playLog(games, null, [])).toEqual([]);
+    expect(u.playLog(games, undefined, [])).toEqual([]);
+  });
+});

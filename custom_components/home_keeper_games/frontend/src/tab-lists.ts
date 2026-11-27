@@ -1,11 +1,11 @@
 // The Loans, Wishlist and Settings views.
 
-import { formatDate, t, tn } from './i18n';
+import { formatDate, formatTime, t, tn } from './i18n';
 import { button, cover, navBar, options, personDot, statusLabel, taskLinkHtml } from './markup';
 import { navCounts } from './tab-games';
 import type { ViewCtx } from './tab-types';
-import type { Game, Loan } from './types';
-import { buildPath, dueState, escapeHTML, gameByline, loansFor, statusOf, type LoanTab } from './utils';
+import type { Game, Loan, Session } from './types';
+import { buildPath, dueState, escapeHTML, formatPlaytime, gameByline, loansFor, platformLabel, playLog, statusOf, type LoanTab, type PlayLogRow } from './utils';
 
 const LOAN_TABS: LoanTab[] = ['out', 'in', 'returned'];
 
@@ -105,6 +105,83 @@ export function renderWishlist(ctx: ViewCtx): string {
   <div class="hkl-banner info"><div class="hkl-todos">${lists}<span class="hkl-muted small">${escapeHTML(t('wishlist.buy_hint'))}</span></div><span class="hkl-spacer"></span>${button(escapeHTML(t('action.change')), 'nav', 'text', 'data-path="/settings" data-k="wish-change"')}</div>
   <section class="hkl-card"><div class="hkl-list">${games.map((b) => wishRow(ctx, b)).join('') || `<div class="hkl-empty">${escapeHTML(t('wishlist.empty'))}</div>`}</div></section>
   <p class="hkl-muted small">${escapeHTML(t('wishlist.scan_hint'))}</p>`;
+}
+
+/** The person of the play log: the `person` of the route, else the viewer, else the first. */
+export function playLogPerson(ctx: ViewCtx): string | null {
+  const wanted = ctx.route.query.person;
+  if (wanted && ctx.idx.person.has(wanted)) return wanted;
+  if (ctx.me && ctx.idx.person.has(ctx.me)) return ctx.me;
+  return ctx.lib.people[0]?.id ?? null;
+}
+
+function sessionTime(s: Session): string {
+  if (!s.started_at) return t('playlog.no_times');
+  const start = formatTime(s.started_at);
+  if (!s.ended_at) return t('playlog.playing_since', { time: start });
+  return `${start} – ${formatTime(s.ended_at)}`;
+}
+
+function sessionRow(s: Session): string {
+  const id = escapeHTML(s.id);
+  const length = s.minutes === null ? t('playlog.open') : formatPlaytime(s.minutes);
+  const source = s.source === 'manual' ? t('playlog.source_manual') : s.source === 'psn' ? 'PSN' : platformLabel(s.platform);
+  return `<div class="hkl-session" data-k="ss-${id}">
+    <span class="hkl-session-date">${escapeHTML(formatDate(s.date))}</span>
+    <span class="hkl-muted">${escapeHTML(sessionTime(s))}</span>
+    <span class="hkl-session-len">${escapeHTML(length)}</span>
+    <span><span class="hkl-pill${s.source === 'manual' ? '' : ' src'}">${escapeHTML(source)}</span></span>
+    ${button(escapeHTML(t('action.delete')), 'delete-session', 'text', `data-id="${id}" data-k="ds-${id}" aria-label="${escapeHTML(t('playlog.delete_session', { date: formatDate(s.date) }))}"`)}
+  </div>`;
+}
+
+function playLogRow(ctx: ViewCtx, row: PlayLogRow): string {
+  const open = Boolean(ctx.ui.playlog.open[row.key]);
+  const key = escapeHTML(row.key);
+  const count = row.sessions.length;
+  const sessions = open
+    ? `<div class="hkl-sessions">${row.sessions.map(sessionRow).join('') || `<div class="hkl-muted small">${escapeHTML(t('playlog.no_sessions'))}</div>`}</div>`
+    : '';
+  return `<div class="hkl-logrow${open ? ' open' : ''}">
+    <button class="hkl-logrow-head" data-act="playlog-toggle" data-id="${key}" data-k="pl-${key}" aria-expanded="${open}">
+      ${cover(row.game, 'thumb')}
+      <span class="hkl-row-main"><span class="hkl-row-title">${escapeHTML(row.game.title)}</span><span class="hkl-row-sub">${escapeHTML(row.status ? statusLabel(row.status) : '')}</span></span>
+      <span><span class="hkl-pill">${escapeHTML(platformLabel(row.platform))}</span></span>
+      <span class="hkl-log-time">${escapeHTML(formatPlaytime(row.minutes))}</span>
+      <span class="hkl-muted">${escapeHTML(tn('playlog.sessions', count))}</span>
+      <span class="hkl-muted">${escapeHTML(row.last ? formatDate(row.last) : '')}</span>
+      <span class="hkl-chev" aria-hidden="true"></span>
+    </button>
+    ${sessions}
+  </div>`;
+}
+
+/** The Play log view: the games, play time and sessions of 1 person. */
+export function renderPlayLog(ctx: ViewCtx): string {
+  const pid = playLogPerson(ctx);
+  const chips = ctx.lib.people
+    .map((p) => {
+      const on = p.id === pid;
+      const id = escapeHTML(p.id);
+      return `<button class="hkl-navchip${on ? ' on' : ''}" data-act="playlog-person" data-id="${id}" data-k="lp-${id}" aria-pressed="${on}">${personDot(p)}${escapeHTML(p.name)}</button>`;
+    })
+    .join('');
+  const state = ctx.ui.playlog;
+  const ready = state.person === pid && state.sessions !== null;
+  const rows = playLog(ctx.lib.games, pid, ready ? state.sessions ?? [] : []);
+  const total = rows.reduce((sum, r) => sum + r.minutes, 0);
+  const person = pid ? ctx.idx.person.get(pid) : undefined;
+  const actions = button(escapeHTML(t('playlog.log_session')), 'log-session', 'tonal', 'data-k="log-session"');
+  const body = state.error
+    ? `<div class="hkl-empty">${escapeHTML(state.error)}</div>`
+    : rows.map((r) => playLogRow(ctx, r)).join('') || `<div class="hkl-empty">${escapeHTML(t('playlog.empty'))}</div>`;
+  return `${navBar(ctx.route, navCounts(ctx), actions)}
+  <div class="hkl-people" role="group" aria-label="${escapeHTML(t('common.person'))}">${chips}</div>
+  <section class="hkl-card">
+    <div class="hkl-card-head"><h2>${escapeHTML(person ? t('playlog.title_for', { name: person.name }) : t('nav.playlog'))}</h2><span class="hkl-muted small">${escapeHTML(rows.length ? t('playlog.summary', { games: tn('count.games', rows.length), time: formatPlaytime(total) }) : '')}</span></div>
+    <div class="hkl-log">${ready || state.error ? body : `<div class="hkl-empty">${escapeHTML(t('common.loading'))}</div>`}</div>
+  </section>
+  <p class="hkl-muted small">${escapeHTML(t('playlog.hint'))}</p>`;
 }
 
 /** The Settings view: people settings, currency and export. */

@@ -1,6 +1,6 @@
 // The state that the tab views read. The views are free functions over `ViewCtx`.
 
-import type { ImportSummary, Lib, Platform, ScanResult } from './types';
+import type { ImportSummary, Lib, Platform, ScanResult, Session } from './types';
 import type { Index, TabRoute } from './utils';
 
 export interface ScanEntry {
@@ -50,6 +50,16 @@ export interface ImportState {
   done: boolean;
 }
 
+export interface PlayLogState {
+  /** The person whose sessions are in `sessions`. */
+  person: string | null;
+  /** Null until `list_sessions` replies. */
+  sessions: Session[] | null;
+  error: string;
+  /** The open rows, by `PlayLogRow.key`. */
+  open: Record<string, boolean>;
+}
+
 export interface UiState {
   limit: number;
   notesTab: 'shared' | 'private';
@@ -60,6 +70,7 @@ export interface UiState {
   scan: ScanSession;
   import: ImportState;
   todoEntities: Array<{ entity_id: string; name?: string }>;
+  playlog: PlayLogState;
   exportPerson: string;
 }
 

@@ -19,6 +19,7 @@ import type {
   RawState,
   Room,
   ScanResult,
+  Session,
   Shelf,
 } from './types';
 
@@ -222,6 +223,7 @@ export type View =
   | 'shelves'
   | 'loans'
   | 'wishlist'
+  | 'playlog'
   | 'scan'
   | 'import'
   | 'settings';
@@ -252,6 +254,7 @@ const VIEW_QUERY: Record<View, string[]> = {
   shelves: [],
   loans: ['tab'],
   wishlist: [],
+  playlog: ['person'],
   scan: ['shelf', 'mode', 'step', 'debug'],
   import: [],
   settings: [],
@@ -321,7 +324,7 @@ export function parseRoute(path: string | undefined, search = ''): TabRoute {
   } else if (head === 'shelves') {
     view = 'shelves';
     id = segs[1] ?? null;
-  } else if (['loans', 'wishlist', 'scan', 'import', 'settings'].includes(head)) {
+  } else if (['loans', 'wishlist', 'playlog', 'scan', 'import', 'settings'].includes(head)) {
     view = head as View;
   }
   return { view, id, query: cleanQuery(view, query) };
@@ -404,6 +407,74 @@ export function progressRows(game: Game, personId: string | null | undefined): A
   if (!personId) return [];
   const rows = game.progress?.[personId] ?? {};
   return PLATFORMS.filter((p) => rows[p]).map((p): [Platform, ProgressRow] => [p, rows[p]!]);
+}
+
+/** Minutes as `45 min`, `6 h` or `6 h 5 min`. */
+export function formatPlaytime(minutes: number): string {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h === 0) return t('time.min', { m });
+  return m === 0 ? t('time.h', { h }) : t('time.h_min', { h, m });
+}
+
+/** 1 row of the play log: 1 game on 1 platform for 1 person. */
+export interface PlayLogRow {
+  key: string;
+  game: Game;
+  platform: Platform;
+  /** The play time of the progress row, else (none or 0) the sum of the sessions. */
+  minutes: number;
+  last: string | null;
+  status: PlayStatus | null;
+  /** The newest first. */
+  sessions: Session[];
+}
+
+/**
+ * The play log of *personId*: each game and platform with play time or a session,
+ * the last played first.
+ */
+export function playLog(games: Game[], personId: string | null | undefined, sessions: Session[]): PlayLogRow[] {
+  if (!personId) return [];
+  const rows = new Map<string, PlayLogRow>();
+  const byId = new Map(games.map((g) => [g.id, g]));
+  const rowOf = (game: Game, platform: Platform): PlayLogRow => {
+    const key = `${game.id}|${platform}`;
+    let row = rows.get(key);
+    if (!row) {
+      const progress = progressOf(game, personId, platform);
+      row = {
+        key,
+        game,
+        platform,
+        minutes: progress?.playtime_minutes ?? 0,
+        last: progress?.last_played_at ?? null,
+        status: progress?.play_status ?? null,
+        sessions: [],
+      };
+      rows.set(key, row);
+    }
+    return row;
+  };
+  for (const game of games) {
+    for (const [platform, progress] of progressRows(game, personId)) {
+      if ((progress.playtime_minutes ?? 0) > 0) rowOf(game, platform);
+    }
+  }
+  for (const session of sessions) {
+    const game = byId.get(session.game_id);
+    if (session.person_id !== personId || !game) continue;
+    rowOf(game, session.platform).sessions.push(session);
+  }
+  for (const row of rows.values()) {
+    row.sessions.sort((a, b) => (b.date + b.created_at).localeCompare(a.date + a.created_at));
+    if (row.minutes <= 0) row.minutes = row.sessions.reduce((sum, s) => sum + (s.minutes ?? 0), 0);
+    const newest = row.sessions[0]?.date ?? null;
+    if (newest && (!row.last || newest > row.last)) row.last = newest;
+  }
+  return [...rows.values()].sort(
+    (a, b) => (b.last ?? '').localeCompare(a.last ?? '') || fold(a.game.title).localeCompare(fold(b.game.title)) || a.platform.localeCompare(b.platform),
+  );
 }
 
 /** The progress row of *personId* for *game* on *platform*, or null. */
