@@ -44,13 +44,31 @@
           "igdb_client_id": "Valinnainen. Luo sovellus osoitteessa dev.twitch.tv saadaksesi IGDB-avaimet.",
           "igdb_client_secret": "Valinnainen. Jätä tyhjäksi, niin tallennettu salaisuus säilyy."
         }
+      },
+      "consoles": {
+        "title": "Konsolit",
+        "description": "Kirjasto kirjaa pelisessiot PlayStation Network -integraation jokaisen konsolin mediasoittimesta.",
+        "data": {
+          "keep": "Konsolit",
+          "entity_id": "Uusi konsoli",
+          "person_id": "Henkilö",
+          "platform": "Alusta"
+        },
+        "data_description": {
+          "keep": "Poista konsolin valinta, niin sen pelisessioita ei enää kirjata.",
+          "entity_id": "Valinnainen. PlayStation-konsolin mediasoitin.",
+          "person_id": "Henkilö, joka pelaa uudella konsolilla.",
+          "platform": "Uuden konsolin alusta."
+        }
       }
     },
     "error": {
       "invalid_currency": "Anna 3 kirjaimen valuuttakoodi.",
       "invalid_igdb_auth": "Twitch ei hyväksy asiakastunnusta ja asiakassalaisuutta.",
       "cannot_connect": "Yhteyttä Twitchiin ei voi muodostaa. Yritä myöhemmin uudelleen.",
-      "igdb_keys_incomplete": "Anna asiakastunnus ja asiakassalaisuus."
+      "igdb_keys_incomplete": "Anna asiakastunnus ja asiakassalaisuus.",
+      "console_incomplete": "Valitse uuden konsolin mediasoitin ja henkilö.",
+      "console_exists": "Tämä mediasoitin on jo konsoli."
     }
   },
   "entity": {

@@ -38,7 +38,7 @@ The first release will have these features:
 - Get the details and the cover of a game from [IGDB](https://www.igdb.com).
 - Keep a play status, a rating and a review for each person.
 - Record the play time from the PlayStation Network and Nintendo integrations of Home
-  Assistant.
+  Assistant ([PlayStation](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/playstation)).
 - Lend and borrow games, with a Home Keeper task on each due date.
 - Send the wishlist games to buy to a to-do list of the person.
 - Add a game from Telegram with a blueprint: send `/juego Hades switch`

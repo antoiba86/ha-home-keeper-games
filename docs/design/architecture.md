@@ -9,7 +9,7 @@ implements:
   - custom_components/home_keeper_games/backend_i18n.py
   - custom_components/home_keeper_games/manifest.json
 related: [store-models, people-privilege, events-api, home-keeper-dependency, frontend-tab-card]
-source_hash: 5dc6b4127afc
+source_hash: 7a6fa75eda31
 ---
 
 # Architecture
@@ -49,9 +49,9 @@ and updates their own play progress through a card, native entities and services
 
 | Layer | Modules | Rule |
 |---|---|---|
-| Pure core | `const.py`, `models.py`, `catalog.py`, `events.py`, `projections.py`, `csv_io.py`, `import_export.py`, `wishlist.py`, `loan_tasks.py`, `card_resource.py`, `backend_i18n.py`, `api_surface.py` | No `homeassistant` import. Time comes in as an argument. |
+| Pure core | `const.py`, `models.py`, `catalog.py`, `events.py`, `projections.py`, `csv_io.py`, `import_export.py`, `wishlist.py`, `activity.py`, `loan_tasks.py`, `card_resource.py`, `backend_i18n.py`, `api_surface.py` | No `homeassistant` import. Time comes in as an argument. |
 | Boundary | `store.py`, `coordinator.py`, `people.py` | Talks to Home Assistant storage, the bus and the person registry. |
-| Glue | `__init__.py`, `services.py`, `websocket_api.py`, `covers.py`, `igdb.py`, `home_keeper.py`, `loan_sync.py`, `wishlist_sync.py`, `frontend_assets.py`, `card.py`, `config_flow.py`, `diagnostics.py` | Registers surfaces and runs the syncs. |
+| Glue | `__init__.py`, `services.py`, `websocket_api.py`, `covers.py`, `igdb.py`, `home_keeper.py`, `loan_sync.py`, `wishlist_sync.py`, `activity_listener.py`, `frontend_assets.py`, `card.py`, `config_flow.py`, `diagnostics.py` | Registers surfaces and runs the syncs. |
 | Platforms | `sensor.py`, `todo.py`, with `entity.py` | `const.PLATFORMS` lists them. |
 
 The mutation allowlist (`only_mutate` in `pyproject.toml`) holds the pure modules with
@@ -72,11 +72,12 @@ resource.
 2. Make `LibraryCoordinator` and give it the IGDB client and the 2 syncs. Store it as
    `entry.runtime_data`. A store listener sends the dispatcher signal
    `const.SIGNAL_STORE_CHANGED` for the websocket subscriptions. An update listener of the
-   entry fires `settings_updated` when the currency changes.
-3. Register the static path, the card delivery, the websocket commands and the cover
-   views ([frontend-tab-card](frontend-tab-card.md#delivery)).
+   entry fires `settings_updated` when the currency changes and restarts the console
+   listener.
+3. Register the static path, the card, the websocket commands and the cover views.
 4. Forward `const.PLATFORMS` and register the services.
-5. Start the wishlist sync and the loan sync.
+5. Start the wishlist sync, the loan sync and the console listener
+   ([console-activity](console-activity.md)).
 6. Start `home_keeper.HomeKeeperLink`, which adds the tab and the companion or shows a
    repair issue.
 7. Fire the overdue loans, start the hourly overdue check, and delete the old uploads
@@ -102,10 +103,8 @@ options ([catalog-igdb](catalog-igdb.md#keys)).
 
 The pure core raises `models.LibraryError` with a key of `strings.json` `exceptions`. A
 service turns it into a `ServiceValidationError`, which Home Assistant translates. A
-websocket error and an HTTP view error show their text as is, so
-`backend_i18n.resolve_exception` resolves it in the language of Home Assistant. Text that
-is not an exception, such as the tab title and the loan task names, is in
-`backend_strings/<lang>.json` and resolves with `backend_i18n.resolve_string`.
+websocket or HTTP view error shows its text as is, so `backend_i18n.resolve_exception`
+resolves it. Other text, such as the tab title, is in `backend_strings/<lang>.json`.
 
 ### Diagnostics
 
@@ -126,6 +125,7 @@ It redacts the names of loan parties, the notes and `acquired_from`.
 | [csv-import-export](csv-import-export.md) | The CSV format of the integration |
 | [loans-home-keeper](loans-home-keeper.md) | Loans and their Home Keeper tasks |
 | [wishlist-todo-sync](wishlist-todo-sync.md) | The wishlist and its per-person to-do list |
+| [console-activity](console-activity.md) | The console listener and its play sessions |
 | [entities](entities.md) | The coordinator, the sensors and the Backlog lists |
 | [home-keeper-dependency](home-keeper-dependency.md) | The check, the tab, the companion and the repairs |
 | [frontend-tab-card](frontend-tab-card.md) | The tab, the card, routing, i18n and the bundles |

@@ -124,8 +124,9 @@ async def test_settings_updated(hass, setup_entry, call) -> None:
     assert len(updated) == 1
     # The options flow fires it too.
     result = await hass.config_entries.options.async_init(setup_entry.entry_id)
-    await hass.config_entries.options.async_configure(
+    result = await hass.config_entries.options.async_configure(
         result["flow_id"], {"currency": "GBP"}
     )
+    await hass.config_entries.options.async_configure(result["flow_id"], {})
     await hass.async_block_till_done()
     assert [e.data["currency"] for e in updated] == ["USD", "GBP"]

@@ -23,7 +23,7 @@ import math
 import re
 import unicodedata
 import uuid
-from datetime import date
+from datetime import date, datetime
 from typing import Any
 
 STATE_SECTIONS = (
@@ -753,8 +753,8 @@ def apply_progress(
 
 # ── Play sessions ────────────────────────────────────────────────────────────
 
-# Where a session comes from. A console listener adds its own source.
-SESSION_SOURCES = ("manual",)
+# Where a session comes from: a person (``log_session``) or a console listener.
+SESSION_SOURCES = ("manual", "psn")
 MAX_SESSION_MINUTES = 24 * 60
 MAX_SESSION_LIST = 500
 DEFAULT_SESSION_LIST = 50
@@ -778,12 +778,74 @@ def build_session(
         "game_id": str(data.get("game_id")),
         "platform": choice(platform, "platform", PLATFORMS),
         "source": "manual",
+        "external_id": None,
         "started_at": None,
         "ended_at": None,
         "date": iso_date(data.get("date"), "date") or today,
         "minutes": minutes,
         "created_at": now,
     }
+
+
+def build_live_session(
+    *,
+    game_id: str,
+    person_id: str,
+    platform: str,
+    source: str,
+    external_id: str | None,
+    started_at: str,
+) -> dict[str, Any]:
+    """An open session that a console listener starts.
+
+    *started_at* is an aware time stamp, and the date is its date. ``minutes``
+    stays None until :func:`session_minutes` closes it.
+    """
+    return {
+        "id": new_id(),
+        "person_id": person_id,
+        "game_id": game_id,
+        "platform": choice(platform, "platform", PLATFORMS),
+        "source": choice(source, "source", SESSION_SOURCES),
+        "external_id": external_id or None,
+        "started_at": started_at,
+        "ended_at": None,
+        "date": started_at[:10],
+        "minutes": None,
+        "created_at": started_at,
+    }
+
+
+def session_minutes(started_at: str, ended_at: str) -> int:
+    """The whole minutes from *started_at* to *ended_at*, 0 for a bad pair."""
+    try:
+        start = datetime.fromisoformat(started_at)
+        end = datetime.fromisoformat(ended_at)
+    except (TypeError, ValueError):
+        return 0
+    seconds = (end - start).total_seconds()
+    return max(0, min(int(seconds // 60), MAX_PLAYTIME))
+
+
+def session_start_progress(
+    row: dict[str, Any] | None, day: str, *, now: str, today: str
+) -> tuple[dict[str, Any], list[str]]:
+    """Return ``(row, changed_fields)`` when a console session starts.
+
+    A new or ``backlog`` row becomes ``playing`` from *day*, and
+    ``last_played_at`` takes the later date. The play time changes when the
+    session ends.
+    """
+    data: dict[str, Any] = {}
+    last = (row or {}).get("last_played_at")
+    if not last or day > last:
+        data["last_played_at"] = day
+    if (row or {}).get("play_status") in (None, "backlog"):
+        data["play_status"] = "playing"
+        data["started_at"] = (row or {}).get("started_at") or day
+    if row is not None and not data:
+        return dict(row), []
+    return apply_progress(row, data, now=now, today=today)
 
 
 def session_progress(

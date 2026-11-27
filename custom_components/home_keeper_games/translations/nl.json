@@ -44,13 +44,31 @@
           "igdb_client_id": "Optioneel. Maak een applicatie op dev.twitch.tv om de IGDB-sleutels te krijgen.",
           "igdb_client_secret": "Optioneel. Laat leeg om het opgeslagen geheim te houden."
         }
+      },
+      "consoles": {
+        "title": "Spelconsoles",
+        "description": "De bibliotheek legt speelsessies vast vanuit de mediaspeler van elke console van de integratie PlayStation Network.",
+        "data": {
+          "keep": "Spelconsoles",
+          "entity_id": "Nieuwe console",
+          "person_id": "Persoon",
+          "platform": "Consoleplatform"
+        },
+        "data_description": {
+          "keep": "Vink een console uit om de speelsessies ervan te stoppen.",
+          "entity_id": "Optioneel. De mediaspeler van een PlayStation-console.",
+          "person_id": "De persoon die op de nieuwe console speelt.",
+          "platform": "Het platform van de nieuwe console."
+        }
       }
     },
     "error": {
       "invalid_currency": "Voer een valutacode van 3 letters in.",
       "invalid_igdb_auth": "Twitch accepteert de client-ID en het clientgeheim niet.",
       "cannot_connect": "Kan geen verbinding maken met Twitch. Probeer het later opnieuw.",
-      "igdb_keys_incomplete": "Voer de client-ID en het clientgeheim in."
+      "igdb_keys_incomplete": "Voer de client-ID en het clientgeheim in.",
+      "console_incomplete": "Kies de mediaspeler en de persoon van de nieuwe console.",
+      "console_exists": "Deze mediaspeler is al een console."
     }
   },
   "entity": {

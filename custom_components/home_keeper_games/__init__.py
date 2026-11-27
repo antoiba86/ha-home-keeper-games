@@ -25,6 +25,7 @@ from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.typing import ConfigType
 
 from . import backend_i18n, card, covers, frontend_assets, home_keeper, websocket_api
+from .activity_listener import ActivityListener
 from .api_surface import SERVICE_NAMES
 from .const import DOMAIN, OVERDUE_CHECK_INTERVAL_S, PLATFORMS, SIGNAL_STORE_CHANGED
 from .coordinator import LibraryCoordinator
@@ -85,6 +86,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: LibraryConfigEntry) -> b
     entry.async_on_unload(coordinator.wishlist_sync.async_stop)
     coordinator.loan_sync.async_start()
     entry.async_on_unload(coordinator.loan_sync.async_stop)
+    coordinator.activity = ActivityListener(hass, entry, coordinator)
+    await coordinator.activity.async_start()
+    entry.async_on_unload(lambda: coordinator.activity.async_stop())
     # The link checks Home Keeper now and when it changes. It adds the tab and
     # turns the loan tasks on only while Home Keeper can take them.
     link = home_keeper.HomeKeeperLink(hass, entry, coordinator)
@@ -113,8 +117,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: LibraryConfigEntry) -> b
 
 
 async def _async_entry_updated(hass: HomeAssistant, entry: LibraryConfigEntry) -> None:
-    """Fire ``settings_updated`` when the options flow changes the currency."""
-    entry.runtime_data.async_check_settings()
+    """Fire ``settings_updated`` when the options flow changes the currency.
+
+    The activity listener reads the consoles again. The open sessions stay in the
+    store, so a session that plays now continues.
+    """
+    coordinator = entry.runtime_data
+    coordinator.async_check_settings()
+    coordinator.activity.async_stop()
+    await coordinator.activity.async_start()
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: LibraryConfigEntry) -> bool:

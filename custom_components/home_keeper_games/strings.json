@@ -44,13 +44,31 @@
           "igdb_client_id": "Optional. Make an application at dev.twitch.tv to get the IGDB keys.",
           "igdb_client_secret": "Optional. Keep it empty to keep the stored secret."
         }
+      },
+      "consoles": {
+        "title": "Consoles",
+        "description": "The library logs play sessions from the media player of each console of the PlayStation Network integration.",
+        "data": {
+          "keep": "Consoles",
+          "entity_id": "New console",
+          "person_id": "Person",
+          "platform": "Platform"
+        },
+        "data_description": {
+          "keep": "Clear a console to stop its play sessions.",
+          "entity_id": "Optional. The media player of a PlayStation console.",
+          "person_id": "The person who plays on the new console.",
+          "platform": "The platform of the new console."
+        }
       }
     },
     "error": {
       "invalid_currency": "Enter a currency code of 3 letters.",
       "invalid_igdb_auth": "Twitch does not accept the client ID and the client secret.",
       "cannot_connect": "Cannot connect to Twitch. Try again later.",
-      "igdb_keys_incomplete": "Enter the client ID and the client secret."
+      "igdb_keys_incomplete": "Enter the client ID and the client secret.",
+      "console_incomplete": "Select the media player and the person of the new console.",
+      "console_exists": "This media player is already a console."
     }
   },
   "entity": {

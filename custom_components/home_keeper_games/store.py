@@ -45,6 +45,7 @@ from .const import (
     EVENT_ROOM_UPDATED,
     EVENT_SESSION_DELETED,
     EVENT_SESSION_LOGGED,
+    EVENT_SESSION_STARTED,
     EVENT_SETTINGS_UPDATED,
     EVENT_SHELF_ADDED,
     EVENT_SHELF_REMOVED,
@@ -693,6 +694,93 @@ class LibraryStore:
             (EVENT_SESSION_LOGGED, events.session_event_data(game, session, origin))
         ]
         fired += self._session_progress(game, session, session["minutes"], origin)
+        await self._commit(fired)
+        return dict(session)
+
+    async def start_session(
+        self,
+        *,
+        game_id: str,
+        person_id: str,
+        platform: str,
+        source: str,
+        external_id: str | None,
+        started_at: str,
+        origin: str | None = None,
+    ) -> dict[str, Any]:
+        """Open a session that a console listener measures.
+
+        A new or ``backlog`` progress row becomes ``playing``. The play time
+        changes when :meth:`end_session` closes the session.
+        """
+        game = self.game(game_id)
+        session = models.build_live_session(
+            game_id=game_id,
+            person_id=person_id,
+            platform=platform,
+            source=source,
+            external_id=external_id,
+            started_at=started_at,
+        )
+        self.state["sessions"][session["id"]] = session
+        fired: list[Event] = [
+            (EVENT_SESSION_STARTED, events.session_event_data(game, session, origin))
+        ]
+        current = self.progress_row(person_id, game_id, session["platform"])
+        row, changed = models.session_start_progress(
+            current, session["date"], now=now(), today=today()
+        )
+        if changed:
+            games = self.state["progress"].setdefault(person_id, {})
+            games.setdefault(game_id, {})[session["platform"]] = row
+            previous = current["play_status"] if current else None
+            if "play_status" in changed:
+                fired += self._progress_events(
+                    game, person_id, session["platform"], row, previous, origin
+                )
+            else:
+                payload = events.progress_updated_event_data(
+                    game,
+                    person_id,
+                    session["platform"],
+                    row["play_status"],
+                    changed,
+                    origin,
+                )
+                fired.append((EVENT_PROGRESS_UPDATED, payload))
+        await self._commit(fired)
+        return dict(session)
+
+    async def end_session(
+        self, session_id: str, ended_at: str, *, origin: str | None = None
+    ) -> dict[str, Any] | None:
+        """Close an open session and add its minutes to the progress row.
+
+        A session of less than 1 minute is deleted, and the reply is None. A
+        closed session stays as it is.
+        """
+        session = self.session(session_id)
+        if session["minutes"] is not None:
+            return session
+        game = self.game(session["game_id"])
+        minutes = models.session_minutes(session["started_at"] or "", ended_at)
+        if minutes < 1:
+            del self.state["sessions"][session_id]
+            await self._commit(
+                [
+                    (
+                        EVENT_SESSION_DELETED,
+                        events.session_event_data(game, session, origin),
+                    )
+                ]
+            )
+            return None
+        session = {**session, "ended_at": ended_at, "minutes": minutes}
+        self.state["sessions"][session_id] = session
+        fired: list[Event] = [
+            (EVENT_SESSION_LOGGED, events.session_event_data(game, session, origin))
+        ]
+        fired += self._session_progress(game, session, minutes, origin)
         await self._commit(fired)
         return dict(session)
 

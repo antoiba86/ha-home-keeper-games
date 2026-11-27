@@ -44,13 +44,31 @@
           "igdb_client_id": "Opcjonalne. Utwórz aplikację na dev.twitch.tv, aby uzyskać klucze IGDB.",
           "igdb_client_secret": "Opcjonalne. Zostaw puste, aby zachować zapisany sekret."
         }
+      },
+      "consoles": {
+        "title": "Konsole",
+        "description": "Biblioteka zapisuje sesje gry z odtwarzacza multimediów każdej konsoli integracji PlayStation Network.",
+        "data": {
+          "keep": "Konsole",
+          "entity_id": "Nowa konsola",
+          "person_id": "Osoba",
+          "platform": "Platforma"
+        },
+        "data_description": {
+          "keep": "Odznacz konsolę, aby zatrzymać jej sesje gry.",
+          "entity_id": "Opcjonalne. Odtwarzacz multimediów konsoli PlayStation.",
+          "person_id": "Osoba, która gra na nowej konsoli.",
+          "platform": "Platforma nowej konsoli."
+        }
       }
     },
     "error": {
       "invalid_currency": "Wpisz kod waluty z 3 liter.",
       "invalid_igdb_auth": "Twitch nie akceptuje identyfikatora klienta i sekretu klienta.",
       "cannot_connect": "Nie można połączyć się z Twitch. Spróbuj ponownie później.",
-      "igdb_keys_incomplete": "Wpisz identyfikator klienta i sekret klienta."
+      "igdb_keys_incomplete": "Wpisz identyfikator klienta i sekret klienta.",
+      "console_incomplete": "Wybierz odtwarzacz multimediów i osobę nowej konsoli.",
+      "console_exists": "Ten odtwarzacz multimediów jest już konsolą."
     }
   },
   "entity": {
