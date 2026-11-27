@@ -56,7 +56,7 @@
   "entity": {
     "sensor": {
       "games": {
-        "name": "Kirjat"
+        "name": "Pelit"
       },
       "loans_out": {
         "name": "Lainassa"
@@ -80,15 +80,15 @@
   "issues": {
     "home_keeper_missing": {
       "title": "Home Keeperia ei ole asennettu",
-      "description": "Kirjasto-välilehti ja lainatehtävät vaativat Home Keeperin. Kortti, entiteetit ja palvelut toimivat nyt. Asenna Home Keeper HACSista ja käynnistä Home Assistant uudelleen. Asennusohjeet: {url}"
+      "description": "Pelit-välilehti ja lainatehtävät vaativat Home Keeperin. Kortti, entiteetit ja palvelut toimivat nyt. Asenna Home Keeper HACSista ja käynnistä Home Assistant uudelleen. Asennusohjeet: {url}"
     },
     "home_keeper_not_set_up": {
       "title": "Home Keeperia ei ole määritetty",
-      "description": "Kirjasto-välilehti ja lainatehtävät vaativat ladatun Home Keeper -integraation. Kortti, entiteetit ja palvelut toimivat nyt. Lisää tai ota käyttöön Home Keeper -integraatio."
+      "description": "Pelit-välilehti ja lainatehtävät vaativat ladatun Home Keeper -integraation. Kortti, entiteetit ja palvelut toimivat nyt. Lisää tai ota käyttöön Home Keeper -integraatio."
     },
     "home_keeper_too_old": {
       "title": "Home Keeper on liian vanha",
-      "description": "Kirjasto-välilehti ja lainatehtävät vaativat Home Keeperin version {version} tai uudemman. Kortti, entiteetit ja palvelut toimivat nyt. Päivitä Home Keeper."
+      "description": "Pelit-välilehti ja lainatehtävät vaativat Home Keeperin version {version} tai uudemman. Kortti, entiteetit ja palvelut toimivat nyt. Päivitä Home Keeper."
     }
   },
   "services": {
@@ -134,7 +134,7 @@
     },
     "delete_room": {
       "name": "Poista huone",
-      "description": "Poista huone. Huone, jossa on kirjahyllyjä, tarvitsee force-arvon.",
+      "description": "Poista huone. Huone, jossa on kaappeja, tarvitsee force-arvon.",
       "fields": {
         "room_id": {
           "name": "Huone",
@@ -147,8 +147,8 @@
       }
     },
     "add_unit": {
-      "name": "Lisää kirjahylly",
-      "description": "Lisää kirjahylly huoneeseen.",
+      "name": "Lisää kaappi",
+      "description": "Lisää kaappi huoneeseen.",
       "fields": {
         "room_id": {
           "name": "Huone",
@@ -169,12 +169,12 @@
       }
     },
     "update_unit": {
-      "name": "Muuta kirjahyllyä",
-      "description": "Muuta kirjahyllyä tai siirrä se toiseen huoneeseen.",
+      "name": "Muuta kaappia",
+      "description": "Muuta kaappia tai siirrä se toiseen huoneeseen.",
       "fields": {
         "unit_id": {
-          "name": "Kirjahylly",
-          "description": "Kirjahyllyn ID."
+          "name": "Kaappi",
+          "description": "Kaapin ID."
         },
         "room_id": {
           "name": "Huone",
@@ -195,12 +195,12 @@
       }
     },
     "delete_unit": {
-      "name": "Poista kirjahylly",
-      "description": "Poista kirjahylly. Kirjahylly, jossa on hyllytasoja, tarvitsee force-arvon.",
+      "name": "Poista kaappi",
+      "description": "Poista kaappi. Kaappi, jossa on hyllytasoja, tarvitsee force-arvon.",
       "fields": {
         "unit_id": {
-          "name": "Kirjahylly",
-          "description": "Kirjahyllyn ID."
+          "name": "Kaappi",
+          "description": "Kaapin ID."
         },
         "force": {
           "name": "Pakota",
@@ -210,11 +210,11 @@
     },
     "add_shelf": {
       "name": "Lisää hyllytaso",
-      "description": "Lisää hyllytaso kirjahyllyyn.",
+      "description": "Lisää hyllytaso kaappiin.",
       "fields": {
         "unit_id": {
-          "name": "Kirjahylly",
-          "description": "Kirjahyllyn ID."
+          "name": "Kaappi",
+          "description": "Kaapin ID."
         },
         "name": {
           "name": "Nimi",
@@ -228,15 +228,15 @@
     },
     "update_shelf": {
       "name": "Muuta hyllytasoa",
-      "description": "Muuta hyllytasoa tai siirrä se toiseen kirjahyllyyn.",
+      "description": "Muuta hyllytasoa tai siirrä se toiseen kaappiin.",
       "fields": {
         "shelf_id": {
           "name": "Hyllytaso",
           "description": "Hyllytason ID. Tyhjä, jos hyllytasoa ei ole."
         },
         "unit_id": {
-          "name": "Kirjahylly",
-          "description": "Kirjahyllyn ID."
+          "name": "Kaappi",
+          "description": "Kaapin ID."
         },
         "name": {
           "name": "Nimi",
@@ -263,12 +263,12 @@
       }
     },
     "add_game": {
-      "name": "Lisää kirja",
-      "description": "Lisää kirja. Jos kirjalla on sama viivakoodi, palvelu palauttaa sen kirjan.",
+      "name": "Lisää peli",
+      "description": "Lisää peli. Jos pelillä on sama viivakoodi, palvelu palauttaa sen pelin.",
       "fields": {
         "title": {
           "name": "Nimeke",
-          "description": "Kirjan nimeke."
+          "description": "Pelin nimeke."
         },
         "summary": {
           "name": "Yhteenveto",
@@ -296,7 +296,7 @@
         },
         "tags": {
           "name": "Tunnisteet",
-          "description": "Kirjan tunnisteet."
+          "description": "Pelin tunnisteet."
         },
         "shared_notes": {
           "name": "Jaetut muistiinpanot",
@@ -304,7 +304,7 @@
         },
         "needs_details": {
           "name": "Tiedot puuttuvat",
-          "description": "Merkitse kirja keskeneräiseksi."
+          "description": "Merkitse peli keskeneräiseksi."
         },
         "lookup": {
           "name": "Hae IGDB:stä",
@@ -335,16 +335,16 @@
       }
     },
     "update_game": {
-      "name": "Muuta kirjaa",
-      "description": "Muuta kirjan tietoja.",
+      "name": "Muuta peliä",
+      "description": "Muuta pelin tietoja.",
       "fields": {
         "game_id": {
-          "name": "Kirja",
-          "description": "Kirjan ID."
+          "name": "Peli",
+          "description": "Pelin ID."
         },
         "title": {
           "name": "Nimeke",
-          "description": "Kirjan nimeke."
+          "description": "Pelin nimeke."
         },
         "summary": {
           "name": "Yhteenveto",
@@ -368,7 +368,7 @@
         },
         "tags": {
           "name": "Tunnisteet",
-          "description": "Kirjan tunnisteet."
+          "description": "Pelin tunnisteet."
         },
         "shared_notes": {
           "name": "Jaetut muistiinpanot",
@@ -376,7 +376,7 @@
         },
         "needs_details": {
           "name": "Tiedot puuttuvat",
-          "description": "Merkitse kirja keskeneräiseksi."
+          "description": "Merkitse peli keskeneräiseksi."
         }
       }
     },
@@ -395,18 +395,18 @@
       }
     },
     "delete_game": {
-      "name": "Poista kirja",
-      "description": "Poista kirja ja sen kappaleet, lukutila, lainat ja kansikuva.",
+      "name": "Poista peli",
+      "description": "Poista peli ja sen kappaleet, edistyminen, lainat ja kansikuva.",
       "fields": {
         "game_id": {
-          "name": "Kirja",
-          "description": "Kirjan ID."
+          "name": "Peli",
+          "description": "Pelin ID."
         }
       }
     },
     "scan_barcode": {
       "name": "Skannaa viivakoodi",
-      "description": "Lisää skannattu kirja hyllytasolle.",
+      "description": "Lisää skannattu peli hyllytasolle.",
       "fields": {
         "barcode": {
           "name": "Viivakoodi",
@@ -426,17 +426,17 @@
         },
         "on_duplicate": {
           "name": "Jos kappale on jo olemassa",
-          "description": "Toiminto, jos kirjastossa on kirjan kappale."
+          "description": "Toiminto, jos kirjastossa on pelin kappale."
         }
       }
     },
     "add_copy": {
       "name": "Lisää kappale",
-      "description": "Lisää kirjan kappale.",
+      "description": "Lisää pelin kappale.",
       "fields": {
         "game_id": {
-          "name": "Kirja",
-          "description": "Kirjan ID."
+          "name": "Peli",
+          "description": "Pelin ID."
         },
         "shelf_id": {
           "name": "Hyllytaso",
@@ -588,11 +588,11 @@
     },
     "set_cover": {
       "name": "Aseta kansikuva",
-      "description": "Aseta kirjan kansikuva.",
+      "description": "Aseta pelin kansikuva.",
       "fields": {
         "game_id": {
-          "name": "Kirja",
-          "description": "Kirjan ID."
+          "name": "Peli",
+          "description": "Pelin ID."
         },
         "kind": {
           "name": "Kansikuvan tyyppi",
@@ -655,7 +655,7 @@
       }
     },
     "lend_game": {
-      "name": "Lainaa kirja",
+      "name": "Lainaa peli",
       "description": "Lainaa kappale toiselle henkilölle.",
       "fields": {
         "copy_id": {
@@ -685,12 +685,12 @@
       }
     },
     "borrow_game": {
-      "name": "Lisää lainattu kirja",
-      "description": "Kirjaa kirja, jonka henkilö on lainannut.",
+      "name": "Lisää lainattu peli",
+      "description": "Kirjaa peli, jonka henkilö on lainannut.",
       "fields": {
         "game_id": {
-          "name": "Kirja",
-          "description": "Kirjan ID."
+          "name": "Peli",
+          "description": "Pelin ID."
         },
         "barcode": {
           "name": "Viivakoodi",
@@ -698,7 +698,7 @@
         },
         "title": {
           "name": "Nimeke",
-          "description": "Kirjan nimeke."
+          "description": "Pelin nimeke."
         },
         "party": {
           "name": "Toinen henkilö",
@@ -786,11 +786,11 @@
     },
     "add_to_wishlist": {
       "name": "Lisää toivelistalle",
-      "description": "Lisää kirja henkilön toivelistalle.",
+      "description": "Lisää peli henkilön toivelistalle.",
       "fields": {
         "game_id": {
-          "name": "Kirja",
-          "description": "Kirjan ID."
+          "name": "Peli",
+          "description": "Pelin ID."
         },
         "barcode": {
           "name": "Viivakoodi",
@@ -798,7 +798,7 @@
         },
         "title": {
           "name": "Nimeke",
-          "description": "Kirjan nimeke."
+          "description": "Pelin nimeke."
         },
         "person_id": {
           "name": "Henkilö",
@@ -806,7 +806,7 @@
         },
         "buy": {
           "name": "Osta",
-          "description": "Lisää kirja henkilön toivelistan tehtävälistalle."
+          "description": "Lisää peli henkilön toivelistan tehtävälistalle."
         }
       }
     },
@@ -815,12 +815,12 @@
       "description": "Muuta toivelistan merkintää.",
       "fields": {
         "game_id": {
-          "name": "Kirja",
-          "description": "Kirjan ID."
+          "name": "Peli",
+          "description": "Pelin ID."
         },
         "buy": {
           "name": "Osta",
-          "description": "Lisää kirja henkilön toivelistan tehtävälistalle."
+          "description": "Lisää peli henkilön toivelistan tehtävälistalle."
         },
         "person_id": {
           "name": "Henkilö",
@@ -830,21 +830,21 @@
     },
     "remove_from_wishlist": {
       "name": "Poista toivelistalta",
-      "description": "Poista kirja toivelistalta.",
+      "description": "Poista peli toivelistalta.",
       "fields": {
         "game_id": {
-          "name": "Kirja",
-          "description": "Kirjan ID."
+          "name": "Peli",
+          "description": "Pelin ID."
         }
       }
     },
     "got_wishlist_game": {
-      "name": "Toivekirja saatu",
-      "description": "Lisää toivekirjan kappale ja poista kirja toivelistalta.",
+      "name": "Toivepeli saatu",
+      "description": "Lisää toivepelin kappale ja poista peli toivelistalta.",
       "fields": {
         "game_id": {
-          "name": "Kirja",
-          "description": "Kirjan ID."
+          "name": "Peli",
+          "description": "Pelin ID."
         },
         "shelf_id": {
           "name": "Hyllytaso",
@@ -878,7 +878,7 @@
         },
         "wishlist_todo": {
           "name": "Toivelista",
-          "description": "Ostettavien kirjojen tehtävälista."
+          "description": "Ostettavien pelien tehtävälista."
         }
       }
     },
@@ -894,7 +894,7 @@
     },
     "import_csv": {
       "name": "Tuo CSV",
-      "description": "Tuo kirjoja Home Keeper Gamesin CSV-viennistä.",
+      "description": "Tuo pelejä Home Keeper Gamesin CSV-viennistä.",
       "fields": {
         "content": {
           "name": "CSV-sisältö",
@@ -933,8 +933,8 @@
       }
     },
     "list_games": {
-      "name": "Luettele kirjat",
-      "description": "Palauta kirjat, jotka vastaavat suodattimia.",
+      "name": "Luettele pelit",
+      "description": "Palauta pelit, jotka vastaavat suodattimia.",
       "fields": {
         "query": {
           "name": "Haku",
@@ -950,7 +950,7 @@
         },
         "owned": {
           "name": "Omistettu",
-          "description": "Vain kirjat, joilla on kappale, tai vain kirjat ilman kappaletta."
+          "description": "Vain pelit, joilla on kappale, tai vain pelit ilman kappaletta."
         },
         "play_status": {
           "name": "Pelitila",
@@ -962,23 +962,23 @@
         },
         "limit": {
           "name": "Raja",
-          "description": "Kirjojen enimmäismäärä."
+          "description": "Pelien enimmäismäärä."
         }
       }
     },
     "get_game": {
-      "name": "Hae kirja",
-      "description": "Palauta kirja sen kappaleineen ja lainoineen.",
+      "name": "Hae peli",
+      "description": "Palauta peli sen kappaleineen ja lainoineen.",
       "fields": {
         "game_id": {
-          "name": "Kirja",
-          "description": "Kirjan ID."
+          "name": "Peli",
+          "description": "Pelin ID."
         }
       }
     },
     "list_locations": {
       "name": "Luettele sijainnit",
-      "description": "Palauta huoneet, kirjahyllyt ja hyllytasot."
+      "description": "Palauta huoneet, kaapit ja hyllytasot."
     },
     "list_loans": {
       "name": "Luettele lainat",
@@ -990,7 +990,7 @@
         },
         "direction": {
           "name": "Suunta",
-          "description": "out lainattuna annetulle kirjalle, in lainaksi saadulle kirjalle."
+          "description": "out lainattuna annetulle pelille, in lainaksi saadulle pelille."
         }
       }
     },
@@ -1059,13 +1059,13 @@
       "message": "Millään huoneella ei ole ID:tä {id}."
     },
     "unit_not_found": {
-      "message": "Millään kirjahyllyllä ei ole ID:tä {id}."
+      "message": "Millään kaapilla ei ole ID:tä {id}."
     },
     "shelf_not_found": {
       "message": "Millään hyllytasolla ei ole ID:tä {id}."
     },
     "game_not_found": {
-      "message": "Millään kirjalla ei ole ID:tä {id}."
+      "message": "Millään pelillä ei ole ID:tä {id}."
     },
     "copy_not_found": {
       "message": "Millään kappaleella ei ole ID:tä {id}."
@@ -1083,16 +1083,16 @@
       "message": "Käyttäjälläsi ei ole Home Assistant -henkilöä. Yhdistä henkilö käyttäjään."
     },
     "room_not_empty": {
-      "message": "Huoneessa on {count} kirjahyllyä. Käytä force-arvoa, jos haluat poistaa myös ne."
+      "message": "Huoneessa on {count} kaappia. Käytä force-arvoa, jos haluat poistaa myös ne."
     },
     "unit_not_empty": {
-      "message": "Kirjahyllyssä on {count} hyllytasoa. Käytä force-arvoa, jos haluat poistaa myös ne."
+      "message": "Kaapissa on {count} hyllytasoa. Käytä force-arvoa, jos haluat poistaa myös ne."
     },
     "shelf_not_empty": {
       "message": "Hyllytasolla on {count} kappaletta. Käytä force-arvoa, jos haluat siirtää ne pois hyllytasolta."
     },
     "duplicate_barcode": {
-      "message": "Toisella kirjalla on viivakoodi {barcode}."
+      "message": "Toisella pelillä on viivakoodi {barcode}."
     },
     "copy_on_loan": {
       "message": "Kappale on lainassa. Palauta laina ensin."
@@ -1101,16 +1101,16 @@
       "message": "Eräpäivä on ennen aloituspäivää."
     },
     "already_on_wishlist": {
-      "message": "Kirja on jo toivelistalla."
+      "message": "Peli on jo toivelistalla."
     },
     "not_on_wishlist": {
-      "message": "Kirja ei ole millään toivelistalla."
+      "message": "Peli ei ole millään toivelistalla."
     },
     "upload_not_found": {
       "message": "Millään ladatulla kansikuvalla ei ole ID:tä {file_id}."
     },
     "barcode_or_title_required": {
-      "message": "Anna kirjan ID, viivakoodi tai nimeke."
+      "message": "Anna pelin ID, viivakoodi tai nimeke."
     },
     "todo_entity_not_found": {
       "message": "{entity_id} ei ole tehtävälista."

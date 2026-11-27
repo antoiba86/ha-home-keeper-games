@@ -56,7 +56,7 @@
   "entity": {
     "sensor": {
       "games": {
-        "name": "Livres"
+        "name": "Jeux"
       },
       "loans_out": {
         "name": "Prêts en cours"
@@ -80,15 +80,15 @@
   "issues": {
     "home_keeper_missing": {
       "title": "Home Keeper n'est pas installé",
-      "description": "L'onglet Bibliothèque et les tâches de prêt demandent Home Keeper. La carte, les entités et les services fonctionnent déjà. Installez Home Keeper depuis HACS et redémarrez Home Assistant. Étapes d'installation : {url}"
+      "description": "L'onglet Jeux et les tâches de prêt demandent Home Keeper. La carte, les entités et les services fonctionnent déjà. Installez Home Keeper depuis HACS et redémarrez Home Assistant. Étapes d'installation : {url}"
     },
     "home_keeper_not_set_up": {
       "title": "Home Keeper n'est pas configuré",
-      "description": "L'onglet Bibliothèque et les tâches de prêt demandent une intégration Home Keeper chargée. La carte, les entités et les services fonctionnent déjà. Ajoutez ou activez l'intégration Home Keeper."
+      "description": "L'onglet Jeux et les tâches de prêt demandent une intégration Home Keeper chargée. La carte, les entités et les services fonctionnent déjà. Ajoutez ou activez l'intégration Home Keeper."
     },
     "home_keeper_too_old": {
       "title": "Home Keeper est trop ancien",
-      "description": "L'onglet Bibliothèque et les tâches de prêt demandent Home Keeper version {version} ou plus récente. La carte, les entités et les services fonctionnent déjà. Mettez à jour Home Keeper."
+      "description": "L'onglet Jeux et les tâches de prêt demandent Home Keeper version {version} ou plus récente. La carte, les entités et les services fonctionnent déjà. Mettez à jour Home Keeper."
     }
   },
   "services": {
@@ -134,7 +134,7 @@
     },
     "delete_room": {
       "name": "Supprimer une pièce",
-      "description": "Supprimer une pièce. Une pièce avec des bibliothèques demande force.",
+      "description": "Supprimer une pièce. Une pièce avec des meubles demande force.",
       "fields": {
         "room_id": {
           "name": "Pièce",
@@ -147,8 +147,8 @@
       }
     },
     "add_unit": {
-      "name": "Ajouter une bibliothèque",
-      "description": "Ajouter un meuble bibliothèque à une pièce.",
+      "name": "Ajouter un meuble",
+      "description": "Ajouter un meuble à une pièce.",
       "fields": {
         "room_id": {
           "name": "Pièce",
@@ -169,12 +169,12 @@
       }
     },
     "update_unit": {
-      "name": "Modifier une bibliothèque",
-      "description": "Modifier un meuble bibliothèque ou le déplacer dans une autre pièce.",
+      "name": "Modifier un meuble",
+      "description": "Modifier un meuble ou le déplacer dans une autre pièce.",
       "fields": {
         "unit_id": {
-          "name": "Bibliothèque",
-          "description": "L'ID du meuble bibliothèque."
+          "name": "Meuble",
+          "description": "L'ID du meuble."
         },
         "room_id": {
           "name": "Pièce",
@@ -195,12 +195,12 @@
       }
     },
     "delete_unit": {
-      "name": "Supprimer une bibliothèque",
-      "description": "Supprimer un meuble bibliothèque. Un meuble avec des étagères demande force.",
+      "name": "Supprimer un meuble",
+      "description": "Supprimer un meuble. Un meuble avec des étagères demande force.",
       "fields": {
         "unit_id": {
-          "name": "Bibliothèque",
-          "description": "L'ID du meuble bibliothèque."
+          "name": "Meuble",
+          "description": "L'ID du meuble."
         },
         "force": {
           "name": "Forcer",
@@ -210,11 +210,11 @@
     },
     "add_shelf": {
       "name": "Ajouter une étagère",
-      "description": "Ajouter une étagère à un meuble bibliothèque.",
+      "description": "Ajouter une étagère à un meuble.",
       "fields": {
         "unit_id": {
-          "name": "Bibliothèque",
-          "description": "L'ID du meuble bibliothèque."
+          "name": "Meuble",
+          "description": "L'ID du meuble."
         },
         "name": {
           "name": "Nom",
@@ -235,8 +235,8 @@
           "description": "L'ID de l'étagère. Vide pour aucune étagère."
         },
         "unit_id": {
-          "name": "Bibliothèque",
-          "description": "L'ID du meuble bibliothèque."
+          "name": "Meuble",
+          "description": "L'ID du meuble."
         },
         "name": {
           "name": "Nom",
@@ -263,12 +263,12 @@
       }
     },
     "add_game": {
-      "name": "Ajouter un livre",
-      "description": "Ajouter un livre. Si un livre a le même code-barres, le service renvoie ce livre.",
+      "name": "Ajouter un jeu",
+      "description": "Ajouter un jeu. Si un jeu a le même code-barres, le service renvoie ce jeu.",
       "fields": {
         "title": {
           "name": "Titre",
-          "description": "Le titre du livre."
+          "description": "Le titre du jeu."
         },
         "summary": {
           "name": "Résumé",
@@ -296,7 +296,7 @@
         },
         "tags": {
           "name": "Étiquettes",
-          "description": "Les étiquettes du livre."
+          "description": "Les étiquettes du jeu."
         },
         "shared_notes": {
           "name": "Notes partagées",
@@ -304,7 +304,7 @@
         },
         "needs_details": {
           "name": "Détails manquants",
-          "description": "Marquer le livre comme incomplet."
+          "description": "Marquer le jeu comme incomplet."
         },
         "lookup": {
           "name": "Rechercher dans IGDB",
@@ -335,16 +335,16 @@
       }
     },
     "update_game": {
-      "name": "Modifier un livre",
-      "description": "Modifier les détails d'un livre.",
+      "name": "Modifier un jeu",
+      "description": "Modifier les détails d'un jeu.",
       "fields": {
         "game_id": {
-          "name": "Livre",
-          "description": "L'ID du livre."
+          "name": "Jeu",
+          "description": "L'ID du jeu."
         },
         "title": {
           "name": "Titre",
-          "description": "Le titre du livre."
+          "description": "Le titre du jeu."
         },
         "summary": {
           "name": "Résumé",
@@ -368,7 +368,7 @@
         },
         "tags": {
           "name": "Étiquettes",
-          "description": "Les étiquettes du livre."
+          "description": "Les étiquettes du jeu."
         },
         "shared_notes": {
           "name": "Notes partagées",
@@ -376,7 +376,7 @@
         },
         "needs_details": {
           "name": "Détails manquants",
-          "description": "Marquer le livre comme incomplet."
+          "description": "Marquer le jeu comme incomplet."
         }
       }
     },
@@ -395,18 +395,18 @@
       }
     },
     "delete_game": {
-      "name": "Supprimer un livre",
-      "description": "Supprimer un livre avec ses exemplaires, son statut de lecture, ses prêts et sa couverture.",
+      "name": "Supprimer un jeu",
+      "description": "Supprimer un jeu avec ses exemplaires, sa progression de jeu, ses prêts et sa couverture.",
       "fields": {
         "game_id": {
-          "name": "Livre",
-          "description": "L'ID du livre."
+          "name": "Jeu",
+          "description": "L'ID du jeu."
         }
       }
     },
     "scan_barcode": {
       "name": "Scanner un code-barres",
-      "description": "Ajouter un livre scanné à une étagère.",
+      "description": "Ajouter un jeu scanné à une étagère.",
       "fields": {
         "barcode": {
           "name": "Code-barres",
@@ -421,22 +421,22 @@
           "description": "La console de l'exemplaire, par exemple ps5 ou switch."
         },
         "format": {
-          "name": "Format du livre",
+          "name": "Format de la copie",
           "description": "Le format de l'exemplaire."
         },
         "on_duplicate": {
           "name": "Si un exemplaire existe",
-          "description": "L'action si la bibliothèque a un exemplaire du livre."
+          "description": "L'action si la bibliothèque a un exemplaire du jeu."
         }
       }
     },
     "add_copy": {
       "name": "Ajouter un exemplaire",
-      "description": "Ajouter un exemplaire d'un livre.",
+      "description": "Ajouter un exemplaire d'un jeu.",
       "fields": {
         "game_id": {
-          "name": "Livre",
-          "description": "L'ID du livre."
+          "name": "Jeu",
+          "description": "L'ID du jeu."
         },
         "shelf_id": {
           "name": "Étagère",
@@ -447,7 +447,7 @@
           "description": "La console de l'exemplaire, par exemple ps5 ou switch."
         },
         "format": {
-          "name": "Format du livre",
+          "name": "Format de la copie",
           "description": "Le format de l'exemplaire."
         },
         "storefront": {
@@ -513,7 +513,7 @@
           "description": "La console de l'exemplaire, par exemple ps5 ou switch."
         },
         "format": {
-          "name": "Format du livre",
+          "name": "Format de la copie",
           "description": "Le format de l'exemplaire."
         },
         "storefront": {
@@ -588,11 +588,11 @@
     },
     "set_cover": {
       "name": "Définir la couverture",
-      "description": "Définir la couverture d'un livre.",
+      "description": "Définir la couverture d'un jeu.",
       "fields": {
         "game_id": {
-          "name": "Livre",
-          "description": "L'ID du livre."
+          "name": "Jeu",
+          "description": "L'ID du jeu."
         },
         "kind": {
           "name": "Type de couverture",
@@ -655,7 +655,7 @@
       }
     },
     "lend_game": {
-      "name": "Prêter un livre",
+      "name": "Prêter un jeu",
       "description": "Prêter un exemplaire à une autre personne.",
       "fields": {
         "copy_id": {
@@ -685,12 +685,12 @@
       }
     },
     "borrow_game": {
-      "name": "Ajouter un livre emprunté",
-      "description": "Enregistrer un livre qu'une personne a emprunté.",
+      "name": "Ajouter un jeu emprunté",
+      "description": "Enregistrer un jeu qu'une personne a emprunté.",
       "fields": {
         "game_id": {
-          "name": "Livre",
-          "description": "L'ID du livre."
+          "name": "Jeu",
+          "description": "L'ID du jeu."
         },
         "barcode": {
           "name": "Code-barres",
@@ -698,7 +698,7 @@
         },
         "title": {
           "name": "Titre",
-          "description": "Le titre du livre."
+          "description": "Le titre du jeu."
         },
         "party": {
           "name": "Autre personne",
@@ -725,7 +725,7 @@
           "description": "L'ID de la personne Home Assistant."
         },
         "format": {
-          "name": "Format du livre",
+          "name": "Format de la copie",
           "description": "Le format de l'exemplaire."
         }
       }
@@ -769,7 +769,7 @@
           "description": "Une courte note."
         },
         "format": {
-          "name": "Format du livre",
+          "name": "Format de la copie",
           "description": "Le format de l'exemplaire."
         }
       }
@@ -786,11 +786,11 @@
     },
     "add_to_wishlist": {
       "name": "Ajouter aux souhaits",
-      "description": "Mettre un livre sur la liste des souhaits d'une personne.",
+      "description": "Mettre un jeu sur la liste des souhaits d'une personne.",
       "fields": {
         "game_id": {
-          "name": "Livre",
-          "description": "L'ID du livre."
+          "name": "Jeu",
+          "description": "L'ID du jeu."
         },
         "barcode": {
           "name": "Code-barres",
@@ -798,7 +798,7 @@
         },
         "title": {
           "name": "Titre",
-          "description": "Le titre du livre."
+          "description": "Le titre du jeu."
         },
         "person_id": {
           "name": "Personne",
@@ -806,7 +806,7 @@
         },
         "buy": {
           "name": "Acheter",
-          "description": "Mettre le livre sur la liste de tâches des souhaits de la personne."
+          "description": "Mettre le jeu sur la liste de tâches des souhaits de la personne."
         }
       }
     },
@@ -815,12 +815,12 @@
       "description": "Modifier une entrée de la liste des souhaits.",
       "fields": {
         "game_id": {
-          "name": "Livre",
-          "description": "L'ID du livre."
+          "name": "Jeu",
+          "description": "L'ID du jeu."
         },
         "buy": {
           "name": "Acheter",
-          "description": "Mettre le livre sur la liste de tâches des souhaits de la personne."
+          "description": "Mettre le jeu sur la liste de tâches des souhaits de la personne."
         },
         "person_id": {
           "name": "Personne",
@@ -830,21 +830,21 @@
     },
     "remove_from_wishlist": {
       "name": "Retirer des souhaits",
-      "description": "Retirer un livre de la liste des souhaits.",
+      "description": "Retirer un jeu de la liste des souhaits.",
       "fields": {
         "game_id": {
-          "name": "Livre",
-          "description": "L'ID du livre."
+          "name": "Jeu",
+          "description": "L'ID du jeu."
         }
       }
     },
     "got_wishlist_game": {
-      "name": "Livre souhaité reçu",
-      "description": "Ajouter un exemplaire d'un livre souhaité et le retirer de la liste des souhaits.",
+      "name": "Jeu souhaité reçu",
+      "description": "Ajouter un exemplaire d'un jeu souhaité et le retirer de la liste des souhaits.",
       "fields": {
         "game_id": {
-          "name": "Livre",
-          "description": "L'ID du livre."
+          "name": "Jeu",
+          "description": "L'ID du jeu."
         },
         "shelf_id": {
           "name": "Étagère",
@@ -855,7 +855,7 @@
           "description": "La console de l'exemplaire, par exemple ps5 ou switch."
         },
         "format": {
-          "name": "Format du livre",
+          "name": "Format de la copie",
           "description": "Le format de l'exemplaire."
         }
       }
@@ -878,7 +878,7 @@
         },
         "wishlist_todo": {
           "name": "Liste des souhaits",
-          "description": "La liste de tâches pour les livres à acheter."
+          "description": "La liste de tâches pour les jeux à acheter."
         }
       }
     },
@@ -894,7 +894,7 @@
     },
     "import_csv": {
       "name": "Importer un CSV",
-      "description": "Importer des livres depuis un export CSV de Home Keeper Games.",
+      "description": "Importer des jeux depuis un export CSV de Home Keeper Games.",
       "fields": {
         "content": {
           "name": "Contenu CSV",
@@ -933,8 +933,8 @@
       }
     },
     "list_games": {
-      "name": "Lister les livres",
-      "description": "Renvoyer les livres qui correspondent aux filtres.",
+      "name": "Lister les jeux",
+      "description": "Renvoyer les jeux qui correspondent aux filtres.",
       "fields": {
         "query": {
           "name": "Recherche",
@@ -950,7 +950,7 @@
         },
         "owned": {
           "name": "Possédé",
-          "description": "Seulement les livres avec un exemplaire, ou seulement ceux sans exemplaire."
+          "description": "Seulement les jeux avec un exemplaire, ou seulement ceux sans exemplaire."
         },
         "play_status": {
           "name": "Statut de jeu",
@@ -962,23 +962,23 @@
         },
         "limit": {
           "name": "Limite",
-          "description": "Le nombre maximum de livres."
+          "description": "Le nombre maximum de jeux."
         }
       }
     },
     "get_game": {
-      "name": "Obtenir un livre",
-      "description": "Renvoyer un livre avec ses exemplaires et ses prêts.",
+      "name": "Obtenir un jeu",
+      "description": "Renvoyer un jeu avec ses exemplaires et ses prêts.",
       "fields": {
         "game_id": {
-          "name": "Livre",
-          "description": "L'ID du livre."
+          "name": "Jeu",
+          "description": "L'ID du jeu."
         }
       }
     },
     "list_locations": {
       "name": "Lister les emplacements",
-      "description": "Renvoyer les pièces, les bibliothèques et les étagères."
+      "description": "Renvoyer les pièces, les meubles et les étagères."
     },
     "list_loans": {
       "name": "Lister les prêts",
@@ -990,7 +990,7 @@
         },
         "direction": {
           "name": "Sens",
-          "description": "out pour un livre prêté, in pour un livre emprunté."
+          "description": "out pour un jeu prêté, in pour un jeu emprunté."
         }
       }
     },
@@ -1059,13 +1059,13 @@
       "message": "Aucune pièce n'a l'ID {id}."
     },
     "unit_not_found": {
-      "message": "Aucune bibliothèque n'a l'ID {id}."
+      "message": "Aucun meuble n'a l'ID {id}."
     },
     "shelf_not_found": {
       "message": "Aucune étagère n'a l'ID {id}."
     },
     "game_not_found": {
-      "message": "Aucun livre n'a l'ID {id}."
+      "message": "Aucun jeu n'a l'ID {id}."
     },
     "copy_not_found": {
       "message": "Aucun exemplaire n'a l'ID {id}."
@@ -1083,16 +1083,16 @@
       "message": "Votre utilisateur n'a pas de personne Home Assistant. Liez une personne à l'utilisateur."
     },
     "room_not_empty": {
-      "message": "La pièce a {count} bibliothèques. Utilisez force pour les supprimer aussi."
+      "message": "La pièce a {count} meubles. Utilisez force pour les supprimer aussi."
     },
     "unit_not_empty": {
-      "message": "La bibliothèque a {count} étagères. Utilisez force pour les supprimer aussi."
+      "message": "Le meuble a {count} étagères. Utilisez force pour les supprimer aussi."
     },
     "shelf_not_empty": {
       "message": "L'étagère a {count} exemplaires. Utilisez force pour les mettre sans étagère."
     },
     "duplicate_barcode": {
-      "message": "Un autre livre a le code-barres {barcode}."
+      "message": "Un autre jeu a le code-barres {barcode}."
     },
     "copy_on_loan": {
       "message": "L'exemplaire est prêté. Rendez d'abord le prêt."
@@ -1101,16 +1101,16 @@
       "message": "La date d'échéance est avant la date de début."
     },
     "already_on_wishlist": {
-      "message": "Le livre est déjà sur une liste des souhaits."
+      "message": "Le jeu est déjà sur une liste des souhaits."
     },
     "not_on_wishlist": {
-      "message": "Le livre n'est sur aucune liste des souhaits."
+      "message": "Le jeu n'est sur aucune liste des souhaits."
     },
     "upload_not_found": {
       "message": "Aucune couverture envoyée n'a l'ID {file_id}."
     },
     "barcode_or_title_required": {
-      "message": "Donnez un ID de livre, un code-barres ou un titre."
+      "message": "Donnez un ID de jeu, un code-barres ou un titre."
     },
     "todo_entity_not_found": {
       "message": "{entity_id} n'est pas une liste de tâches."

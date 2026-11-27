@@ -22,7 +22,7 @@ For the library, a guest account must not:
 - read the review of another person;
 - read the progress of a person who does not share it.
 
-The admin UI is the Library tab of the Home Keeper panel, and that panel is admin-only.
+The admin UI is the Games tab of the Home Keeper panel, and that panel is admin-only.
 Every user can use the card and the entities. Every user can also call the services that
 this page lists as open.
 

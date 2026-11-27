@@ -56,7 +56,7 @@
   "entity": {
     "sensor": {
       "games": {
-        "name": "图书"
+        "name": "游戏"
       },
       "loans_out": {
         "name": "已借出"
@@ -80,15 +80,15 @@
   "issues": {
     "home_keeper_missing": {
       "title": "未安装 Home Keeper",
-      "description": "藏书选项卡和借阅任务需要 Home Keeper。卡片、实体和服务现在可以使用。请从 HACS 安装 Home Keeper 并重启 Home Assistant。安装步骤：{url}"
+      "description": "游戏选项卡和借阅任务需要 Home Keeper。卡片、实体和服务现在可以使用。请从 HACS 安装 Home Keeper 并重启 Home Assistant。安装步骤：{url}"
     },
     "home_keeper_not_set_up": {
       "title": "未设置 Home Keeper",
-      "description": "藏书选项卡和借阅任务需要已加载的 Home Keeper 集成。卡片、实体和服务现在可以使用。请添加或启用 Home Keeper 集成。"
+      "description": "游戏选项卡和借阅任务需要已加载的 Home Keeper 集成。卡片、实体和服务现在可以使用。请添加或启用 Home Keeper 集成。"
     },
     "home_keeper_too_old": {
       "title": "Home Keeper 版本过旧",
-      "description": "藏书选项卡和借阅任务需要 Home Keeper {version} 或更高版本。卡片、实体和服务现在可以使用。请更新 Home Keeper。"
+      "description": "游戏选项卡和借阅任务需要 Home Keeper {version} 或更高版本。卡片、实体和服务现在可以使用。请更新 Home Keeper。"
     }
   },
   "services": {
@@ -134,7 +134,7 @@
     },
     "delete_room": {
       "name": "删除房间",
-      "description": "删除一个房间。有书柜的房间需要 force。",
+      "description": "删除一个房间。有柜子的房间需要 force。",
       "fields": {
         "room_id": {
           "name": "房间",
@@ -147,8 +147,8 @@
       }
     },
     "add_unit": {
-      "name": "添加书柜",
-      "description": "向房间添加一个书柜。",
+      "name": "添加柜子",
+      "description": "向房间添加一个柜子。",
       "fields": {
         "room_id": {
           "name": "房间",
@@ -169,12 +169,12 @@
       }
     },
     "update_unit": {
-      "name": "修改书柜",
-      "description": "修改书柜，或将其移到另一个房间。",
+      "name": "修改柜子",
+      "description": "修改柜子，或将其移到另一个房间。",
       "fields": {
         "unit_id": {
-          "name": "书柜",
-          "description": "书柜的 ID。"
+          "name": "柜子",
+          "description": "柜子的 ID。"
         },
         "room_id": {
           "name": "房间",
@@ -195,12 +195,12 @@
       }
     },
     "delete_unit": {
-      "name": "删除书柜",
-      "description": "删除一个书柜。有书架层的书柜需要 force。",
+      "name": "删除柜子",
+      "description": "删除一个柜子。有书架层的柜子需要 force。",
       "fields": {
         "unit_id": {
-          "name": "书柜",
-          "description": "书柜的 ID。"
+          "name": "柜子",
+          "description": "柜子的 ID。"
         },
         "force": {
           "name": "强制",
@@ -210,11 +210,11 @@
     },
     "add_shelf": {
       "name": "添加书架层",
-      "description": "向书柜添加一个书架层。",
+      "description": "向柜子添加一个书架层。",
       "fields": {
         "unit_id": {
-          "name": "书柜",
-          "description": "书柜的 ID。"
+          "name": "柜子",
+          "description": "柜子的 ID。"
         },
         "name": {
           "name": "名称",
@@ -228,15 +228,15 @@
     },
     "update_shelf": {
       "name": "修改书架层",
-      "description": "修改书架层，或将其移到另一个书柜。",
+      "description": "修改书架层，或将其移到另一个柜子。",
       "fields": {
         "shelf_id": {
           "name": "书架层",
           "description": "书架层的 ID。留空表示没有书架层。"
         },
         "unit_id": {
-          "name": "书柜",
-          "description": "书柜的 ID。"
+          "name": "柜子",
+          "description": "柜子的 ID。"
         },
         "name": {
           "name": "名称",
@@ -263,12 +263,12 @@
       }
     },
     "add_game": {
-      "name": "添加图书",
-      "description": "添加一本图书。如果已有相同条形码的图书，服务返回那本书。",
+      "name": "添加游戏",
+      "description": "添加一款游戏。如果已有相同条形码的游戏，服务返回那款游戏。",
       "fields": {
         "title": {
           "name": "书名",
-          "description": "图书的书名。"
+          "description": "游戏的名称。"
         },
         "summary": {
           "name": "简介",
@@ -296,7 +296,7 @@
         },
         "tags": {
           "name": "标签",
-          "description": "图书的标签。"
+          "description": "游戏的标签。"
         },
         "shared_notes": {
           "name": "共享笔记",
@@ -304,7 +304,7 @@
         },
         "needs_details": {
           "name": "缺少详情",
-          "description": "将图书标记为信息不完整。"
+          "description": "将游戏标记为信息不完整。"
         },
         "lookup": {
           "name": "在 IGDB 中查找",
@@ -335,16 +335,16 @@
       }
     },
     "update_game": {
-      "name": "修改图书",
-      "description": "修改图书的详情。",
+      "name": "修改游戏",
+      "description": "修改游戏的详情。",
       "fields": {
         "game_id": {
-          "name": "图书",
-          "description": "图书的 ID。"
+          "name": "游戏",
+          "description": "游戏的 ID。"
         },
         "title": {
           "name": "书名",
-          "description": "图书的书名。"
+          "description": "游戏的名称。"
         },
         "summary": {
           "name": "简介",
@@ -368,7 +368,7 @@
         },
         "tags": {
           "name": "标签",
-          "description": "图书的标签。"
+          "description": "游戏的标签。"
         },
         "shared_notes": {
           "name": "共享笔记",
@@ -376,7 +376,7 @@
         },
         "needs_details": {
           "name": "缺少详情",
-          "description": "将图书标记为信息不完整。"
+          "description": "将游戏标记为信息不完整。"
         }
       }
     },
@@ -395,18 +395,18 @@
       }
     },
     "delete_game": {
-      "name": "删除图书",
-      "description": "删除图书及其藏本、阅读状态、借阅和封面。",
+      "name": "删除游戏",
+      "description": "删除游戏及其藏本、游戏进度、借阅和封面。",
       "fields": {
         "game_id": {
-          "name": "图书",
-          "description": "图书的 ID。"
+          "name": "游戏",
+          "description": "游戏的 ID。"
         }
       }
     },
     "scan_barcode": {
       "name": "扫描条形码",
-      "description": "将扫描的图书添加到书架层。",
+      "description": "将扫描的游戏添加到书架层。",
       "fields": {
         "barcode": {
           "name": "条形码",
@@ -426,17 +426,17 @@
         },
         "on_duplicate": {
           "name": "已有藏本时",
-          "description": "藏书中已有该书藏本时的操作。"
+          "description": "库中已有该游戏的藏本时的操作。"
         }
       }
     },
     "add_copy": {
       "name": "添加藏本",
-      "description": "添加一本图书的藏本。",
+      "description": "添加一款游戏的藏本。",
       "fields": {
         "game_id": {
-          "name": "图书",
-          "description": "图书的 ID。"
+          "name": "游戏",
+          "description": "游戏的 ID。"
         },
         "shelf_id": {
           "name": "书架层",
@@ -588,11 +588,11 @@
     },
     "set_cover": {
       "name": "设置封面",
-      "description": "设置图书的封面。",
+      "description": "设置游戏的封面。",
       "fields": {
         "game_id": {
-          "name": "图书",
-          "description": "图书的 ID。"
+          "name": "游戏",
+          "description": "游戏的 ID。"
         },
         "kind": {
           "name": "封面类型",
@@ -655,7 +655,7 @@
       }
     },
     "lend_game": {
-      "name": "借出图书",
+      "name": "借出游戏",
       "description": "将藏本借给另一个人。",
       "fields": {
         "copy_id": {
@@ -685,12 +685,12 @@
       }
     },
     "borrow_game": {
-      "name": "添加借入的图书",
-      "description": "记录某人借入的一本图书。",
+      "name": "添加借入的游戏",
+      "description": "记录某人借入的一款游戏。",
       "fields": {
         "game_id": {
-          "name": "图书",
-          "description": "图书的 ID。"
+          "name": "游戏",
+          "description": "游戏的 ID。"
         },
         "barcode": {
           "name": "条形码",
@@ -698,7 +698,7 @@
         },
         "title": {
           "name": "书名",
-          "description": "图书的书名。"
+          "description": "游戏的名称。"
         },
         "party": {
           "name": "对方",
@@ -786,11 +786,11 @@
     },
     "add_to_wishlist": {
       "name": "加入心愿单",
-      "description": "将图书放入某人的心愿单。",
+      "description": "将游戏放入某人的心愿单。",
       "fields": {
         "game_id": {
-          "name": "图书",
-          "description": "图书的 ID。"
+          "name": "游戏",
+          "description": "游戏的 ID。"
         },
         "barcode": {
           "name": "条形码",
@@ -798,7 +798,7 @@
         },
         "title": {
           "name": "书名",
-          "description": "图书的书名。"
+          "description": "游戏的名称。"
         },
         "person_id": {
           "name": "人员",
@@ -806,7 +806,7 @@
         },
         "buy": {
           "name": "购买",
-          "description": "将图书放入该人员的心愿待办清单。"
+          "description": "将游戏放入该人员的心愿待办清单。"
         }
       }
     },
@@ -815,12 +815,12 @@
       "description": "修改心愿单中的一项。",
       "fields": {
         "game_id": {
-          "name": "图书",
-          "description": "图书的 ID。"
+          "name": "游戏",
+          "description": "游戏的 ID。"
         },
         "buy": {
           "name": "购买",
-          "description": "将图书放入该人员的心愿待办清单。"
+          "description": "将游戏放入该人员的心愿待办清单。"
         },
         "person_id": {
           "name": "人员",
@@ -830,21 +830,21 @@
     },
     "remove_from_wishlist": {
       "name": "移出心愿单",
-      "description": "将图书移出心愿单。",
+      "description": "将游戏移出心愿单。",
       "fields": {
         "game_id": {
-          "name": "图书",
-          "description": "图书的 ID。"
+          "name": "游戏",
+          "description": "游戏的 ID。"
         }
       }
     },
     "got_wishlist_game": {
-      "name": "已得到心愿图书",
-      "description": "添加心愿图书的藏本，并将其移出心愿单。",
+      "name": "已得到心愿游戏",
+      "description": "添加心愿游戏的藏本，并将其移出心愿单。",
       "fields": {
         "game_id": {
-          "name": "图书",
-          "description": "图书的 ID。"
+          "name": "游戏",
+          "description": "游戏的 ID。"
         },
         "shelf_id": {
           "name": "书架层",
@@ -878,7 +878,7 @@
         },
         "wishlist_todo": {
           "name": "心愿清单",
-          "description": "用于待购图书的待办清单。"
+          "description": "用于待购游戏的待办清单。"
         }
       }
     },
@@ -894,7 +894,7 @@
     },
     "import_csv": {
       "name": "导入 CSV",
-      "description": "从 Home Keeper Games 的 CSV 导出文件导入图书。",
+      "description": "从 Home Keeper Games 的 CSV 导出文件导入游戏。",
       "fields": {
         "content": {
           "name": "CSV 内容",
@@ -933,8 +933,8 @@
       }
     },
     "list_games": {
-      "name": "列出图书",
-      "description": "返回符合筛选条件的图书。",
+      "name": "列出游戏",
+      "description": "返回符合筛选条件的游戏。",
       "fields": {
         "query": {
           "name": "搜索",
@@ -950,7 +950,7 @@
         },
         "owned": {
           "name": "已拥有",
-          "description": "只显示有藏本的图书，或只显示没有藏本的图书。"
+          "description": "只显示有藏本的游戏，或只显示没有藏本的游戏。"
         },
         "play_status": {
           "name": "游玩状态",
@@ -962,23 +962,23 @@
         },
         "limit": {
           "name": "上限",
-          "description": "图书的最大数量。"
+          "description": "游戏的最大数量。"
         }
       }
     },
     "get_game": {
-      "name": "获取图书",
-      "description": "返回一本图书及其藏本和借阅。",
+      "name": "获取游戏",
+      "description": "返回一款游戏及其藏本和借阅。",
       "fields": {
         "game_id": {
-          "name": "图书",
-          "description": "图书的 ID。"
+          "name": "游戏",
+          "description": "游戏的 ID。"
         }
       }
     },
     "list_locations": {
       "name": "列出位置",
-      "description": "返回房间、书柜和书架层。"
+      "description": "返回房间、柜子和书架层。"
     },
     "list_loans": {
       "name": "列出借阅",
@@ -990,7 +990,7 @@
         },
         "direction": {
           "name": "方向",
-          "description": "out 表示借出的书，in 表示借入的书。"
+          "description": "out 表示借出的游戏，in 表示借入的游戏。"
         }
       }
     },
@@ -1059,13 +1059,13 @@
       "message": "没有 ID 为 {id} 的房间。"
     },
     "unit_not_found": {
-      "message": "没有 ID 为 {id} 的书柜。"
+      "message": "没有 ID 为 {id} 的柜子。"
     },
     "shelf_not_found": {
       "message": "没有 ID 为 {id} 的书架层。"
     },
     "game_not_found": {
-      "message": "没有 ID 为 {id} 的图书。"
+      "message": "没有 ID 为 {id} 的游戏。"
     },
     "copy_not_found": {
       "message": "没有 ID 为 {id} 的藏本。"
@@ -1083,16 +1083,16 @@
       "message": "你的用户没有关联 Home Assistant 人员。请将一个人员关联到该用户。"
     },
     "room_not_empty": {
-      "message": "该房间有 {count} 个书柜。使用 force 可一并删除。"
+      "message": "该房间有 {count} 个柜子。使用 force 可一并删除。"
     },
     "unit_not_empty": {
-      "message": "该书柜有 {count} 个书架层。使用 force 可一并删除。"
+      "message": "该柜子有 {count} 个书架层。使用 force 可一并删除。"
     },
     "shelf_not_empty": {
       "message": "该书架层有 {count} 个藏本。使用 force 可将它们移出书架层。"
     },
     "duplicate_barcode": {
-      "message": "另一本图书的条形码是 {barcode}。"
+      "message": "另一款游戏的条形码是 {barcode}。"
     },
     "copy_on_loan": {
       "message": "该藏本已借出。请先归还借阅。"
@@ -1101,16 +1101,16 @@
       "message": "到期日早于开始日期。"
     },
     "already_on_wishlist": {
-      "message": "该图书已在心愿单中。"
+      "message": "该游戏已在心愿单中。"
     },
     "not_on_wishlist": {
-      "message": "该图书不在任何心愿单中。"
+      "message": "该游戏不在任何心愿单中。"
     },
     "upload_not_found": {
       "message": "没有 ID 为 {file_id} 的已上传封面。"
     },
     "barcode_or_title_required": {
-      "message": "请提供图书 ID、条形码或书名。"
+      "message": "请提供游戏 ID、条形码或名称。"
     },
     "todo_entity_not_found": {
       "message": "{entity_id} 不是待办清单。"

@@ -1,5 +1,5 @@
 /**
- * The screenshots of the Library tab and the card, for docs/images/ and the PR.
+ * The screenshots of the Games tab and the card, for docs/images/ and the PR.
  *
  *   KEEP_UP=1 NO_TESTS=1 bash ci/e2e-up.sh
  *   cd tests/e2e && SHOT_DIR=../../docs/images npx playwright test --config=screenshots.config.ts

@@ -22,7 +22,7 @@ This file gives the rules for code that changes it.
 
 ## Administration and usage
 
-- **Administration is the Library tab of the Home Keeper panel** at
+- **Administration is the Games tab of the Home Keeper panel** at
   `/home-keeper/games/...`. The library has no sidebar panel of its own. The Home
   Keeper panel is admin-only, so the tab is admin-only.
 - **Usage goes through the card, the per-person `sensor` and `todo` entities, and the

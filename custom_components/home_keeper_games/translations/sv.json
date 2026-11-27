@@ -56,7 +56,7 @@
   "entity": {
     "sensor": {
       "games": {
-        "name": "Böcker"
+        "name": "Spel"
       },
       "loans_out": {
         "name": "Utlånade"
@@ -80,15 +80,15 @@
   "issues": {
     "home_keeper_missing": {
       "title": "Home Keeper är inte installerat",
-      "description": "Fliken Bibliotek och låneuppgifterna kräver Home Keeper. Kortet, entiteterna och tjänsterna fungerar nu. Installera Home Keeper från HACS och starta om Home Assistant. Installationssteg: {url}"
+      "description": "Fliken Spel och låneuppgifterna kräver Home Keeper. Kortet, entiteterna och tjänsterna fungerar nu. Installera Home Keeper från HACS och starta om Home Assistant. Installationssteg: {url}"
     },
     "home_keeper_not_set_up": {
       "title": "Home Keeper är inte konfigurerat",
-      "description": "Fliken Bibliotek och låneuppgifterna kräver en inläst Home Keeper-integration. Kortet, entiteterna och tjänsterna fungerar nu. Lägg till eller aktivera Home Keeper-integrationen."
+      "description": "Fliken Spel och låneuppgifterna kräver en inläst Home Keeper-integration. Kortet, entiteterna och tjänsterna fungerar nu. Lägg till eller aktivera Home Keeper-integrationen."
     },
     "home_keeper_too_old": {
       "title": "Home Keeper är för gammalt",
-      "description": "Fliken Bibliotek och låneuppgifterna kräver Home Keeper version {version} eller senare. Kortet, entiteterna och tjänsterna fungerar nu. Uppdatera Home Keeper."
+      "description": "Fliken Spel och låneuppgifterna kräver Home Keeper version {version} eller senare. Kortet, entiteterna och tjänsterna fungerar nu. Uppdatera Home Keeper."
     }
   },
   "services": {
@@ -134,7 +134,7 @@
     },
     "delete_room": {
       "name": "Ta bort rum",
-      "description": "Ta bort ett rum. Ett rum med bokhyllor behöver force.",
+      "description": "Ta bort ett rum. Ett rum med skåp behöver force.",
       "fields": {
         "room_id": {
           "name": "Rum",
@@ -147,8 +147,8 @@
       }
     },
     "add_unit": {
-      "name": "Lägg till bokhylla",
-      "description": "Lägg till en bokhylla i ett rum.",
+      "name": "Lägg till skåp",
+      "description": "Lägg till ett skåp i ett rum.",
       "fields": {
         "room_id": {
           "name": "Rum",
@@ -169,12 +169,12 @@
       }
     },
     "update_unit": {
-      "name": "Ändra bokhylla",
-      "description": "Ändra en bokhylla eller flytta den till ett annat rum.",
+      "name": "Ändra skåp",
+      "description": "Ändra ett skåp eller flytta det till ett annat rum.",
       "fields": {
         "unit_id": {
-          "name": "Bokhylla",
-          "description": "Bokhyllans ID."
+          "name": "Skåp",
+          "description": "Skåpets ID."
         },
         "room_id": {
           "name": "Rum",
@@ -195,12 +195,12 @@
       }
     },
     "delete_unit": {
-      "name": "Ta bort bokhylla",
-      "description": "Ta bort en bokhylla. En bokhylla med hyllplan behöver force.",
+      "name": "Ta bort skåp",
+      "description": "Ta bort ett skåp. Ett skåp med hyllplan behöver force.",
       "fields": {
         "unit_id": {
-          "name": "Bokhylla",
-          "description": "Bokhyllans ID."
+          "name": "Skåp",
+          "description": "Skåpets ID."
         },
         "force": {
           "name": "Tvinga",
@@ -210,11 +210,11 @@
     },
     "add_shelf": {
       "name": "Lägg till hyllplan",
-      "description": "Lägg till ett hyllplan i en bokhylla.",
+      "description": "Lägg till ett hyllplan i ett skåp.",
       "fields": {
         "unit_id": {
-          "name": "Bokhylla",
-          "description": "Bokhyllans ID."
+          "name": "Skåp",
+          "description": "Skåpets ID."
         },
         "name": {
           "name": "Namn",
@@ -228,15 +228,15 @@
     },
     "update_shelf": {
       "name": "Ändra hyllplan",
-      "description": "Ändra ett hyllplan eller flytta det till en annan bokhylla.",
+      "description": "Ändra ett hyllplan eller flytta det till ett annat skåp.",
       "fields": {
         "shelf_id": {
           "name": "Hyllplan",
           "description": "Hyllplanets ID. Tomt för inget hyllplan."
         },
         "unit_id": {
-          "name": "Bokhylla",
-          "description": "Bokhyllans ID."
+          "name": "Skåp",
+          "description": "Skåpets ID."
         },
         "name": {
           "name": "Namn",
@@ -263,12 +263,12 @@
       }
     },
     "add_game": {
-      "name": "Lägg till bok",
-      "description": "Lägg till en bok. Om en bok har samma streckkod returnerar tjänsten den boken.",
+      "name": "Lägg till spel",
+      "description": "Lägg till ett spel. Om ett spel har samma streckkod returnerar tjänsten det spelet.",
       "fields": {
         "title": {
           "name": "Titel",
-          "description": "Bokens titel."
+          "description": "Spelets titel."
         },
         "summary": {
           "name": "Sammanfattning",
@@ -296,7 +296,7 @@
         },
         "tags": {
           "name": "Taggar",
-          "description": "Bokens taggar."
+          "description": "Spelets taggar."
         },
         "shared_notes": {
           "name": "Delade anteckningar",
@@ -304,7 +304,7 @@
         },
         "needs_details": {
           "name": "Uppgifter saknas",
-          "description": "Markera boken som ofullständig."
+          "description": "Markera spelet som ofullständigt."
         },
         "lookup": {
           "name": "Slå upp i IGDB",
@@ -335,16 +335,16 @@
       }
     },
     "update_game": {
-      "name": "Ändra bok",
-      "description": "Ändra uppgifterna för en bok.",
+      "name": "Ändra spel",
+      "description": "Ändra uppgifterna för ett spel.",
       "fields": {
         "game_id": {
-          "name": "Bok",
-          "description": "Bokens ID."
+          "name": "Spel",
+          "description": "Spelets ID."
         },
         "title": {
           "name": "Titel",
-          "description": "Bokens titel."
+          "description": "Spelets titel."
         },
         "summary": {
           "name": "Sammanfattning",
@@ -368,7 +368,7 @@
         },
         "tags": {
           "name": "Taggar",
-          "description": "Bokens taggar."
+          "description": "Spelets taggar."
         },
         "shared_notes": {
           "name": "Delade anteckningar",
@@ -376,7 +376,7 @@
         },
         "needs_details": {
           "name": "Uppgifter saknas",
-          "description": "Markera boken som ofullständig."
+          "description": "Markera spelet som ofullständigt."
         }
       }
     },
@@ -395,18 +395,18 @@
       }
     },
     "delete_game": {
-      "name": "Ta bort bok",
-      "description": "Ta bort en bok med dess exemplar, lässtatus, lån och omslag.",
+      "name": "Ta bort spel",
+      "description": "Ta bort ett spel med dess exemplar, spelstatus, lån och omslag.",
       "fields": {
         "game_id": {
-          "name": "Bok",
-          "description": "Bokens ID."
+          "name": "Spel",
+          "description": "Spelets ID."
         }
       }
     },
     "scan_barcode": {
       "name": "Skanna streckkod",
-      "description": "Lägg till en skannad bok på ett hyllplan.",
+      "description": "Lägg till ett skannat spel på ett hyllplan.",
       "fields": {
         "barcode": {
           "name": "Streckkod",
@@ -426,17 +426,17 @@
         },
         "on_duplicate": {
           "name": "Om ett exemplar finns",
-          "description": "Åtgärden om biblioteket har ett exemplar av boken."
+          "description": "Åtgärden om biblioteket har ett exemplar av spelet."
         }
       }
     },
     "add_copy": {
       "name": "Lägg till exemplar",
-      "description": "Lägg till ett exemplar av en bok.",
+      "description": "Lägg till ett exemplar av ett spel.",
       "fields": {
         "game_id": {
-          "name": "Bok",
-          "description": "Bokens ID."
+          "name": "Spel",
+          "description": "Spelets ID."
         },
         "shelf_id": {
           "name": "Hyllplan",
@@ -588,11 +588,11 @@
     },
     "set_cover": {
       "name": "Ange omslag",
-      "description": "Ange omslaget för en bok.",
+      "description": "Ange omslaget för ett spel.",
       "fields": {
         "game_id": {
-          "name": "Bok",
-          "description": "Bokens ID."
+          "name": "Spel",
+          "description": "Spelets ID."
         },
         "kind": {
           "name": "Omslagstyp",
@@ -655,7 +655,7 @@
       }
     },
     "lend_game": {
-      "name": "Låna ut bok",
+      "name": "Låna ut spel",
       "description": "Låna ut ett exemplar till en annan person.",
       "fields": {
         "copy_id": {
@@ -685,12 +685,12 @@
       }
     },
     "borrow_game": {
-      "name": "Lägg till lånad bok",
-      "description": "Registrera en bok som en person har lånat.",
+      "name": "Lägg till lånat spel",
+      "description": "Registrera ett spel som en person har lånat.",
       "fields": {
         "game_id": {
-          "name": "Bok",
-          "description": "Bokens ID."
+          "name": "Spel",
+          "description": "Spelets ID."
         },
         "barcode": {
           "name": "Streckkod",
@@ -698,7 +698,7 @@
         },
         "title": {
           "name": "Titel",
-          "description": "Bokens titel."
+          "description": "Spelets titel."
         },
         "party": {
           "name": "Annan person",
@@ -786,11 +786,11 @@
     },
     "add_to_wishlist": {
       "name": "Lägg till på önskelistan",
-      "description": "Sätt en bok på en persons önskelista.",
+      "description": "Sätt ett spel på en persons önskelista.",
       "fields": {
         "game_id": {
-          "name": "Bok",
-          "description": "Bokens ID."
+          "name": "Spel",
+          "description": "Spelets ID."
         },
         "barcode": {
           "name": "Streckkod",
@@ -798,7 +798,7 @@
         },
         "title": {
           "name": "Titel",
-          "description": "Bokens titel."
+          "description": "Spelets titel."
         },
         "person_id": {
           "name": "Person",
@@ -806,7 +806,7 @@
         },
         "buy": {
           "name": "Köp",
-          "description": "Sätt boken på personens att göra-lista för önskningar."
+          "description": "Sätt spelet på personens att göra-lista för önskningar."
         }
       }
     },
@@ -815,12 +815,12 @@
       "description": "Ändra en post på önskelistan.",
       "fields": {
         "game_id": {
-          "name": "Bok",
-          "description": "Bokens ID."
+          "name": "Spel",
+          "description": "Spelets ID."
         },
         "buy": {
           "name": "Köp",
-          "description": "Sätt boken på personens att göra-lista för önskningar."
+          "description": "Sätt spelet på personens att göra-lista för önskningar."
         },
         "person_id": {
           "name": "Person",
@@ -830,21 +830,21 @@
     },
     "remove_from_wishlist": {
       "name": "Ta bort från önskelistan",
-      "description": "Ta bort en bok från önskelistan.",
+      "description": "Ta bort ett spel från önskelistan.",
       "fields": {
         "game_id": {
-          "name": "Bok",
-          "description": "Bokens ID."
+          "name": "Spel",
+          "description": "Spelets ID."
         }
       }
     },
     "got_wishlist_game": {
-      "name": "Önskad bok mottagen",
-      "description": "Lägg till ett exemplar av en önskad bok och ta bort den från önskelistan.",
+      "name": "Önskat spel mottaget",
+      "description": "Lägg till ett exemplar av ett önskat spel och ta bort det från önskelistan.",
       "fields": {
         "game_id": {
-          "name": "Bok",
-          "description": "Bokens ID."
+          "name": "Spel",
+          "description": "Spelets ID."
         },
         "shelf_id": {
           "name": "Hyllplan",
@@ -878,7 +878,7 @@
         },
         "wishlist_todo": {
           "name": "Önskelista",
-          "description": "Att göra-listan för böckerna att köpa."
+          "description": "Att göra-listan för spelen att köpa."
         }
       }
     },
@@ -894,7 +894,7 @@
     },
     "import_csv": {
       "name": "Importera CSV",
-      "description": "Importera böcker från en CSV-export av Home Keeper Games.",
+      "description": "Importera spel från en CSV-export av Home Keeper Games.",
       "fields": {
         "content": {
           "name": "CSV-innehåll",
@@ -933,8 +933,8 @@
       }
     },
     "list_games": {
-      "name": "Lista böcker",
-      "description": "Returnera böckerna som matchar filtren.",
+      "name": "Lista spel",
+      "description": "Returnera spelen som matchar filtren.",
       "fields": {
         "query": {
           "name": "Sök",
@@ -950,7 +950,7 @@
         },
         "owned": {
           "name": "Ägd",
-          "description": "Bara böcker med ett exemplar, eller bara böcker utan exemplar."
+          "description": "Bara spel med ett exemplar, eller bara spel utan exemplar."
         },
         "play_status": {
           "name": "Spelstatus",
@@ -962,23 +962,23 @@
         },
         "limit": {
           "name": "Gräns",
-          "description": "Det högsta antalet böcker."
+          "description": "Det högsta antalet spel."
         }
       }
     },
     "get_game": {
-      "name": "Hämta bok",
-      "description": "Returnera en bok med dess exemplar och lån.",
+      "name": "Hämta spel",
+      "description": "Returnera ett spel med dess exemplar och lån.",
       "fields": {
         "game_id": {
-          "name": "Bok",
-          "description": "Bokens ID."
+          "name": "Spel",
+          "description": "Spelets ID."
         }
       }
     },
     "list_locations": {
       "name": "Lista platser",
-      "description": "Returnera rummen, bokhyllorna och hyllplanen."
+      "description": "Returnera rummen, skåpen och hyllplanen."
     },
     "list_loans": {
       "name": "Lista lån",
@@ -990,7 +990,7 @@
         },
         "direction": {
           "name": "Riktning",
-          "description": "out för en utlånad bok, in för en lånad bok."
+          "description": "out för ett utlånat spel, in för ett lånat spel."
         }
       }
     },
@@ -1059,13 +1059,13 @@
       "message": "Inget rum har ID {id}."
     },
     "unit_not_found": {
-      "message": "Ingen bokhylla har ID {id}."
+      "message": "Inget skåp har ID {id}."
     },
     "shelf_not_found": {
       "message": "Inget hyllplan har ID {id}."
     },
     "game_not_found": {
-      "message": "Ingen bok har ID {id}."
+      "message": "Inget spel har ID {id}."
     },
     "copy_not_found": {
       "message": "Inget exemplar har ID {id}."
@@ -1083,16 +1083,16 @@
       "message": "Din användare har ingen person i Home Assistant. Koppla en person till användaren."
     },
     "room_not_empty": {
-      "message": "Rummet har {count} bokhyllor. Använd force för att ta bort dem också."
+      "message": "Rummet har {count} skåp. Använd force för att ta bort dem också."
     },
     "unit_not_empty": {
-      "message": "Bokhyllan har {count} hyllplan. Använd force för att ta bort dem också."
+      "message": "Skåpet har {count} hyllplan. Använd force för att ta bort dem också."
     },
     "shelf_not_empty": {
       "message": "Hyllplanet har {count} exemplar. Använd force för att flytta dem till inget hyllplan."
     },
     "duplicate_barcode": {
-      "message": "En annan bok har streckkoden {barcode}."
+      "message": "Ett annat spel har streckkoden {barcode}."
     },
     "copy_on_loan": {
       "message": "Exemplaret är utlånat. Återlämna lånet först."
@@ -1101,16 +1101,16 @@
       "message": "Förfallodatumet är före startdatumet."
     },
     "already_on_wishlist": {
-      "message": "Boken finns redan på en önskelista."
+      "message": "Spelet finns redan på en önskelista."
     },
     "not_on_wishlist": {
-      "message": "Boken finns inte på någon önskelista."
+      "message": "Spelet finns inte på någon önskelista."
     },
     "upload_not_found": {
       "message": "Inget uppladdat omslag har ID {file_id}."
     },
     "barcode_or_title_required": {
-      "message": "Ange ett bok-ID, en streckkod eller en titel."
+      "message": "Ange ett spel-ID, en streckkod eller en titel."
     },
     "todo_entity_not_found": {
       "message": "{entity_id} är ingen att göra-lista."

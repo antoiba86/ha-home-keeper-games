@@ -33,7 +33,7 @@ user.**
 
 The card shows only what the user can read
 ([People and privacy](../start/people-and-privacy.md)). The card has no management
-controls: use the Library tab for those.
+controls: use the Games tab for those.
 
 ## YAML
 

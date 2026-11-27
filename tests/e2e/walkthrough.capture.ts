@@ -1,10 +1,10 @@
 /**
- * The video walkthrough of the Library tab, for the PR comment (not committed).
+ * The video walkthrough of the Games tab, for the PR comment (not committed).
  *
  *   KEEP_UP=1 NO_TESTS=1 bash ci/e2e-up.sh
  *   bash ci/capture-video.sh        # writes docs/videos/walkthrough.{webm,mp4,gif}
  *
- * The tour: open the Library tab in Home Keeper, browse the grid, search, open a
+ * The tour: open the Games tab in Home Keeper, browse the grid, search, open a
  * game, set the play status on a platform, add another platform chip, scan a stored
  * barcode and a new barcode into a shelf, give the title of the new game, give a game
  * that needs details its IGDB game (from the fake IGDB of tests/e2e/fake-igdb), lend a game
@@ -63,7 +63,7 @@ test('record the Library walkthrough', async ({ browser }) => {
   await fakeIgdbCovers(context);
   const page = await context.newPage();
   try {
-    // 1. The Library tab in the Home Keeper panel, with the game grid.
+    // 1. The Games tab in the Home Keeper panel, with the game grid.
     const tab = await openTab(page, '/games');
     await expect(tab.locator('.hkl-tile').first()).toBeVisible();
     await beat(page, 2);

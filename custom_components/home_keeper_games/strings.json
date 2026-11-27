@@ -56,7 +56,7 @@
   "entity": {
     "sensor": {
       "games": {
-        "name": "Books"
+        "name": "Games"
       },
       "loans_out": {
         "name": "Loans out"
@@ -80,15 +80,15 @@
   "issues": {
     "home_keeper_missing": {
       "title": "Home Keeper is not installed",
-      "description": "The Library tab and the loan tasks need Home Keeper. The card, the entities and the services work now. Install Home Keeper from HACS and restart Home Assistant. Installation steps: {url}"
+      "description": "The Games tab and the loan tasks need Home Keeper. The card, the entities and the services work now. Install Home Keeper from HACS and restart Home Assistant. Installation steps: {url}"
     },
     "home_keeper_not_set_up": {
       "title": "Home Keeper is not set up",
-      "description": "The Library tab and the loan tasks need a loaded Home Keeper integration. The card, the entities and the services work now. Add or enable the Home Keeper integration."
+      "description": "The Games tab and the loan tasks need a loaded Home Keeper integration. The card, the entities and the services work now. Add or enable the Home Keeper integration."
     },
     "home_keeper_too_old": {
       "title": "Home Keeper is too old",
-      "description": "The Library tab and the loan tasks need Home Keeper version {version} or later. The card, the entities and the services work now. Update Home Keeper."
+      "description": "The Games tab and the loan tasks need Home Keeper version {version} or later. The card, the entities and the services work now. Update Home Keeper."
     }
   },
   "services": {
@@ -134,7 +134,7 @@
     },
     "delete_room": {
       "name": "Delete room",
-      "description": "Delete a room. A room with bookcases needs force.",
+      "description": "Delete a room. A room with cabinets needs force.",
       "fields": {
         "room_id": {
           "name": "Room",
@@ -147,8 +147,8 @@
       }
     },
     "add_unit": {
-      "name": "Add bookcase",
-      "description": "Add a bookcase to a room.",
+      "name": "Add cabinet",
+      "description": "Add a cabinet to a room.",
       "fields": {
         "room_id": {
           "name": "Room",
@@ -169,12 +169,12 @@
       }
     },
     "update_unit": {
-      "name": "Update bookcase",
-      "description": "Change a bookcase or move it to another room.",
+      "name": "Update cabinet",
+      "description": "Change a cabinet or move it to another room.",
       "fields": {
         "unit_id": {
-          "name": "Bookcase",
-          "description": "The ID of the bookcase."
+          "name": "Cabinet",
+          "description": "The ID of the cabinet."
         },
         "room_id": {
           "name": "Room",
@@ -195,12 +195,12 @@
       }
     },
     "delete_unit": {
-      "name": "Delete bookcase",
-      "description": "Delete a bookcase. A bookcase with shelves needs force.",
+      "name": "Delete cabinet",
+      "description": "Delete a cabinet. A cabinet with shelves needs force.",
       "fields": {
         "unit_id": {
-          "name": "Bookcase",
-          "description": "The ID of the bookcase."
+          "name": "Cabinet",
+          "description": "The ID of the cabinet."
         },
         "force": {
           "name": "Force",
@@ -210,11 +210,11 @@
     },
     "add_shelf": {
       "name": "Add shelf",
-      "description": "Add a shelf to a bookcase.",
+      "description": "Add a shelf to a cabinet.",
       "fields": {
         "unit_id": {
-          "name": "Bookcase",
-          "description": "The ID of the bookcase."
+          "name": "Cabinet",
+          "description": "The ID of the cabinet."
         },
         "name": {
           "name": "Name",
@@ -228,15 +228,15 @@
     },
     "update_shelf": {
       "name": "Update shelf",
-      "description": "Change a shelf or move it to another bookcase.",
+      "description": "Change a shelf or move it to another cabinet.",
       "fields": {
         "shelf_id": {
           "name": "Shelf",
           "description": "The ID of the shelf. Empty for no shelf."
         },
         "unit_id": {
-          "name": "Bookcase",
-          "description": "The ID of the bookcase."
+          "name": "Cabinet",
+          "description": "The ID of the cabinet."
         },
         "name": {
           "name": "Name",
@@ -263,12 +263,12 @@
       }
     },
     "add_game": {
-      "name": "Add book",
-      "description": "Add a book. If a book has the same barcode, the service returns that book.",
+      "name": "Add game",
+      "description": "Add a game. If a game has the same barcode, the service returns that game.",
       "fields": {
         "title": {
           "name": "Title",
-          "description": "The title of the book."
+          "description": "The title of the game."
         },
         "summary": {
           "name": "Summary",
@@ -296,7 +296,7 @@
         },
         "tags": {
           "name": "Tags",
-          "description": "The tags of the book."
+          "description": "The tags of the game."
         },
         "shared_notes": {
           "name": "Shared notes",
@@ -304,7 +304,7 @@
         },
         "needs_details": {
           "name": "Needs details",
-          "description": "Mark the book as incomplete."
+          "description": "Mark the game as incomplete."
         },
         "lookup": {
           "name": "Look up in IGDB",
@@ -335,16 +335,16 @@
       }
     },
     "update_game": {
-      "name": "Update book",
-      "description": "Change the details of a book.",
+      "name": "Update game",
+      "description": "Change the details of a game.",
       "fields": {
         "game_id": {
-          "name": "Book",
-          "description": "The ID of the book."
+          "name": "Game",
+          "description": "The ID of the game."
         },
         "title": {
           "name": "Title",
-          "description": "The title of the book."
+          "description": "The title of the game."
         },
         "summary": {
           "name": "Summary",
@@ -368,7 +368,7 @@
         },
         "tags": {
           "name": "Tags",
-          "description": "The tags of the book."
+          "description": "The tags of the game."
         },
         "shared_notes": {
           "name": "Shared notes",
@@ -376,7 +376,7 @@
         },
         "needs_details": {
           "name": "Needs details",
-          "description": "Mark the book as incomplete."
+          "description": "Mark the game as incomplete."
         }
       }
     },
@@ -395,18 +395,18 @@
       }
     },
     "delete_game": {
-      "name": "Delete book",
-      "description": "Delete a book with its copies, reading status, loans and cover.",
+      "name": "Delete game",
+      "description": "Delete a game with its copies, play progress, loans and cover.",
       "fields": {
         "game_id": {
-          "name": "Book",
-          "description": "The ID of the book."
+          "name": "Game",
+          "description": "The ID of the game."
         }
       }
     },
     "scan_barcode": {
       "name": "Scan barcode",
-      "description": "Add a scanned book to a shelf.",
+      "description": "Add a scanned game to a shelf.",
       "fields": {
         "barcode": {
           "name": "Barcode",
@@ -426,17 +426,17 @@
         },
         "on_duplicate": {
           "name": "If a copy exists",
-          "description": "The action if the library has a copy of the book."
+          "description": "The action if the library has a copy of the game."
         }
       }
     },
     "add_copy": {
       "name": "Add copy",
-      "description": "Add a copy of a book.",
+      "description": "Add a copy of a game.",
       "fields": {
         "game_id": {
-          "name": "Book",
-          "description": "The ID of the book."
+          "name": "Game",
+          "description": "The ID of the game."
         },
         "shelf_id": {
           "name": "Shelf",
@@ -588,11 +588,11 @@
     },
     "set_cover": {
       "name": "Set cover",
-      "description": "Set the cover of a book.",
+      "description": "Set the cover of a game.",
       "fields": {
         "game_id": {
-          "name": "Book",
-          "description": "The ID of the book."
+          "name": "Game",
+          "description": "The ID of the game."
         },
         "kind": {
           "name": "Cover type",
@@ -655,7 +655,7 @@
       }
     },
     "lend_game": {
-      "name": "Lend book",
+      "name": "Lend game",
       "description": "Lend a copy to another person.",
       "fields": {
         "copy_id": {
@@ -685,12 +685,12 @@
       }
     },
     "borrow_game": {
-      "name": "Add borrowed book",
-      "description": "Record a book that a person borrowed.",
+      "name": "Add borrowed game",
+      "description": "Record a game that a person borrowed.",
       "fields": {
         "game_id": {
-          "name": "Book",
-          "description": "The ID of the book."
+          "name": "Game",
+          "description": "The ID of the game."
         },
         "barcode": {
           "name": "Barcode",
@@ -698,7 +698,7 @@
         },
         "title": {
           "name": "Title",
-          "description": "The title of the book."
+          "description": "The title of the game."
         },
         "party": {
           "name": "Other person",
@@ -786,11 +786,11 @@
     },
     "add_to_wishlist": {
       "name": "Add to wishlist",
-      "description": "Put a book on the wishlist of a person.",
+      "description": "Put a game on the wishlist of a person.",
       "fields": {
         "game_id": {
-          "name": "Book",
-          "description": "The ID of the book."
+          "name": "Game",
+          "description": "The ID of the game."
         },
         "barcode": {
           "name": "Barcode",
@@ -798,7 +798,7 @@
         },
         "title": {
           "name": "Title",
-          "description": "The title of the book."
+          "description": "The title of the game."
         },
         "person_id": {
           "name": "Person",
@@ -806,7 +806,7 @@
         },
         "buy": {
           "name": "Buy",
-          "description": "Put the book on the wishlist to-do list of the person."
+          "description": "Put the game on the wishlist to-do list of the person."
         }
       }
     },
@@ -815,12 +815,12 @@
       "description": "Change a wishlist entry.",
       "fields": {
         "game_id": {
-          "name": "Book",
-          "description": "The ID of the book."
+          "name": "Game",
+          "description": "The ID of the game."
         },
         "buy": {
           "name": "Buy",
-          "description": "Put the book on the wishlist to-do list of the person."
+          "description": "Put the game on the wishlist to-do list of the person."
         },
         "person_id": {
           "name": "Person",
@@ -830,21 +830,21 @@
     },
     "remove_from_wishlist": {
       "name": "Remove from wishlist",
-      "description": "Take a book off the wishlist.",
+      "description": "Take a game off the wishlist.",
       "fields": {
         "game_id": {
-          "name": "Book",
-          "description": "The ID of the book."
+          "name": "Game",
+          "description": "The ID of the game."
         }
       }
     },
     "got_wishlist_game": {
-      "name": "Got wishlist book",
-      "description": "Add a copy of a wishlist book and take it off the wishlist.",
+      "name": "Got wishlist game",
+      "description": "Add a copy of a wishlist game and take it off the wishlist.",
       "fields": {
         "game_id": {
-          "name": "Book",
-          "description": "The ID of the book."
+          "name": "Game",
+          "description": "The ID of the game."
         },
         "shelf_id": {
           "name": "Shelf",
@@ -878,7 +878,7 @@
         },
         "wishlist_todo": {
           "name": "Wishlist list",
-          "description": "The to-do list for the books to buy."
+          "description": "The to-do list for the games to buy."
         }
       }
     },
@@ -894,7 +894,7 @@
     },
     "import_csv": {
       "name": "Import CSV",
-      "description": "Import books from a CSV export of Home Keeper Games.",
+      "description": "Import games from a CSV export of Home Keeper Games.",
       "fields": {
         "content": {
           "name": "CSV content",
@@ -933,8 +933,8 @@
       }
     },
     "list_games": {
-      "name": "List books",
-      "description": "Return the books that match the filters.",
+      "name": "List games",
+      "description": "Return the games that match the filters.",
       "fields": {
         "query": {
           "name": "Search",
@@ -950,7 +950,7 @@
         },
         "owned": {
           "name": "Owned",
-          "description": "Only books with a copy, or only books with no copy."
+          "description": "Only games with a copy, or only games with no copy."
         },
         "play_status": {
           "name": "Play status",
@@ -962,23 +962,23 @@
         },
         "limit": {
           "name": "Limit",
-          "description": "The maximum number of books."
+          "description": "The maximum number of games."
         }
       }
     },
     "get_game": {
-      "name": "Get book",
-      "description": "Return a book with its copies and loans.",
+      "name": "Get game",
+      "description": "Return a game with its copies and loans.",
       "fields": {
         "game_id": {
-          "name": "Book",
-          "description": "The ID of the book."
+          "name": "Game",
+          "description": "The ID of the game."
         }
       }
     },
     "list_locations": {
       "name": "List locations",
-      "description": "Return the rooms, bookcases and shelves."
+      "description": "Return the rooms, cabinets and shelves."
     },
     "list_loans": {
       "name": "List loans",
@@ -990,7 +990,7 @@
         },
         "direction": {
           "name": "Direction",
-          "description": "out for a lent book, in for a borrowed book."
+          "description": "out for a lent game, in for a borrowed game."
         }
       }
     },
@@ -1059,13 +1059,13 @@
       "message": "No room has the ID {id}."
     },
     "unit_not_found": {
-      "message": "No bookcase has the ID {id}."
+      "message": "No cabinet has the ID {id}."
     },
     "shelf_not_found": {
       "message": "No shelf has the ID {id}."
     },
     "game_not_found": {
-      "message": "No book has the ID {id}."
+      "message": "No game has the ID {id}."
     },
     "copy_not_found": {
       "message": "No copy has the ID {id}."
@@ -1083,16 +1083,16 @@
       "message": "Your user has no Home Assistant person. Link a person to the user."
     },
     "room_not_empty": {
-      "message": "The room has {count} bookcases. Use force to delete them too."
+      "message": "The room has {count} cabinets. Use force to delete them too."
     },
     "unit_not_empty": {
-      "message": "The bookcase has {count} shelves. Use force to delete them too."
+      "message": "The cabinet has {count} shelves. Use force to delete them too."
     },
     "shelf_not_empty": {
       "message": "The shelf has {count} copies. Use force to move them to no shelf."
     },
     "duplicate_barcode": {
-      "message": "Another book has the barcode {barcode}."
+      "message": "Another game has the barcode {barcode}."
     },
     "copy_on_loan": {
       "message": "The copy is lent out. Return the loan first."
@@ -1101,16 +1101,16 @@
       "message": "The due date is before the start date."
     },
     "already_on_wishlist": {
-      "message": "The book is already on a wishlist."
+      "message": "The game is already on a wishlist."
     },
     "not_on_wishlist": {
-      "message": "The book is not on a wishlist."
+      "message": "The game is not on a wishlist."
     },
     "upload_not_found": {
       "message": "No uploaded cover has the ID {file_id}."
     },
     "barcode_or_title_required": {
-      "message": "Give a book ID, a barcode or a title."
+      "message": "Give a game ID, a barcode or a title."
     },
     "todo_entity_not_found": {
       "message": "{entity_id} is not a to-do list."

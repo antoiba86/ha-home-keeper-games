@@ -1,6 +1,6 @@
 # Services and events
 
-Each operation of the Library tab is a `home_keeper_games.*` service. Automations,
+Each operation of the Games tab is a `home_keeper_games.*` service. Automations,
 scripts and voice assistants can use the services to change the library, and the bus
 events to react to a change.
 

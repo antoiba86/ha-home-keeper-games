@@ -16,7 +16,7 @@ in **Settings → People**. The library acts for the person of the user who sign
 | Select the wishlist to-do list of a person | Yes | No |
 | Read the games, the shelves and the covers | Yes | Yes |
 
-The Library tab is in the Home Keeper panel, which only admins can open. Other users use
+The Games tab is in the Home Keeper panel, which only admins can open. Other users use
 the [dashboard card](../views/dashboard-card.md), the entities and the services. A user
 with no linked person can read the library, and cannot set a play progress.
 
@@ -33,7 +33,7 @@ Shared notes are for the whole household. A review is for 1 person and the admin
 
 ## People settings
 
-An admin sets these in the **Settings** page of the Library tab, for each person:
+An admin sets these in the **Settings** page of the Games tab, for each person:
 
 - **Share progress**: other users see the play progress of the person, with no review. It
   is on by default.

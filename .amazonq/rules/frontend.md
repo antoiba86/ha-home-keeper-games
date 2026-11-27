@@ -1,6 +1,6 @@
 ---
 title: Frontend rules
-summary: Rules for the Library tab and the card - routing through the host, markup, bundles, covers, i18n, layout and Home Assistant elements.
+summary: Rules for the Games tab and the card - routing through the host, markup, bundles, covers, i18n, layout and Home Assistant elements.
 ---
 
 # Frontend rules
