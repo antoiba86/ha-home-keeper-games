@@ -35,6 +35,7 @@ STATE_SECTIONS = (
     "progress",
     "loans",
     "people",
+    "sessions",
 )
 
 FORMATS = ("physical", "digital", "other")
@@ -748,6 +749,87 @@ def apply_progress(
     if changed:
         updated["updated_at"] = now
     return updated, changed
+
+
+# ── Play sessions ────────────────────────────────────────────────────────────
+
+# Where a session comes from. A console listener adds its own source.
+SESSION_SOURCES = ("manual",)
+MAX_SESSION_MINUTES = 24 * 60
+MAX_SESSION_LIST = 500
+DEFAULT_SESSION_LIST = 50
+
+
+def build_session(
+    data: dict[str, Any], *, person_id: str, platform: str, now: str, today: str
+) -> dict[str, Any]:
+    """A closed play session that a person logs by hand.
+
+    The caller checks the game, the person and the platform. ``started_at`` and
+    ``ended_at`` are time stamps of a session that a console listener measures, so
+    they are None here.
+    """
+    minutes = integer(
+        data.get("minutes"), "minutes", low=1, high=MAX_SESSION_MINUTES, nullable=False
+    )
+    return {
+        "id": new_id(),
+        "person_id": person_id,
+        "game_id": str(data.get("game_id")),
+        "platform": choice(platform, "platform", PLATFORMS),
+        "source": "manual",
+        "started_at": None,
+        "ended_at": None,
+        "date": iso_date(data.get("date"), "date") or today,
+        "minutes": minutes,
+        "created_at": now,
+    }
+
+
+def session_progress(
+    row: dict[str, Any] | None,
+    minutes: int,
+    day: str,
+    *,
+    now: str,
+    today: str,
+) -> tuple[dict[str, Any], list[str]]:
+    """Return ``(row, changed_fields)`` after a session adds or takes *minutes*.
+
+    A positive *minutes* adds play time, sets ``last_played_at`` to the later
+    date, and moves a new or ``backlog`` row to ``playing`` from *day*. A negative
+    *minutes* (a deleted session) only takes play time off, down to 0.
+    """
+    total = int((row or {}).get("playtime_minutes") or 0) + minutes
+    data: dict[str, Any] = {"playtime_minutes": max(0, min(total, MAX_PLAYTIME))}
+    if minutes > 0:
+        last = (row or {}).get("last_played_at")
+        if not last or day > last:
+            data["last_played_at"] = day
+        if (row or {}).get("play_status") in (None, "backlog"):
+            data["play_status"] = "playing"
+            data["started_at"] = (row or {}).get("started_at") or day
+    return apply_progress(row, data, now=now, today=today)
+
+
+def sessions_of(
+    state: dict[str, Any],
+    *,
+    game_id: str | None = None,
+    person_id: str | None = None,
+) -> list[dict[str, Any]]:
+    """The sessions that match, the newest first."""
+    rows = [
+        s
+        for s in state["sessions"].values()
+        if isinstance(s, dict)
+        and (game_id is None or s.get("game_id") == game_id)
+        and (person_id is None or s.get("person_id") == person_id)
+    ]
+    rows.sort(
+        key=lambda s: (s.get("date") or "", s.get("created_at") or ""), reverse=True
+    )
+    return rows
 
 
 # ── Loans ────────────────────────────────────────────────────────────────────

@@ -654,6 +654,42 @@
         }
       }
     },
+    "log_session": {
+      "name": "Registrer spilløkt",
+      "description": "Legg til en spilløkt for en person. Minuttene legges til spilletiden i fremdriften. En bruker som ikke er administrator, kan bare registrere sine egne økter.",
+      "fields": {
+        "game_id": {
+          "name": "Spill",
+          "description": "ID-en til spillet."
+        },
+        "person_id": {
+          "name": "Person",
+          "description": "ID-en til personen i Home Assistant."
+        },
+        "platform": {
+          "name": "Plattform",
+          "description": "Konsollen. Tom for å bruke plattformen til eksemplarene av spillet."
+        },
+        "minutes": {
+          "name": "Minutter",
+          "description": "Lengden på økten i minutter."
+        },
+        "date": {
+          "name": "Dato",
+          "description": "Datoen for økten. Tom for i dag."
+        }
+      }
+    },
+    "delete_session": {
+      "name": "Slett spilløkt",
+      "description": "Slett en spilløkt og trekk minuttene fra spilletiden. En bruker som ikke er administrator, kan bare slette sine egne økter.",
+      "fields": {
+        "session_id": {
+          "name": "Økt",
+          "description": "ID-en til spilløkten."
+        }
+      }
+    },
     "lend_game": {
       "name": "Lån ut spill",
       "description": "Lån ut et eksemplar til en annen person.",
@@ -998,6 +1034,24 @@
       "name": "Vis personer",
       "description": "Returner personene og bibliotekinnstillingene deres."
     },
+    "list_sessions": {
+      "name": "Vis spilløkter",
+      "description": "Returner spilløktene, de nyeste først. En bruker som ikke er administrator, får sine egne økter og øktene til personene som deler fremdriften sin.",
+      "fields": {
+        "game_id": {
+          "name": "Spill",
+          "description": "Bare øktene for dette spillet."
+        },
+        "person_id": {
+          "name": "Person",
+          "description": "Bare øktene for denne personen."
+        },
+        "limit": {
+          "name": "Grense",
+          "description": "Det høyeste antallet økter."
+        }
+      }
+    },
     "export_data": {
       "name": "Eksporter data",
       "description": "Eksporter biblioteksdelen av Home Keeper-eksporten.",
@@ -1072,6 +1126,9 @@
     },
     "loan_not_found": {
       "message": "Ingen utlån har ID {id}."
+    },
+    "session_not_found": {
+      "message": "Ingen spilløkt har ID {id}."
     },
     "person_not_found": {
       "message": "Ingen person har ID {id}."

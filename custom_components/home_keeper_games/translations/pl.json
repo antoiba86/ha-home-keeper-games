@@ -654,6 +654,42 @@
         }
       }
     },
+    "log_session": {
+      "name": "Zapisz sesję gry",
+      "description": "Dodaj sesję gry osoby. Jej minuty trafiają do czasu gry w postępie. Użytkownik, który nie jest administratorem, może zapisać tylko własne sesje.",
+      "fields": {
+        "game_id": {
+          "name": "Gra",
+          "description": "ID gry."
+        },
+        "person_id": {
+          "name": "Osoba",
+          "description": "ID osoby w Home Assistant."
+        },
+        "platform": {
+          "name": "Platforma",
+          "description": "Konsola. Puste, aby użyć platformy kopii gry."
+        },
+        "minutes": {
+          "name": "Minuty",
+          "description": "Długość sesji w minutach."
+        },
+        "date": {
+          "name": "Data",
+          "description": "Data sesji. Puste oznacza dzisiaj."
+        }
+      }
+    },
+    "delete_session": {
+      "name": "Usuń sesję gry",
+      "description": "Usuń sesję gry i odejmij jej minuty od czasu gry. Użytkownik, który nie jest administratorem, może usunąć tylko własne sesje.",
+      "fields": {
+        "session_id": {
+          "name": "Sesja",
+          "description": "ID sesji gry."
+        }
+      }
+    },
     "lend_game": {
       "name": "Wypożycz grę",
       "description": "Wypożycz egzemplarz innej osobie.",
@@ -998,6 +1034,24 @@
       "name": "Wyświetl osoby",
       "description": "Zwróć osoby i ich ustawienia biblioteki."
     },
+    "list_sessions": {
+      "name": "Wyświetl sesje gry",
+      "description": "Zwróć sesje gry, najnowsze najpierw. Użytkownik, który nie jest administratorem, dostaje własne sesje i sesje osób, które udostępniają swój postęp.",
+      "fields": {
+        "game_id": {
+          "name": "Gra",
+          "description": "Tylko sesje tej gry."
+        },
+        "person_id": {
+          "name": "Osoba",
+          "description": "Tylko sesje tej osoby."
+        },
+        "limit": {
+          "name": "Limit gier",
+          "description": "Największa liczba sesji."
+        }
+      }
+    },
     "export_data": {
       "name": "Eksportuj dane",
       "description": "Eksportuj część biblioteki z eksportu Home Keeper.",
@@ -1072,6 +1126,9 @@
     },
     "loan_not_found": {
       "message": "Żadne wypożyczenie nie ma ID {id}."
+    },
+    "session_not_found": {
+      "message": "Żadna sesja gry nie ma ID {id}."
     },
     "person_not_found": {
       "message": "Żadna osoba nie ma ID {id}."

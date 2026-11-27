@@ -4,7 +4,7 @@ summary: How the library joins the combined export and import of Home Keeper, wh
 implements:
   - custom_components/home_keeper_games/import_export.py
 related: [csv-import-export, home-keeper-dependency, store-models, events-api]
-source_hash: 0fa890075e50
+source_hash: 68b9184c8850
 ---
 
 # Home Keeper export and import
@@ -49,7 +49,8 @@ the stored record, with these changes:
 - `game.cover` is `{kind, file}` with a relative path in a bundle, else `null`.
 
 `EXCLUDED_KEYS` drops `hk_task_id`, the `todo_uid` and `todo_entity` of a
-wishlist entry and `todo_orphans`. `services.py` reads the names from the person, area
+wishlist entry, `todo_orphans` and `sessions`. Format 1 has no play sessions yet; the
+play time of each progress row goes out. `services.py` reads the names from the person, area
 and entity registries and gives plain maps to the pure module. The reply of `export_data`
 is `{format, version, data, skipped}`, and `data` goes through
 `projections.project_export`.

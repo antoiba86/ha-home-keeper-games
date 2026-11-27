@@ -43,6 +43,8 @@ from .const import (
     EVENT_ROOM_ADDED,
     EVENT_ROOM_REMOVED,
     EVENT_ROOM_UPDATED,
+    EVENT_SESSION_DELETED,
+    EVENT_SESSION_LOGGED,
     EVENT_SETTINGS_UPDATED,
     EVENT_SHELF_ADDED,
     EVENT_SHELF_REMOVED,
@@ -186,6 +188,10 @@ class LibraryStore:
     def loan(self, loan_id: str) -> dict[str, Any]:
         """The loan, or ``loan_not_found``."""
         return self._get("loans", "loan", loan_id)
+
+    def session(self, session_id: str) -> dict[str, Any]:
+        """The play session, or ``session_not_found``."""
+        return self._get("sessions", "session", session_id)
 
     def check_shelf(self, shelf_id: str | None) -> str | None:
         """*shelf_id* if it is None or a known shelf, else ``shelf_not_found``."""
@@ -438,6 +444,10 @@ class LibraryStore:
             lo["id"] for lo in self.state["loans"].values() if lo["game_id"] == game_id
         ]:
             del self.state["loans"][loan_id]
+        for session_id in [
+            s["id"] for s in self.state["sessions"].values() if s["game_id"] == game_id
+        ]:
+            del self.state["sessions"][session_id]
         self._orphan_item(game.get("wishlist"))
         del self.state["games"][game_id]
         fired.append((EVENT_GAME_REMOVED, events.game_event_data(game, origin)))
@@ -620,6 +630,86 @@ class LibraryStore:
             fired = [(EVENT_PROGRESS_UPDATED, payload)]
         await self._commit(fired)
         return {**row, "platform": platform}
+
+    # ── Play sessions ────────────────────────────────────────────────────────
+
+    def _session_progress(
+        self,
+        game: dict[str, Any],
+        session: dict[str, Any],
+        minutes: int,
+        origin: str | None,
+    ) -> list[Event]:
+        """Add or take the minutes of *session* on its progress row.
+
+        A deleted session of a row that is gone changes nothing.
+        """
+        person_id, platform = session["person_id"], session["platform"]
+        current = self.progress_row(person_id, game["id"], platform)
+        if current is None and minutes < 0:
+            return []
+        row, changed = models.session_progress(
+            current, minutes, session["date"], now=now(), today=today()
+        )
+        if not changed:
+            return []
+        games = self.state["progress"].setdefault(person_id, {})
+        games.setdefault(game["id"], {})[platform] = row
+        previous = current["play_status"] if current else None
+        if "play_status" in changed:
+            return self._progress_events(
+                game, person_id, platform, row, previous, origin
+            )
+        payload = events.progress_updated_event_data(
+            game, person_id, platform, row["play_status"], changed, origin
+        )
+        return [(EVENT_PROGRESS_UPDATED, payload)]
+
+    async def log_session(
+        self,
+        data: dict[str, Any],
+        person_id: str,
+        *,
+        origin: str | None = None,
+    ) -> dict[str, Any]:
+        """Add a closed play session and its minutes to the progress row.
+
+        With no ``platform``, the session is on the platform of the copies
+        (:func:`models.progress_platform`).
+        """
+        game = self.game(str(data.get("game_id")))
+        platform = models.progress_platform(
+            self.state, game["id"], data.get("platform")
+        )
+        session = models.build_session(
+            {**data, "game_id": game["id"]},
+            person_id=person_id,
+            platform=platform,
+            now=now(),
+            today=today(),
+        )
+        self.state["sessions"][session["id"]] = session
+        fired: list[Event] = [
+            (EVENT_SESSION_LOGGED, events.session_event_data(game, session, origin))
+        ]
+        fired += self._session_progress(game, session, session["minutes"], origin)
+        await self._commit(fired)
+        return dict(session)
+
+    async def delete_session(
+        self, session_id: str, *, origin: str | None = None
+    ) -> dict[str, Any]:
+        """Delete a play session and take its minutes off the progress row."""
+        session = self.session(session_id)
+        game = self.game(session["game_id"])
+        del self.state["sessions"][session_id]
+        fired: list[Event] = [
+            (EVENT_SESSION_DELETED, events.session_event_data(game, session, origin))
+        ]
+        if session["minutes"]:
+            fired += self._session_progress(game, session, -session["minutes"], origin)
+        await self._commit(fired)
+        return session
 
     # ── Loans ────────────────────────────────────────────────────────────────
 

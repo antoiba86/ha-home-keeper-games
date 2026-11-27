@@ -89,6 +89,11 @@ EXCLUDED_KEYS: dict[str, tuple[tuple[str, str], ...]] = {
             "todo_orphans",
             "to-do items of this install that the wishlist sync removes",
         ),
+        (
+            "sessions",
+            "the play sessions are not in format 1 of the export yet (IDEAS.md); "
+            "the play time of each progress row is",
+        ),
     ),
     "loans": (
         (

@@ -654,6 +654,42 @@
         }
       }
     },
+    "log_session": {
+      "name": "Spielsitzung erfassen",
+      "description": "Eine Spielsitzung einer Person hinzufügen. Ihre Minuten kommen zur Spielzeit des Fortschritts. Ein Benutzer, der kein Administrator ist, kann nur seine eigenen Sitzungen erfassen.",
+      "fields": {
+        "game_id": {
+          "name": "Spiel",
+          "description": "Die ID des Spiels."
+        },
+        "person_id": {
+          "name": "Person",
+          "description": "Die ID der Home-Assistant-Person."
+        },
+        "platform": {
+          "name": "Plattform",
+          "description": "Die Konsole. Leer, um die Plattform der Exemplare des Spiels zu verwenden."
+        },
+        "minutes": {
+          "name": "Minuten",
+          "description": "Die Länge der Sitzung in Minuten."
+        },
+        "date": {
+          "name": "Datum",
+          "description": "Das Datum der Sitzung. Leer für heute."
+        }
+      }
+    },
+    "delete_session": {
+      "name": "Spielsitzung löschen",
+      "description": "Eine Spielsitzung löschen und ihre Minuten von der Spielzeit abziehen. Ein Benutzer, der kein Administrator ist, kann nur seine eigenen Sitzungen löschen.",
+      "fields": {
+        "session_id": {
+          "name": "Sitzung",
+          "description": "Die ID der Spielsitzung."
+        }
+      }
+    },
     "lend_game": {
       "name": "Spiel verleihen",
       "description": "Ein Exemplar an eine andere Person verleihen.",
@@ -998,6 +1034,24 @@
       "name": "Personen auflisten",
       "description": "Die Personen und ihre Bibliothekseinstellungen zurückgeben."
     },
+    "list_sessions": {
+      "name": "Spielsitzungen auflisten",
+      "description": "Die Spielsitzungen zurückgeben, die neuesten zuerst. Ein Benutzer, der kein Administrator ist, bekommt seine eigenen Sitzungen und die Sitzungen der Personen, die ihren Fortschritt teilen.",
+      "fields": {
+        "game_id": {
+          "name": "Spiel",
+          "description": "Nur die Sitzungen dieses Spiels."
+        },
+        "person_id": {
+          "name": "Person",
+          "description": "Nur die Sitzungen dieser Person."
+        },
+        "limit": {
+          "name": "Höchstzahl",
+          "description": "Die höchste Anzahl der Sitzungen."
+        }
+      }
+    },
     "export_data": {
       "name": "Daten exportieren",
       "description": "Den Bibliotheksteil des Home-Keeper-Exports exportieren.",
@@ -1072,6 +1126,9 @@
     },
     "loan_not_found": {
       "message": "Keine Ausleihe hat die ID {id}."
+    },
+    "session_not_found": {
+      "message": "Keine Spielsitzung hat die ID {id}."
     },
     "person_not_found": {
       "message": "Keine Person hat die ID {id}."

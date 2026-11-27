@@ -654,6 +654,42 @@
         }
       }
     },
+    "log_session": {
+      "name": "Speelsessie vastleggen",
+      "description": "Een speelsessie van een persoon toevoegen. De minuten gaan naar de speeltijd van de voortgang. Een gebruiker die geen beheerder is, kan alleen de eigen sessies vastleggen.",
+      "fields": {
+        "game_id": {
+          "name": "Spel",
+          "description": "De ID van de game."
+        },
+        "person_id": {
+          "name": "Persoon",
+          "description": "De ID van de Home Assistant-persoon."
+        },
+        "platform": {
+          "name": "Platform",
+          "description": "De console. Leeg om het platform van de exemplaren van de game te gebruiken."
+        },
+        "minutes": {
+          "name": "Minuten",
+          "description": "De lengte van de sessie in minuten."
+        },
+        "date": {
+          "name": "Datum",
+          "description": "De datum van de sessie. Leeg voor vandaag."
+        }
+      }
+    },
+    "delete_session": {
+      "name": "Speelsessie verwijderen",
+      "description": "Een speelsessie verwijderen en de minuten van de speeltijd aftrekken. Een gebruiker die geen beheerder is, kan alleen de eigen sessies verwijderen.",
+      "fields": {
+        "session_id": {
+          "name": "Sessie",
+          "description": "De ID van de speelsessie."
+        }
+      }
+    },
     "lend_game": {
       "name": "Spel uitlenen",
       "description": "Een exemplaar aan een andere persoon uitlenen.",
@@ -998,6 +1034,24 @@
       "name": "Personen weergeven",
       "description": "De personen en hun bibliotheekinstellingen teruggeven."
     },
+    "list_sessions": {
+      "name": "Speelsessies weergeven",
+      "description": "De speelsessies teruggeven, de nieuwste eerst. Een gebruiker die geen beheerder is, krijgt de eigen sessies en de sessies van de personen die hun voortgang delen.",
+      "fields": {
+        "game_id": {
+          "name": "Spel",
+          "description": "Alleen de sessies van dit spel."
+        },
+        "person_id": {
+          "name": "Persoon",
+          "description": "Alleen de sessies van deze persoon."
+        },
+        "limit": {
+          "name": "Maximum",
+          "description": "Het maximale aantal sessies."
+        }
+      }
+    },
     "export_data": {
       "name": "Gegevens exporteren",
       "description": "Het bibliotheekdeel van de Home Keeper-export exporteren.",
@@ -1072,6 +1126,9 @@
     },
     "loan_not_found": {
       "message": "Geen uitlening heeft de ID {id}."
+    },
+    "session_not_found": {
+      "message": "Geen speelsessie heeft de ID {id}."
     },
     "person_not_found": {
       "message": "Geen persoon heeft de ID {id}."

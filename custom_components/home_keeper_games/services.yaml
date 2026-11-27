@@ -603,6 +603,46 @@ set_progress:
         text:
           multiline: true
 
+log_session:
+  fields:
+    game_id:
+      required: true
+      selector:
+        text:
+    person_id:
+      selector:
+        text:
+    platform:
+      selector:
+        select:
+          options:
+            - ps5
+            - ps4
+            - ps3
+            - switch2
+            - switch
+            - xbox_series
+            - xbox_one
+            - pc
+            - other
+    minutes:
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 1440
+          mode: "box"
+    date:
+      selector:
+        date:
+
+delete_session:
+  fields:
+    session_id:
+      required: true
+      selector:
+        text:
+
 lend_game:
   fields:
     copy_id:
@@ -926,3 +966,18 @@ list_loans:
 
 list_people:
   fields: {}
+
+list_sessions:
+  fields:
+    game_id:
+      selector:
+        text:
+    person_id:
+      selector:
+        text:
+    limit:
+      selector:
+        number:
+          min: 1
+          max: 500
+          mode: "box"

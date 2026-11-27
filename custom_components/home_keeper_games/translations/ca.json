@@ -654,6 +654,42 @@
         }
       }
     },
+    "log_session": {
+      "name": "Registra una sessió de joc",
+      "description": "Afegeix una sessió de joc d'una persona. Els minuts van al temps de joc del progrés. Un usuari que no és administrador només pot registrar les seves sessions.",
+      "fields": {
+        "game_id": {
+          "name": "Joc",
+          "description": "L'ID del joc."
+        },
+        "person_id": {
+          "name": "Persona",
+          "description": "L'ID de la persona de Home Assistant."
+        },
+        "platform": {
+          "name": "Plataforma",
+          "description": "La consola. Buit per usar la plataforma de les còpies del joc."
+        },
+        "minutes": {
+          "name": "Minuts",
+          "description": "La durada de la sessió en minuts."
+        },
+        "date": {
+          "name": "Data",
+          "description": "La data de la sessió. Buit per a avui."
+        }
+      }
+    },
+    "delete_session": {
+      "name": "Esborra una sessió de joc",
+      "description": "Esborra una sessió de joc i treu-ne els minuts del temps de joc. Un usuari que no és administrador només pot esborrar les seves sessions.",
+      "fields": {
+        "session_id": {
+          "name": "Sessió",
+          "description": "L'ID de la sessió de joc."
+        }
+      }
+    },
     "lend_game": {
       "name": "Presta un joc",
       "description": "Presta un exemplar a una altra persona.",
@@ -998,6 +1034,24 @@
       "name": "Llista les persones",
       "description": "Retorna les persones i la seva configuració de biblioteca."
     },
+    "list_sessions": {
+      "name": "Llista les sessions de joc",
+      "description": "Retorna les sessions de joc, primer les més noves. Un usuari que no és administrador rep les seves sessions i les de les persones que comparteixen el progrés.",
+      "fields": {
+        "game_id": {
+          "name": "Joc",
+          "description": "Només les sessions d'aquest joc."
+        },
+        "person_id": {
+          "name": "Persona",
+          "description": "Només les sessions d'aquesta persona."
+        },
+        "limit": {
+          "name": "Límit",
+          "description": "El nombre màxim de sessions."
+        }
+      }
+    },
     "export_data": {
       "name": "Exporta les dades",
       "description": "Exporta la secció de la biblioteca de l'exportació de Home Keeper.",
@@ -1072,6 +1126,9 @@
     },
     "loan_not_found": {
       "message": "Cap préstec té l'ID {id}."
+    },
+    "session_not_found": {
+      "message": "Cap sessió de joc té l'ID {id}."
     },
     "person_not_found": {
       "message": "Cap persona té l'ID {id}."

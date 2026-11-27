@@ -7,6 +7,8 @@ An admin reads the full document. A non-admin reads a projection:
 * The progress rows of another person show only if that person shares the
   progress (``share_progress``), and never with ``review``.
 * A person setting of another person has no ``wishlist_todo``.
+* The play sessions of another person show only if that person shares the
+  progress.
 
 A reply never leaks: each read surface goes through :func:`project_state` or
 :func:`project_game`. The sensors use the stats functions at the end.
@@ -19,7 +21,14 @@ from __future__ import annotations
 from typing import Any
 
 from .const import COVER_URL_PREFIX
-from .models import clone, is_open, is_overdue, location_path, person_settings
+from .models import (
+    clone,
+    is_open,
+    is_overdue,
+    location_path,
+    person_settings,
+    sessions_of,
+)
 
 PRIVATE_COPY_FIELDS = ("price", "value", "acquired_from")
 PRIVATE_LOAN_FIELDS = ("party",)
@@ -93,6 +102,36 @@ def visible_progress(
             platform: {k: v for k, v in row.items() if k not in PRIVATE_PROGRESS_FIELDS}
             for platform, row in rows.items()
         }
+    return out
+
+
+def visible_sessions(
+    state: dict[str, Any],
+    *,
+    viewer: str | None,
+    is_admin: bool,
+    game_id: str | None = None,
+    person_id: str | None = None,
+    limit: int,
+) -> list[dict[str, Any]]:
+    """The play sessions that the viewer can read, the newest first.
+
+    A session is progress data: a non-admin reads their own sessions and the
+    sessions of a person who shares the progress, as in :func:`visible_progress`.
+    """
+    out: list[dict[str, Any]] = []
+    for session in sessions_of(state, game_id=game_id, person_id=person_id):
+        owner = session.get("person_id")
+        if not (
+            is_admin
+            or owner == viewer
+            or person_settings(state["people"], str(owner))["share_progress"]
+        ):
+            continue
+        game = state["games"].get(session.get("game_id")) or {}
+        out.append({**clone(session), "title": game.get("title", "")})
+        if len(out) >= limit:
+            break
     return out
 
 

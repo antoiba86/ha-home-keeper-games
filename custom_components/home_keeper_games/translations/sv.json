@@ -654,6 +654,42 @@
         }
       }
     },
+    "log_session": {
+      "name": "Registrera spelsession",
+      "description": "Lägg till en spelsession för en person. Minuterna läggs till speltiden i förloppet. En användare som inte är administratör kan bara registrera sina egna sessioner.",
+      "fields": {
+        "game_id": {
+          "name": "Spel",
+          "description": "Spelets ID."
+        },
+        "person_id": {
+          "name": "Person",
+          "description": "ID för personen i Home Assistant."
+        },
+        "platform": {
+          "name": "Plattform",
+          "description": "Konsolen. Tom för att använda plattformen för spelets exemplar."
+        },
+        "minutes": {
+          "name": "Minuter",
+          "description": "Sessionens längd i minuter."
+        },
+        "date": {
+          "name": "Datum",
+          "description": "Sessionens datum. Tomt för i dag."
+        }
+      }
+    },
+    "delete_session": {
+      "name": "Ta bort spelsession",
+      "description": "Ta bort en spelsession och dra av dess minuter från speltiden. En användare som inte är administratör kan bara ta bort sina egna sessioner.",
+      "fields": {
+        "session_id": {
+          "name": "Spelsession",
+          "description": "Spelsessionens ID."
+        }
+      }
+    },
     "lend_game": {
       "name": "Låna ut spel",
       "description": "Låna ut ett exemplar till en annan person.",
@@ -998,6 +1034,24 @@
       "name": "Lista personer",
       "description": "Returnera personerna och deras biblioteksinställningar."
     },
+    "list_sessions": {
+      "name": "Lista spelsessioner",
+      "description": "Returnera spelsessionerna, de nyaste först. En användare som inte är administratör får sina egna sessioner och sessionerna för de personer som delar sitt förlopp.",
+      "fields": {
+        "game_id": {
+          "name": "Spel",
+          "description": "Bara sessionerna för det här spelet."
+        },
+        "person_id": {
+          "name": "Person",
+          "description": "Bara sessionerna för den här personen."
+        },
+        "limit": {
+          "name": "Gräns",
+          "description": "Det högsta antalet sessioner."
+        }
+      }
+    },
     "export_data": {
       "name": "Exportera data",
       "description": "Exportera biblioteksdelen av Home Keeper-exporten.",
@@ -1072,6 +1126,9 @@
     },
     "loan_not_found": {
       "message": "Inget lån har ID {id}."
+    },
+    "session_not_found": {
+      "message": "Ingen spelsession har ID {id}."
     },
     "person_not_found": {
       "message": "Ingen person har ID {id}."

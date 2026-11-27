@@ -5,7 +5,7 @@ implements:
   - custom_components/home_keeper_games/people.py
   - custom_components/home_keeper_games/projections.py
 related: [events-api, entities, architecture]
-source_hash: 0294d2d75a49
+source_hash: 913968e4d5ed
 ---
 
 # People and privilege
@@ -47,16 +47,18 @@ its name, its entity id and its user id, sorted by name.
 ### Gates
 
 `services.async_run` runs every operation. It refuses a non-admin caller of an
-`admin_only` spec with `Unauthorized`. The 2 `caller_scoped` services are open:
+`admin_only` spec with `Unauthorized`. The 4 `caller_scoped` services are open:
 
 - `set_progress` acts for the caller's person. A non-admin user who names another person
   gets `Unauthorized`. A caller with no person gets `no_person`.
+- `log_session` adds a play session with the same rule as `set_progress`, and
+  `delete_session` lets a non-admin user delete only a session of their own person.
 - `set_person_settings` lets a non-admin user change `share_progress` and `yearly_goal`
   of their own person. `wishlist_todo` is admin-only, because it sends text to a to-do
   list.
 
-The read services `list_games`, `get_game`, `list_locations`, `list_loans` and
-`list_people` are open and projected. `get_state` and `subscribe` are open.
+The read services `list_games`, `get_game`, `list_locations`, `list_loans`,
+`list_people` and `list_sessions` are open and projected. `get_state` and `subscribe` are open.
 `list_todo_entities` and the cover upload are admin-only. The cover view is open to
 each signed-in user, because covers are not private.
 
@@ -69,6 +71,8 @@ each signed-in user, because covers are not private.
 - a loan drops `PRIVATE_LOAN_FIELDS` (`party`);
 - the progress rows of another person show only with `share_progress: true`, and drop
   `review`;
+- the play sessions of another person show only with `share_progress: true`
+  (`projections.visible_sessions`);
 - the settings of another person drop `wishlist_todo`;
 - the wishlist entry of another person drops `PRIVATE_WISHLIST_FIELDS` (`todo_entity`,
   `todo_uid`).
