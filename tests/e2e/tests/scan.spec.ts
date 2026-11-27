@@ -9,10 +9,10 @@ import { adminState, gameByTitle, gamesWithCode, expect, fakeCamera, openTab, te
  */
 const NEW_CODE = '9780553418606';
 const SEEDED_CODE = '9780441478125';
-const SEEDED_TITLE = 'The Left Hand of Darkness';
+const SEEDED_TITLE = 'The Legend of Zelda: Tears of the Kingdom';
 /** No seeded game has this barcode. */
 const MISS_CODE = '9781402894626';
-const MISS_TITLE = 'Field Notes on Moss';
+const MISS_TITLE = 'Moss';
 const COVER = resolve(__dirname, '../seed/covers/13be6b0e5c354e1981a89fe2766196e0-552257a9.jpg');
 
 async function shelfId(room: string, unit: string, shelf: string): Promise<string> {

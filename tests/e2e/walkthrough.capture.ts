@@ -25,10 +25,10 @@ const BEAT = 900;
 const SEEDED_CODE = '9780441478125';
 // No game has this barcode. The scan asks for its title.
 const MISS_CODE = '9781402894626';
-const MISS_TITLE = 'Field Notes on Moss';
-const LEND_TITLE = 'Station Eleven';
+const MISS_TITLE = 'Moss';
+const LEND_TITLE = 'The Last of Us Part I';
 const PARTY = 'Robin';
-const STATUS_TITLE = 'The Lathe of Heaven';
+const STATUS_TITLE = 'Pikmin 4';
 // The fake IGDB finds "Hades" (IGDB id 1001) for this title.
 const IGDB_TITLE = 'Hade';
 
@@ -71,7 +71,7 @@ test('record the Library walkthrough', async ({ browser }) => {
     await beat(page);
 
     // 2. Search, then open a game.
-    await tab.locator('[data-k="q"]').pressSequentially('lathe', { delay: 90 });
+    await tab.locator('[data-k="q"]').pressSequentially('pikmin', { delay: 90 });
     await expect(tab.locator('.hkl-tile')).toHaveCount(1);
     await beat(page);
     await tab.locator(`[data-k="b-${status.id}"]`).click();
@@ -166,7 +166,7 @@ test('record the Library walkthrough', async ({ browser }) => {
     const lend = await gameByTitle(LEND_TITLE);
     await tab.locator('[data-k="nav-games"]').click();
     await tab.locator('[data-k="q"]').fill('');
-    await tab.locator('[data-k="q"]').pressSequentially('station', { delay: 90 });
+    await tab.locator('[data-k="q"]').pressSequentially('last of us', { delay: 90 });
     await expect(tab.locator('.hkl-tile')).toHaveCount(1);
     await tab.locator(`[data-k="b-${lend.id}"]`).click();
     await expect(tab.locator('h1')).toHaveText(LEND_TITLE);

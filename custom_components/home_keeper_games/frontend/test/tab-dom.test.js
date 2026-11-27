@@ -97,11 +97,11 @@ describe('games view', () => {
   it('reads the filters from the route', async () => {
     await mount('/games;status=playing;view=rows');
     expect($$('.hkl-row').map((r) => r.querySelector('.hkl-row-title').textContent)).toEqual([
-      'Every Grain of Rice',
-      'Integrated Chinese 1',
-      'Project Hail Mary',
-      'The Left Hand of Darkness',
-      'The Ministry for the Future',
+      "Baldur's Gate 3",
+      'Outer Wilds',
+      'Overcooked! 2',
+      'Professor Layton and the Curious Village',
+      'The Legend of Zelda: Tears of the Kingdom',
     ]);
     expect($('[data-k="st-playing"]').getAttribute('aria-pressed')).toBe('true');
   });
@@ -135,13 +135,13 @@ describe('games view', () => {
     vi.useFakeTimers();
     const input = $('[data-k="q"]');
     input.focus();
-    input.value = 'science fiction';
+    input.value = 'role-playing';
     input.dispatchEvent(new Event('input', { bubbles: true }));
     expect(host.navigate).not.toHaveBeenCalled();
     vi.advanceTimersByTime(260);
-    expect(host.navigate).toHaveBeenCalledWith('/games;q=science%20fiction', { replace: true });
+    expect(host.navigate).toHaveBeenCalledWith('/games;q=role-playing', { replace: true });
     expect(el.shadowRoot.activeElement?.dataset.k).toBe('q');
-    expect($$('.hkl-tile').length).toBe(11);
+    expect($$('.hkl-tile').length).toBe(9);
   });
 
   it('opens a game with a push', async () => {
@@ -153,7 +153,7 @@ describe('games view', () => {
 
   it('escapes user text', async () => {
     const state = fixture();
-    state.games.find((b) => b.title === 'Dune').title = '<img src=x onerror="alert(1)">';
+    state.games.find((b) => b.title === 'Hollow Knight').title = '<img src=x onerror="alert(1)">';
     await mount('/games', { state });
     expect(el.shadowRoot.querySelector('img[src="x"]')).toBeNull();
     expect(text()).toContain('<img src=x onerror="alert(1)">');
@@ -172,7 +172,7 @@ describe('covers', () => {
 
   it('signs each cover path, then shows the image with the signed URL', async () => {
     const state = fixture();
-    const game = state.games.find((b) => b.title === 'The Left Hand of Darkness');
+    const game = state.games.find((b) => b.title === 'The Legend of Zelda: Tears of the Kingdom');
     expect(game.cover_url).toMatch(/^\/api\/home_keeper_games\/cover\/[0-9a-f]{32}\?v=[0-9a-f]{8}$/);
     const fake = await mount('/games');
     const signs = fake.send.mock.calls.map((c) => c[0]).filter((m) => m.type === 'auth/sign_path');
@@ -188,17 +188,17 @@ describe('covers', () => {
 
   it('shows the title block when the sign fails', async () => {
     const state = fixture();
-    const game = state.games.find((b) => b.title === 'Piranesi');
+    const game = state.games.find((b) => b.title === 'Hades');
     await mount(`/games/${game.id}`, { replies: { 'auth/sign_path': () => Promise.reject(new Error('no')) } });
     const block = $('.hkl-cover-large');
     expect(block.dataset.cover).toBe(game.cover_url);
     expect(block.querySelector('img')).toBeNull();
-    expect(block.querySelector('.hkl-cover-title').textContent).toBe('Piranesi');
+    expect(block.querySelector('.hkl-cover-title').textContent).toBe('Hades');
   });
 
   it('puts the reader marks in their own row and shows the ring colors in the legend', async () => {
     const state = fixture();
-    const game = state.games.find((b) => b.title === 'The Left Hand of Darkness');
+    const game = state.games.find((b) => b.title === 'The Legend of Zelda: Tears of the Kingdom');
     await mount('/games');
     const tile = $(`[data-k="b-${game.id}"]`);
     const dots = tile.querySelectorAll('.hkl-tile-readers .hkl-dot');
@@ -212,24 +212,24 @@ describe('covers', () => {
 describe('game detail', () => {
   it('shows the location, the loan and the task link', async () => {
     const state = fixture();
-    await mount(`/games/${gameId(state, 'The Left Hand of Darkness')}`);
-    expect($('h1').textContent).toBe('The Left Hand of Darkness');
+    await mount(`/games/${gameId(state, 'The Legend of Zelda: Tears of the Kingdom')}`);
+    expect($('h1').textContent).toBe('The Legend of Zelda: Tears of the Kingdom');
     expect(text()).toContain('Living room › Unit A › Shelf 2');
     expect(text()).toContain('Priya · since Sep 12, 2026');
-    const task = state.loans.find((l) => l.party === 'Priya' && l.game_id === gameId(state, 'The Left Hand of Darkness')).hk_task_id;
+    const task = state.loans.find((l) => l.party === 'Priya' && l.game_id === gameId(state, 'The Legend of Zelda: Tears of the Kingdom')).hk_task_id;
     expect(task).toMatch(/^[0-9a-f]{32}$/);
     expect($('.hkl-task').getAttribute('href')).toBe(`/home-keeper/tasks/${task}`);
     expect(host.taskLink).toHaveBeenCalledWith(task);
     expect(text()).toContain('Completed on Mar 2, 2025 · Completed 2 times');
     expect(text()).toContain('Switch 2 Playing');
-    expect(text()).toContain('Hainish Cycle');
+    expect(text()).toContain('The Legend of Zelda 2023');
     expect($('[data-k="rs-completed"]').getAttribute('aria-pressed')).toBe('true');
     expect($$('.hkl-star.on')).toHaveLength(4);
   });
 
   it('shows 1 chip for each platform and edits the platform of the chip', async () => {
     const state = fixture();
-    const id = gameId(state, 'The Left Hand of Darkness');
+    const id = gameId(state, 'The Legend of Zelda: Tears of the Kingdom');
     const fake = await mount(`/games/${id}`);
     expect($$('.hkl-plat').map((c) => c.textContent)).toEqual(['Switch 2 · Completed', 'Switch · Playing']);
     expect($('[data-k="pp-switch2"]').getAttribute('aria-pressed')).toBe('true');
@@ -253,7 +253,7 @@ describe('game detail', () => {
 
   it('opens the task with host.openTask, or leaves the link to the browser', async () => {
     const state = fixture();
-    await mount(`/games/${gameId(state, 'The Left Hand of Darkness')}`);
+    await mount(`/games/${gameId(state, 'The Legend of Zelda: Tears of the Kingdom')}`);
     const link = $('.hkl-task');
     const plain = new MouseEvent('click', { bubbles: true, cancelable: true, composed: true });
     link.dispatchEvent(plain);
@@ -268,7 +268,7 @@ describe('game detail', () => {
 
   it('sets the status, the rating and the play time for the person', async () => {
     const state = fixture();
-    const id = gameId(state, 'The Lathe of Heaven');
+    const id = gameId(state, 'Pikmin 4');
     const platform = state.copies.find((c) => c.game_id === id).platform;
     const fake = await mount(`/games/${id}`);
     $('[data-k="rs-playing"]').click();
@@ -286,7 +286,7 @@ describe('game detail', () => {
 
   it('sets the status of another person', async () => {
     const state = fixture();
-    const id = gameId(state, 'Dune');
+    const id = gameId(state, 'Hollow Knight');
     const fake = await mount(`/games/${id}`);
     change($('[data-k="rp"]'), SAM);
     $('[data-k="rs-completed"]').click();
@@ -296,7 +296,7 @@ describe('game detail', () => {
 
   it('returns a loan', async () => {
     const state = fixture();
-    const fake = await mount(`/games/${gameId(state, 'The Left Hand of Darkness')}`);
+    const fake = await mount(`/games/${gameId(state, 'The Legend of Zelda: Tears of the Kingdom')}`);
     $('[data-act="return-loan"]').click();
     await flush();
     expect(fake.calls('return_loan')).toEqual([{ type: 'home_keeper_games/return_loan', loan_id: expect.any(String) }]);
@@ -305,10 +305,10 @@ describe('game detail', () => {
 
   it('deletes after the confirmation and goes back to the list', async () => {
     const state = fixture();
-    const id = gameId(state, 'Dune');
+    const id = gameId(state, 'Hollow Knight');
     const fake = await mount(`/games/${id}`);
     $('[data-k="delete-game"]').click();
-    expect(el.shadowRoot.getElementById('dlg').textContent).toContain('Delete "Dune"');
+    expect(el.shadowRoot.getElementById('dlg').textContent).toContain('Delete "Hollow Knight"');
     $('[data-k="d-submit"]').click();
     await flush();
     expect(fake.calls('delete_game')[0]).toMatchObject({ game_id: id });
@@ -322,7 +322,7 @@ describe('game detail', () => {
 
   it('saves the shared notes', async () => {
     const state = fixture();
-    const id = gameId(state, 'Dune');
+    const id = gameId(state, 'Hollow Knight');
     const fake = await mount(`/games/${id}`);
     $('[data-k="notes-edit"]').click();
     $('[data-k="notes-text"]').value = '**Good**';
@@ -333,26 +333,26 @@ describe('game detail', () => {
 
   it('edits the game from the dialog', async () => {
     const state = fixture();
-    const id = gameId(state, 'Dune');
+    const id = gameId(state, 'Hollow Knight');
     const fake = await mount(`/games/${id}`);
     $('[data-k="edit-game"]').click();
     const dlg = el.shadowRoot.getElementById('dlg');
     dlg.querySelector('[name="genres"]').value = 'Strategy, Classic';
-    dlg.querySelector('[name="franchise"]').value = 'Dune';
+    dlg.querySelector('[name="franchise"]').value = 'Hollow Knight';
     dlg.querySelector('[data-k="d-submit"]').click();
     await flush();
     expect(fake.calls('update_game')[0]).toMatchObject({
       game_id: id,
-      title: 'Dune',
+      title: 'Hollow Knight',
       genres: ['Strategy', 'Classic'],
-      franchise: 'Dune',
+      franchise: 'Hollow Knight',
     });
     expect(dlg.innerHTML).toBe('');
   });
 
   it('adds a copy with the game fields, and a digital copy goes on no shelf', async () => {
     const state = fixture();
-    const id = gameId(state, 'Dune');
+    const id = gameId(state, 'Hollow Knight');
     const fake = await mount(`/games/${id}`);
     expect(text()).toContain('Barcode');
     $('[data-k="add-copy"]').click();
@@ -386,7 +386,7 @@ describe('game detail', () => {
 
   it('refuses a bad copy barcode', async () => {
     const state = fixture();
-    const fake = await mount(`/games/${gameId(state, 'Dune')}`);
+    const fake = await mount(`/games/${gameId(state, 'Hollow Knight')}`);
     $('[data-k="add-copy"]').click();
     const dlg = el.shadowRoot.getElementById('dlg');
     dlg.querySelector('[name="barcode"]').value = 'b#d';
@@ -399,7 +399,7 @@ describe('game detail', () => {
   it('shows the error of a failed dialog inline and keeps what the user typed', async () => {
     const state = fixture();
     let n = 0;
-    await mount(`/games/${gameId(state, 'Dune')}`, { replies: { update_game: () => Promise.reject({ message: `Not allowed ${++n}` }) } });
+    await mount(`/games/${gameId(state, 'Hollow Knight')}`, { replies: { update_game: () => Promise.reject({ message: `Not allowed ${++n}` }) } });
     $('[data-k="edit-game"]').click();
     const dlg = el.shadowRoot.getElementById('dlg');
     dlg.querySelector('[name="franchise"]').value = 'Typed text';
@@ -417,7 +417,7 @@ describe('game detail', () => {
   it('disables the submit button while the call runs, and a late reply leaves a new dialog open', async () => {
     const state = fixture();
     let finish;
-    await mount(`/games/${gameId(state, 'Dune')}`, { replies: { update_game: () => new Promise((r) => (finish = r)) } });
+    await mount(`/games/${gameId(state, 'Hollow Knight')}`, { replies: { update_game: () => new Promise((r) => (finish = r)) } });
     $('[data-k="edit-game"]').click();
     const dlg = el.shadowRoot.getElementById('dlg');
     dlg.querySelector('[data-k="d-submit"]').click();
@@ -433,7 +433,7 @@ describe('game detail', () => {
 
   it('keeps the notes editor open with the text when the save fails', async () => {
     const state = fixture();
-    const id = gameId(state, 'Dune');
+    const id = gameId(state, 'Hollow Knight');
     await mount(`/games/${id}`, { replies: { update_game: () => Promise.reject({ message: 'No' }) } });
     $('[data-k="notes-edit"]').click();
     $('[data-k="notes-text"]').value = 'Kept';
@@ -445,7 +445,7 @@ describe('game detail', () => {
 
   it('shows the stored status again when a change fails', async () => {
     const state = fixture();
-    const id = gameId(state, 'The Lathe of Heaven');
+    const id = gameId(state, 'Pikmin 4');
     await mount(`/games/${id}`, { replies: { set_progress: () => Promise.reject({ message: 'No' }) } });
     const time = $('[data-k="r-playtime_minutes"]');
     const before = time.value;
@@ -601,7 +601,7 @@ describe('scan', () => {
   it('scans a barcode and resolves a duplicate', async () => {
     const state = fixture();
     const shelf = Object.values(state.shelves)[0].id;
-    const dune = Object.values(state.games).find((b) => b.title === 'Dune');
+    const dune = Object.values(state.games).find((b) => b.title === 'Hollow Knight');
     const copies = Object.values(state.copies).filter((c) => c.game_id === dune.id);
     const fake = await mount(`/scan;shelf=${shelf};step=camera`, {
       replies: {
@@ -653,8 +653,8 @@ describe('scan', () => {
   it('marks a scanned game that comes from the wishlist', async () => {
     const state = fixture();
     const shelf = state.shelves[0].id;
-    const wished = state.games.find((b) => b.title === 'The Other Wind');
-    const dune = state.games.find((b) => b.title === 'Dune');
+    const wished = state.games.find((b) => b.title === 'The Legend of Zelda: Echoes of Wisdom');
+    const dune = state.games.find((b) => b.title === 'Hollow Knight');
     const fake = await mount(`/scan;shelf=${shelf};step=camera`, {
       replies: {
         scan_barcode: (m) =>
@@ -670,8 +670,8 @@ describe('scan', () => {
       await flush();
     }
     const rows = $$('.hkl-result');
-    const wishRow = rows.find((r) => r.textContent.includes('The Other Wind'));
-    const duneRow = rows.find((r) => r.textContent.includes('Dune'));
+    const wishRow = rows.find((r) => r.textContent.includes('The Legend of Zelda: Echoes of Wisdom'));
+    const duneRow = rows.find((r) => r.textContent.includes('Hollow Knight'));
     expect(wishRow.querySelector('[data-k^="from-wish-"]').textContent).toBe('From wishlist');
     expect(wishRow.querySelector('.hkl-pill.ok').textContent).toBe('Added');
     expect(duneRow.querySelector('[data-k^="from-wish-"]')).toBeNull();
@@ -680,7 +680,7 @@ describe('scan', () => {
   it('sets Completed for me on the scanned games when the box is set', async () => {
     const state = fixture();
     const shelf = Object.values(state.shelves)[0].id;
-    const dune = Object.values(state.games).find((b) => b.title === 'Dune');
+    const dune = Object.values(state.games).find((b) => b.title === 'Hollow Knight');
     const fake = await mount(`/scan;shelf=${shelf};step=camera`, {
       replies: { scan_barcode: { result: 'added', game: dune, copy: null, existing_copies: [] } },
     });
@@ -971,7 +971,7 @@ describe('scan camera', () => {
 
   it('keeps the video in the page when a scan renders the view', async () => {
     const state = fixture();
-    const dune = state.games.find((b) => b.title === 'Dune');
+    const dune = state.games.find((b) => b.title === 'Hollow Knight');
     const fake = await mount(`/scan;shelf=${state.shelves[0].id};step=camera`, {
       replies: { scan_barcode: { result: 'added', game: dune, copy: null, existing_copies: [] } },
     });
@@ -1077,8 +1077,8 @@ describe('import', () => {
       dry_run: true,
       counts: { rows: 900, read: 3, existing: 1, new: 1, title_match: 1, errors: 1 },
       rows: [
-        { line: 2, title: 'Piranesi', authors: ['Susanna Clarke'], barcode: '9781635575637', game_id: 'b1', action: 'existing', message: '' },
-        { line: 3, title: 'Dune', authors: ['Frank Herbert'], barcode: null, game_id: 'b2', action: 'title_match', message: '' },
+        { line: 2, title: 'Hades', authors: ['Susanna Clarke'], barcode: '9781635575637', game_id: 'b1', action: 'existing', message: '' },
+        { line: 3, title: 'Hollow Knight', authors: ['Frank Herbert'], barcode: null, game_id: 'b2', action: 'title_match', message: '' },
         { line: 4, title: '', authors: [], barcode: null, game_id: null, action: 'error', message: 'The row has no title.' },
       ],
       truncated: true,
@@ -1127,7 +1127,7 @@ describe('import', () => {
 describe('no Open Library', () => {
   it('shows no Open Library control in the games, the game and the settings views', async () => {
     const state = fixture();
-    const id = gameId(state, 'Dune');
+    const id = gameId(state, 'Hollow Knight');
     await mount('/games');
     expect($('[data-k="st-not_on_ol"]')).toBeNull();
     expect(text()).not.toContain('Open Library');
@@ -1146,27 +1146,27 @@ describe('no Open Library', () => {
 });
 
 describe('change IGDB game', () => {
-  const HIT = { igdb_id: 11, title: 'Dune', release_year: 1965, platforms: ['pc'], cover_url: 'https://images.example/t_cover_big/co1.jpg', in_library: null };
-  const TAKEN = { igdb_id: 10, title: 'Dune II', release_year: null, platforms: [], cover_url: null, in_library: 'other-game' };
+  const HIT = { igdb_id: 11, title: 'Hollow Knight', release_year: 1965, platforms: ['pc'], cover_url: 'https://images.example/t_cover_big/co1.jpg', in_library: null };
+  const TAKEN = { igdb_id: 10, title: 'Hollow Knight II', release_year: null, platforms: [], cover_url: null, in_library: 'other-game' };
   const dlg = () => el.shadowRoot.getElementById('dlg');
 
   it('shows no IGDB button with no IGDB keys', async () => {
     const state = fixture();
-    await mount(`/games/${gameId(state, 'Dune')}`, { state });
+    await mount(`/games/${gameId(state, 'Hollow Knight')}`, { state });
     expect($('[data-k="igdb-game"]')).toBeNull();
   });
 
   it('searches the title on the platform of the copies and sets the selected game', async () => {
     const state = fixture();
     state.igdb = true;
-    const id = gameId(state, 'Dune');
+    const id = gameId(state, 'Hollow Knight');
     const platforms = [...new Set(state.copies.filter((c) => c.game_id === id).map((c) => c.platform))].filter((p) => p !== 'other');
     const fake = await mount(`/games/${id}`, { state, replies: { search_catalog: { candidates: [TAKEN, HIT] } } });
     $('[data-k="igdb-game"]').click();
     await flush();
     expect(fake.calls('search_catalog')[0]).toEqual({
       type: 'home_keeper_games/search_catalog',
-      query: 'Dune',
+      query: 'Hollow Knight',
       ...(platforms.length === 1 ? { platform: platforms[0] } : {}),
     });
     const taken = dlg().querySelector('[data-k="d-igdb-row-10"] input');
@@ -1186,7 +1186,7 @@ describe('change IGDB game', () => {
     const state = fixture();
     state.igdb = true;
     let reply = { candidates: [] };
-    const fake = await mount(`/games/${gameId(state, 'Dune')}`, {
+    const fake = await mount(`/games/${gameId(state, 'Hollow Knight')}`, {
       state,
       replies: {
         search_catalog: () => {
@@ -1199,14 +1199,14 @@ describe('change IGDB game', () => {
     await flush();
     expect(dlg().querySelector('[data-k="d-igdb-status"]').textContent).toBe('IGDB has no game for this search.');
     const query = dlg().querySelector('[data-k="d-igdb-query"]');
-    query.value = 'Dune Messiah';
+    query.value = 'Hollow Knight Messiah';
     dlg().querySelector('[data-k="d-igdb-platform"]').value = '';
     reply = new Error('IGDB is not available now.');
     const enter = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true, cancelable: true });
     query.dispatchEvent(enter);
     await flush();
     expect(enter.defaultPrevented).toBe(true);
-    expect(fake.calls('search_catalog')[1]).toEqual({ type: 'home_keeper_games/search_catalog', query: 'Dune Messiah' });
+    expect(fake.calls('search_catalog')[1]).toEqual({ type: 'home_keeper_games/search_catalog', query: 'Hollow Knight Messiah' });
     expect(dlg().querySelector('.hkl-error').textContent).toContain('IGDB is not available now.');
     expect(dlg().querySelector('[data-k="d-igdb-status"]')).toBeNull();
     dlg().querySelector('[data-k="d-submit"]').click();

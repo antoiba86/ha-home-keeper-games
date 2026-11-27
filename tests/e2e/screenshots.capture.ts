@@ -20,7 +20,7 @@ const DESKTOP_SHOT = { width: 1280, height: 900 };
 /** The 1st barcode is a seeded game. No game has the 2nd, so the scan asks for its title. */
 const SCAN_CODES = ['9780441478125', '9781250313188'];
 const NEW_CODES = [SCAN_CODES[1]];
-const MISS_TITLE = 'Field Notes on Moss';
+const MISS_TITLE = 'Moss';
 
 async function shot(page: Page, name: string): Promise<void> {
   // Let the covers and the fonts settle, and move the pointer out of the way.
@@ -108,7 +108,7 @@ async function scanSession(page: Page, missShot: string, detailsShot?: string, s
   if (detailsShot) {
     await sheet.locator('[data-k="d-more-toggle"]').click();
     await sheet.locator('[name="franchise"]').fill('Moss');
-    await sheet.locator('[name="release_date"]').fill('2004');
+    await sheet.locator('[name="release_date"]').fill('2018');
     await shot(page, detailsShot);
   }
   await sheet.locator('[data-k="d-submit"]').click();
@@ -169,7 +169,7 @@ test('capture the Library screenshots', async ({ page, browser }) => {
   // Game detail: a custom cover, a loan with its task, shared notes in Markdown. The
   // window is tall enough to show the notes.
   await page.setViewportSize({ width: 1280, height: 1400 });
-  const left = await gameByTitle('The Left Hand of Darkness');
+  const left = await gameByTitle('The Legend of Zelda: Tears of the Kingdom');
   let tab = await openTab(page, `/games/${left.id}`);
   await expect(tab.locator('ha-markdown strong')).toHaveText('Oct 2026');
   await coversLoaded(page);
@@ -200,7 +200,7 @@ test('capture the Library screenshots', async ({ page, browser }) => {
 
   // Wishlist.
   tab = await openTab(page, '/wishlist');
-  await expect(tab.locator('.hkl-todo').first()).toContainText('Alex books');
+  await expect(tab.locator('.hkl-todo').first()).toContainText('Alex games');
   await coversLoaded(page);
   await shot(page, 'wishlist-desktop');
 

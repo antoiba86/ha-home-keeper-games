@@ -370,7 +370,7 @@ describe('progress helpers and search', () => {
   const b = game('b', {
     title: 'The Left Hand',
     genres: ['Strategy game'],
-    franchise: 'Hainish',
+    franchise: 'Metroid',
     shared_notes: 'Game club',
     tags: ['hugo'],
     progress: { me: row('completed', { review: 'secret word' }), other: row('playing', { review: 'hidden' }) },
@@ -410,7 +410,7 @@ describe('progress helpers and search', () => {
   });
 
   it('searches each field', () => {
-    for (const q of ['left hand', 'STRATEGY', 'game', 'hainish', 'club', 'hugo', 'secret']) {
+    for (const q of ['left hand', 'STRATEGY', 'game', 'metroid', 'club', 'hugo', 'secret']) {
       expect(u.matchesSearch(b, q, 'me'), q).toBe(true);
     }
     // The barcode is on a copy. The caller passes the codes of the copies.
@@ -591,7 +591,7 @@ describe('barcodes', () => {
     expect(u.retailBarcode('96385074')).toBe('96385074');
     expect(u.retailBarcode('4006381333932')).toBeNull();
     expect(u.retailBarcode('1984')).toBeNull();
-    expect(u.retailBarcode('Dune')).toBeNull();
+    expect(u.retailBarcode('Hollow Knight')).toBeNull();
     expect(u.retailBarcode('40063813339310')).toBeNull();
     expect(u.retailBarcode('0360002914521')).toBeNull();
     expect(u.retailBarcode('ABCDEFGH')).toBeNull();

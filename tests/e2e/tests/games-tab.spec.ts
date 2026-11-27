@@ -18,7 +18,7 @@ async function lendableGame(): Promise<Record<string, any>> {
 
 test.describe('Games tab', { tag: '@responsive' }, () => {
   test('a copy shows its platform and the barcode of its case', async ({ page }) => {
-    const game = await gameByTitle('The Left Hand of Darkness');
+    const game = await gameByTitle('The Legend of Zelda: Tears of the Kingdom');
     const state = await adminState();
     const copy = state.copies.find((c: { game_id: string; barcode: string | null }) => c.game_id === game.id && c.barcode);
     const tab = await openTab(page, `/games/${game.id}`);
@@ -50,12 +50,12 @@ test.describe('Games tab', { tag: '@responsive' }, () => {
 
   test('the search narrows the grid and goes into the URL', async ({ page }) => {
     const tab = await openTab(page);
-    await tab.locator('[data-k="q"]').fill('science fiction');
-    await expect(page).toHaveURL(/\/home-keeper\/games\/games;q=science%20fiction$/);
+    await tab.locator('[data-k="q"]').fill('role-playing');
+    await expect(page).toHaveURL(/\/home-keeper\/games\/games;q=role-playing$/);
     const state = await adminState();
-    const leGuin = state.games.filter((b: { owned: boolean; genres: string[] }) => b.owned && b.genres.includes('Science fiction'));
-    await expect(tab.locator('.hkl-tile')).toHaveCount(leGuin.length);
-    await expect(tab.locator('.hkl-summary')).toContainText(`${leGuin.length} games`);
+    const rpg = state.games.filter((b: { owned: boolean; genres: string[] }) => b.owned && b.genres.includes('Role-playing (RPG)'));
+    await expect(tab.locator('.hkl-tile')).toHaveCount(rpg.length);
+    await expect(tab.locator('.hkl-summary')).toContainText(`${rpg.length} games`);
     await tab.locator('[data-k="clear"]').click();
     await expect(page).toHaveURL(/\/home-keeper\/games\/games$/);
   });
@@ -75,7 +75,7 @@ test.describe('Games tab', { tag: '@responsive' }, () => {
   });
 
   test('a cover loads through a signed URL', async ({ page }) => {
-    const game = await gameByTitle('Piranesi');
+    const game = await gameByTitle('Hades');
     expect(game.cover_url).toMatch(/^\/api\/home_keeper_games\/cover\//);
     const tab = await openTab(page);
     const img = tab.locator(`[data-k="b-${game.id}"] img`);
@@ -84,7 +84,7 @@ test.describe('Games tab', { tag: '@responsive' }, () => {
   });
 
   test('the shared notes render as Markdown', async ({ page }) => {
-    const game = await gameByTitle('The Left Hand of Darkness');
+    const game = await gameByTitle('The Legend of Zelda: Tears of the Kingdom');
     const tab = await openTab(page, `/games/${game.id}`);
     await expect(tab.locator('h1')).toHaveText(game.title);
     const md = tab.locator('ha-markdown.hkl-md');
@@ -94,7 +94,7 @@ test.describe('Games tab', { tag: '@responsive' }, () => {
 });
 
 test.describe('Game detail', { tag: '@responsive' }, () => {
-  const TITLE = 'The Lathe of Heaven';
+  const TITLE = 'Pikmin 4';
   let seedRow: Record<string, unknown> | undefined;
   let gameId = '';
 
@@ -128,7 +128,7 @@ test.describe('Game detail', { tag: '@responsive' }, () => {
   });
 
   test('a chip for each platform picks the row that the form edits', async ({ page }) => {
-    const game = await gameByTitle('The Left Hand of Darkness');
+    const game = await gameByTitle('The Legend of Zelda: Tears of the Kingdom');
     const tab = await openTab(page, `/games/${game.id}`);
     const chips = tab.locator('.hkl-plats .hkl-plat');
     await expect(chips).toHaveCount(2);

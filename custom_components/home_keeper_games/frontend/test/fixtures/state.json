@@ -118,132 +118,14 @@
    "progress": {}
   },
   {
-   "id": "06618efb9962471d992ba150a7d619b6",
-   "title": "A Memory Called Empire",
-   "summary": "A science fiction title by Arkady Martine.",
+   "id": "93ff2f45f4464b0d836a5c3d8cc5e33d",
+   "title": "A Short Hike",
+   "summary": "A adventure title by adamgryu.",
    "genres": [
-    "Science fiction"
+    "Adventure",
+    "Indie"
    ],
    "release_date": "2019",
-   "franchise": "Teixcalaan",
-   "igdb_id": null,
-   "tags": [
-    "Hugo winner"
-   ],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-03-13T10:00:00+00:00",
-   "updated_at": "2026-03-13T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": null,
-   "progress": {
-    "alex": {
-     "ps5": {
-      "play_status": "completed",
-      "rating": 4,
-      "playtime_minutes": null,
-      "started_at": null,
-      "completed_at": "2026-08-08",
-      "last_played_at": null,
-      "completion_count": 1,
-      "review": "",
-      "updated_at": "2026-08-08T22:00:00+00:00"
-     }
-    }
-   }
-  },
-  {
-   "id": "e4b7df5e6eef4483b1751162204397b8",
-   "title": "A Wizard of Earthsea",
-   "summary": "A fantasy title by Ursula K. Le Guin.",
-   "genres": [
-    "Fantasy"
-   ],
-   "release_date": "1968",
-   "franchise": "Earthsea",
-   "igdb_id": null,
-   "tags": [],
-   "shared_notes": "",
-   "cover": {
-    "kind": "custom",
-    "file": "e4b7df5e6eef4483b1751162204397b8-798c3698.jpg"
-   },
-   "needs_details": false,
-   "created_at": "2026-01-03T10:00:00+00:00",
-   "updated_at": "2026-01-03T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": "/api/home_keeper_games/cover/e4b7df5e6eef4483b1751162204397b8?v=798c3698",
-   "progress": {
-    "alex": {
-     "ps5": {
-      "play_status": "completed",
-      "rating": 5,
-      "playtime_minutes": null,
-      "started_at": null,
-      "completed_at": "2026-02-11",
-      "last_played_at": null,
-      "completion_count": 1,
-      "review": "",
-      "updated_at": "2026-02-11T21:00:00+00:00"
-     }
-    },
-    "jo": {
-     "ps5": {
-      "play_status": "completed",
-      "rating": 4,
-      "playtime_minutes": null,
-      "started_at": null,
-      "completed_at": "2026-08-30",
-      "last_played_at": null,
-      "completion_count": 1,
-      "review": "",
-      "updated_at": "2026-08-30T19:00:00+00:00"
-     }
-    }
-   }
-  },
-  {
-   "id": "360738e00aa246d38aab80792e9087fb",
-   "title": "Always Coming Home",
-   "summary": "A science fiction title by Ursula K. Le Guin.",
-   "genres": [
-    "Science fiction"
-   ],
-   "release_date": "1985",
-   "franchise": null,
-   "igdb_id": null,
-   "tags": [],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-01-15T10:00:00+00:00",
-   "updated_at": "2026-01-15T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": null,
-   "progress": {}
-  },
-  {
-   "id": "93ff2f45f4464b0d836a5c3d8cc5e33d",
-   "title": "Atlas of Remote Islands",
-   "summary": "A travel title by Judith Schalansky.",
-   "genres": [
-    "Travel",
-    "Maps"
-   ],
-   "release_date": "2009",
    "franchise": null,
    "igdb_id": null,
    "tags": [],
@@ -262,25 +144,26 @@
    "progress": {}
   },
   {
-   "id": "117b1aed4a5547c39b9627cbb9d71506",
-   "title": "Braiding Sweetgrass",
-   "summary": "A nature title by Robin Wall Kimmerer.",
+   "id": "c8a701c41eb84f78949683fc37d29497",
+   "title": "Animal Crossing: New Horizons",
+   "summary": "A simulator title by Nintendo.",
    "genres": [
-    "Nature",
-    "Botany"
+    "Simulator"
    ],
-   "release_date": "2013",
-   "franchise": null,
+   "release_date": "2020",
+   "franchise": "Animal Crossing",
    "igdb_id": null,
-   "tags": [],
+   "tags": [
+    "Award winner"
+   ],
    "shared_notes": "",
    "cover": {
     "kind": "none",
     "file": null
    },
    "needs_details": false,
-   "created_at": "2026-02-21T10:00:00+00:00",
-   "updated_at": "2026-02-21T10:00:00+00:00",
+   "created_at": "2026-01-13T10:00:00+00:00",
+   "updated_at": "2026-01-13T10:00:00+00:00",
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
@@ -288,220 +171,79 @@
    "progress": {}
   },
   {
-   "id": "eed5dacf0ada41059efc64fdefd6dfa9",
-   "title": "Dune",
-   "summary": "A science fiction title by Frank Herbert.",
+   "id": "d8d911387500471c9736a6a204509f73",
+   "title": "Baba Is You",
+   "summary": "A puzzle title by Hempuli.",
    "genres": [
-    "Science fiction"
+    "Puzzle"
    ],
-   "release_date": "1965",
-   "franchise": "Dune",
+   "release_date": "2019",
+   "franchise": null,
+   "igdb_id": null,
+   "tags": [
+    "Puzzle night"
+   ],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-03-05T10:00:00+00:00",
+   "updated_at": "2026-03-05T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": null,
+   "progress": {}
+  },
+  {
+   "id": "ae18ed68fc3445f484544a09c13ece47",
+   "title": "Baldur's Gate 3",
+   "summary": "A role-playing (rpg) title by Larian Studios.",
+   "genres": [
+    "Role-playing (RPG)"
+   ],
+   "release_date": "2023",
+   "franchise": null,
    "igdb_id": null,
    "tags": [],
    "shared_notes": "",
    "cover": {
     "kind": "custom",
-    "file": "eed5dacf0ada41059efc64fdefd6dfa9-543ed35b.jpg"
+    "file": "ae18ed68fc3445f484544a09c13ece47-a66afeef.jpg"
    },
    "needs_details": false,
-   "created_at": "2026-02-03T10:00:00+00:00",
-   "updated_at": "2026-02-03T10:00:00+00:00",
+   "created_at": "2026-04-01T10:00:00+00:00",
+   "updated_at": "2026-04-01T10:00:00+00:00",
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
-   "cover_url": "/api/home_keeper_games/cover/eed5dacf0ada41059efc64fdefd6dfa9?v=543ed35b",
-   "progress": {
-    "alex": {
-     "switch": {
-      "play_status": "completed",
-      "rating": 4,
-      "playtime_minutes": null,
-      "started_at": null,
-      "completed_at": "2024-12-01",
-      "last_played_at": null,
-      "completion_count": 1,
-      "review": "",
-      "updated_at": "2024-12-01T22:00:00+00:00"
-     }
-    },
-    "jo": {
-     "switch": {
-      "play_status": "abandoned",
-      "rating": null,
-      "playtime_minutes": 140,
-      "started_at": null,
-      "completed_at": null,
-      "last_played_at": null,
-      "completion_count": 0,
-      "review": "",
-      "updated_at": "2026-07-12T10:00:00+00:00"
-     }
-    }
-   }
-  },
-  {
-   "id": "e888e36a88504536bd6a87fd7c4aafe1",
-   "title": "Every Grain of Rice",
-   "summary": "A cooking title by Fuchsia Dunlop.",
-   "genres": [
-    "Cooking",
-    "Chinese cooking"
-   ],
-   "release_date": "2012",
-   "franchise": null,
-   "igdb_id": null,
-   "tags": [
-    "Kitchen"
-   ],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-02-09T10:00:00+00:00",
-   "updated_at": "2026-02-09T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": null,
+   "cover_url": "/api/home_keeper_games/cover/ae18ed68fc3445f484544a09c13ece47?v=a66afeef",
    "progress": {
     "alex": {
      "pc": {
       "play_status": "playing",
       "rating": null,
-      "playtime_minutes": 80,
-      "started_at": "2026-08-01",
+      "playtime_minutes": 300,
+      "started_at": "2026-09-01",
       "completed_at": null,
       "last_played_at": null,
       "completion_count": 0,
       "review": "",
-      "updated_at": "2026-09-12T18:00:00+00:00"
+      "updated_at": "2026-09-29T21:00:00+00:00"
      }
     }
    }
-  },
-  {
-   "id": "84cbfdd27dcf4439a1fa041c32d955fc",
-   "title": "Gödel, Escher, Bach",
-   "summary": "A mathematics title by Douglas Hofstadter.",
-   "genres": [
-    "Mathematics",
-    "Philosophy"
-   ],
-   "release_date": "1979",
-   "franchise": null,
-   "igdb_id": null,
-   "tags": [],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-02-17T10:00:00+00:00",
-   "updated_at": "2026-02-17T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": null,
-   "progress": {
-    "alex": {
-     "switch": {
-      "play_status": "abandoned",
-      "rating": 3,
-      "playtime_minutes": 320,
-      "started_at": null,
-      "completed_at": null,
-      "last_played_at": null,
-      "completion_count": 0,
-      "review": "Try again one day.",
-      "updated_at": "2025-11-11T10:00:00+00:00"
-     }
-    }
-   }
-  },
-  {
-   "id": "ad5098f6bd434ad8af9c3e8307d5724c",
-   "title": "Integrated Chinese 1",
-   "summary": "A chinese language title by Yuehua Liu.",
-   "genres": [
-    "Chinese language"
-   ],
-   "release_date": "2017",
-   "franchise": "Integrated Chinese",
-   "igdb_id": null,
-   "tags": [
-    "Study"
-   ],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-03-03T10:00:00+00:00",
-   "updated_at": "2026-03-03T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": null,
-   "progress": {
-    "alex": {
-     "switch": {
-      "play_status": "playing",
-      "rating": null,
-      "playtime_minutes": 150,
-      "started_at": "2026-01-08",
-      "completed_at": null,
-      "last_played_at": null,
-      "completion_count": 0,
-      "review": "",
-      "updated_at": "2026-09-30T18:00:00+00:00"
-     }
-    }
-   }
-  },
-  {
-   "id": "6d4bd3ff12e9445ca851b230b527ce18",
-   "title": "Integrated Chinese 2",
-   "summary": "A chinese language title by Yuehua Liu.",
-   "genres": [
-    "Chinese language"
-   ],
-   "release_date": "2018",
-   "franchise": "Integrated Chinese",
-   "igdb_id": null,
-   "tags": [],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-04-15T10:00:00+00:00",
-   "updated_at": "2026-04-15T10:00:00+00:00",
-   "wishlist": {
-    "person_id": "alex",
-    "buy": false,
-    "added_at": "2026-06-01T10:00:00+00:00",
-    "todo_uid": null,
-    "todo_entity": null,
-    "bought": false
-   },
-   "owned": false,
-   "copy_count": 0,
-   "cover_url": null,
-   "progress": {}
   },
   {
    "id": "af804c5b7f944aabb9462c114fab95d0",
-   "title": "Klara and the Sun",
-   "summary": "A science fiction title by Kazuo Ishiguro.",
+   "title": "Celeste",
+   "summary": "A adventure title by Maddy Makes Games.",
    "genres": [
-    "Science fiction"
+    "Adventure"
    ],
-   "release_date": "2021",
+   "release_date": "2018",
    "franchise": null,
    "igdb_id": null,
    "tags": [],
@@ -534,14 +276,135 @@
    }
   },
   {
-   "id": "0079317c9882402e93c2fdfa755ebffb",
-   "title": "Land of Fish and Rice",
-   "summary": "A cooking title by Fuchsia Dunlop.",
+   "id": "7961cdfbeccb4c9c85ed872f0d50319c",
+   "title": "Civilization VI",
+   "summary": "A strategy title by Firaxis Games.",
    "genres": [
-    "Cooking",
-    "Chinese cooking"
+    "Strategy"
    ],
    "release_date": "2016",
+   "franchise": "Civilization",
+   "igdb_id": null,
+   "tags": [],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-03-11T10:00:00+00:00",
+   "updated_at": "2026-03-11T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": null,
+   "progress": {
+    "sam": {
+     "switch": {
+      "play_status": "abandoned",
+      "rating": null,
+      "playtime_minutes": 120,
+      "started_at": null,
+      "completed_at": null,
+      "last_played_at": null,
+      "completion_count": 0,
+      "review": "",
+      "updated_at": "2026-04-04T10:00:00+00:00"
+     }
+    }
+   }
+  },
+  {
+   "id": "9d5b05a55a2d4f4297abee49d4b7981b",
+   "title": "Disco Elysium",
+   "summary": "A role-playing (rpg) title by ZA/UM.",
+   "genres": [
+    "Role-playing (RPG)"
+   ],
+   "release_date": "2019",
+   "franchise": null,
+   "igdb_id": null,
+   "tags": [
+    "Award winner"
+   ],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-02-19T10:00:00+00:00",
+   "updated_at": "2026-02-19T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": null,
+   "progress": {
+    "sam": {
+     "switch2": {
+      "play_status": "completed",
+      "rating": 5,
+      "playtime_minutes": null,
+      "started_at": null,
+      "completed_at": "2026-03-03",
+      "last_played_at": null,
+      "completion_count": 1,
+      "review": "",
+      "updated_at": "2026-03-03T21:00:00+00:00"
+     }
+    }
+   }
+  },
+  {
+   "id": "8ffa744031884f64a2b39c35342641c1",
+   "title": "Elden Ring",
+   "summary": "A role-playing (rpg) title by FromSoftware.",
+   "genres": [
+    "Role-playing (RPG)",
+    "Adventure"
+   ],
+   "release_date": "2022",
+   "franchise": "Elden Ring",
+   "igdb_id": null,
+   "tags": [
+    "Award winner"
+   ],
+   "shared_notes": "",
+   "cover": {
+    "kind": "custom",
+    "file": "8ffa744031884f64a2b39c35342641c1-d2033a57.jpg"
+   },
+   "needs_details": false,
+   "created_at": "2026-02-01T10:00:00+00:00",
+   "updated_at": "2026-02-01T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": "/api/home_keeper_games/cover/8ffa744031884f64a2b39c35342641c1?v=d2033a57",
+   "progress": {
+    "alex": {
+     "ps5": {
+      "play_status": "completed",
+      "rating": 5,
+      "playtime_minutes": null,
+      "started_at": null,
+      "completed_at": "2026-05-14",
+      "last_played_at": null,
+      "completion_count": 1,
+      "review": "",
+      "updated_at": "2026-05-14T22:00:00+00:00"
+     }
+    }
+   }
+  },
+  {
+   "id": "06210f4a2c25422c83f65a12663ab1b1",
+   "title": "Factorio",
+   "summary": "A strategy title by Wube Software.",
+   "genres": [
+    "Strategy"
+   ],
+   "release_date": "2020",
    "franchise": null,
    "igdb_id": null,
    "tags": [],
@@ -551,29 +414,36 @@
     "file": null
    },
    "needs_details": false,
-   "created_at": "2026-04-13T10:00:00+00:00",
-   "updated_at": "2026-04-13T10:00:00+00:00",
-   "wishlist": {
-    "person_id": "sam",
-    "buy": true,
-    "added_at": "2026-09-18T10:00:00+00:00",
-    "todo_uid": null,
-    "todo_entity": null,
-    "bought": false
-   },
-   "owned": false,
-   "copy_count": 0,
+   "created_at": "2026-03-07T10:00:00+00:00",
+   "updated_at": "2026-03-07T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
    "cover_url": null,
-   "progress": {}
+   "progress": {
+    "alex": {
+     "switch2": {
+      "play_status": "completed",
+      "rating": 4,
+      "playtime_minutes": null,
+      "started_at": null,
+      "completed_at": "2026-07-20",
+      "last_played_at": null,
+      "completion_count": 1,
+      "review": "",
+      "updated_at": "2026-07-20T22:00:00+00:00"
+     }
+    }
+   }
   },
   {
    "id": "3bd29a2113cc46c08d7ff1eaf7c68307",
-   "title": "Lavinia",
-   "summary": "A historical fiction title by Ursula K. Le Guin.",
+   "title": "Fire Emblem Engage",
+   "summary": "A strategy title by Nintendo.",
    "genres": [
-    "Historical fiction"
+    "Strategy"
    ],
-   "release_date": "2008",
+   "release_date": "2023",
    "franchise": null,
    "igdb_id": null,
    "tags": [],
@@ -593,10 +463,11 @@
   },
   {
    "id": "e50273c278814a57b97033997476c0df",
-   "title": "Piranesi",
-   "summary": "A fantasy title by Susanna Clarke.",
+   "title": "Hades",
+   "summary": "A role-playing (rpg) title by Supergiant Games.",
    "genres": [
-    "Fantasy"
+    "Role-playing (RPG)",
+    "Indie"
    ],
    "release_date": "2020",
    "franchise": null,
@@ -646,13 +517,352 @@
    }
   },
   {
-   "id": "d4c37434a7ea4a8e860517cd82ccc32b",
-   "title": "Project Hail Mary",
-   "summary": "A science fiction title by Andy Weir.",
+   "id": "0a6099a9263f4b709ee6b01c2d7e9506",
+   "title": "Hi-Fi Rush",
+   "summary": "A action title by Tango Gameworks.",
    "genres": [
-    "Science fiction"
+    "Action"
+   ],
+   "release_date": "2023",
+   "franchise": null,
+   "igdb_id": null,
+   "tags": [],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-04-05T10:00:00+00:00",
+   "updated_at": "2026-04-05T10:00:00+00:00",
+   "wishlist": null,
+   "owned": false,
+   "copy_count": 0,
+   "cover_url": null,
+   "progress": {
+    "alex": {
+     "other": {
+      "play_status": "playing",
+      "rating": null,
+      "playtime_minutes": 64,
+      "started_at": "2026-09-21",
+      "completed_at": null,
+      "last_played_at": null,
+      "completion_count": 0,
+      "review": "",
+      "updated_at": "2026-10-01T20:00:00+00:00"
+     }
+    }
+   }
+  },
+  {
+   "id": "eed5dacf0ada41059efc64fdefd6dfa9",
+   "title": "Hollow Knight",
+   "summary": "A adventure title by Team Cherry.",
+   "genres": [
+    "Adventure",
+    "Platform"
+   ],
+   "release_date": "2017",
+   "franchise": "Hollow Knight",
+   "igdb_id": null,
+   "tags": [],
+   "shared_notes": "",
+   "cover": {
+    "kind": "custom",
+    "file": "eed5dacf0ada41059efc64fdefd6dfa9-543ed35b.jpg"
+   },
+   "needs_details": false,
+   "created_at": "2026-02-03T10:00:00+00:00",
+   "updated_at": "2026-02-03T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": "/api/home_keeper_games/cover/eed5dacf0ada41059efc64fdefd6dfa9?v=543ed35b",
+   "progress": {
+    "alex": {
+     "switch": {
+      "play_status": "completed",
+      "rating": 4,
+      "playtime_minutes": null,
+      "started_at": null,
+      "completed_at": "2024-12-01",
+      "last_played_at": null,
+      "completion_count": 1,
+      "review": "",
+      "updated_at": "2024-12-01T22:00:00+00:00"
+     }
+    },
+    "jo": {
+     "switch": {
+      "play_status": "abandoned",
+      "rating": null,
+      "playtime_minutes": 140,
+      "started_at": null,
+      "completed_at": null,
+      "last_played_at": null,
+      "completion_count": 0,
+      "review": "",
+      "updated_at": "2026-07-12T10:00:00+00:00"
+     }
+    }
+   }
+  },
+  {
+   "id": "46027ede85e54b56a1da501c26b7eee7",
+   "title": "Hollow Knight: Silksong",
+   "summary": "A adventure title by Team Cherry.",
+   "genres": [
+    "Adventure",
+    "Platform"
+   ],
+   "release_date": "2025",
+   "franchise": "Hollow Knight",
+   "igdb_id": null,
+   "tags": [],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-04-11T10:00:00+00:00",
+   "updated_at": "2026-04-11T10:00:00+00:00",
+   "wishlist": {
+    "person_id": "alex",
+    "buy": false,
+    "added_at": "2026-08-15T10:00:00+00:00",
+    "todo_uid": null,
+    "todo_entity": null,
+    "bought": false
+   },
+   "owned": false,
+   "copy_count": 0,
+   "cover_url": null,
+   "progress": {}
+  },
+  {
+   "id": "d4a98396d9f9490bb2371d3bfa27b476",
+   "title": "Kirby and the Forgotten Land",
+   "summary": "A platform title by Nintendo.",
+   "genres": [
+    "Platform"
+   ],
+   "release_date": "2022",
+   "franchise": "Kirby",
+   "igdb_id": null,
+   "tags": [],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-01-17T10:00:00+00:00",
+   "updated_at": "2026-01-17T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": null,
+   "progress": {
+    "sam": {
+     "ps4": {
+      "play_status": "completed",
+      "rating": 3,
+      "playtime_minutes": null,
+      "started_at": null,
+      "completed_at": "2026-06-01",
+      "last_played_at": null,
+      "completion_count": 1,
+      "review": "",
+      "updated_at": "2026-06-01T20:00:00+00:00"
+     }
+    }
+   }
+  },
+  {
+   "id": "b796ea67f1b14d51a21aea93829a5f3d",
+   "title": "Kirby's Return to Dream Land Deluxe",
+   "summary": "A platform title by Nintendo.",
+   "genres": [
+    "Platform"
+   ],
+   "release_date": "2023",
+   "franchise": "Kirby",
+   "igdb_id": null,
+   "tags": [],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-03-23T10:00:00+00:00",
+   "updated_at": "2026-03-23T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": null,
+   "progress": {}
+  },
+  {
+   "id": "ba6076bfc6414e079514e8559c452e7f",
+   "title": "Mario Kart 8 Deluxe",
+   "summary": "A racing title by Nintendo.",
+   "genres": [
+    "Racing"
+   ],
+   "release_date": "2017",
+   "franchise": "Mario Kart",
+   "igdb_id": null,
+   "tags": [],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-01-11T10:00:00+00:00",
+   "updated_at": "2026-01-11T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": null,
+   "progress": {}
+  },
+  {
+   "id": "dbcf7eb0b9f14491ba5bcde27e29a967",
+   "title": "Mario Party Superstars",
+   "summary": "A party title by Nintendo.",
+   "genres": [
+    "Party"
    ],
    "release_date": "2021",
+   "franchise": null,
+   "igdb_id": null,
+   "tags": [
+    "Family"
+   ],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-03-01T10:00:00+00:00",
+   "updated_at": "2026-03-01T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": null,
+   "progress": {
+    "jo": {
+     "switch": {
+      "play_status": "completed",
+      "rating": null,
+      "playtime_minutes": null,
+      "started_at": null,
+      "completed_at": "2026-01-02",
+      "last_played_at": null,
+      "completion_count": 12,
+      "review": "",
+      "updated_at": "2026-01-02T19:00:00+00:00"
+     }
+    }
+   }
+  },
+  {
+   "id": "06618efb9962471d992ba150a7d619b6",
+   "title": "Mass Effect Legendary Edition",
+   "summary": "A role-playing (rpg) title by BioWare.",
+   "genres": [
+    "Role-playing (RPG)",
+    "Shooter"
+   ],
+   "release_date": "2021",
+   "franchise": "Mass Effect",
+   "igdb_id": null,
+   "tags": [
+    "Award winner"
+   ],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-03-13T10:00:00+00:00",
+   "updated_at": "2026-03-13T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": null,
+   "progress": {
+    "alex": {
+     "ps5": {
+      "play_status": "completed",
+      "rating": 4,
+      "playtime_minutes": null,
+      "started_at": null,
+      "completed_at": "2026-08-08",
+      "last_played_at": null,
+      "completion_count": 1,
+      "review": "",
+      "updated_at": "2026-08-08T22:00:00+00:00"
+     }
+    }
+   }
+  },
+  {
+   "id": "13be6b0e5c354e1981a89fe2766196e0",
+   "title": "Metroid Dread",
+   "summary": "A adventure title by Nintendo.",
+   "genres": [
+    "Adventure",
+    "Shooter"
+   ],
+   "release_date": "2021",
+   "franchise": "Metroid",
+   "igdb_id": null,
+   "tags": [
+    "Award winner"
+   ],
+   "shared_notes": "",
+   "cover": {
+    "kind": "custom",
+    "file": "13be6b0e5c354e1981a89fe2766196e0-552257a9.jpg"
+   },
+   "needs_details": false,
+   "created_at": "2026-01-05T10:00:00+00:00",
+   "updated_at": "2026-01-05T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": "/api/home_keeper_games/cover/13be6b0e5c354e1981a89fe2766196e0?v=552257a9",
+   "progress": {
+    "alex": {
+     "switch": {
+      "play_status": "completed",
+      "rating": 5,
+      "playtime_minutes": null,
+      "started_at": null,
+      "completed_at": "2026-04-20",
+      "last_played_at": null,
+      "completion_count": 1,
+      "review": "",
+      "updated_at": "2026-04-20T22:00:00+00:00"
+     }
+    }
+   }
+  },
+  {
+   "id": "d4c37434a7ea4a8e860517cd82ccc32b",
+   "title": "Outer Wilds",
+   "summary": "A adventure title by Mobius Digital.",
+   "genres": [
+    "Adventure"
+   ],
+   "release_date": "2019",
    "franchise": null,
    "igdb_id": null,
    "tags": [],
@@ -698,17 +908,131 @@
    }
   },
   {
-   "id": "2ff469fc40f54abfbb1a50274f264dae",
-   "title": "Salt, Fat, Acid, Heat",
-   "summary": "A cooking title by Samin Nosrat.",
+   "id": "e888e36a88504536bd6a87fd7c4aafe1",
+   "title": "Overcooked! 2",
+   "summary": "A simulator title by Ghost Town Games.",
    "genres": [
-    "Cooking"
+    "Simulator",
+    "Party"
    ],
-   "release_date": "2017",
+   "release_date": "2018",
+   "franchise": "Overcooked",
+   "igdb_id": null,
+   "tags": [
+    "Couch co-op"
+   ],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-02-09T10:00:00+00:00",
+   "updated_at": "2026-02-09T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": null,
+   "progress": {
+    "alex": {
+     "pc": {
+      "play_status": "playing",
+      "rating": null,
+      "playtime_minutes": 80,
+      "started_at": "2026-08-01",
+      "completed_at": null,
+      "last_played_at": null,
+      "completion_count": 0,
+      "review": "",
+      "updated_at": "2026-09-12T18:00:00+00:00"
+     }
+    }
+   }
+  },
+  {
+   "id": "0079317c9882402e93c2fdfa755ebffb",
+   "title": "Overcooked! All You Can Eat",
+   "summary": "A simulator title by Ghost Town Games.",
+   "genres": [
+    "Simulator",
+    "Party"
+   ],
+   "release_date": "2020",
+   "franchise": "Overcooked",
+   "igdb_id": null,
+   "tags": [],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-04-13T10:00:00+00:00",
+   "updated_at": "2026-04-13T10:00:00+00:00",
+   "wishlist": {
+    "person_id": "sam",
+    "buy": true,
+    "added_at": "2026-09-18T10:00:00+00:00",
+    "todo_uid": null,
+    "todo_entity": null,
+    "bought": false
+   },
+   "owned": false,
+   "copy_count": 0,
+   "cover_url": null,
+   "progress": {}
+  },
+  {
+   "id": "db815384ca094b1ca4cc5b9a7e437b86",
+   "title": "Pikmin 4",
+   "summary": "A strategy title by Nintendo.",
+   "genres": [
+    "Strategy"
+   ],
+   "release_date": "2023",
+   "franchise": null,
+   "igdb_id": null,
+   "tags": [],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-01-07T10:00:00+00:00",
+   "updated_at": "2026-01-07T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": null,
+   "progress": {
+    "alex": {
+     "ps4": {
+      "play_status": "backlog",
+      "rating": null,
+      "playtime_minutes": null,
+      "started_at": null,
+      "completed_at": null,
+      "last_played_at": null,
+      "completion_count": 0,
+      "review": "",
+      "updated_at": "2026-05-01T10:00:00+00:00"
+     }
+    }
+   }
+  },
+  {
+   "id": "2ff469fc40f54abfbb1a50274f264dae",
+   "title": "PowerWash Simulator",
+   "summary": "A simulator title by FuturLab.",
+   "genres": [
+    "Simulator"
+   ],
+   "release_date": "2022",
    "franchise": null,
    "igdb_id": null,
    "tags": [
-    "Kitchen"
+    "Couch co-op"
    ],
    "shared_notes": "",
    "cover": {
@@ -725,13 +1049,86 @@
    "progress": {}
   },
   {
-   "id": "7961cdfbeccb4c9c85ed872f0d50319c",
-   "title": "Sapiens",
-   "summary": "A history title by Yuval Noah Harari.",
+   "id": "ad5098f6bd434ad8af9c3e8307d5724c",
+   "title": "Professor Layton and the Curious Village",
+   "summary": "A puzzle title by Level-5.",
    "genres": [
-    "History"
+    "Puzzle"
    ],
-   "release_date": "2011",
+   "release_date": "2007",
+   "franchise": "Professor Layton",
+   "igdb_id": null,
+   "tags": [
+    "Puzzle night"
+   ],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-03-03T10:00:00+00:00",
+   "updated_at": "2026-03-03T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": null,
+   "progress": {
+    "alex": {
+     "switch": {
+      "play_status": "playing",
+      "rating": null,
+      "playtime_minutes": 150,
+      "started_at": "2026-01-08",
+      "completed_at": null,
+      "last_played_at": null,
+      "completion_count": 0,
+      "review": "",
+      "updated_at": "2026-09-30T18:00:00+00:00"
+     }
+    }
+   }
+  },
+  {
+   "id": "6d4bd3ff12e9445ca851b230b527ce18",
+   "title": "Professor Layton and the Diabolical Box",
+   "summary": "A puzzle title by Level-5.",
+   "genres": [
+    "Puzzle"
+   ],
+   "release_date": "2007",
+   "franchise": "Professor Layton",
+   "igdb_id": null,
+   "tags": [],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-04-15T10:00:00+00:00",
+   "updated_at": "2026-04-15T10:00:00+00:00",
+   "wishlist": {
+    "person_id": "alex",
+    "buy": false,
+    "added_at": "2026-06-01T10:00:00+00:00",
+    "todo_uid": null,
+    "todo_entity": null,
+    "bought": false
+   },
+   "owned": false,
+   "copy_count": 0,
+   "cover_url": null,
+   "progress": {}
+  },
+  {
+   "id": "a662b1be82664e1790a514c31fa97558",
+   "title": "Return of the Obra Dinn",
+   "summary": "A puzzle title by Lucas Pope.",
+   "genres": [
+    "Puzzle"
+   ],
+   "release_date": "2018",
    "franchise": null,
    "igdb_id": null,
    "tags": [],
@@ -741,8 +1138,33 @@
     "file": null
    },
    "needs_details": false,
-   "created_at": "2026-03-11T10:00:00+00:00",
-   "updated_at": "2026-03-11T10:00:00+00:00",
+   "created_at": "2026-03-09T10:00:00+00:00",
+   "updated_at": "2026-03-09T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": null,
+   "progress": {}
+  },
+  {
+   "id": "3d2bac374c67488480cf6c8511eb0411",
+   "title": "Sea of Stars",
+   "summary": "A role-playing (rpg) title by Sabotage Studio.",
+   "genres": [
+    "Role-playing (RPG)"
+   ],
+   "release_date": "2023",
+   "franchise": null,
+   "igdb_id": null,
+   "tags": [],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-04-03T10:00:00+00:00",
+   "updated_at": "2026-04-03T10:00:00+00:00",
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
@@ -750,27 +1172,28 @@
    "progress": {
     "sam": {
      "switch": {
-      "play_status": "abandoned",
+      "play_status": "playing",
       "rating": null,
-      "playtime_minutes": 120,
-      "started_at": null,
+      "playtime_minutes": 20,
+      "started_at": "2026-10-01",
       "completed_at": null,
       "last_played_at": null,
       "completion_count": 0,
       "review": "",
-      "updated_at": "2026-04-04T10:00:00+00:00"
+      "updated_at": "2026-10-01T22:00:00+00:00"
      }
     }
    }
   },
   {
    "id": "518cc58e5bbe485d8b8a241e59e56f2f",
-   "title": "Sea of Tranquility",
-   "summary": "A science fiction title by Emily St. John Mandel.",
+   "title": "Spiritfarer",
+   "summary": "A simulator title by Thunder Lotus.",
    "genres": [
-    "Science fiction"
+    "Simulator",
+    "Indie"
    ],
-   "release_date": "2022",
+   "release_date": "2020",
    "franchise": null,
    "igdb_id": null,
    "tags": [],
@@ -803,13 +1226,13 @@
    }
   },
   {
-   "id": "0a6099a9263f4b709ee6b01c2d7e9506",
-   "title": "Spinning Silver",
-   "summary": "A fantasy title by Naomi Novik.",
+   "id": "360738e00aa246d38aab80792e9087fb",
+   "title": "Splatoon 3",
+   "summary": "A shooter title by Nintendo.",
    "genres": [
-    "Fantasy"
+    "Shooter"
    ],
-   "release_date": "2018",
+   "release_date": "2022",
    "franchise": null,
    "igdb_id": null,
    "tags": [],
@@ -819,256 +1242,29 @@
     "file": null
    },
    "needs_details": false,
-   "created_at": "2026-04-05T10:00:00+00:00",
-   "updated_at": "2026-04-05T10:00:00+00:00",
-   "wishlist": null,
-   "owned": false,
-   "copy_count": 0,
-   "cover_url": null,
-   "progress": {
-    "alex": {
-     "other": {
-      "play_status": "playing",
-      "rating": null,
-      "playtime_minutes": 64,
-      "started_at": "2026-09-21",
-      "completed_at": null,
-      "last_played_at": null,
-      "completion_count": 0,
-      "review": "",
-      "updated_at": "2026-10-01T20:00:00+00:00"
-     }
-    }
-   }
-  },
-  {
-   "id": "b30885c12d524a63b858d237b5353dc2",
-   "title": "Station Eleven",
-   "summary": "A literary fiction title by Emily St. John Mandel.",
-   "genres": [
-    "Literary fiction"
-   ],
-   "release_date": "2014",
-   "franchise": null,
-   "igdb_id": null,
-   "tags": [],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-03-15T10:00:00+00:00",
-   "updated_at": "2026-03-15T10:00:00+00:00",
+   "created_at": "2026-01-15T10:00:00+00:00",
+   "updated_at": "2026-01-15T10:00:00+00:00",
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
    "cover_url": null,
    "progress": {}
-  },
-  {
-   "id": "b796ea67f1b14d51a21aea93829a5f3d",
-   "title": "Steering the Craft",
-   "summary": "A writing title by Ursula K. Le Guin.",
-   "genres": [
-    "Writing"
-   ],
-   "release_date": "1998",
-   "franchise": null,
-   "igdb_id": null,
-   "tags": [],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-03-23T10:00:00+00:00",
-   "updated_at": "2026-03-23T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": null,
-   "progress": {}
-  },
-  {
-   "id": "d8d911387500471c9736a6a204509f73",
-   "title": "Structure and Interpretation of Computer Programs",
-   "summary": "A computer science title by Harold Abelson.",
-   "genres": [
-    "Computer science"
-   ],
-   "release_date": "1996",
-   "franchise": null,
-   "igdb_id": null,
-   "tags": [
-    "Study"
-   ],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-03-05T10:00:00+00:00",
-   "updated_at": "2026-03-05T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": null,
-   "progress": {}
-  },
-  {
-   "id": "c8a701c41eb84f78949683fc37d29497",
-   "title": "Tehanu",
-   "summary": "A fantasy title by Ursula K. Le Guin.",
-   "genres": [
-    "Fantasy"
-   ],
-   "release_date": "1990",
-   "franchise": "Earthsea",
-   "igdb_id": null,
-   "tags": [
-    "Nebula winner"
-   ],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-01-13T10:00:00+00:00",
-   "updated_at": "2026-01-13T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": null,
-   "progress": {}
-  },
-  {
-   "id": "13be6b0e5c354e1981a89fe2766196e0",
-   "title": "The Dispossessed",
-   "summary": "A science fiction title by Ursula K. Le Guin.",
-   "genres": [
-    "Science fiction",
-    "Utopias"
-   ],
-   "release_date": "1974",
-   "franchise": "Hainish Cycle",
-   "igdb_id": null,
-   "tags": [
-    "Hugo winner"
-   ],
-   "shared_notes": "",
-   "cover": {
-    "kind": "custom",
-    "file": "13be6b0e5c354e1981a89fe2766196e0-552257a9.jpg"
-   },
-   "needs_details": false,
-   "created_at": "2026-01-05T10:00:00+00:00",
-   "updated_at": "2026-01-05T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": "/api/home_keeper_games/cover/13be6b0e5c354e1981a89fe2766196e0?v=552257a9",
-   "progress": {
-    "alex": {
-     "switch": {
-      "play_status": "completed",
-      "rating": 5,
-      "playtime_minutes": null,
-      "started_at": null,
-      "completed_at": "2026-04-20",
-      "last_played_at": null,
-      "completion_count": 1,
-      "review": "",
-      "updated_at": "2026-04-20T22:00:00+00:00"
-     }
-    }
-   }
-  },
-  {
-   "id": "ba6076bfc6414e079514e8559c452e7f",
-   "title": "The Farthest Shore",
-   "summary": "A fantasy title by Ursula K. Le Guin.",
-   "genres": [
-    "Fantasy"
-   ],
-   "release_date": "1972",
-   "franchise": "Earthsea",
-   "igdb_id": null,
-   "tags": [],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-01-11T10:00:00+00:00",
-   "updated_at": "2026-01-11T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": null,
-   "progress": {}
-  },
-  {
-   "id": "8ffa744031884f64a2b39c35342641c1",
-   "title": "The Fifth Season",
-   "summary": "A fantasy title by N. K. Jemisin.",
-   "genres": [
-    "Fantasy",
-    "Science fiction"
-   ],
-   "release_date": "2015",
-   "franchise": "The Broken Earth",
-   "igdb_id": null,
-   "tags": [
-    "Hugo winner"
-   ],
-   "shared_notes": "",
-   "cover": {
-    "kind": "custom",
-    "file": "8ffa744031884f64a2b39c35342641c1-d2033a57.jpg"
-   },
-   "needs_details": false,
-   "created_at": "2026-02-01T10:00:00+00:00",
-   "updated_at": "2026-02-01T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": "/api/home_keeper_games/cover/8ffa744031884f64a2b39c35342641c1?v=d2033a57",
-   "progress": {
-    "alex": {
-     "ps5": {
-      "play_status": "completed",
-      "rating": 5,
-      "playtime_minutes": null,
-      "started_at": null,
-      "completed_at": "2026-05-14",
-      "last_played_at": null,
-      "completion_count": 1,
-      "review": "",
-      "updated_at": "2026-05-14T22:00:00+00:00"
-     }
-    }
-   }
   },
   {
    "id": "9cbb153d8b0046dc81ceedd95bf92aaf",
-   "title": "The Food Lab",
-   "summary": "A cooking title by J. Kenji López-Alt.",
+   "title": "Stardew Valley",
+   "summary": "A simulator title by ConcernedApe.",
    "genres": [
-    "Cooking",
-    "Science"
+    "Simulator",
+    "Role-playing (RPG)"
    ],
-   "release_date": "2015",
+   "release_date": "2016",
    "franchise": null,
    "igdb_id": null,
    "tags": [
-    "Kitchen"
+    "Couch co-op"
    ],
-   "shared_notes": "The *pancake* recipe is on page 102.\n\n- Sticky notes from Jo\n- Do not lend",
+   "shared_notes": "The *greenhouse* plan is in the case.\n\n- Sticky notes from Jo\n- Do not lend",
    "cover": {
     "kind": "none",
     "file": null
@@ -1083,19 +1279,71 @@
    "progress": {}
   },
   {
-   "id": "fd086096a83f483ab7219f131e678534",
-   "title": "The Hobbit",
-   "summary": "A fantasy title by J. R. R. Tolkien.",
+   "id": "fb4f591ff96c45e5abc0fa81325c564c",
+   "title": "Super Mario Bros. Wonder",
+   "summary": "A platform title by Nintendo.",
    "genres": [
-    "Fantasy"
+    "Platform"
    ],
-   "release_date": "1937",
-   "franchise": null,
+   "release_date": "2023",
+   "franchise": "Super Mario",
+   "igdb_id": null,
+   "tags": [],
+   "shared_notes": "",
+   "cover": {
+    "kind": "custom",
+    "file": "fb4f591ff96c45e5abc0fa81325c564c-7ccde4d9.jpg"
+   },
+   "needs_details": false,
+   "created_at": "2026-01-09T10:00:00+00:00",
+   "updated_at": "2026-01-09T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": "/api/home_keeper_games/cover/fb4f591ff96c45e5abc0fa81325c564c?v=7ccde4d9",
+   "progress": {
+    "alex": {
+     "switch2": {
+      "play_status": "backlog",
+      "rating": null,
+      "playtime_minutes": null,
+      "started_at": null,
+      "completed_at": null,
+      "last_played_at": null,
+      "completion_count": 0,
+      "review": "",
+      "updated_at": "2026-08-31T10:00:00+00:00"
+     }
+    },
+    "jo": {
+     "switch2": {
+      "play_status": "playing",
+      "rating": null,
+      "playtime_minutes": 40,
+      "started_at": "2026-09-28",
+      "completed_at": null,
+      "last_played_at": null,
+      "completion_count": 0,
+      "review": "",
+      "updated_at": "2026-10-02T18:00:00+00:00"
+     }
+    }
+   }
+  },
+  {
+   "id": "fd086096a83f483ab7219f131e678534",
+   "title": "Super Mario Galaxy",
+   "summary": "A platform title by Nintendo.",
+   "genres": [
+    "Platform"
+   ],
+   "release_date": "2007",
+   "franchise": "Super Mario",
    "igdb_id": null,
    "tags": [
     "Family"
    ],
-   "shared_notes": "First edition of the family. Keep it out of the sun.",
+   "shared_notes": "First game of the family. Keep the case out of the sun.",
    "cover": {
     "kind": "custom",
     "file": "fd086096a83f483ab7219f131e678534-f18df7a1.jpg"
@@ -1137,14 +1385,66 @@
    }
   },
   {
-   "id": "db815384ca094b1ca4cc5b9a7e437b86",
-   "title": "The Lathe of Heaven",
-   "summary": "A science fiction title by Ursula K. Le Guin.",
+   "id": "e4b7df5e6eef4483b1751162204397b8",
+   "title": "Super Mario Odyssey",
+   "summary": "A platform title by Nintendo.",
    "genres": [
-    "Science fiction"
+    "Platform"
    ],
-   "release_date": "1971",
-   "franchise": null,
+   "release_date": "2017",
+   "franchise": "Super Mario",
+   "igdb_id": null,
+   "tags": [],
+   "shared_notes": "",
+   "cover": {
+    "kind": "custom",
+    "file": "e4b7df5e6eef4483b1751162204397b8-798c3698.jpg"
+   },
+   "needs_details": false,
+   "created_at": "2026-01-03T10:00:00+00:00",
+   "updated_at": "2026-01-03T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": "/api/home_keeper_games/cover/e4b7df5e6eef4483b1751162204397b8?v=798c3698",
+   "progress": {
+    "alex": {
+     "ps5": {
+      "play_status": "completed",
+      "rating": 5,
+      "playtime_minutes": null,
+      "started_at": null,
+      "completed_at": "2026-02-11",
+      "last_played_at": null,
+      "completion_count": 1,
+      "review": "",
+      "updated_at": "2026-02-11T21:00:00+00:00"
+     }
+    },
+    "jo": {
+     "ps5": {
+      "play_status": "completed",
+      "rating": 4,
+      "playtime_minutes": null,
+      "started_at": null,
+      "completed_at": "2026-08-30",
+      "last_played_at": null,
+      "completion_count": 1,
+      "review": "",
+      "updated_at": "2026-08-30T19:00:00+00:00"
+     }
+    }
+   }
+  },
+  {
+   "id": "b30885c12d524a63b858d237b5353dc2",
+   "title": "The Last of Us Part I",
+   "summary": "A adventure title by Naughty Dog.",
+   "genres": [
+    "Adventure"
+   ],
+   "release_date": "2022",
+   "franchise": "The Last of Us",
    "igdb_id": null,
    "tags": [],
    "shared_notes": "",
@@ -1153,43 +1453,61 @@
     "file": null
    },
    "needs_details": false,
-   "created_at": "2026-01-07T10:00:00+00:00",
-   "updated_at": "2026-01-07T10:00:00+00:00",
+   "created_at": "2026-03-15T10:00:00+00:00",
+   "updated_at": "2026-03-15T10:00:00+00:00",
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
    "cover_url": null,
-   "progress": {
-    "alex": {
-     "ps4": {
-      "play_status": "backlog",
-      "rating": null,
-      "playtime_minutes": null,
-      "started_at": null,
-      "completed_at": null,
-      "last_played_at": null,
-      "completion_count": 0,
-      "review": "",
-      "updated_at": "2026-05-01T10:00:00+00:00"
-     }
-    }
-   }
+   "progress": {}
+  },
+  {
+   "id": "3c13e288a2d24a49a7464566679c565c",
+   "title": "The Legend of Zelda: Echoes of Wisdom",
+   "summary": "A adventure title by Nintendo.",
+   "genres": [
+    "Adventure"
+   ],
+   "release_date": "2024",
+   "franchise": "The Legend of Zelda",
+   "igdb_id": null,
+   "tags": [],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-04-09T10:00:00+00:00",
+   "updated_at": "2026-04-09T10:00:00+00:00",
+   "wishlist": {
+    "person_id": "alex",
+    "buy": true,
+    "added_at": "2026-09-02T10:00:00+00:00",
+    "todo_uid": null,
+    "todo_entity": null,
+    "bought": false
+   },
+   "owned": false,
+   "copy_count": 0,
+   "cover_url": null,
+   "progress": {}
   },
   {
    "id": "58247cad1ced46248fefe4d2b0db71b5",
-   "title": "The Left Hand of Darkness",
-   "summary": "A science fiction title by Ursula K. Le Guin.",
+   "title": "The Legend of Zelda: Tears of the Kingdom",
+   "summary": "A adventure title by Nintendo.",
    "genres": [
-    "Science fiction",
-    "Gender"
+    "Adventure",
+    "Open world"
    ],
-   "release_date": "1969",
-   "franchise": "Hainish Cycle",
+   "release_date": "2023",
+   "franchise": "The Legend of Zelda",
    "igdb_id": null,
    "tags": [
-    "Hugo winner"
+    "Award winner"
    ],
-   "shared_notes": "Game club pick, **Oct 2026**. Sam has the map of Gethen bookmarked on page 6.",
+   "shared_notes": "Game club pick, **Oct 2026**. Sam has the map of Hyrule on the 3rd save.",
    "cover": {
     "kind": "custom",
     "file": "58247cad1ced46248fefe4d2b0db71b5-cff560bf.jpg"
@@ -1242,53 +1560,14 @@
    }
   },
   {
-   "id": "ae18ed68fc3445f484544a09c13ece47",
-   "title": "The Ministry for the Future",
-   "summary": "A science fiction title by Kim Stanley Robinson.",
-   "genres": [
-    "Science fiction"
-   ],
-   "release_date": "2020",
-   "franchise": null,
-   "igdb_id": null,
-   "tags": [],
-   "shared_notes": "",
-   "cover": {
-    "kind": "custom",
-    "file": "ae18ed68fc3445f484544a09c13ece47-a66afeef.jpg"
-   },
-   "needs_details": false,
-   "created_at": "2026-04-01T10:00:00+00:00",
-   "updated_at": "2026-04-01T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": "/api/home_keeper_games/cover/ae18ed68fc3445f484544a09c13ece47?v=a66afeef",
-   "progress": {
-    "alex": {
-     "pc": {
-      "play_status": "playing",
-      "rating": null,
-      "playtime_minutes": 300,
-      "started_at": "2026-09-01",
-      "completed_at": null,
-      "last_played_at": null,
-      "completion_count": 0,
-      "review": "",
-      "updated_at": "2026-09-29T21:00:00+00:00"
-     }
-    }
-   }
-  },
-  {
    "id": "f308096519994fb78d16e480b16b71aa",
-   "title": "The Name of the Wind",
-   "summary": "A fantasy title by Patrick Rothfuss.",
+   "title": "The Witcher 3: Wild Hunt",
+   "summary": "A role-playing (rpg) title by CD Projekt Red.",
    "genres": [
-    "Fantasy"
+    "Role-playing (RPG)"
    ],
-   "release_date": "2007",
-   "franchise": "The Kingkiller Chronicle",
+   "release_date": "2015",
+   "franchise": "The Witcher",
    "igdb_id": null,
    "tags": [],
    "shared_notes": "",
@@ -1306,119 +1585,13 @@
    "progress": {}
   },
   {
-   "id": "46027ede85e54b56a1da501c26b7eee7",
-   "title": "The Obelisk Gate",
-   "summary": "A fantasy title by N. K. Jemisin.",
+   "id": "84cbfdd27dcf4439a1fa041c32d955fc",
+   "title": "The Witness",
+   "summary": "A puzzle title by Thekla.",
    "genres": [
-    "Fantasy"
+    "Puzzle"
    ],
    "release_date": "2016",
-   "franchise": "The Broken Earth",
-   "igdb_id": null,
-   "tags": [],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-04-11T10:00:00+00:00",
-   "updated_at": "2026-04-11T10:00:00+00:00",
-   "wishlist": {
-    "person_id": "alex",
-    "buy": false,
-    "added_at": "2026-08-15T10:00:00+00:00",
-    "todo_uid": null,
-    "todo_entity": null,
-    "bought": false
-   },
-   "owned": false,
-   "copy_count": 0,
-   "cover_url": null,
-   "progress": {}
-  },
-  {
-   "id": "3c13e288a2d24a49a7464566679c565c",
-   "title": "The Other Wind",
-   "summary": "A fantasy title by Ursula K. Le Guin.",
-   "genres": [
-    "Fantasy"
-   ],
-   "release_date": "2001",
-   "franchise": "Earthsea",
-   "igdb_id": null,
-   "tags": [],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-04-09T10:00:00+00:00",
-   "updated_at": "2026-04-09T10:00:00+00:00",
-   "wishlist": {
-    "person_id": "alex",
-    "buy": true,
-    "added_at": "2026-09-02T10:00:00+00:00",
-    "todo_uid": null,
-    "todo_entity": null,
-    "bought": false
-   },
-   "owned": false,
-   "copy_count": 0,
-   "cover_url": null,
-   "progress": {}
-  },
-  {
-   "id": "9d5b05a55a2d4f4297abee49d4b7981b",
-   "title": "The Overstory",
-   "summary": "A literary fiction title by Richard Powers.",
-   "genres": [
-    "Literary fiction",
-    "Trees"
-   ],
-   "release_date": "2018",
-   "franchise": null,
-   "igdb_id": null,
-   "tags": [
-    "Pulitzer winner"
-   ],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-02-19T10:00:00+00:00",
-   "updated_at": "2026-02-19T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": null,
-   "progress": {
-    "sam": {
-     "switch2": {
-      "play_status": "completed",
-      "rating": 5,
-      "playtime_minutes": null,
-      "started_at": null,
-      "completed_at": "2026-03-03",
-      "last_played_at": null,
-      "completion_count": 1,
-      "review": "",
-      "updated_at": "2026-03-03T21:00:00+00:00"
-     }
-    }
-   }
-  },
-  {
-   "id": "06210f4a2c25422c83f65a12663ab1b1",
-   "title": "The Pragmatic Programmer",
-   "summary": "A computer science title by Andrew Hunt.",
-   "genres": [
-    "Computer science"
-   ],
-   "release_date": "1999",
    "franchise": null,
    "igdb_id": null,
    "tags": [],
@@ -1428,211 +1601,57 @@
     "file": null
    },
    "needs_details": false,
-   "created_at": "2026-03-07T10:00:00+00:00",
-   "updated_at": "2026-03-07T10:00:00+00:00",
+   "created_at": "2026-02-17T10:00:00+00:00",
+   "updated_at": "2026-02-17T10:00:00+00:00",
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
    "cover_url": null,
    "progress": {
     "alex": {
-     "switch2": {
-      "play_status": "completed",
-      "rating": 4,
-      "playtime_minutes": null,
-      "started_at": null,
-      "completed_at": "2026-07-20",
-      "last_played_at": null,
-      "completion_count": 1,
-      "review": "",
-      "updated_at": "2026-07-20T22:00:00+00:00"
-     }
-    }
-   }
-  },
-  {
-   "id": "fb4f591ff96c45e5abc0fa81325c564c",
-   "title": "The Tombs of Atuan",
-   "summary": "A fantasy title by Ursula K. Le Guin.",
-   "genres": [
-    "Fantasy"
-   ],
-   "release_date": "1970",
-   "franchise": "Earthsea",
-   "igdb_id": null,
-   "tags": [],
-   "shared_notes": "",
-   "cover": {
-    "kind": "custom",
-    "file": "fb4f591ff96c45e5abc0fa81325c564c-7ccde4d9.jpg"
-   },
-   "needs_details": false,
-   "created_at": "2026-01-09T10:00:00+00:00",
-   "updated_at": "2026-01-09T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": "/api/home_keeper_games/cover/fb4f591ff96c45e5abc0fa81325c564c?v=7ccde4d9",
-   "progress": {
-    "alex": {
-     "switch2": {
-      "play_status": "backlog",
-      "rating": null,
-      "playtime_minutes": null,
-      "started_at": null,
-      "completed_at": null,
-      "last_played_at": null,
-      "completion_count": 0,
-      "review": "",
-      "updated_at": "2026-08-31T10:00:00+00:00"
-     }
-    },
-    "jo": {
-     "switch2": {
-      "play_status": "playing",
-      "rating": null,
-      "playtime_minutes": 40,
-      "started_at": "2026-09-28",
-      "completed_at": null,
-      "last_played_at": null,
-      "completion_count": 0,
-      "review": "",
-      "updated_at": "2026-10-02T18:00:00+00:00"
-     }
-    }
-   }
-  },
-  {
-   "id": "e82369ba83ea4f0f8cafe3229fb3c669",
-   "title": "The Unreal and the Real",
-   "summary": "A short stories title by Ursula K. Le Guin.",
-   "genres": [
-    "Short stories"
-   ],
-   "release_date": "2012",
-   "franchise": null,
-   "igdb_id": null,
-   "tags": [],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-03-17T10:00:00+00:00",
-   "updated_at": "2026-03-17T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": null,
-   "progress": {}
-  },
-  {
-   "id": "d4a98396d9f9490bb2371d3bfa27b476",
-   "title": "The Word for World Is Forest",
-   "summary": "A science fiction title by Ursula K. Le Guin.",
-   "genres": [
-    "Science fiction"
-   ],
-   "release_date": "1972",
-   "franchise": "Hainish Cycle",
-   "igdb_id": null,
-   "tags": [],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-01-17T10:00:00+00:00",
-   "updated_at": "2026-01-17T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": null,
-   "progress": {
-    "sam": {
-     "ps4": {
-      "play_status": "completed",
-      "rating": 3,
-      "playtime_minutes": null,
-      "started_at": null,
-      "completed_at": "2026-06-01",
-      "last_played_at": null,
-      "completion_count": 1,
-      "review": "",
-      "updated_at": "2026-06-01T20:00:00+00:00"
-     }
-    }
-   }
-  },
-  {
-   "id": "a662b1be82664e1790a514c31fa97558",
-   "title": "Thinking, Fast and Slow",
-   "summary": "A psychology title by Daniel Kahneman.",
-   "genres": [
-    "Psychology"
-   ],
-   "release_date": "2011",
-   "franchise": null,
-   "igdb_id": null,
-   "tags": [],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-03-09T10:00:00+00:00",
-   "updated_at": "2026-03-09T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": null,
-   "progress": {}
-  },
-  {
-   "id": "3d2bac374c67488480cf6c8511eb0411",
-   "title": "Tomorrow, and Tomorrow, and Tomorrow",
-   "summary": "A literary fiction title by Gabrielle Zevin.",
-   "genres": [
-    "Literary fiction"
-   ],
-   "release_date": "2022",
-   "franchise": null,
-   "igdb_id": null,
-   "tags": [],
-   "shared_notes": "",
-   "cover": {
-    "kind": "none",
-    "file": null
-   },
-   "needs_details": false,
-   "created_at": "2026-04-03T10:00:00+00:00",
-   "updated_at": "2026-04-03T10:00:00+00:00",
-   "wishlist": null,
-   "owned": true,
-   "copy_count": 1,
-   "cover_url": null,
-   "progress": {
-    "sam": {
      "switch": {
-      "play_status": "playing",
-      "rating": null,
-      "playtime_minutes": 20,
-      "started_at": "2026-10-01",
+      "play_status": "abandoned",
+      "rating": 3,
+      "playtime_minutes": 320,
+      "started_at": null,
       "completed_at": null,
       "last_played_at": null,
       "completion_count": 0,
-      "review": "",
-      "updated_at": "2026-10-01T22:00:00+00:00"
+      "review": "Try again one day.",
+      "updated_at": "2025-11-11T10:00:00+00:00"
      }
     }
    }
+  },
+  {
+   "id": "117b1aed4a5547c39b9627cbb9d71506",
+   "title": "Unpacking",
+   "summary": "A puzzle title by Witch Beam.",
+   "genres": [
+    "Puzzle",
+    "Indie"
+   ],
+   "release_date": "2021",
+   "franchise": null,
+   "igdb_id": null,
+   "tags": [],
+   "shared_notes": "",
+   "cover": {
+    "kind": "none",
+    "file": null
+   },
+   "needs_details": false,
+   "created_at": "2026-02-21T10:00:00+00:00",
+   "updated_at": "2026-02-21T10:00:00+00:00",
+   "wishlist": null,
+   "owned": true,
+   "copy_count": 1,
+   "cover_url": null,
+   "progress": {}
   },
   {
    "id": "65821c98c7fd417b88431ca2948bab28",
-   "title": "Untitled paperback",
+   "title": "Untitled game case",
    "summary": "",
    "genres": [],
    "release_date": "",
@@ -1654,45 +1673,29 @@
    "progress": {}
   },
   {
-   "id": "dbcf7eb0b9f14491ba5bcde27e29a967",
-   "title": "Where the Wild Things Are",
-   "summary": "A picture games title by Maurice Sendak.",
+   "id": "e82369ba83ea4f0f8cafe3229fb3c669",
+   "title": "Xenoblade Chronicles 3",
+   "summary": "A role-playing (rpg) title by Nintendo.",
    "genres": [
-    "Picture games"
+    "Role-playing (RPG)"
    ],
-   "release_date": "1963",
-   "franchise": null,
+   "release_date": "2022",
+   "franchise": "Xenoblade Chronicles",
    "igdb_id": null,
-   "tags": [
-    "Family"
-   ],
+   "tags": [],
    "shared_notes": "",
    "cover": {
     "kind": "none",
     "file": null
    },
    "needs_details": false,
-   "created_at": "2026-03-01T10:00:00+00:00",
-   "updated_at": "2026-03-01T10:00:00+00:00",
+   "created_at": "2026-03-17T10:00:00+00:00",
+   "updated_at": "2026-03-17T10:00:00+00:00",
    "wishlist": null,
    "owned": true,
    "copy_count": 1,
    "cover_url": null,
-   "progress": {
-    "jo": {
-     "switch": {
-      "play_status": "completed",
-      "rating": null,
-      "playtime_minutes": null,
-      "started_at": null,
-      "completed_at": "2026-01-02",
-      "last_played_at": null,
-      "completion_count": 12,
-      "review": "",
-      "updated_at": "2026-01-02T19:00:00+00:00"
-     }
-    }
-   }
+   "progress": {}
   }
  ],
  "copies": [
@@ -1804,7 +1807,7 @@
    "barcode": "9781598537055",
    "condition": "new",
    "acquired": "2019-09-01",
-   "acquired_from": "Library of America",
+   "acquired_from": "Nintendo Store",
    "price": 45,
    "value": 45,
    "note": "",
@@ -1883,7 +1886,7 @@
    "acquired_from": "Elliott Bay Game Co.",
    "price": 7.99,
    "value": 45,
-   "note": "Signed at a reading in Portland.",
+   "note": "Signed at a launch event in Portland.",
    "created_at": "2026-01-01T10:00:00+00:00"
   },
   {
@@ -2051,7 +2054,7 @@
    "barcode": "9781622911356",
    "condition": "good",
    "acquired": "2024-01-08",
-   "acquired_from": "Cheng & Tsui",
+   "acquired_from": "Game shop",
    "price": 59.99,
    "value": null,
    "note": "",
@@ -2377,7 +2380,7 @@
    "acquired_from": "Garage sale",
    "price": 1,
    "value": null,
-   "note": "Spine is cracked.",
+   "note": "The case is cracked.",
    "created_at": "2026-02-03T10:00:00+00:00"
   },
   {
@@ -2542,7 +2545,7 @@
    "name": "Alex",
    "entity_id": "person.alex",
    "share_progress": true,
-   "wishlist_todo": "todo.alex_books",
+   "wishlist_todo": "todo.alex_games",
    "yearly_goal": 24
   },
   "sam": {
@@ -2570,5 +2573,6 @@
  "currency": "EUR",
  "home_keeper": {
   "tab": true
- }
+ },
+ "igdb": false
 }

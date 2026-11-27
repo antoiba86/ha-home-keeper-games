@@ -91,7 +91,7 @@ def seed_id(kind: str, key: str) -> str:
     return uuid.UUID(bytes=digest[:16], version=4).hex
 
 
-# The copy format of each book format of the seed tables.
+# The copy format of each old book format of the seed tables.
 FORMAT_OF = {
     "hardcover": "physical",
     "paperback": "physical",
@@ -138,111 +138,112 @@ SHELVES = [
 ]
 
 # ── Games ────────────────────────────────────────────────────────────────────
-# key: (title, authors, barcode first 12 digits, publisher, published, pages,
-#       subjects, series, tags, cover). The game record takes the year as its
-#       release date, the subjects as genres and the series as its franchise.
+# key: (title, developers, barcode first 12 digits, publisher, release year,
+#       unused, genres, franchise, tags, cover). The game record takes the year as
+#       its release date. The keys and barcodes come from the old book seed, so the
+#       ids of the seed records stay the same.
 # cover: None or "custom". Each cover is a file in tests/e2e/seed/covers.
-LE_GUIN = ["Ursula K. Le Guin"]
-SF = ["Science fiction"]
-FANTASY = ["Fantasy"]
+NINTENDO = ["Nintendo"]
+ADVENTURE = ["Adventure"]
+RPG = ["Role-playing (RPG)"]
+PLATFORM = ["Platform"]
 GAMES: dict[str, tuple[Any, ...]] = {
-    "left_hand": ("The Left Hand of Darkness", LE_GUIN, "978044147812", "Ace Games",
-                  "1969", 304, [*SF, "Gender"], ("Hainish Cycle", 4), ["Hugo winner"], "custom"),
-    "earthsea": ("A Wizard of Earthsea", LE_GUIN, "978054777374", "Clarion Games",
-                 "1968", 183, FANTASY, ("Earthsea", 1), [], "custom"),
-    "dispossessed": ("The Dispossessed", LE_GUIN, "978006105488", "Harper Voyager",
-                     "1974", 387, [*SF, "Utopias"], ("Hainish Cycle", 6), ["Hugo winner"], "custom"),
-    "lathe": ("The Lathe of Heaven", LE_GUIN, "978141655696", "Scribner",
-              "1971", 184, SF, None, [], None),
-    "atuan": ("The Tombs of Atuan", LE_GUIN, "978141650960", "Atheneum",
-              "1970", 180, FANTASY, ("Earthsea", 2), [], "custom"),
-    "farthest": ("The Farthest Shore", LE_GUIN, "978141650963", "Atheneum",
-                 "1972", 223, FANTASY, ("Earthsea", 3), [], None),
-    "tehanu": ("Tehanu", LE_GUIN, "978068931595", "Atheneum",
-               "1990", 252, FANTASY, ("Earthsea", 4), ["Nebula winner"], None),
-    "always": ("Always Coming Home", LE_GUIN, "978159853705", "Library of America",
-               "1985", 523, SF, None, [], None),
-    "word_world": ("The Word for World Is Forest", LE_GUIN, "978076532345", "Tor Games",
-                   "1972", 189, SF, ("Hainish Cycle", 5), [], None),
-    "lavinia": ("Lavinia", LE_GUIN, "978015603368", "Mariner Games",
-                "2008", 279, ["Historical fiction"], None, [], None),
-    "piranesi": ("Piranesi", ["Susanna Clarke"], "978163557563", "Bloomsbury",
-                 "2020", 272, FANTASY, None, ["Game club"], "custom"),
-    "hail_mary": ("Project Hail Mary", ["Andy Weir"], "978059313520", "Ballantine Games",
-                  "2021", 476, SF, None, [], "custom"),
-    "fifth_season": ("The Fifth Season", ["N. K. Jemisin"], "978031622929", "Orbit",
-                     "2015", 468, [*FANTASY, "Science fiction"], ("The Broken Earth", 1),
-                     ["Hugo winner"], "custom"),
-    "dune": ("Dune", ["Frank Herbert"], "978044101359", "Ace Games",
-             "1965", 688, SF, ("Dune", 1), [], "custom"),
-    "name_wind": ("The Name of the Wind", ["Patrick Rothfuss"], "978075640474", "DAW Games",
-                  "2007", 662, FANTASY, ("The Kingkiller Chronicle", 1), [], None),
-    "klara": ("Klara and the Sun", ["Kazuo Ishiguro"], "978059331817", "Knopf",
-              "2021", 303, SF, None, [], "custom"),
-    "grain_rice": ("Every Grain of Rice", ["Fuchsia Dunlop"], "978039308928", "W. W. Norton",
-                   "2012", 352, ["Cooking", "Chinese cooking"], None, ["Kitchen"], None),
-    "salt_fat": ("Salt, Fat, Acid, Heat", ["Samin Nosrat"], "978147675383", "Simon & Schuster",
-                 "2017", 480, ["Cooking"], None, ["Kitchen"], "custom"),
-    "food_lab": ("The Food Lab", ["J. Kenji López-Alt"], "978039308108", "W. W. Norton",
-                 "2015", 958, ["Cooking", "Science"], None, ["Kitchen"], None),
-    "atlas": ("Atlas of Remote Islands", ["Judith Schalansky"], "978014311820", "Penguin Games",
-              "2009", 144, ["Travel", "Maps"], None, [], None),
-    "geb": ("Gödel, Escher, Bach", ["Douglas Hofstadter"], "978046502656", "Basic Games",
-            "1979", 777, ["Mathematics", "Philosophy"], None, [], None),
-    "overstory": ("The Overstory", ["Richard Powers"], "978039363552", "W. W. Norton",
-                  "2018", 502, ["Literary fiction", "Trees"], None, ["Pulitzer winner"], None),
-    "sweetgrass": ("Braiding Sweetgrass", ["Robin Wall Kimmerer"], "978157131356",
-                   "Milkweed Editions", "2013", 391, ["Nature", "Botany"], None, [], None),
-    "hobbit": ("The Hobbit", ["J. R. R. Tolkien"], "978054792822", "Mariner Games",
-               "1937", 310, FANTASY, None, ["Family"], "custom"),
-    "wild_things": ("Where the Wild Things Are", ["Maurice Sendak"], "978006025492",
-                    "HarperCollins", "1963", 48, ["Picture games"], None, ["Family"], None),
-    "chinese_1": ("Integrated Chinese 1", ["Yuehua Liu", "Tao-chung Yao"], "978162291135",
-                  "Cheng & Tsui", "2017", 420, ["Chinese language"], ("Integrated Chinese", 1),
-                  ["Study"], None),
-    "sicp": ("Structure and Interpretation of Computer Programs",
-             ["Harold Abelson", "Gerald Jay Sussman"], "978026251087", "MIT Press",
-             "1996", 657, ["Computer science"], None, ["Study"], None),
-    "pragmatic": ("The Pragmatic Programmer", ["Andrew Hunt", "David Thomas"], "978020161622",
-                  "Addison-Wesley", "1999", 352, ["Computer science"], None, [], None),
-    "thinking": ("Thinking, Fast and Slow", ["Daniel Kahneman"], "978037453355",
-                 "Farrar, Straus and Giroux", "2011", 499, ["Psychology"], None, [], None),
-    "sapiens": ("Sapiens", ["Yuval Noah Harari"], "978006231609", "Harper",
-                "2011", 443, ["History"], None, [], None),
-    "memory_empire": ("A Memory Called Empire", ["Arkady Martine"], "978125018643", "Tor Games",
-                      "2019", 462, SF, ("Teixcalaan", 1), ["Hugo winner"], None),
-    "station_eleven": ("Station Eleven", ["Emily St. John Mandel"], "978080417244", "Vintage",
-                       "2014", 333, ["Literary fiction"], None, [], None),
-    "unreal": ("The Unreal and the Real", LE_GUIN, "978161873079", "Saga Press",
-               "2012", 320, ["Short stories"], None, [], None),
-    "untitled": ("Untitled paperback", [], "978098012345", "", "", None, [], None, [], None),
+    "left_hand": ("The Legend of Zelda: Tears of the Kingdom", NINTENDO, "978044147812", "Nintendo",
+                  "2023", None, [*ADVENTURE, "Open world"], ("The Legend of Zelda", 20), ["Award winner"], "custom"),
+    "earthsea": ("Super Mario Odyssey", NINTENDO, "978054777374", "Nintendo",
+                 "2017", None, PLATFORM, ("Super Mario", 1), [], "custom"),
+    "dispossessed": ("Metroid Dread", NINTENDO, "978006105488", "Nintendo",
+                     "2021", None, [*ADVENTURE, "Shooter"], ("Metroid", 5), ["Award winner"], "custom"),
+    "lathe": ("Pikmin 4", NINTENDO, "978141655696", "Nintendo",
+              "2023", None, ["Strategy"], None, [], None),
+    "atuan": ("Super Mario Bros. Wonder", NINTENDO, "978141650960", "Nintendo",
+              "2023", None, PLATFORM, ("Super Mario", 2), [], "custom"),
+    "farthest": ("Mario Kart 8 Deluxe", NINTENDO, "978141650963", "Nintendo",
+                 "2017", None, ["Racing"], ("Mario Kart", 8), [], None),
+    "tehanu": ("Animal Crossing: New Horizons", NINTENDO, "978068931595", "Nintendo",
+               "2020", None, ["Simulator"], ("Animal Crossing", 5), ["Award winner"], None),
+    "always": ("Splatoon 3", NINTENDO, "978159853705", "Nintendo",
+               "2022", None, ["Shooter"], None, [], None),
+    "word_world": ("Kirby and the Forgotten Land", NINTENDO, "978076532345", "Nintendo",
+                   "2022", None, PLATFORM, ("Kirby", 5), [], None),
+    "lavinia": ("Fire Emblem Engage", NINTENDO, "978015603368", "Nintendo",
+                "2023", None, ["Strategy"], None, [], None),
+    "piranesi": ("Hades", ["Supergiant Games"], "978163557563", "Supergiant Games",
+                 "2020", None, [*RPG, "Indie"], None, ["Game club"], "custom"),
+    "hail_mary": ("Outer Wilds", ["Mobius Digital"], "978059313520", "Annapurna Interactive",
+                  "2019", None, ADVENTURE, None, [], "custom"),
+    "fifth_season": ("Elden Ring", ["FromSoftware"], "978031622929", "Bandai Namco",
+                     "2022", None, [*RPG, "Adventure"], ("Elden Ring", 1),
+                     ["Award winner"], "custom"),
+    "dune": ("Hollow Knight", ["Team Cherry"], "978044101359", "Team Cherry",
+             "2017", None, [*ADVENTURE, "Platform"], ("Hollow Knight", 1), [], "custom"),
+    "name_wind": ("The Witcher 3: Wild Hunt", ["CD Projekt Red"], "978075640474", "CD Projekt",
+                  "2015", None, RPG, ("The Witcher", 3), [], None),
+    "klara": ("Celeste", ["Maddy Makes Games"], "978059331817", "Maddy Makes Games",
+              "2018", None, ADVENTURE, None, [], "custom"),
+    "grain_rice": ("Overcooked! 2", ["Ghost Town Games"], "978039308928", "Team17",
+                   "2018", None, ["Simulator", "Party"], ("Overcooked", 2), ["Couch co-op"], None),
+    "salt_fat": ("PowerWash Simulator", ["FuturLab"], "978147675383", "Square Enix",
+                 "2022", None, ["Simulator"], None, ["Couch co-op"], "custom"),
+    "food_lab": ("Stardew Valley", ["ConcernedApe"], "978039308108", "ConcernedApe",
+                 "2016", None, ["Simulator", "Role-playing (RPG)"], None, ["Couch co-op"], None),
+    "atlas": ("A Short Hike", ["adamgryu"], "978014311820", "adamgryu",
+              "2019", None, ["Adventure", "Indie"], None, [], None),
+    "geb": ("The Witness", ["Thekla"], "978046502656", "Thekla",
+            "2016", None, ["Puzzle"], None, [], None),
+    "overstory": ("Disco Elysium", ["ZA/UM"], "978039363552", "ZA/UM",
+                  "2019", None, RPG, None, ["Award winner"], None),
+    "sweetgrass": ("Unpacking", ["Witch Beam"], "978157131356",
+                   "Humble Games", "2021", None, ["Puzzle", "Indie"], None, [], None),
+    "hobbit": ("Super Mario Galaxy", NINTENDO, "978054792822", "Nintendo",
+               "2007", None, PLATFORM, ("Super Mario", 3), ["Family"], "custom"),
+    "wild_things": ("Mario Party Superstars", NINTENDO, "978006025492",
+                    "Nintendo", "2021", None, ["Party"], None, ["Family"], None),
+    "chinese_1": ("Professor Layton and the Curious Village", ["Level-5"], "978162291135",
+                  "Nintendo", "2007", None, ["Puzzle"], ("Professor Layton", 1),
+                  ["Puzzle night"], None),
+    "sicp": ("Baba Is You", ["Hempuli"], "978026251087", "Hempuli",
+             "2019", None, ["Puzzle"], None, ["Puzzle night"], None),
+    "pragmatic": ("Factorio", ["Wube Software"], "978020161622",
+                  "Wube Software", "2020", None, ["Strategy"], None, [], None),
+    "thinking": ("Return of the Obra Dinn", ["Lucas Pope"], "978037453355",
+                 "3909", "2018", None, ["Puzzle"], None, [], None),
+    "sapiens": ("Civilization VI", ["Firaxis Games"], "978006231609", "2K",
+                "2016", None, ["Strategy"], ("Civilization", 6), [], None),
+    "memory_empire": ("Mass Effect Legendary Edition", ["BioWare"], "978125018643", "Electronic Arts",
+                      "2021", None, [*RPG, "Shooter"], ("Mass Effect", 1), ["Award winner"], None),
+    "station_eleven": ("The Last of Us Part I", ["Naughty Dog"], "978080417244", "Sony",
+                       "2022", None, ADVENTURE, ("The Last of Us", 1), [], None),
+    "unreal": ("Xenoblade Chronicles 3", NINTENDO, "978161873079", "Nintendo",
+               "2022", None, RPG, ("Xenoblade Chronicles", 3), [], None),
+    "untitled": ("Untitled game case", [], "978098012345", "", "", None, [], None, [], None),
     "code_only": ("9780980123468", [], "978098012346", "", "", None, [], None, [], None),
-    "steering": ("Steering the Craft", LE_GUIN, "978054461161", "Mariner Games",
-                 "1998", 176, ["Writing"], None, [], None),
-    "ministry": ("The Ministry for the Future", ["Kim Stanley Robinson"], "978031630013",
-                 "Orbit", "2020", 563, SF, None, [], "custom"),
-    "tomorrow": ("Tomorrow, and Tomorrow, and Tomorrow", ["Gabrielle Zevin"], "978059332120",
-                 "Knopf", "2022", 401, ["Literary fiction"], None, [], None),
+    "steering": ("Kirby's Return to Dream Land Deluxe", NINTENDO, "978054461161", "Nintendo",
+                 "2023", None, PLATFORM, ("Kirby", 4), [], None),
+    "ministry": ("Baldur's Gate 3", ["Larian Studios"], "978031630013",
+                 "Larian Studios", "2023", None, RPG, None, [], "custom"),
+    "tomorrow": ("Sea of Stars", ["Sabotage Studio"], "978059332120",
+                 "Sabotage Studio", "2023", None, RPG, None, [], None),
     # Games with no copy: a borrowed game and the wishlist.
-    "spinning": ("Spinning Silver", ["Naomi Novik"], "978039958103", "Del Rey",
-                 "2018", 466, FANTASY, None, [], None),
-    "sea_tranquility": ("Sea of Tranquility", ["Emily St. John Mandel"], "978059332144",
-                        "Knopf", "2022", 255, SF, None, [], None),
-    "other_wind": ("The Other Wind", LE_GUIN, "978054777376", "Clarion Games",
-                   "2001", 246, FANTASY, ("Earthsea", 6), [], None),
-    "obelisk": ("The Obelisk Gate", ["N. K. Jemisin"], "978031622926", "Orbit",
-                "2016", 448, FANTASY, ("The Broken Earth", 2), [], None),
-    "fish_rice": ("Land of Fish and Rice", ["Fuchsia Dunlop"], "978039325438", "W. W. Norton",
-                  "2016", 368, ["Cooking", "Chinese cooking"], None, [], None),
-    "chinese_2": ("Integrated Chinese 2", ["Yuehua Liu", "Tao-chung Yao"], "978162291140",
-                  "Cheng & Tsui", "2018", 412, ["Chinese language"], ("Integrated Chinese", 2),
+    "spinning": ("Hi-Fi Rush", ["Tango Gameworks"], "978039958103", "Bethesda",
+                 "2023", None, ["Action"], None, [], None),
+    "sea_tranquility": ("Spiritfarer", ["Thunder Lotus"], "978059332144",
+                        "Thunder Lotus", "2020", None, ["Simulator", "Indie"], None, [], None),
+    "other_wind": ("The Legend of Zelda: Echoes of Wisdom", NINTENDO, "978054777376", "Nintendo",
+                   "2024", None, ADVENTURE, ("The Legend of Zelda", 21), [], None),
+    "obelisk": ("Hollow Knight: Silksong", ["Team Cherry"], "978031622926", "Team Cherry",
+                "2025", None, [*ADVENTURE, "Platform"], ("Hollow Knight", 2), [], None),
+    "fish_rice": ("Overcooked! All You Can Eat", ["Ghost Town Games"], "978039325438", "Team17",
+                  "2020", None, ["Simulator", "Party"], ("Overcooked", 3), [], None),
+    "chinese_2": ("Professor Layton and the Diabolical Box", ["Level-5"], "978162291140",
+                  "Nintendo", "2007", None, ["Puzzle"], ("Professor Layton", 2),
                   [], None),
 }
 NEEDS_DETAILS = {"untitled", "code_only"}
 SHARED_NOTES = {
-    "left_hand": "Game club pick, **Oct 2026**. Sam has the map of Gethen bookmarked on page 6.",
-    "food_lab": "The *pancake* recipe is on page 102.\n\n- Sticky notes from Jo\n- Do not lend",
-    "hobbit": "First edition of the family. Keep it out of the sun.",
+    "left_hand": "Game club pick, **Oct 2026**. Sam has the map of Hyrule on the 3rd save.",
+    "food_lab": "The *greenhouse* plan is in the case.\n\n- Sticky notes from Jo\n- Do not lend",
+    "hobbit": "First game of the family. Keep the case out of the sun.",
 }
 
 # (game, shelf or None, format, condition, acquired, acquired_from, price, value,
@@ -251,7 +252,7 @@ SHARED_NOTES = {
 #  The first copy of a game takes the barcode of the game.
 COPIES = [
     ("left_hand", "a2", "paperback", "good", "2019-05-04", "Elliott Bay Game Co.", 7.99, 45,
-     True, False, "Signed at a reading in Portland."),
+     True, False, "Signed at a launch event in Portland."),
     ("left_hand", "o1", "hardcover", "fine", "2023-12-24", "Gift from Jo", None, None,
      False, False, ""),
     ("earthsea", "a2", "paperback", "fair", "2008-07-01", "", 6.5, None, False, False, ""),
@@ -262,7 +263,7 @@ COPIES = [
     ("atuan", "a2", "paperback", "good", "2008-07-01", "", 6.5, None, False, False, ""),
     ("farthest", "a2", "paperback", "good", "2008-07-01", "", 6.5, None, False, False, ""),
     ("tehanu", "a2", "paperback", "good", "2009-01-15", "", 7.5, None, False, False, ""),
-    ("always", "a3", "hardcover", "new", "2019-09-01", "Library of America", 45, 45,
+    ("always", "a3", "hardcover", "new", "2019-09-01", "Nintendo Store", 45, 45,
      False, False, ""),
     ("word_world", "a3", "paperback", "good", "2016-03-03", "", 8, None, False, False, ""),
     ("lavinia", "a3", "paperback", "good", "2010-05-05", "", 12, None, False, False, ""),
@@ -273,7 +274,7 @@ COPIES = [
     ("fifth_season", "a1", "paperback", "good", "2018-11-02", "", 15.99, None,
      False, False, ""),
     ("dune", "a1", "paperback", "fair", "2004-06-01", "Garage sale", 1,
-     None, False, False, "Spine is cracked."),
+     None, False, False, "The case is cracked."),
     ("name_wind", "a1", "paperback", "good", "2012-08-08", "", 9.99, None, False, False, ""),
     ("klara", "a1", "hardcover", "fine", "2021-03-02", "Elliott Bay Game Co.", 28, None,
      False, False, ""),
@@ -291,7 +292,7 @@ COPIES = [
      False, True, ""),
     ("wild_things", "top", "hardcover", "fair", "2016-04-01", "", 17.99, None,
      False, False, ""),
-    ("chinese_1", "o2", "paperback", "good", "2024-01-08", "Cheng & Tsui", 59.99, None,
+    ("chinese_1", "o2", "paperback", "good", "2024-01-08", "Game shop", 59.99, None,
      False, False, ""),
     ("sicp", "o2", "hardcover", "good", "2003-09-01", "University Game Store", 75, 60,
      False, False, ""),
@@ -394,7 +395,7 @@ WISHLIST = [
 ]
 
 PEOPLE = {
-    ALEX: {"share_progress": True, "wishlist_todo": "todo.alex_books", "yearly_goal": 24},
+    ALEX: {"share_progress": True, "wishlist_todo": "todo.alex_games", "yearly_goal": 24},
     SAM: {"share_progress": True, "wishlist_todo": None, "yearly_goal": 12},
     JO: {"share_progress": True, "wishlist_todo": None, "yearly_goal": None},
 }
@@ -584,7 +585,15 @@ def draw_covers(state: dict[str, Any]) -> None:
     """Draw a simple cover image for each game with a cover file."""
     from PIL import Image, ImageDraw, ImageFont
 
-    fonts = Path("/usr/share/fonts/truetype/dejavu")
+    # DejaVu on Linux, else the macOS fonts.
+    dejavu = Path("/usr/share/fonts/truetype/dejavu")
+    mac = Path("/System/Library/Fonts/Supplemental")
+    serif, sans = (
+        (dejavu / "DejaVuSerif-Bold.ttf", dejavu / "DejaVuSans.ttf")
+        if dejavu.exists()
+        else (mac / "Georgia Bold.ttf", mac / "Arial.ttf")
+    )
+    key_of = {seed_id("book", key): key for key in GAMES}
     palette = [
         ("#16324f", "#f4d35e"),
         ("#7a1f2b", "#f6e7d8"),
@@ -603,6 +612,7 @@ def draw_covers(state: dict[str, Any]) -> None:
     for old in COVERS_OUT.glob("*.jpg"):
         old.unlink()
     for n, game in enumerate(sorted(state["games"].values(), key=lambda b: b["id"])):
+        key = key_of[game["id"]]
         file = game["cover"]["file"]
         if not file:
             continue
@@ -611,7 +621,7 @@ def draw_covers(state: dict[str, Any]) -> None:
         draw = ImageDraw.Draw(img)
         draw.rectangle((0, 0, 18, 600), fill=ink)
         draw.rectangle((40, 330, 360, 334), fill=ink)
-        title_font = ImageFont.truetype(str(fonts / "DejaVuSerif-Bold.ttf"), 40)
+        title_font = ImageFont.truetype(str(serif), 40)
         words, lines, line = game["title"].split(), [], ""
         for word in words:
             test = f"{line} {word}".strip()
@@ -625,9 +635,9 @@ def draw_covers(state: dict[str, Any]) -> None:
         for text in lines:
             draw.text((40, y), text, font=title_font, fill=ink)
             y += 50
-        author_font = ImageFont.truetype(str(fonts / "DejaVuSans.ttf"), 22)
+        author_font = ImageFont.truetype(str(sans), 22)
         draw.text(
-            (40, 360), ", ".join(game["authors"]).upper(), font=author_font, fill=ink
+            (40, 360), ", ".join(GAMES[key][1]).upper(), font=author_font, fill=ink
         )
         img.save(COVERS_OUT / file, "JPEG", quality=82)
 

@@ -11,12 +11,12 @@ test.describe('Card for a user who is not an admin', { tag: '@responsive' }, () 
   test('shows only the data of that person and no price', async ({ page }) => {
     const card = await openCard(page);
     await expect(card.locator('.head h2')).toHaveText('Library: Sam');
-    await expect(card).toContainText('The Left Hand of Darkness');
+    await expect(card).toContainText('The Legend of Zelda: Tears of the Kingdom');
     await expect(card).toContainText('112 min played');
-    await expect(card).toContainText('Tomorrow, and Tomorrow, and Tomorrow');
+    await expect(card).toContainText('Sea of Stars');
     // The progress of Alex shows only as household activity, never as Sam's.
-    await expect(card.locator('.sec').filter({ hasText: 'Playing' }).first()).not.toContainText('Project Hail Mary');
-    await expect(card).toContainText('Alex: completed Piranesi');
+    await expect(card.locator('.sec').filter({ hasText: 'Playing' }).first()).not.toContainText('Outer Wilds');
+    await expect(card).toContainText('Alex: completed Hades');
     await expect(card).not.toContainText('€');
 
     const state = await userState();
