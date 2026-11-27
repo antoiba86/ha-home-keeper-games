@@ -404,7 +404,7 @@
   "playlog.open": "Playing now",
   "playlog.source_manual": "Manual",
   "playlog.delete_session": "Delete the session of {date}",
-  "playlog.no_sessions": "No sessions. The play time comes from the progress.",
+  "playlog.no_sessions": "The play time comes from the progress, because there are no sessions.",
   "playlog.empty": "No play time yet.",
   "playlog.hint": "Each row is 1 game on 1 platform. Select a row to see its sessions.",
   "playlog.log_session": "Log session",
