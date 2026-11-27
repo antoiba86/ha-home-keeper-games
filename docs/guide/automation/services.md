@@ -30,9 +30,8 @@ automation:
 
 ### Play sessions
 
-`log_session` adds a play session of a person: the game, the platform, the minutes and
-the date. The minutes go on the play time of that game and platform, and a game in the
-backlog becomes **Playing**. `delete_session` takes the minutes off again.
+`log_session` adds a play session of a person, with its minutes. The minutes go on the
+play time of that game and platform, and a game in the backlog becomes **Playing**. `delete_session` takes the minutes off again.
 `list_sessions` returns the sessions, the newest first. Example: log 45 minutes when a
 script stops.
 

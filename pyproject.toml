@@ -46,8 +46,10 @@ source_paths = ["custom_components/home_keeper_games"]
 # `.github/workflows/release.yml` to run the release workflow's publish decision.
 # `test_generate_api_docs.py` reads `website/scripts/doc-map.mjs` to check the page's
 # front matter against the route it is published at. `test_pure_core.py` reads the
-# design doc's module map and both mutation thresholds.
+# design doc's module map and both mutation thresholds. `test_blueprint_surface.py`
+# reads the Telegram blueprint in `blueprints/`.
 also_copy = [
+    "blueprints",
     "ci",
     "tests/integration/ha_config",
     "CHANGELOG.md",

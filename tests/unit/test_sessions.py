@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ex.events as ev
 import ex.models as m
 import ex.projections as pr
 import pytest
@@ -210,3 +211,19 @@ def test_visible_sessions_add_the_title_and_copy_the_record() -> None:
     rows[0]["minutes"] = 99
     assert state["sessions"]["s3"]["minutes"] == 10
     assert "title" not in state["sessions"]["s3"]
+
+
+def test_session_event_data() -> None:
+    session = _build(date="2026-10-01")
+    data = ev.session_event_data({"id": "g1", "title": "Hades"}, session, "bot")
+    assert data == {
+        "game_id": "g1",
+        "title": "Hades",
+        "person_id": "alice",
+        "origin": "bot",
+        "session_id": session["id"],
+        "platform": "ps5",
+        "source": "manual",
+        "date": "2026-10-01",
+        "minutes": 45,
+    }
