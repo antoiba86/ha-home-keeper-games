@@ -81,6 +81,14 @@ export function formatDate(value: string | null | undefined, withYear = true): s
   return d.toLocaleDateString(currentLang, opts);
 }
 
+/** The time of day (HH:MM) of an ISO time stamp in the active locale, or ''. */
+export function formatTime(value: string | null | undefined): string {
+  if (!value) return '';
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleTimeString(currentLang, { hour: '2-digit', minute: '2-digit' });
+}
+
 /** An amount of money in the active locale, or '' for no amount. */
 export function formatMoney(value: number | null | undefined, currency: string): string {
   if (value == null) return '';

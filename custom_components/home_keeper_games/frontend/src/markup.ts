@@ -139,6 +139,7 @@ export function navBar(route: TabRoute, counts: { loans: number; wishlist: numbe
     ['shelves', '/shelves', t('nav.shelves'), null],
     ['loans', '/loans', t('nav.loans'), counts.loans],
     ['wishlist', '/wishlist', t('nav.wishlist'), counts.wishlist],
+    ['playlog', '/playlog', t('nav.playlog'), null],
     ['settings', '/settings', t('nav.settings'), null],
   ];
   const current = route.view === 'game' || route.view === 'import' ? 'games' : route.view;

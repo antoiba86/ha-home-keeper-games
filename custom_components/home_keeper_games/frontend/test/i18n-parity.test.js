@@ -12,8 +12,8 @@ const OTHER = Object.keys(LOCALES).filter((l) => l !== DEFAULT_LOCALE);
 const PLURAL = /^(.*)\.(zero|one|two|few|many|other)$/;
 
 // Values that are the same as English by design: the product name, the steelbook case
-// and a bare "{name}: {list}" pair. Keep this list short.
-const IDENTICAL = new Set(['card.name', 'copy.steelbook', 'wishlist.list_for']);
+// a bare "{name}: {list}" pair and the units of a play time. Keep this list short.
+const IDENTICAL = new Set(['card.name', 'copy.steelbook', 'wishlist.list_for', 'time.min', 'time.h', 'time.h_min']);
 
 // Words that are the same as English in one language, reviewed one by one. "Person",
 // "Format", "Status", "Version", "Export" and "Optional" are the native words in the
@@ -22,19 +22,20 @@ const IDENTICAL = new Set(['card.name', 'copy.steelbook', 'wishlist.list_for']);
 // Italian uses "Area". "Digital", "Region", "Platform" and "Edition" are the native
 // words in the languages listed.
 // Danish uses "Note" and the verb "Scan". German and Dutch use "Barcode".
+// "Manual" (es, ca, pt-BR) and "session" (ca, fr, da, sv) are the native words.
 const COGNATES = {
-  'pt-BR': ['format.kind_digital'],
-  es: ['format.kind_digital'],
-  ca: ['copy.format', 'format.kind_digital'],
+  'pt-BR': ['format.kind_digital', 'playlog.source_manual'],
+  es: ['format.kind_digital', 'playlog.source_manual'],
+  ca: ['copy.format', 'format.kind_digital', 'playlog.source_manual', 'playlog.sessions.other'],
   cs: ['copy.region', 'settings.export'],
-  da: ['action.scan', 'common.person', 'common.version', 'copy.format', 'copy.note', 'copy.platform', 'copy.region', 'filter.genre', 'filter.status_label', 'format.kind_digital', 'game.franchise', 'game.platform', 'scan.scan_shelf', 'sort.franchise'],
+  da: ['action.scan', 'common.person', 'common.version', 'copy.format', 'copy.note', 'copy.platform', 'copy.region', 'filter.genre', 'filter.status_label', 'format.kind_digital', 'game.franchise', 'game.platform', 'scan.scan_shelf', 'sort.franchise', 'playlog.sessions.one'],
   de: ['common.optional', 'common.person', 'common.version', 'copy.edition', 'copy.format', 'copy.region', 'dialog.name', 'filter.genre', 'filter.status_label', 'format.kind_digital', 'game.barcode', 'game.barcode_label', 'game.franchise', 'game.genres', 'scan.barcode', 'settings.export', 'sort.franchise'],
-  fr: ['common.version', 'copy.format', 'editor.sections', 'filter.genre', 'game.franchise', 'game.genres', 'sort.franchise'],
+  fr: ['common.version', 'copy.format', 'editor.sections', 'filter.genre', 'game.franchise', 'game.genres', 'sort.franchise', 'playlog.sessions.one', 'playlog.sessions.other'],
   it: ['dialog.area', 'game.franchise', 'shelves.area', 'sort.franchise'],
   nb: ['common.person', 'copy.format', 'copy.region', 'filter.status_label', 'format.kind_digital', 'game.franchise', 'sort.franchise'],
   nl: ['copy.platform', 'filter.genre', 'filter.status_label', 'game.barcode', 'game.barcode_label', 'game.franchise', 'game.genres', 'game.platform', 'scan.barcode', 'sort.franchise'],
   pl: ['copy.format', 'copy.region'],
-  sv: ['common.person', 'common.version', 'copy.format', 'copy.region', 'filter.genre', 'filter.status_label', 'format.kind_digital', 'game.franchise', 'settings.export', 'sort.franchise'],
+  sv: ['common.person', 'common.version', 'copy.format', 'copy.region', 'filter.genre', 'filter.status_label', 'format.kind_digital', 'game.franchise', 'settings.export', 'sort.franchise', 'playlog.sessions.one'],
 };
 
 const tokens = (s) => [...new Set(String(s).match(/\{\w+\}/g) ?? [])].sort();

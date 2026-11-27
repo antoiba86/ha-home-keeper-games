@@ -28,6 +28,7 @@ export type Dialog =
   | { kind: 'scan-title'; key: number; gameId: string; copyId: string | null; barcode: string }
   | { kind: 'lend'; gameId: string | null }
   | { kind: 'borrow' }
+  | { kind: 'log-session'; personId: string | null }
   | { kind: 'wish-add'; gameId: string | null }
   | { kind: 'got-it'; gameId: string }
   | { kind: 'room'; roomId: string | null }
@@ -228,6 +229,23 @@ function body(ctx: ViewCtx, d: Dialog, areas: Array<[string, string]>): DialogBo
           </div>
           ${check('add_task', t('loan.add_task'), true, t('loan.add_task_hint'))}
           ${field(t('copy.note'), text('note', '', `placeholder="${escapeHTML(t('common.optional'))}"`), 'wide')}`,
+      };
+    }
+    case 'log-session': {
+      const games = [...ctx.lib.games]
+        .sort((a, b) => a.title.localeCompare(b.title))
+        .map((g): [string, string] => [g.id, g.title]);
+      const platforms: Array<[string, string]> = [['', t('playlog.platform_auto')], ...PLATFORMS.map((p): [string, string] => [p, platformLabel(p)])];
+      return {
+        title: t('playlog.log_session'),
+        submit: t('action.add'),
+        html: `${field(t('common.person'), `<select name="person_id" data-k="d-person">${personOptions(ctx.lib, d.personId)}</select>`)}
+          ${field(t('playlog.game'), `<select name="game_id" required data-k="d-game">${options(games, games[0]?.[0] ?? '')}</select>`, 'wide')}
+          <div class="hkl-fields">
+            ${field(t('game.platform'), `<select name="platform" data-k="d-platform">${options(platforms, '')}</select>`)}
+            ${field(t('playlog.minutes'), text('minutes', '', 'type="number" min="1" max="1440" required inputmode="numeric"'), 'small')}
+            ${field(t('playlog.date'), text('date', ctx.today, 'type="date"'), 'small')}
+          </div>`,
       };
     }
     case 'borrow':

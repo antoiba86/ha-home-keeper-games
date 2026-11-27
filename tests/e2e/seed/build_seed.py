@@ -35,6 +35,7 @@ import json
 import sys
 import types
 import uuid
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -394,6 +395,17 @@ WISHLIST = [
     ("chinese_2", ALEX, False, "2026-06-01T10:00:00+00:00"),
 ]
 
+# (key, game, person, platform, source, date, start time or None, minutes). A psn
+# session has the start and end time stamps; a manual one has only the date and the
+# minutes. The seed writes the sessions as they are, with no change to the progress.
+SESSIONS = [
+    ("hail_mary_1", "hail_mary", ALEX, "pc", "psn", "2026-10-03", "18:00", 95),
+    ("hail_mary_2", "hail_mary", ALEX, "pc", "psn", "2026-10-01", "21:10", 70),
+    ("hail_mary_3", "hail_mary", ALEX, "pc", "manual", "2026-09-27", None, 45),
+    ("ministry_1", "ministry", ALEX, "pc", "psn", "2026-09-29", "20:30", 120),
+    ("left_hand_1", "left_hand", ALEX, "switch", "manual", "2026-10-04", None, 95),
+]
+
 PEOPLE = {
     ALEX: {"share_progress": True, "wishlist_todo": "todo.alex_games", "yearly_goal": 24},
     SAM: {"share_progress": True, "wishlist_todo": None, "yearly_goal": 12},
@@ -563,6 +575,26 @@ def build_store(models: types.ModuleType) -> dict[str, Any]:
         state["games"][seed_id("book", game)]["wishlist"] = models.build_wishlist(
             person, buy=buy, now=at
         )
+    for key, game, person, platform, source, day, start, minutes in SESSIONS:
+        game_id = seed_id("book", game)
+        started = f"{day}T{start}:00+00:00" if start else None
+        ended = None
+        if started:
+            begin = datetime.fromisoformat(started)
+            ended = (begin + timedelta(minutes=minutes)).isoformat()
+        state["sessions"][seed_id("session", key)] = {
+            "id": seed_id("session", key),
+            "person_id": person,
+            "game_id": game_id,
+            "platform": platform,
+            "source": source,
+            "external_id": "PPSA00001_00" if source == "psn" else None,
+            "started_at": started,
+            "ended_at": ended,
+            "date": day,
+            "minutes": minutes,
+            "created_at": ended or f"{day}T22:00:00+00:00",
+        }
     state["people"] = {pid: dict(settings) for pid, settings in PEOPLE.items()}
     return state
 

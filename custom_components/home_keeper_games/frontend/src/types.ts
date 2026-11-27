@@ -45,6 +45,24 @@ export interface ProgressRow {
   updated_at: string;
 }
 
+/** A play session, as `list_sessions` returns it. */
+export interface Session {
+  id: string;
+  person_id: string;
+  game_id: string;
+  platform: Platform;
+  /** `manual` for `log_session`, `psn` for a PlayStation console. */
+  source: string;
+  external_id: string | null;
+  started_at: string | null;
+  ended_at: string | null;
+  date: string;
+  /** Null while a console session is open. */
+  minutes: number | null;
+  created_at: string;
+  title: string;
+}
+
 /** The progress rows of 1 person on a game, by platform. */
 export type PlatformRows = Partial<Record<Platform, ProgressRow>>;
 

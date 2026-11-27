@@ -24,8 +24,6 @@ Nothing here is committed scope. When an item ships, remove it. The design docs 
   options step reads the trophies of each game and the list of played games.
 - **Nintendo play time.** A source for the Nintendo Switch Parental Controls or Presence
   integration, with the same consoles list.
-- **Play sessions in the tab.** The game page can show the sessions of a person, with a
-  delete button. Today only `list_sessions` reads them.
 
 ## Product ideas
 
