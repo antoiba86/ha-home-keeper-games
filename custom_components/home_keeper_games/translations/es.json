@@ -56,7 +56,7 @@
   "entity": {
     "sensor": {
       "games": {
-        "name": "Libros"
+        "name": "Juegos"
       },
       "loans_out": {
         "name": "Préstamos fuera"
@@ -80,15 +80,15 @@
   "issues": {
     "home_keeper_missing": {
       "title": "Home Keeper no está instalado",
-      "description": "La pestaña Biblioteca y las tareas de préstamo necesitan Home Keeper. La tarjeta, las entidades y los servicios ya funcionan. Instala Home Keeper desde HACS y reinicia Home Assistant. Pasos de instalación: {url}"
+      "description": "La pestaña Juegos y las tareas de préstamo necesitan Home Keeper. La tarjeta, las entidades y los servicios ya funcionan. Instala Home Keeper desde HACS y reinicia Home Assistant. Pasos de instalación: {url}"
     },
     "home_keeper_not_set_up": {
       "title": "Home Keeper no está configurado",
-      "description": "La pestaña Biblioteca y las tareas de préstamo necesitan una integración Home Keeper cargada. La tarjeta, las entidades y los servicios ya funcionan. Añade o activa la integración Home Keeper."
+      "description": "La pestaña Juegos y las tareas de préstamo necesitan una integración Home Keeper cargada. La tarjeta, las entidades y los servicios ya funcionan. Añade o activa la integración Home Keeper."
     },
     "home_keeper_too_old": {
       "title": "Home Keeper es demasiado antiguo",
-      "description": "La pestaña Biblioteca y las tareas de préstamo necesitan Home Keeper versión {version} o posterior. La tarjeta, las entidades y los servicios ya funcionan. Actualiza Home Keeper."
+      "description": "La pestaña Juegos y las tareas de préstamo necesitan Home Keeper versión {version} o posterior. La tarjeta, las entidades y los servicios ya funcionan. Actualiza Home Keeper."
     }
   },
   "services": {
@@ -134,7 +134,7 @@
     },
     "delete_room": {
       "name": "Borrar habitación",
-      "description": "Borrar una habitación. Una habitación con librerías necesita force.",
+      "description": "Borrar una habitación. Una habitación con muebles necesita force.",
       "fields": {
         "room_id": {
           "name": "Habitación",
@@ -147,8 +147,8 @@
       }
     },
     "add_unit": {
-      "name": "Añadir librería",
-      "description": "Añadir una librería a una habitación.",
+      "name": "Añadir mueble",
+      "description": "Añadir un mueble a una habitación.",
       "fields": {
         "room_id": {
           "name": "Habitación",
@@ -169,12 +169,12 @@
       }
     },
     "update_unit": {
-      "name": "Cambiar librería",
-      "description": "Cambiar una librería o moverla a otra habitación.",
+      "name": "Cambiar mueble",
+      "description": "Cambiar un mueble o moverlo a otra habitación.",
       "fields": {
         "unit_id": {
-          "name": "Librería",
-          "description": "El ID de la librería."
+          "name": "Mueble",
+          "description": "El ID del mueble."
         },
         "room_id": {
           "name": "Habitación",
@@ -195,12 +195,12 @@
       }
     },
     "delete_unit": {
-      "name": "Borrar librería",
-      "description": "Borrar una librería. Una librería con estantes necesita force.",
+      "name": "Borrar mueble",
+      "description": "Borrar un mueble. Un mueble con estantes necesita force.",
       "fields": {
         "unit_id": {
-          "name": "Librería",
-          "description": "El ID de la librería."
+          "name": "Mueble",
+          "description": "El ID del mueble."
         },
         "force": {
           "name": "Forzar",
@@ -210,11 +210,11 @@
     },
     "add_shelf": {
       "name": "Añadir estante",
-      "description": "Añadir un estante a una librería.",
+      "description": "Añadir un estante a un mueble.",
       "fields": {
         "unit_id": {
-          "name": "Librería",
-          "description": "El ID de la librería."
+          "name": "Mueble",
+          "description": "El ID del mueble."
         },
         "name": {
           "name": "Nombre",
@@ -228,15 +228,15 @@
     },
     "update_shelf": {
       "name": "Cambiar estante",
-      "description": "Cambiar un estante o moverlo a otra librería.",
+      "description": "Cambiar un estante o moverlo a otro mueble.",
       "fields": {
         "shelf_id": {
           "name": "Estante",
           "description": "El ID del estante. Vacío para ningún estante."
         },
         "unit_id": {
-          "name": "Librería",
-          "description": "El ID de la librería."
+          "name": "Mueble",
+          "description": "El ID del mueble."
         },
         "name": {
           "name": "Nombre",
@@ -263,12 +263,12 @@
       }
     },
     "add_game": {
-      "name": "Añadir libro",
-      "description": "Añadir un libro. Si un libro tiene el mismo código de barras, el servicio devuelve ese libro.",
+      "name": "Añadir juego",
+      "description": "Añadir un juego. Si un juego tiene el mismo código de barras, el servicio devuelve ese juego.",
       "fields": {
         "title": {
           "name": "Título",
-          "description": "El título del libro."
+          "description": "El título del juego."
         },
         "summary": {
           "name": "Resumen",
@@ -296,7 +296,7 @@
         },
         "tags": {
           "name": "Etiquetas",
-          "description": "Las etiquetas del libro."
+          "description": "Las etiquetas del juego."
         },
         "shared_notes": {
           "name": "Notas compartidas",
@@ -304,7 +304,7 @@
         },
         "needs_details": {
           "name": "Faltan detalles",
-          "description": "Marcar el libro como incompleto."
+          "description": "Marcar el juego como incompleto."
         },
         "lookup": {
           "name": "Buscar en IGDB",
@@ -335,16 +335,16 @@
       }
     },
     "update_game": {
-      "name": "Cambiar libro",
-      "description": "Cambiar los detalles de un libro.",
+      "name": "Cambiar juego",
+      "description": "Cambiar los detalles de un juego.",
       "fields": {
         "game_id": {
-          "name": "Libro",
-          "description": "El ID del libro."
+          "name": "Juego",
+          "description": "El ID del juego."
         },
         "title": {
           "name": "Título",
-          "description": "El título del libro."
+          "description": "El título del juego."
         },
         "summary": {
           "name": "Resumen",
@@ -368,7 +368,7 @@
         },
         "tags": {
           "name": "Etiquetas",
-          "description": "Las etiquetas del libro."
+          "description": "Las etiquetas del juego."
         },
         "shared_notes": {
           "name": "Notas compartidas",
@@ -376,7 +376,7 @@
         },
         "needs_details": {
           "name": "Faltan detalles",
-          "description": "Marcar el libro como incompleto."
+          "description": "Marcar el juego como incompleto."
         }
       }
     },
@@ -395,18 +395,18 @@
       }
     },
     "delete_game": {
-      "name": "Borrar libro",
-      "description": "Borrar un libro con sus ejemplares, su estado de lectura, sus préstamos y su portada.",
+      "name": "Borrar juego",
+      "description": "Borrar un juego con sus ejemplares, su progreso de juego, sus préstamos y su portada.",
       "fields": {
         "game_id": {
-          "name": "Libro",
-          "description": "El ID del libro."
+          "name": "Juego",
+          "description": "El ID del juego."
         }
       }
     },
     "scan_barcode": {
       "name": "Escanear código de barras",
-      "description": "Añadir un libro escaneado a un estante.",
+      "description": "Añadir un juego escaneado a un estante.",
       "fields": {
         "barcode": {
           "name": "Código de barras",
@@ -426,17 +426,17 @@
         },
         "on_duplicate": {
           "name": "Si existe un ejemplar",
-          "description": "La acción si la biblioteca tiene un ejemplar del libro."
+          "description": "La acción si la biblioteca tiene un ejemplar del juego."
         }
       }
     },
     "add_copy": {
       "name": "Añadir ejemplar",
-      "description": "Añadir un ejemplar de un libro.",
+      "description": "Añadir un ejemplar de un juego.",
       "fields": {
         "game_id": {
-          "name": "Libro",
-          "description": "El ID del libro."
+          "name": "Juego",
+          "description": "El ID del juego."
         },
         "shelf_id": {
           "name": "Estante",
@@ -588,11 +588,11 @@
     },
     "set_cover": {
       "name": "Poner portada",
-      "description": "Poner la portada de un libro.",
+      "description": "Poner la portada de un juego.",
       "fields": {
         "game_id": {
-          "name": "Libro",
-          "description": "El ID del libro."
+          "name": "Juego",
+          "description": "El ID del juego."
         },
         "kind": {
           "name": "Tipo de portada",
@@ -655,7 +655,7 @@
       }
     },
     "lend_game": {
-      "name": "Prestar libro",
+      "name": "Prestar juego",
       "description": "Prestar un ejemplar a otra persona.",
       "fields": {
         "copy_id": {
@@ -685,12 +685,12 @@
       }
     },
     "borrow_game": {
-      "name": "Añadir libro prestado",
-      "description": "Registrar un libro que una persona tomó prestado.",
+      "name": "Añadir juego prestado",
+      "description": "Registrar un juego que una persona tomó prestado.",
       "fields": {
         "game_id": {
-          "name": "Libro",
-          "description": "El ID del libro."
+          "name": "Juego",
+          "description": "El ID del juego."
         },
         "barcode": {
           "name": "Código de barras",
@@ -698,7 +698,7 @@
         },
         "title": {
           "name": "Título",
-          "description": "El título del libro."
+          "description": "El título del juego."
         },
         "party": {
           "name": "Otra persona",
@@ -786,11 +786,11 @@
     },
     "add_to_wishlist": {
       "name": "Añadir a deseos",
-      "description": "Poner un libro en la lista de deseos de una persona.",
+      "description": "Poner un juego en la lista de deseos de una persona.",
       "fields": {
         "game_id": {
-          "name": "Libro",
-          "description": "El ID del libro."
+          "name": "Juego",
+          "description": "El ID del juego."
         },
         "barcode": {
           "name": "Código de barras",
@@ -798,7 +798,7 @@
         },
         "title": {
           "name": "Título",
-          "description": "El título del libro."
+          "description": "El título del juego."
         },
         "person_id": {
           "name": "Persona",
@@ -806,7 +806,7 @@
         },
         "buy": {
           "name": "Comprar",
-          "description": "Poner el libro en la lista de tareas de deseos de la persona."
+          "description": "Poner el juego en la lista de tareas de deseos de la persona."
         }
       }
     },
@@ -815,12 +815,12 @@
       "description": "Cambiar una entrada de la lista de deseos.",
       "fields": {
         "game_id": {
-          "name": "Libro",
-          "description": "El ID del libro."
+          "name": "Juego",
+          "description": "El ID del juego."
         },
         "buy": {
           "name": "Comprar",
-          "description": "Poner el libro en la lista de tareas de deseos de la persona."
+          "description": "Poner el juego en la lista de tareas de deseos de la persona."
         },
         "person_id": {
           "name": "Persona",
@@ -830,21 +830,21 @@
     },
     "remove_from_wishlist": {
       "name": "Quitar de deseos",
-      "description": "Quitar un libro de la lista de deseos.",
+      "description": "Quitar un juego de la lista de deseos.",
       "fields": {
         "game_id": {
-          "name": "Libro",
-          "description": "El ID del libro."
+          "name": "Juego",
+          "description": "El ID del juego."
         }
       }
     },
     "got_wishlist_game": {
-      "name": "Libro deseado recibido",
-      "description": "Añadir un ejemplar de un libro deseado y quitarlo de la lista de deseos.",
+      "name": "Juego deseado recibido",
+      "description": "Añadir un ejemplar de un juego deseado y quitarlo de la lista de deseos.",
       "fields": {
         "game_id": {
-          "name": "Libro",
-          "description": "El ID del libro."
+          "name": "Juego",
+          "description": "El ID del juego."
         },
         "shelf_id": {
           "name": "Estante",
@@ -878,7 +878,7 @@
         },
         "wishlist_todo": {
           "name": "Lista de deseos",
-          "description": "La lista de tareas de los libros que comprar."
+          "description": "La lista de tareas de los juegos que comprar."
         }
       }
     },
@@ -894,7 +894,7 @@
     },
     "import_csv": {
       "name": "Importar CSV",
-      "description": "Importar libros de una exportación CSV de Home Keeper Games.",
+      "description": "Importar juegos de una exportación CSV de Home Keeper Games.",
       "fields": {
         "content": {
           "name": "Contenido CSV",
@@ -933,8 +933,8 @@
       }
     },
     "list_games": {
-      "name": "Listar libros",
-      "description": "Devolver los libros que coinciden con los filtros.",
+      "name": "Listar juegos",
+      "description": "Devolver los juegos que coinciden con los filtros.",
       "fields": {
         "query": {
           "name": "Búsqueda",
@@ -950,7 +950,7 @@
         },
         "owned": {
           "name": "En posesión",
-          "description": "Solo libros con un ejemplar, o solo libros sin ejemplar."
+          "description": "Solo juegos con un ejemplar, o solo juegos sin ejemplar."
         },
         "play_status": {
           "name": "Estado de juego",
@@ -962,23 +962,23 @@
         },
         "limit": {
           "name": "Límite",
-          "description": "El número máximo de libros."
+          "description": "El número máximo de juegos."
         }
       }
     },
     "get_game": {
-      "name": "Obtener libro",
-      "description": "Devolver un libro con sus ejemplares y préstamos.",
+      "name": "Obtener juego",
+      "description": "Devolver un juego con sus ejemplares y préstamos.",
       "fields": {
         "game_id": {
-          "name": "Libro",
-          "description": "El ID del libro."
+          "name": "Juego",
+          "description": "El ID del juego."
         }
       }
     },
     "list_locations": {
       "name": "Listar ubicaciones",
-      "description": "Devolver las habitaciones, librerías y estantes."
+      "description": "Devolver las habitaciones, muebles y estantes."
     },
     "list_loans": {
       "name": "Listar préstamos",
@@ -990,7 +990,7 @@
         },
         "direction": {
           "name": "Dirección",
-          "description": "out para un libro prestado a otro, in para un libro tomado prestado."
+          "description": "out para un juego prestado a otro, in para un juego tomado prestado."
         }
       }
     },
@@ -1059,13 +1059,13 @@
       "message": "Ninguna habitación tiene el ID {id}."
     },
     "unit_not_found": {
-      "message": "Ninguna librería tiene el ID {id}."
+      "message": "Ningún mueble tiene el ID {id}."
     },
     "shelf_not_found": {
       "message": "Ningún estante tiene el ID {id}."
     },
     "game_not_found": {
-      "message": "Ningún libro tiene el ID {id}."
+      "message": "Ningún juego tiene el ID {id}."
     },
     "copy_not_found": {
       "message": "Ningún ejemplar tiene el ID {id}."
@@ -1083,16 +1083,16 @@
       "message": "Tu usuario no tiene una persona de Home Assistant. Vincula una persona al usuario."
     },
     "room_not_empty": {
-      "message": "La habitación tiene {count} librerías. Usa force para borrarlas también."
+      "message": "La habitación tiene {count} muebles. Usa force para borrarlos también."
     },
     "unit_not_empty": {
-      "message": "La librería tiene {count} estantes. Usa force para borrarlos también."
+      "message": "El mueble tiene {count} estantes. Usa force para borrarlos también."
     },
     "shelf_not_empty": {
       "message": "El estante tiene {count} ejemplares. Usa force para dejarlos sin estante."
     },
     "duplicate_barcode": {
-      "message": "Otro libro tiene el código de barras {barcode}."
+      "message": "Otro juego tiene el código de barras {barcode}."
     },
     "copy_on_loan": {
       "message": "El ejemplar está prestado. Devuelve primero el préstamo."
@@ -1101,16 +1101,16 @@
       "message": "La fecha de vencimiento es anterior a la fecha de inicio."
     },
     "already_on_wishlist": {
-      "message": "El libro ya está en una lista de deseos."
+      "message": "El juego ya está en una lista de deseos."
     },
     "not_on_wishlist": {
-      "message": "El libro no está en ninguna lista de deseos."
+      "message": "El juego no está en ninguna lista de deseos."
     },
     "upload_not_found": {
       "message": "Ninguna portada subida tiene el ID {file_id}."
     },
     "barcode_or_title_required": {
-      "message": "Da un ID de libro, un código de barras o un título."
+      "message": "Da un ID de juego, un código de barras o un título."
     },
     "todo_entity_not_found": {
       "message": "{entity_id} no es una lista de tareas."

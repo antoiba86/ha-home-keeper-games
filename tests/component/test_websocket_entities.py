@@ -135,7 +135,7 @@ async def test_sensors(hass, setup_entry, call) -> None:
                 "play_status": "playing",
             },
         )
-    assert hass.states.get("sensor.home_keeper_games_books").state == "1"
+    assert hass.states.get("sensor.home_keeper_games_games").state == "1"
     done = hass.states.get("sensor.home_keeper_games_alice_games_completed_this_year")
     assert done.state == "1"
     assert done.attributes["goal"] == 12 and "pages" not in done.attributes

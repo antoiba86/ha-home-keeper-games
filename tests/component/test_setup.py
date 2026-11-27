@@ -172,7 +172,7 @@ async def test_missing_home_keeper(hass, persons, monkeypatch) -> None:
         DOMAIN, "add_room", {"name": "Den"}, blocking=True, return_response=True
     )
     assert room["room"]["name"] == "Den"
-    assert hass.states.get("sensor.home_keeper_games_books").state == "0"
+    assert hass.states.get("sensor.home_keeper_games_games").state == "0"
     issue = ir.async_get(hass).async_get_issue(DOMAIN, "home_keeper_missing")
     assert issue.translation_placeholders == {
         "url": "https://github.com/prestomation/ha-home-keeper#installation"

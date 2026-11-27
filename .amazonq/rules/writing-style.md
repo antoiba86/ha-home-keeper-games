@@ -139,7 +139,7 @@ Use these names and no others for these things.
 | loan | lending, borrow record | A copy that is lent out, or a game that is borrowed. |
 | wishlist | wish list, want list | The games that a person wants to get. |
 | person | member, player | A Home Assistant `person`. |
-| tab | Library page, admin UI | The Library tab of the Home Keeper panel. |
+| tab | Library page, admin UI | The Games tab of the Home Keeper panel. |
 | card | dashboard card, Lovelace card | |
 | Home Keeper | HK, the parent integration | The integration that the library requires. |
 | barcode | bar code, EAN, UPC | The code on the case. EAN-13 is permitted for the format. |

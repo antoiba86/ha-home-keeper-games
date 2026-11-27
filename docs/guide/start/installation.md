@@ -11,7 +11,7 @@ It requires Home Assistant 2025.7 or later, and Home Keeper.
 3. Add the Home Keeper integration in **Settings → Devices & services → Add
    integration**.
 
-The Library tab needs Home Keeper version 0.30.0 or later.
+The Games tab needs Home Keeper version 0.30.0 or later.
 
 ## Install the library
 
@@ -68,7 +68,7 @@ entities and the services still work. **Settings → Repairs** shows 1 of these 
 - **Home Keeper is not set up.** Add or enable the Home Keeper integration.
 - **Home Keeper is too old.** Update Home Keeper.
 
-While the issue shows, the Library tab and the loan tasks are off. When Home Keeper is
+While the issue shows, the Games tab and the loan tasks are off. When Home Keeper is
 ready again, the issue goes away. The tab and the tasks then come back with no restart.
 
 ## Data

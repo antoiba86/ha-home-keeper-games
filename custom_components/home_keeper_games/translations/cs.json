@@ -56,7 +56,7 @@
   "entity": {
     "sensor": {
       "games": {
-        "name": "Knihy"
+        "name": "Hry"
       },
       "loans_out": {
         "name": "Půjčeno"
@@ -80,15 +80,15 @@
   "issues": {
     "home_keeper_missing": {
       "title": "Home Keeper není nainstalován",
-      "description": "Karta Knihovna a úkoly výpůjček vyžadují Home Keeper. Karta na nástěnce, entity a služby teď fungují. Nainstalujte Home Keeper z HACS a restartujte Home Assistant. Kroky instalace: {url}"
+      "description": "Karta Hry a úkoly výpůjček vyžadují Home Keeper. Karta na nástěnce, entity a služby teď fungují. Nainstalujte Home Keeper z HACS a restartujte Home Assistant. Kroky instalace: {url}"
     },
     "home_keeper_not_set_up": {
       "title": "Home Keeper není nastaven",
-      "description": "Karta Knihovna a úkoly výpůjček vyžadují načtenou integraci Home Keeper. Karta na nástěnce, entity a služby teď fungují. Přidejte nebo povolte integraci Home Keeper."
+      "description": "Karta Hry a úkoly výpůjček vyžadují načtenou integraci Home Keeper. Karta na nástěnce, entity a služby teď fungují. Přidejte nebo povolte integraci Home Keeper."
     },
     "home_keeper_too_old": {
       "title": "Home Keeper je příliš starý",
-      "description": "Karta Knihovna a úkoly výpůjček vyžadují Home Keeper verze {version} nebo novější. Karta na nástěnce, entity a služby teď fungují. Aktualizujte Home Keeper."
+      "description": "Karta Hry a úkoly výpůjček vyžadují Home Keeper verze {version} nebo novější. Karta na nástěnce, entity a služby teď fungují. Aktualizujte Home Keeper."
     }
   },
   "services": {
@@ -134,7 +134,7 @@
     },
     "delete_room": {
       "name": "Smazat místnost",
-      "description": "Smazat místnost. Místnost s knihovničkami potřebuje force.",
+      "description": "Smazat místnost. Místnost se skříňkami potřebuje force.",
       "fields": {
         "room_id": {
           "name": "Místnost",
@@ -147,8 +147,8 @@
       }
     },
     "add_unit": {
-      "name": "Přidat knihovničku",
-      "description": "Přidat knihovničku do místnosti.",
+      "name": "Přidat skříňku",
+      "description": "Přidat skříňku do místnosti.",
       "fields": {
         "room_id": {
           "name": "Místnost",
@@ -169,12 +169,12 @@
       }
     },
     "update_unit": {
-      "name": "Změnit knihovničku",
-      "description": "Změnit knihovničku nebo ji přesunout do jiné místnosti.",
+      "name": "Změnit skříňku",
+      "description": "Změnit skříňku nebo ji přesunout do jiné místnosti.",
       "fields": {
         "unit_id": {
-          "name": "Knihovnička",
-          "description": "ID knihovničky."
+          "name": "Skříňka",
+          "description": "ID skříňky."
         },
         "room_id": {
           "name": "Místnost",
@@ -195,12 +195,12 @@
       }
     },
     "delete_unit": {
-      "name": "Smazat knihovničku",
-      "description": "Smazat knihovničku. Knihovnička s policemi potřebuje force.",
+      "name": "Smazat skříňku",
+      "description": "Smazat skříňku. Skříňka s policemi potřebuje force.",
       "fields": {
         "unit_id": {
-          "name": "Knihovnička",
-          "description": "ID knihovničky."
+          "name": "Skříňka",
+          "description": "ID skříňky."
         },
         "force": {
           "name": "Vynutit",
@@ -210,11 +210,11 @@
     },
     "add_shelf": {
       "name": "Přidat polici",
-      "description": "Přidat polici do knihovničky.",
+      "description": "Přidat polici do skříňky.",
       "fields": {
         "unit_id": {
-          "name": "Knihovnička",
-          "description": "ID knihovničky."
+          "name": "Skříňka",
+          "description": "ID skříňky."
         },
         "name": {
           "name": "Název",
@@ -228,15 +228,15 @@
     },
     "update_shelf": {
       "name": "Změnit polici",
-      "description": "Změnit polici nebo ji přesunout do jiné knihovničky.",
+      "description": "Změnit polici nebo ji přesunout do jiné skříňky.",
       "fields": {
         "shelf_id": {
           "name": "Police",
           "description": "ID police. Prázdné pro žádnou polici."
         },
         "unit_id": {
-          "name": "Knihovnička",
-          "description": "ID knihovničky."
+          "name": "Skříňka",
+          "description": "ID skříňky."
         },
         "name": {
           "name": "Název",
@@ -263,12 +263,12 @@
       }
     },
     "add_game": {
-      "name": "Přidat knihu",
-      "description": "Přidat knihu. Pokud má kniha stejný čárový kód, služba vrátí tuto knihu.",
+      "name": "Přidat hru",
+      "description": "Přidat hru. Pokud má hra stejný čárový kód, služba vrátí tuto hru.",
       "fields": {
         "title": {
           "name": "Titul",
-          "description": "Titul knihy."
+          "description": "Titul hry."
         },
         "summary": {
           "name": "Shrnutí",
@@ -296,7 +296,7 @@
         },
         "tags": {
           "name": "Štítky",
-          "description": "Štítky knihy."
+          "description": "Štítky hry."
         },
         "shared_notes": {
           "name": "Sdílené poznámky",
@@ -304,7 +304,7 @@
         },
         "needs_details": {
           "name": "Chybí podrobnosti",
-          "description": "Označit knihu jako neúplnou."
+          "description": "Označit hru jako neúplnou."
         },
         "lookup": {
           "name": "Vyhledat v IGDB",
@@ -335,16 +335,16 @@
       }
     },
     "update_game": {
-      "name": "Změnit knihu",
-      "description": "Změnit podrobnosti knihy.",
+      "name": "Změnit hru",
+      "description": "Změnit podrobnosti hry.",
       "fields": {
         "game_id": {
-          "name": "Kniha",
-          "description": "ID knihy."
+          "name": "Hra",
+          "description": "ID hry."
         },
         "title": {
           "name": "Titul",
-          "description": "Titul knihy."
+          "description": "Titul hry."
         },
         "summary": {
           "name": "Shrnutí",
@@ -368,7 +368,7 @@
         },
         "tags": {
           "name": "Štítky",
-          "description": "Štítky knihy."
+          "description": "Štítky hry."
         },
         "shared_notes": {
           "name": "Sdílené poznámky",
@@ -376,7 +376,7 @@
         },
         "needs_details": {
           "name": "Chybí podrobnosti",
-          "description": "Označit knihu jako neúplnou."
+          "description": "Označit hru jako neúplnou."
         }
       }
     },
@@ -395,18 +395,18 @@
       }
     },
     "delete_game": {
-      "name": "Smazat knihu",
-      "description": "Smazat knihu s jejími výtisky, stavem čtení, výpůjčkami a obálkou.",
+      "name": "Smazat hru",
+      "description": "Smazat hru s jejími výtisky, postupem hraní, výpůjčkami a obálkou.",
       "fields": {
         "game_id": {
-          "name": "Kniha",
-          "description": "ID knihy."
+          "name": "Hra",
+          "description": "ID hry."
         }
       }
     },
     "scan_barcode": {
       "name": "Naskenovat čárový kód",
-      "description": "Přidat naskenovanou knihu na polici.",
+      "description": "Přidat naskenovanou hru na polici.",
       "fields": {
         "barcode": {
           "name": "Čárový kód",
@@ -426,17 +426,17 @@
         },
         "on_duplicate": {
           "name": "Pokud výtisk existuje",
-          "description": "Akce, pokud knihovna má výtisk knihy."
+          "description": "Akce, pokud knihovna má výtisk hry."
         }
       }
     },
     "add_copy": {
       "name": "Přidat výtisk",
-      "description": "Přidat výtisk knihy.",
+      "description": "Přidat výtisk hry.",
       "fields": {
         "game_id": {
-          "name": "Kniha",
-          "description": "ID knihy."
+          "name": "Hra",
+          "description": "ID hry."
         },
         "shelf_id": {
           "name": "Police",
@@ -588,11 +588,11 @@
     },
     "set_cover": {
       "name": "Nastavit obálku",
-      "description": "Nastavit obálku knihy.",
+      "description": "Nastavit obálku hry.",
       "fields": {
         "game_id": {
-          "name": "Kniha",
-          "description": "ID knihy."
+          "name": "Hra",
+          "description": "ID hry."
         },
         "kind": {
           "name": "Typ obálky",
@@ -655,7 +655,7 @@
       }
     },
     "lend_game": {
-      "name": "Půjčit knihu",
+      "name": "Půjčit hru",
       "description": "Půjčit výtisk jiné osobě.",
       "fields": {
         "copy_id": {
@@ -685,12 +685,12 @@
       }
     },
     "borrow_game": {
-      "name": "Přidat vypůjčenou knihu",
-      "description": "Zaznamenat knihu, kterou si osoba vypůjčila.",
+      "name": "Přidat vypůjčenou hru",
+      "description": "Zaznamenat hru, kterou si osoba vypůjčila.",
       "fields": {
         "game_id": {
-          "name": "Kniha",
-          "description": "ID knihy."
+          "name": "Hra",
+          "description": "ID hry."
         },
         "barcode": {
           "name": "Čárový kód",
@@ -698,7 +698,7 @@
         },
         "title": {
           "name": "Titul",
-          "description": "Titul knihy."
+          "description": "Titul hry."
         },
         "party": {
           "name": "Druhá osoba",
@@ -786,11 +786,11 @@
     },
     "add_to_wishlist": {
       "name": "Přidat do přání",
-      "description": "Dát knihu na seznam přání osoby.",
+      "description": "Dát hru na seznam přání osoby.",
       "fields": {
         "game_id": {
-          "name": "Kniha",
-          "description": "ID knihy."
+          "name": "Hra",
+          "description": "ID hry."
         },
         "barcode": {
           "name": "Čárový kód",
@@ -798,7 +798,7 @@
         },
         "title": {
           "name": "Titul",
-          "description": "Titul knihy."
+          "description": "Titul hry."
         },
         "person_id": {
           "name": "Osoba",
@@ -806,7 +806,7 @@
         },
         "buy": {
           "name": "Koupit",
-          "description": "Dát knihu na seznam úkolů přání osoby."
+          "description": "Dát hru na seznam úkolů přání osoby."
         }
       }
     },
@@ -815,12 +815,12 @@
       "description": "Změnit položku seznamu přání.",
       "fields": {
         "game_id": {
-          "name": "Kniha",
-          "description": "ID knihy."
+          "name": "Hra",
+          "description": "ID hry."
         },
         "buy": {
           "name": "Koupit",
-          "description": "Dát knihu na seznam úkolů přání osoby."
+          "description": "Dát hru na seznam úkolů přání osoby."
         },
         "person_id": {
           "name": "Osoba",
@@ -830,21 +830,21 @@
     },
     "remove_from_wishlist": {
       "name": "Odebrat z přání",
-      "description": "Odebrat knihu ze seznamu přání.",
+      "description": "Odebrat hru ze seznamu přání.",
       "fields": {
         "game_id": {
-          "name": "Kniha",
-          "description": "ID knihy."
+          "name": "Hra",
+          "description": "ID hry."
         }
       }
     },
     "got_wishlist_game": {
-      "name": "Kniha z přání získána",
-      "description": "Přidat výtisk knihy ze seznamu přání a odebrat ji ze seznamu.",
+      "name": "Hra z přání získána",
+      "description": "Přidat výtisk hry ze seznamu přání a odebrat ji ze seznamu.",
       "fields": {
         "game_id": {
-          "name": "Kniha",
-          "description": "ID knihy."
+          "name": "Hra",
+          "description": "ID hry."
         },
         "shelf_id": {
           "name": "Police",
@@ -878,7 +878,7 @@
         },
         "wishlist_todo": {
           "name": "Seznam přání",
-          "description": "Seznam úkolů pro knihy ke koupi."
+          "description": "Seznam úkolů pro hry ke koupi."
         }
       }
     },
@@ -894,7 +894,7 @@
     },
     "import_csv": {
       "name": "Importovat CSV",
-      "description": "Importovat knihy z exportu CSV aplikace Home Keeper Games.",
+      "description": "Importovat hry z exportu CSV aplikace Home Keeper Games.",
       "fields": {
         "content": {
           "name": "Obsah CSV",
@@ -933,8 +933,8 @@
       }
     },
     "list_games": {
-      "name": "Vypsat knihy",
-      "description": "Vrátit knihy, které odpovídají filtrům.",
+      "name": "Vypsat hry",
+      "description": "Vrátit hry, které odpovídají filtrům.",
       "fields": {
         "query": {
           "name": "Hledat",
@@ -950,7 +950,7 @@
         },
         "owned": {
           "name": "Vlastněno",
-          "description": "Jen knihy s výtiskem, nebo jen knihy bez výtisku."
+          "description": "Jen hry s výtiskem, nebo jen hry bez výtisku."
         },
         "play_status": {
           "name": "Stav hraní",
@@ -962,23 +962,23 @@
         },
         "limit": {
           "name": "Omezení",
-          "description": "Největší počet knih."
+          "description": "Největší počet her."
         }
       }
     },
     "get_game": {
-      "name": "Získat knihu",
-      "description": "Vrátit knihu s jejími výtisky a výpůjčkami.",
+      "name": "Získat hru",
+      "description": "Vrátit hru s jejími výtisky a výpůjčkami.",
       "fields": {
         "game_id": {
-          "name": "Kniha",
-          "description": "ID knihy."
+          "name": "Hra",
+          "description": "ID hry."
         }
       }
     },
     "list_locations": {
       "name": "Vypsat umístění",
-      "description": "Vrátit místnosti, knihovničky a police."
+      "description": "Vrátit místnosti, skříňky a police."
     },
     "list_loans": {
       "name": "Vypsat výpůjčky",
@@ -990,7 +990,7 @@
         },
         "direction": {
           "name": "Směr",
-          "description": "out pro půjčenou knihu, in pro vypůjčenou knihu."
+          "description": "out pro půjčenou hru, in pro vypůjčenou hru."
         }
       }
     },
@@ -1059,13 +1059,13 @@
       "message": "Žádná místnost nemá ID {id}."
     },
     "unit_not_found": {
-      "message": "Žádná knihovnička nemá ID {id}."
+      "message": "Žádná skříňka nemá ID {id}."
     },
     "shelf_not_found": {
       "message": "Žádná police nemá ID {id}."
     },
     "game_not_found": {
-      "message": "Žádná kniha nemá ID {id}."
+      "message": "Žádná hra nemá ID {id}."
     },
     "copy_not_found": {
       "message": "Žádný výtisk nemá ID {id}."
@@ -1083,16 +1083,16 @@
       "message": "Váš uživatel nemá osobu v Home Assistant. Propojte osobu s uživatelem."
     },
     "room_not_empty": {
-      "message": "Místnost má knihovničky: {count}. Použijte force, chcete-li je také smazat."
+      "message": "Místnost má skříňky: {count}. Použijte force, chcete-li je také smazat."
     },
     "unit_not_empty": {
-      "message": "Knihovnička má police: {count}. Použijte force, chcete-li je také smazat."
+      "message": "Skříňka má police: {count}. Použijte force, chcete-li je také smazat."
     },
     "shelf_not_empty": {
       "message": "Police má výtisky: {count}. Použijte force, chcete-li je nechat bez police."
     },
     "duplicate_barcode": {
-      "message": "Jiná kniha má čárový kód {barcode}."
+      "message": "Jiná hra má čárový kód {barcode}."
     },
     "copy_on_loan": {
       "message": "Výtisk je půjčený. Nejdříve vraťte výpůjčku."
@@ -1101,16 +1101,16 @@
       "message": "Termín vrácení je před datem začátku."
     },
     "already_on_wishlist": {
-      "message": "Kniha už je na seznamu přání."
+      "message": "Hra už je na seznamu přání."
     },
     "not_on_wishlist": {
-      "message": "Kniha není na žádném seznamu přání."
+      "message": "Hra není na žádném seznamu přání."
     },
     "upload_not_found": {
       "message": "Žádná nahraná obálka nemá ID {file_id}."
     },
     "barcode_or_title_required": {
-      "message": "Zadejte ID knihy, čárový kód nebo titul."
+      "message": "Zadejte ID hry, čárový kód nebo titul."
     },
     "todo_entity_not_found": {
       "message": "{entity_id} není seznam úkolů."

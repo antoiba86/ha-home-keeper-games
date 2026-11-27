@@ -21,7 +21,7 @@ in the rules files below. Read the file for your topic before you change code or
 | CI, mutation gate, typing, HA versions, vale, skills | [ci-and-ha-versions.md](.amazonq/rules/ci-and-ha-versions.md) |
 | Admin and usage, privilege, pure core, entities, options, i18n | [architecture.md](.amazonq/rules/architecture.md) |
 | Services, websocket commands, events, API surface | [services-and-events.md](.amazonq/rules/services-and-events.md) |
-| Library tab and card | [frontend.md](.amazonq/rules/frontend.md) |
+| Games tab and card | [frontend.md](.amazonq/rules/frontend.md) |
 | Dev docs, design docs, `ci/docs.py` | [dev-docs.md](.amazonq/rules/dev-docs.md) |
 | How each subsystem works | [docs/design/](docs/design/architecture.md#design-doc-index) |
 | Release steps | [RELEASE.md](RELEASE.md) |
@@ -33,7 +33,7 @@ in the rules files below. Read the file for your topic before you change code or
   Assistant code.
 - Storage: 1 JSON document, `.storage/home_keeper_games`, changed only through
   `LibraryStore`. Covers are files in `.storage/home_keeper_games_covers/`.
-- Home Keeper is an `after_dependencies` entry. The admin UI is the Library tab of the
+- Home Keeper is an `after_dependencies` entry. The admin UI is the Games tab of the
   Home Keeper panel. Without Home Keeper, a repair issue shows and the tab is gone.
 - Frontend: TypeScript and Rollup in `custom_components/home_keeper_games/frontend/`.
   CI builds `frontend/dist/` (`games-tab.js`, `games-card.js`), which is gitignored.

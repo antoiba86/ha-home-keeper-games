@@ -9,7 +9,7 @@ source_hash: 5cd01cecbed7
 
 # Home Keeper dependency
 
-The library requires Home Keeper for 2 things: the Library tab in the Home Keeper panel,
+The library requires Home Keeper for 2 things: the Games tab in the Home Keeper panel,
 and the loan tasks. Everything else works without it. Home Keeper is an
 `after_dependencies` entry in the manifest, so the library loads after Home Keeper when
 both are present, and loads alone when Home Keeper is absent.

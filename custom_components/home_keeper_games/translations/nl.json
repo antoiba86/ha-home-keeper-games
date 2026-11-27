@@ -56,7 +56,7 @@
   "entity": {
     "sensor": {
       "games": {
-        "name": "Boeken"
+        "name": "Spellen"
       },
       "loans_out": {
         "name": "Uitgeleend"
@@ -80,15 +80,15 @@
   "issues": {
     "home_keeper_missing": {
       "title": "Home Keeper is niet geïnstalleerd",
-      "description": "Het tabblad Bibliotheek en de uitleentaken hebben Home Keeper nodig. De kaart, de entiteiten en de diensten werken nu. Installeer Home Keeper via HACS en start Home Assistant opnieuw. Installatiestappen: {url}"
+      "description": "Het tabblad Spellen en de uitleentaken hebben Home Keeper nodig. De kaart, de entiteiten en de diensten werken nu. Installeer Home Keeper via HACS en start Home Assistant opnieuw. Installatiestappen: {url}"
     },
     "home_keeper_not_set_up": {
       "title": "Home Keeper is niet ingesteld",
-      "description": "Het tabblad Bibliotheek en de uitleentaken hebben een geladen Home Keeper-integratie nodig. De kaart, de entiteiten en de diensten werken nu. Voeg de Home Keeper-integratie toe of schakel haar in."
+      "description": "Het tabblad Spellen en de uitleentaken hebben een geladen Home Keeper-integratie nodig. De kaart, de entiteiten en de diensten werken nu. Voeg de Home Keeper-integratie toe of schakel haar in."
     },
     "home_keeper_too_old": {
       "title": "Home Keeper is te oud",
-      "description": "Het tabblad Bibliotheek en de uitleentaken hebben Home Keeper versie {version} of nieuwer nodig. De kaart, de entiteiten en de diensten werken nu. Werk Home Keeper bij."
+      "description": "Het tabblad Spellen en de uitleentaken hebben Home Keeper versie {version} of nieuwer nodig. De kaart, de entiteiten en de diensten werken nu. Werk Home Keeper bij."
     }
   },
   "services": {
@@ -134,7 +134,7 @@
     },
     "delete_room": {
       "name": "Kamer verwijderen",
-      "description": "Een kamer verwijderen. Een kamer met boekenkasten heeft force nodig.",
+      "description": "Een kamer verwijderen. Een kamer met kasten heeft force nodig.",
       "fields": {
         "room_id": {
           "name": "Kamer",
@@ -147,8 +147,8 @@
       }
     },
     "add_unit": {
-      "name": "Boekenkast toevoegen",
-      "description": "Een boekenkast aan een kamer toevoegen.",
+      "name": "Kast toevoegen",
+      "description": "Een kast aan een kamer toevoegen.",
       "fields": {
         "room_id": {
           "name": "Kamer",
@@ -169,12 +169,12 @@
       }
     },
     "update_unit": {
-      "name": "Boekenkast wijzigen",
-      "description": "Een boekenkast wijzigen of naar een andere kamer verplaatsen.",
+      "name": "Kast wijzigen",
+      "description": "Een kast wijzigen of naar een andere kamer verplaatsen.",
       "fields": {
         "unit_id": {
-          "name": "Boekenkast",
-          "description": "De ID van de boekenkast."
+          "name": "Kast",
+          "description": "De ID van de kast."
         },
         "room_id": {
           "name": "Kamer",
@@ -195,12 +195,12 @@
       }
     },
     "delete_unit": {
-      "name": "Boekenkast verwijderen",
-      "description": "Een boekenkast verwijderen. Een boekenkast met planken heeft force nodig.",
+      "name": "Kast verwijderen",
+      "description": "Een kast verwijderen. Een kast met planken heeft force nodig.",
       "fields": {
         "unit_id": {
-          "name": "Boekenkast",
-          "description": "De ID van de boekenkast."
+          "name": "Kast",
+          "description": "De ID van de kast."
         },
         "force": {
           "name": "Forceren",
@@ -210,11 +210,11 @@
     },
     "add_shelf": {
       "name": "Plank toevoegen",
-      "description": "Een plank aan een boekenkast toevoegen.",
+      "description": "Een plank aan een kast toevoegen.",
       "fields": {
         "unit_id": {
-          "name": "Boekenkast",
-          "description": "De ID van de boekenkast."
+          "name": "Kast",
+          "description": "De ID van de kast."
         },
         "name": {
           "name": "Naam",
@@ -228,15 +228,15 @@
     },
     "update_shelf": {
       "name": "Plank wijzigen",
-      "description": "Een plank wijzigen of naar een andere boekenkast verplaatsen.",
+      "description": "Een plank wijzigen of naar een andere kast verplaatsen.",
       "fields": {
         "shelf_id": {
           "name": "Plank",
           "description": "De ID van de plank. Leeg voor geen plank."
         },
         "unit_id": {
-          "name": "Boekenkast",
-          "description": "De ID van de boekenkast."
+          "name": "Kast",
+          "description": "De ID van de kast."
         },
         "name": {
           "name": "Naam",
@@ -263,12 +263,12 @@
       }
     },
     "add_game": {
-      "name": "Boek toevoegen",
-      "description": "Een boek toevoegen. Als een boek dezelfde barcode heeft, geeft de dienst dat boek terug.",
+      "name": "Spel toevoegen",
+      "description": "Een spel toevoegen. Als een spel dezelfde barcode heeft, geeft de dienst dat spel terug.",
       "fields": {
         "title": {
-          "name": "Titel van het boek",
-          "description": "De titel van het boek."
+          "name": "Titel",
+          "description": "De titel van het spel."
         },
         "summary": {
           "name": "Samenvatting",
@@ -296,7 +296,7 @@
         },
         "tags": {
           "name": "Labels",
-          "description": "De labels van het boek."
+          "description": "De labels van het spel."
         },
         "shared_notes": {
           "name": "Gedeelde notities",
@@ -304,7 +304,7 @@
         },
         "needs_details": {
           "name": "Details ontbreken",
-          "description": "Het boek als onvolledig markeren."
+          "description": "Het spel als onvolledig markeren."
         },
         "lookup": {
           "name": "Opzoeken in IGDB",
@@ -335,16 +335,16 @@
       }
     },
     "update_game": {
-      "name": "Boek wijzigen",
-      "description": "De details van een boek wijzigen.",
+      "name": "Spel wijzigen",
+      "description": "De details van een spel wijzigen.",
       "fields": {
         "game_id": {
-          "name": "Boek",
-          "description": "De ID van het boek."
+          "name": "Spel",
+          "description": "De ID van het spel."
         },
         "title": {
-          "name": "Titel van het boek",
-          "description": "De titel van het boek."
+          "name": "Titel",
+          "description": "De titel van het spel."
         },
         "summary": {
           "name": "Samenvatting",
@@ -368,7 +368,7 @@
         },
         "tags": {
           "name": "Labels",
-          "description": "De labels van het boek."
+          "description": "De labels van het spel."
         },
         "shared_notes": {
           "name": "Gedeelde notities",
@@ -376,7 +376,7 @@
         },
         "needs_details": {
           "name": "Details ontbreken",
-          "description": "Het boek als onvolledig markeren."
+          "description": "Het spel als onvolledig markeren."
         }
       }
     },
@@ -395,18 +395,18 @@
       }
     },
     "delete_game": {
-      "name": "Boek verwijderen",
-      "description": "Een boek verwijderen met de exemplaren, de leesstatus, de uitleningen en de omslag.",
+      "name": "Spel verwijderen",
+      "description": "Een spel verwijderen met de exemplaren, de speelvoortgang, de uitleningen en de omslag.",
       "fields": {
         "game_id": {
-          "name": "Boek",
-          "description": "De ID van het boek."
+          "name": "Spel",
+          "description": "De ID van het spel."
         }
       }
     },
     "scan_barcode": {
       "name": "Barcode scannen",
-      "description": "Een gescand boek aan een plank toevoegen.",
+      "description": "Een gescand spel aan een plank toevoegen.",
       "fields": {
         "barcode": {
           "name": "Barcode",
@@ -426,17 +426,17 @@
         },
         "on_duplicate": {
           "name": "Als er een exemplaar is",
-          "description": "De actie als de bibliotheek een exemplaar van het boek heeft."
+          "description": "De actie als de bibliotheek een exemplaar van het spel heeft."
         }
       }
     },
     "add_copy": {
       "name": "Exemplaar toevoegen",
-      "description": "Een exemplaar van een boek toevoegen.",
+      "description": "Een exemplaar van een spel toevoegen.",
       "fields": {
         "game_id": {
-          "name": "Boek",
-          "description": "De ID van het boek."
+          "name": "Spel",
+          "description": "De ID van het spel."
         },
         "shelf_id": {
           "name": "Plank",
@@ -588,11 +588,11 @@
     },
     "set_cover": {
       "name": "Omslag instellen",
-      "description": "De omslag van een boek instellen.",
+      "description": "De omslag van een spel instellen.",
       "fields": {
         "game_id": {
-          "name": "Boek",
-          "description": "De ID van het boek."
+          "name": "Spel",
+          "description": "De ID van het spel."
         },
         "kind": {
           "name": "Soort omslag",
@@ -655,7 +655,7 @@
       }
     },
     "lend_game": {
-      "name": "Boek uitlenen",
+      "name": "Spel uitlenen",
       "description": "Een exemplaar aan een andere persoon uitlenen.",
       "fields": {
         "copy_id": {
@@ -685,20 +685,20 @@
       }
     },
     "borrow_game": {
-      "name": "Geleend boek toevoegen",
-      "description": "Een boek vastleggen dat een persoon heeft geleend.",
+      "name": "Geleend spel toevoegen",
+      "description": "Een spel vastleggen dat een persoon heeft geleend.",
       "fields": {
         "game_id": {
-          "name": "Boek",
-          "description": "De ID van het boek."
+          "name": "Spel",
+          "description": "De ID van het spel."
         },
         "barcode": {
           "name": "Barcode",
           "description": "Het nummer van de barcode, bijvoorbeeld een EAN-13."
         },
         "title": {
-          "name": "Titel van het boek",
-          "description": "De titel van het boek."
+          "name": "Titel",
+          "description": "De titel van het spel."
         },
         "party": {
           "name": "Andere persoon",
@@ -786,19 +786,19 @@
     },
     "add_to_wishlist": {
       "name": "Aan verlanglijst toevoegen",
-      "description": "Een boek op de verlanglijst van een persoon zetten.",
+      "description": "Een spel op de verlanglijst van een persoon zetten.",
       "fields": {
         "game_id": {
-          "name": "Boek",
-          "description": "De ID van het boek."
+          "name": "Spel",
+          "description": "De ID van het spel."
         },
         "barcode": {
           "name": "Barcode",
           "description": "Het nummer van de barcode, bijvoorbeeld een EAN-13."
         },
         "title": {
-          "name": "Titel van het boek",
-          "description": "De titel van het boek."
+          "name": "Titel",
+          "description": "De titel van het spel."
         },
         "person_id": {
           "name": "Persoon",
@@ -806,7 +806,7 @@
         },
         "buy": {
           "name": "Kopen",
-          "description": "Het boek op de takenlijst met wensen van de persoon zetten."
+          "description": "Het spel op de takenlijst met wensen van de persoon zetten."
         }
       }
     },
@@ -815,12 +815,12 @@
       "description": "Een item van de verlanglijst wijzigen.",
       "fields": {
         "game_id": {
-          "name": "Boek",
-          "description": "De ID van het boek."
+          "name": "Spel",
+          "description": "De ID van het spel."
         },
         "buy": {
           "name": "Kopen",
-          "description": "Het boek op de takenlijst met wensen van de persoon zetten."
+          "description": "Het spel op de takenlijst met wensen van de persoon zetten."
         },
         "person_id": {
           "name": "Persoon",
@@ -830,21 +830,21 @@
     },
     "remove_from_wishlist": {
       "name": "Van verlanglijst halen",
-      "description": "Een boek van de verlanglijst halen.",
+      "description": "Een spel van de verlanglijst halen.",
       "fields": {
         "game_id": {
-          "name": "Boek",
-          "description": "De ID van het boek."
+          "name": "Spel",
+          "description": "De ID van het spel."
         }
       }
     },
     "got_wishlist_game": {
-      "name": "Gewenst boek ontvangen",
-      "description": "Een exemplaar van een gewenst boek toevoegen en het van de verlanglijst halen.",
+      "name": "Gewenst spel ontvangen",
+      "description": "Een exemplaar van een gewenst spel toevoegen en het van de verlanglijst halen.",
       "fields": {
         "game_id": {
-          "name": "Boek",
-          "description": "De ID van het boek."
+          "name": "Spel",
+          "description": "De ID van het spel."
         },
         "shelf_id": {
           "name": "Plank",
@@ -878,7 +878,7 @@
         },
         "wishlist_todo": {
           "name": "Verlanglijst",
-          "description": "De takenlijst voor de boeken om te kopen."
+          "description": "De takenlijst voor de spellen om te kopen."
         }
       }
     },
@@ -894,7 +894,7 @@
     },
     "import_csv": {
       "name": "CSV importeren",
-      "description": "Boeken uit een CSV-export van Home Keeper Games importeren.",
+      "description": "Spellen uit een CSV-export van Home Keeper Games importeren.",
       "fields": {
         "content": {
           "name": "CSV-inhoud",
@@ -933,8 +933,8 @@
       }
     },
     "list_games": {
-      "name": "Boeken weergeven",
-      "description": "De boeken teruggeven die bij de filters passen.",
+      "name": "Spellen weergeven",
+      "description": "De spellen teruggeven die bij de filters passen.",
       "fields": {
         "query": {
           "name": "Zoeken",
@@ -950,7 +950,7 @@
         },
         "owned": {
           "name": "In bezit",
-          "description": "Alleen boeken met een exemplaar, of alleen boeken zonder exemplaar."
+          "description": "Alleen spellen met een exemplaar, of alleen spellen zonder exemplaar."
         },
         "play_status": {
           "name": "Speelstatus",
@@ -962,23 +962,23 @@
         },
         "limit": {
           "name": "Maximum",
-          "description": "Het maximale aantal boeken."
+          "description": "Het maximale aantal spellen."
         }
       }
     },
     "get_game": {
-      "name": "Boek ophalen",
-      "description": "Een boek met de exemplaren en uitleningen teruggeven.",
+      "name": "Spel ophalen",
+      "description": "Een spel met de exemplaren en uitleningen teruggeven.",
       "fields": {
         "game_id": {
-          "name": "Boek",
-          "description": "De ID van het boek."
+          "name": "Spel",
+          "description": "De ID van het spel."
         }
       }
     },
     "list_locations": {
       "name": "Locaties weergeven",
-      "description": "De kamers, boekenkasten en planken teruggeven."
+      "description": "De kamers, kasten en planken teruggeven."
     },
     "list_loans": {
       "name": "Uitleningen weergeven",
@@ -990,7 +990,7 @@
         },
         "direction": {
           "name": "Richting",
-          "description": "out voor een uitgeleend boek, in voor een geleend boek."
+          "description": "out voor een uitgeleend spel, in voor een geleend spel."
         }
       }
     },
@@ -1059,13 +1059,13 @@
       "message": "Geen kamer heeft de ID {id}."
     },
     "unit_not_found": {
-      "message": "Geen boekenkast heeft de ID {id}."
+      "message": "Geen kast heeft de ID {id}."
     },
     "shelf_not_found": {
       "message": "Geen plank heeft de ID {id}."
     },
     "game_not_found": {
-      "message": "Geen boek heeft de ID {id}."
+      "message": "Geen spel heeft de ID {id}."
     },
     "copy_not_found": {
       "message": "Geen exemplaar heeft de ID {id}."
@@ -1083,16 +1083,16 @@
       "message": "Je gebruiker heeft geen Home Assistant-persoon. Koppel een persoon aan de gebruiker."
     },
     "room_not_empty": {
-      "message": "De kamer heeft {count} boekenkasten. Gebruik force om ze ook te verwijderen."
+      "message": "De kamer heeft {count} kasten. Gebruik force om ze ook te verwijderen."
     },
     "unit_not_empty": {
-      "message": "De boekenkast heeft {count} planken. Gebruik force om ze ook te verwijderen."
+      "message": "De kast heeft {count} planken. Gebruik force om ze ook te verwijderen."
     },
     "shelf_not_empty": {
       "message": "De plank heeft {count} exemplaren. Gebruik force om ze op geen plank te zetten."
     },
     "duplicate_barcode": {
-      "message": "Een ander boek heeft de barcode {barcode}."
+      "message": "Een ander spel heeft de barcode {barcode}."
     },
     "copy_on_loan": {
       "message": "Het exemplaar is uitgeleend. Breng eerst de uitlening terug."
@@ -1101,16 +1101,16 @@
       "message": "De vervaldatum ligt voor de startdatum."
     },
     "already_on_wishlist": {
-      "message": "Het boek staat al op een verlanglijst."
+      "message": "Het spel staat al op een verlanglijst."
     },
     "not_on_wishlist": {
-      "message": "Het boek staat op geen verlanglijst."
+      "message": "Het spel staat op geen verlanglijst."
     },
     "upload_not_found": {
       "message": "Geen geüploade omslag heeft de ID {file_id}."
     },
     "barcode_or_title_required": {
-      "message": "Geef een boek-ID, een barcode of een titel."
+      "message": "Geef een spel-ID, een barcode of een titel."
     },
     "todo_entity_not_found": {
       "message": "{entity_id} is geen takenlijst."

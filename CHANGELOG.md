@@ -5,6 +5,14 @@ Each change that a user can see is in this file. The format is based on
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). `manifest.json` `version`
 is the single source of truth (see `RELEASE.md`).
 
+## [0.5.0b10] - 2026-11-27
+
+### Changed
+
+- **Game words in the actions.** The names and descriptions of the actions, the errors
+  and the repair issues say games and cabinets in place of books and bookcases, in each
+  language. On a new install, the count sensor is `sensor.home_keeper_games_games`.
+
 ## [0.5.0b9] - 2026-11-26
 
 ### Changed

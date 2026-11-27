@@ -1,6 +1,6 @@
 ---
 title: Tab and card
-summary: How the Library tab runs inside the Home Keeper panel, how the card shows the play progress of a person, and how both read the state, route, render, translate and ship.
+summary: How the Games tab runs inside the Home Keeper panel, how the card shows the play progress of a person, and how both read the state, route, render, translate and ship.
 implements:
   - custom_components/home_keeper_games/frontend_assets.py
   - custom_components/home_keeper_games/card.py
@@ -30,7 +30,7 @@ source_hash: b6458d89f5cf
 
 # Tab and card
 
-The frontend is 2 ES modules: the Library tab, which the Home Keeper panel loads for admins, and the
+The frontend is 2 ES modules: the Games tab, which the Home Keeper panel loads for admins, and the
 card, which any user adds to a dashboard. Both are plain custom elements with no runtime framework.
 The rules for a change are in [frontend.md](../../.amazonq/rules/frontend.md).
 

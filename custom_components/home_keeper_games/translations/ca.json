@@ -56,7 +56,7 @@
   "entity": {
     "sensor": {
       "games": {
-        "name": "Llibres"
+        "name": "Jocs"
       },
       "loans_out": {
         "name": "Préstecs fora"
@@ -80,15 +80,15 @@
   "issues": {
     "home_keeper_missing": {
       "title": "Home Keeper no està instal·lat",
-      "description": "La pestanya Biblioteca i les tasques de préstec necessiten Home Keeper. La targeta, les entitats i els serveis ja funcionen. Instal·la Home Keeper des d'HACS i reinicia Home Assistant. Passos d'instal·lació: {url}"
+      "description": "La pestanya Jocs i les tasques de préstec necessiten Home Keeper. La targeta, les entitats i els serveis ja funcionen. Instal·la Home Keeper des d'HACS i reinicia Home Assistant. Passos d'instal·lació: {url}"
     },
     "home_keeper_not_set_up": {
       "title": "Home Keeper no està configurat",
-      "description": "La pestanya Biblioteca i les tasques de préstec necessiten una integració Home Keeper carregada. La targeta, les entitats i els serveis ja funcionen. Afegeix o activa la integració Home Keeper."
+      "description": "La pestanya Jocs i les tasques de préstec necessiten una integració Home Keeper carregada. La targeta, les entitats i els serveis ja funcionen. Afegeix o activa la integració Home Keeper."
     },
     "home_keeper_too_old": {
       "title": "Home Keeper és massa antic",
-      "description": "La pestanya Biblioteca i les tasques de préstec necessiten Home Keeper versió {version} o posterior. La targeta, les entitats i els serveis ja funcionen. Actualitza Home Keeper."
+      "description": "La pestanya Jocs i les tasques de préstec necessiten Home Keeper versió {version} o posterior. La targeta, les entitats i els serveis ja funcionen. Actualitza Home Keeper."
     }
   },
   "services": {
@@ -134,7 +134,7 @@
     },
     "delete_room": {
       "name": "Esborra una habitació",
-      "description": "Esborra una habitació. Una habitació amb llibreries necessita force.",
+      "description": "Esborra una habitació. Una habitació amb mobles necessita force.",
       "fields": {
         "room_id": {
           "name": "Habitació",
@@ -147,8 +147,8 @@
       }
     },
     "add_unit": {
-      "name": "Afegeix una llibreria",
-      "description": "Afegeix una llibreria a una habitació.",
+      "name": "Afegeix un moble",
+      "description": "Afegeix un moble a una habitació.",
       "fields": {
         "room_id": {
           "name": "Habitació",
@@ -169,12 +169,12 @@
       }
     },
     "update_unit": {
-      "name": "Canvia una llibreria",
-      "description": "Canvia una llibreria o mou-la a una altra habitació.",
+      "name": "Canvia un moble",
+      "description": "Canvia un moble o mou-lo a una altra habitació.",
       "fields": {
         "unit_id": {
-          "name": "Llibreria",
-          "description": "L'ID de la llibreria."
+          "name": "Moble",
+          "description": "L'ID del moble."
         },
         "room_id": {
           "name": "Habitació",
@@ -195,12 +195,12 @@
       }
     },
     "delete_unit": {
-      "name": "Esborra una llibreria",
-      "description": "Esborra una llibreria. Una llibreria amb prestatges necessita force.",
+      "name": "Esborra un moble",
+      "description": "Esborra un moble. Un moble amb prestatges necessita force.",
       "fields": {
         "unit_id": {
-          "name": "Llibreria",
-          "description": "L'ID de la llibreria."
+          "name": "Moble",
+          "description": "L'ID del moble."
         },
         "force": {
           "name": "Força",
@@ -210,11 +210,11 @@
     },
     "add_shelf": {
       "name": "Afegeix un prestatge",
-      "description": "Afegeix un prestatge a una llibreria.",
+      "description": "Afegeix un prestatge a un moble.",
       "fields": {
         "unit_id": {
-          "name": "Llibreria",
-          "description": "L'ID de la llibreria."
+          "name": "Moble",
+          "description": "L'ID del moble."
         },
         "name": {
           "name": "Nom",
@@ -228,15 +228,15 @@
     },
     "update_shelf": {
       "name": "Canvia un prestatge",
-      "description": "Canvia un prestatge o mou-lo a una altra llibreria.",
+      "description": "Canvia un prestatge o mou-lo a un altre moble.",
       "fields": {
         "shelf_id": {
           "name": "Prestatge",
           "description": "L'ID del prestatge. Buit per a cap prestatge."
         },
         "unit_id": {
-          "name": "Llibreria",
-          "description": "L'ID de la llibreria."
+          "name": "Moble",
+          "description": "L'ID del moble."
         },
         "name": {
           "name": "Nom",
@@ -263,12 +263,12 @@
       }
     },
     "add_game": {
-      "name": "Afegeix un llibre",
-      "description": "Afegeix un llibre. Si un llibre té el mateix codi de barres, el servei retorna aquest llibre.",
+      "name": "Afegeix un joc",
+      "description": "Afegeix un joc. Si un joc té el mateix codi de barres, el servei retorna aquest joc.",
       "fields": {
         "title": {
           "name": "Títol",
-          "description": "El títol del llibre."
+          "description": "El títol del joc."
         },
         "summary": {
           "name": "Resum",
@@ -296,7 +296,7 @@
         },
         "tags": {
           "name": "Etiquetes",
-          "description": "Les etiquetes del llibre."
+          "description": "Les etiquetes del joc."
         },
         "shared_notes": {
           "name": "Notes compartides",
@@ -304,7 +304,7 @@
         },
         "needs_details": {
           "name": "Falten detalls",
-          "description": "Marca el llibre com a incomplet."
+          "description": "Marca el joc com a incomplet."
         },
         "lookup": {
           "name": "Cerca a IGDB",
@@ -335,16 +335,16 @@
       }
     },
     "update_game": {
-      "name": "Canvia un llibre",
-      "description": "Canvia els detalls d'un llibre.",
+      "name": "Canvia un joc",
+      "description": "Canvia els detalls d'un joc.",
       "fields": {
         "game_id": {
-          "name": "Llibre",
-          "description": "L'ID del llibre."
+          "name": "Joc",
+          "description": "L'ID del joc."
         },
         "title": {
           "name": "Títol",
-          "description": "El títol del llibre."
+          "description": "El títol del joc."
         },
         "summary": {
           "name": "Resum",
@@ -368,7 +368,7 @@
         },
         "tags": {
           "name": "Etiquetes",
-          "description": "Les etiquetes del llibre."
+          "description": "Les etiquetes del joc."
         },
         "shared_notes": {
           "name": "Notes compartides",
@@ -376,7 +376,7 @@
         },
         "needs_details": {
           "name": "Falten detalls",
-          "description": "Marca el llibre com a incomplet."
+          "description": "Marca el joc com a incomplet."
         }
       }
     },
@@ -395,18 +395,18 @@
       }
     },
     "delete_game": {
-      "name": "Esborra un llibre",
-      "description": "Esborra un llibre amb els exemplars, l'estat de lectura, els préstecs i la coberta.",
+      "name": "Esborra un joc",
+      "description": "Esborra un joc amb els exemplars, el progrés de joc, els préstecs i la coberta.",
       "fields": {
         "game_id": {
-          "name": "Llibre",
-          "description": "L'ID del llibre."
+          "name": "Joc",
+          "description": "L'ID del joc."
         }
       }
     },
     "scan_barcode": {
       "name": "Escaneja un codi de barres",
-      "description": "Afegeix un llibre escanejat a un prestatge.",
+      "description": "Afegeix un joc escanejat a un prestatge.",
       "fields": {
         "barcode": {
           "name": "Codi de barres",
@@ -426,17 +426,17 @@
         },
         "on_duplicate": {
           "name": "Si existeix un exemplar",
-          "description": "L'acció si la biblioteca té un exemplar del llibre."
+          "description": "L'acció si la biblioteca té un exemplar del joc."
         }
       }
     },
     "add_copy": {
       "name": "Afegeix un exemplar",
-      "description": "Afegeix un exemplar d'un llibre.",
+      "description": "Afegeix un exemplar d'un joc.",
       "fields": {
         "game_id": {
-          "name": "Llibre",
-          "description": "L'ID del llibre."
+          "name": "Joc",
+          "description": "L'ID del joc."
         },
         "shelf_id": {
           "name": "Prestatge",
@@ -588,11 +588,11 @@
     },
     "set_cover": {
       "name": "Defineix la coberta",
-      "description": "Defineix la coberta d'un llibre.",
+      "description": "Defineix la coberta d'un joc.",
       "fields": {
         "game_id": {
-          "name": "Llibre",
-          "description": "L'ID del llibre."
+          "name": "Joc",
+          "description": "L'ID del joc."
         },
         "kind": {
           "name": "Tipus de coberta",
@@ -655,7 +655,7 @@
       }
     },
     "lend_game": {
-      "name": "Presta un llibre",
+      "name": "Presta un joc",
       "description": "Presta un exemplar a una altra persona.",
       "fields": {
         "copy_id": {
@@ -685,12 +685,12 @@
       }
     },
     "borrow_game": {
-      "name": "Afegeix un llibre manllevat",
-      "description": "Registra un llibre que una persona ha manllevat.",
+      "name": "Afegeix un joc manllevat",
+      "description": "Registra un joc que una persona ha manllevat.",
       "fields": {
         "game_id": {
-          "name": "Llibre",
-          "description": "L'ID del llibre."
+          "name": "Joc",
+          "description": "L'ID del joc."
         },
         "barcode": {
           "name": "Codi de barres",
@@ -698,7 +698,7 @@
         },
         "title": {
           "name": "Títol",
-          "description": "El títol del llibre."
+          "description": "El títol del joc."
         },
         "party": {
           "name": "Altra persona",
@@ -786,11 +786,11 @@
     },
     "add_to_wishlist": {
       "name": "Afegeix als desitjos",
-      "description": "Posa un llibre a la llista de desitjos d'una persona.",
+      "description": "Posa un joc a la llista de desitjos d'una persona.",
       "fields": {
         "game_id": {
-          "name": "Llibre",
-          "description": "L'ID del llibre."
+          "name": "Joc",
+          "description": "L'ID del joc."
         },
         "barcode": {
           "name": "Codi de barres",
@@ -798,7 +798,7 @@
         },
         "title": {
           "name": "Títol",
-          "description": "El títol del llibre."
+          "description": "El títol del joc."
         },
         "person_id": {
           "name": "Persona",
@@ -806,7 +806,7 @@
         },
         "buy": {
           "name": "Compra",
-          "description": "Posa el llibre a la llista de tasques de desitjos de la persona."
+          "description": "Posa el joc a la llista de tasques de desitjos de la persona."
         }
       }
     },
@@ -815,12 +815,12 @@
       "description": "Canvia una entrada de la llista de desitjos.",
       "fields": {
         "game_id": {
-          "name": "Llibre",
-          "description": "L'ID del llibre."
+          "name": "Joc",
+          "description": "L'ID del joc."
         },
         "buy": {
           "name": "Compra",
-          "description": "Posa el llibre a la llista de tasques de desitjos de la persona."
+          "description": "Posa el joc a la llista de tasques de desitjos de la persona."
         },
         "person_id": {
           "name": "Persona",
@@ -830,21 +830,21 @@
     },
     "remove_from_wishlist": {
       "name": "Treu dels desitjos",
-      "description": "Treu un llibre de la llista de desitjos.",
+      "description": "Treu un joc de la llista de desitjos.",
       "fields": {
         "game_id": {
-          "name": "Llibre",
-          "description": "L'ID del llibre."
+          "name": "Joc",
+          "description": "L'ID del joc."
         }
       }
     },
     "got_wishlist_game": {
-      "name": "Llibre desitjat rebut",
-      "description": "Afegeix un exemplar d'un llibre desitjat i treu-lo de la llista de desitjos.",
+      "name": "Joc desitjat rebut",
+      "description": "Afegeix un exemplar d'un joc desitjat i treu-lo de la llista de desitjos.",
       "fields": {
         "game_id": {
-          "name": "Llibre",
-          "description": "L'ID del llibre."
+          "name": "Joc",
+          "description": "L'ID del joc."
         },
         "shelf_id": {
           "name": "Prestatge",
@@ -878,7 +878,7 @@
         },
         "wishlist_todo": {
           "name": "Llista de desitjos",
-          "description": "La llista de tasques dels llibres a comprar."
+          "description": "La llista de tasques dels jocs a comprar."
         }
       }
     },
@@ -894,7 +894,7 @@
     },
     "import_csv": {
       "name": "Importa un CSV",
-      "description": "Importa llibres d'una exportació CSV de Home Keeper Games.",
+      "description": "Importa jocs d'una exportació CSV de Home Keeper Games.",
       "fields": {
         "content": {
           "name": "Contingut CSV",
@@ -933,8 +933,8 @@
       }
     },
     "list_games": {
-      "name": "Llista els llibres",
-      "description": "Retorna els llibres que coincideixen amb els filtres.",
+      "name": "Llista els jocs",
+      "description": "Retorna els jocs que coincideixen amb els filtres.",
       "fields": {
         "query": {
           "name": "Cerca de text",
@@ -950,7 +950,7 @@
         },
         "owned": {
           "name": "En propietat",
-          "description": "Només llibres amb un exemplar, o només llibres sense exemplar."
+          "description": "Només jocs amb un exemplar, o només jocs sense exemplar."
         },
         "play_status": {
           "name": "Estat de joc",
@@ -962,23 +962,23 @@
         },
         "limit": {
           "name": "Límit",
-          "description": "El nombre màxim de llibres."
+          "description": "El nombre màxim de jocs."
         }
       }
     },
     "get_game": {
-      "name": "Obtén un llibre",
-      "description": "Retorna un llibre amb els exemplars i els préstecs.",
+      "name": "Obtén un joc",
+      "description": "Retorna un joc amb els exemplars i els préstecs.",
       "fields": {
         "game_id": {
-          "name": "Llibre",
-          "description": "L'ID del llibre."
+          "name": "Joc",
+          "description": "L'ID del joc."
         }
       }
     },
     "list_locations": {
       "name": "Llista les ubicacions",
-      "description": "Retorna les habitacions, les llibreries i els prestatges."
+      "description": "Retorna les habitacions, els mobles i els prestatges."
     },
     "list_loans": {
       "name": "Llista els préstecs",
@@ -990,7 +990,7 @@
         },
         "direction": {
           "name": "Direcció",
-          "description": "out per a un llibre prestat a algú, in per a un llibre que s'ha manllevat."
+          "description": "out per a un joc prestat a algú, in per a un joc que s'ha manllevat."
         }
       }
     },
@@ -1059,13 +1059,13 @@
       "message": "Cap habitació té l'ID {id}."
     },
     "unit_not_found": {
-      "message": "Cap llibreria té l'ID {id}."
+      "message": "Cap moble té l'ID {id}."
     },
     "shelf_not_found": {
       "message": "Cap prestatge té l'ID {id}."
     },
     "game_not_found": {
-      "message": "Cap llibre té l'ID {id}."
+      "message": "Cap joc té l'ID {id}."
     },
     "copy_not_found": {
       "message": "Cap exemplar té l'ID {id}."
@@ -1083,16 +1083,16 @@
       "message": "El teu usuari no té cap persona de Home Assistant. Vincula una persona a l'usuari."
     },
     "room_not_empty": {
-      "message": "L'habitació té {count} llibreries. Fes servir force per esborrar-les també."
+      "message": "L'habitació té {count} mobles. Fes servir force per esborrar-los també."
     },
     "unit_not_empty": {
-      "message": "La llibreria té {count} prestatges. Fes servir force per esborrar-los també."
+      "message": "El moble té {count} prestatges. Fes servir force per esborrar-los també."
     },
     "shelf_not_empty": {
       "message": "El prestatge té {count} exemplars. Fes servir force per deixar-los sense prestatge."
     },
     "duplicate_barcode": {
-      "message": "Un altre llibre té el codi de barres {barcode}."
+      "message": "Un altre joc té el codi de barres {barcode}."
     },
     "copy_on_loan": {
       "message": "L'exemplar està prestat. Retorna primer el préstec."
@@ -1101,16 +1101,16 @@
       "message": "La data de venciment és anterior a la data d'inici."
     },
     "already_on_wishlist": {
-      "message": "El llibre ja és en una llista de desitjos."
+      "message": "El joc ja és en una llista de desitjos."
     },
     "not_on_wishlist": {
-      "message": "El llibre no és en cap llista de desitjos."
+      "message": "El joc no és en cap llista de desitjos."
     },
     "upload_not_found": {
       "message": "Cap coberta pujada té l'ID {file_id}."
     },
     "barcode_or_title_required": {
-      "message": "Indica un ID de llibre, un codi de barres o un títol."
+      "message": "Indica un ID de joc, un codi de barres o un títol."
     },
     "todo_entity_not_found": {
       "message": "{entity_id} no és una llista de tasques."

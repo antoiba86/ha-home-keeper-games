@@ -25,8 +25,8 @@ This project is derived from
 Tamkin. See [Origin and credits](#origin-and-credits).
 
 > [!WARNING]
-> **Work in progress.** There is no release yet. The code still keeps books,
-> and the change to games is in progress. Do not install it yet.
+> **Work in progress.** There is no release yet. The change from books to games is
+> in progress. Do not install it yet.
 
 ## Features
 
