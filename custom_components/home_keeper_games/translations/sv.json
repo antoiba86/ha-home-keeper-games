@@ -44,13 +44,31 @@
           "igdb_client_id": "Valfritt. Skapa ett program på dev.twitch.tv för att få IGDB-nycklarna.",
           "igdb_client_secret": "Valfritt. Lämna tomt för att behålla den sparade hemligheten."
         }
+      },
+      "consoles": {
+        "title": "Konsoler",
+        "description": "Biblioteket registrerar spelsessioner från mediaspelaren för varje konsol i integrationen PlayStation Network.",
+        "data": {
+          "keep": "Konsoler",
+          "entity_id": "Ny konsol",
+          "person_id": "Spelare",
+          "platform": "Plattform"
+        },
+        "data_description": {
+          "keep": "Avmarkera en konsol för att stoppa dess spelsessioner.",
+          "entity_id": "Valfritt. Mediaspelaren för en PlayStation-konsol.",
+          "person_id": "Personen som spelar på den nya konsolen.",
+          "platform": "Plattformen för den nya konsolen."
+        }
       }
     },
     "error": {
       "invalid_currency": "Ange en valutakod med 3 bokstäver.",
       "invalid_igdb_auth": "Twitch godtar inte klient-ID:t och klienthemligheten.",
       "cannot_connect": "Det går inte att ansluta till Twitch. Försök igen senare.",
-      "igdb_keys_incomplete": "Ange klient-ID:t och klienthemligheten."
+      "igdb_keys_incomplete": "Ange klient-ID:t och klienthemligheten.",
+      "console_incomplete": "Välj mediaspelaren och personen för den nya konsolen.",
+      "console_exists": "Den här mediaspelaren är redan en konsol."
     }
   },
   "entity": {

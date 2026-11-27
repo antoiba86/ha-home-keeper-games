@@ -35,6 +35,7 @@ def test_build_session_shape() -> None:
         "game_id": "g1",
         "platform": "ps5",
         "source": "manual",
+        "external_id": None,
         "started_at": None,
         "ended_at": None,
         "date": "2026-10-01",

@@ -42,7 +42,7 @@ PLATFORMS = ["sensor", "todo"]
 
 # PANEL_VERSION is the same string as the manifest version. release.yml checks it,
 # and rollup.config.mjs reads it.
-PANEL_VERSION = "0.5.0b11"
+PANEL_VERSION = "0.5.0b12"
 
 # The built bundles are in frontend/dist/ and Home Assistant serves them here.
 STATIC_URL = "/home_keeper_games_static"
@@ -78,6 +78,9 @@ DEFAULT_CURRENCY = "EUR"
 # never options, so no service, event, reply or diagnostics has them.
 CONF_IGDB_CLIENT_ID = "igdb_client_id"
 CONF_IGDB_CLIENT_SECRET = "igdb_client_secret"
+# The consoles that the activity listener watches: a list of
+# ``{entity_id, person_id, platform, source}`` in the options.
+CONF_CONSOLES = "consoles"
 IGDB_API_URL = "https://api.igdb.com/v4"
 IGDB_TOKEN_URL = "https://id.twitch.tv/oauth2/token"
 IGDB_IMAGES_URL = "https://images.igdb.com/igdb/image/upload"
@@ -131,6 +134,7 @@ EVENT_COPY_REMOVED = f"{DOMAIN}_copy_removed"
 EVENT_PROGRESS_CHANGED = f"{DOMAIN}_progress_changed"
 EVENT_PROGRESS_UPDATED = f"{DOMAIN}_progress_updated"
 EVENT_GAME_COMPLETED = f"{DOMAIN}_game_completed"
+EVENT_SESSION_STARTED = f"{DOMAIN}_session_started"
 EVENT_SESSION_LOGGED = f"{DOMAIN}_session_logged"
 EVENT_SESSION_DELETED = f"{DOMAIN}_session_deleted"
 EVENT_LOAN_STARTED = f"{DOMAIN}_loan_started"

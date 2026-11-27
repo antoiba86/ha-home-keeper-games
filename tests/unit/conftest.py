@@ -46,6 +46,7 @@ _PURE_MODULES = (
     "csv_io",
     "import_export",
     "wishlist",
+    "activity",
     "loan_tasks",
     "card_resource",
     "backend_i18n",

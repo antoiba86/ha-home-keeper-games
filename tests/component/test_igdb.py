@@ -468,9 +468,14 @@ async def test_user_flow_key_errors(
 
 async def _options(hass, entry, data: dict) -> dict:
     result = await hass.config_entries.options.async_init(entry.entry_id)
-    return await hass.config_entries.options.async_configure(
+    result = await hass.config_entries.options.async_configure(
         result["flow_id"], {"currency": "EUR", **data}
     )
+    if result.get("step_id") == "consoles":
+        result = await hass.config_entries.options.async_configure(
+            result["flow_id"], {}
+        )
+    return result
 
 
 async def test_options_flow_adds_changes_and_removes_the_keys(

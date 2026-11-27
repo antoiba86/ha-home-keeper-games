@@ -20,6 +20,7 @@ export const USER_SECTIONS = [
   {slug: 'dashboard-card', title: 'Dashboard card', label: 'Dashboard card', group: 'views'},
   {slug: 'services', title: 'Services and events', group: 'automation'},
   {slug: 'telegram', title: 'Telegram', group: 'automation'},
+  {slug: 'playstation', title: 'PlayStation', group: 'automation'},
 ];
 
 // Sidebar categories for the User Guide, in order. Each USER_SECTIONS entry names

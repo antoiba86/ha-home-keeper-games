@@ -4,8 +4,9 @@ The integration has 1 config entry. The flow first checks Home Keeper. If Home
 Keeper is not installed, not set up or too old, the flow stops with the reason
 and a link. The settings are the currency of the prices and values of the copies,
 with the currency of Home Assistant as default, and the optional IGDB keys.
-The options flow has 1 step with the same fields. It merges its input into the
-stored options, so a key that the form does not show stays.
+The options flow has the same fields, then a second step for the consoles of the
+activity listener: keep or remove the consoles, and add 1. It merges its input
+into the stored options, so a key that the form does not show stays.
 
 The IGDB keys are a Twitch client ID and client secret. The flow gets a token with
 them before it saves them, in the entry data. The secret field never shows the
@@ -28,12 +29,20 @@ from homeassistant.config_entries import (
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.selector import (
+    EntitySelector,
+    EntitySelectorConfig,
+    SelectOptionDict,
+    SelectSelector,
+    SelectSelectorConfig,
     TextSelector,
     TextSelectorConfig,
     TextSelectorType,
 )
 
+from . import people
+from .activity import CONSOLE_PLATFORMS, clean_consoles
 from .const import (
+    CONF_CONSOLES,
     CONF_CURRENCY,
     CONF_IGDB_CLIENT_ID,
     CONF_IGDB_CLIENT_SECRET,
@@ -142,8 +151,81 @@ class LibraryConfigFlow(ConfigFlow, domain=DOMAIN):
         return LibraryOptionsFlow()
 
 
+_PLATFORM_LABELS = {"ps5": "PS5", "ps4": "PS4", "ps3": "PS3", "pc": "PC"}
+
+
+def _consoles_schema(
+    consoles: list[dict[str, str]], persons: list[dict[str, Any]]
+) -> vol.Schema:
+    names = {p["person_id"]: str(p["name"]) for p in persons}
+    fields: dict[Any, Any] = {}
+    if consoles:
+        keep = [
+            SelectOptionDict(
+                value=c["entity_id"],
+                label=" · ".join(
+                    (
+                        c["entity_id"],
+                        names.get(c["person_id"], c["person_id"]),
+                        _PLATFORM_LABELS.get(c["platform"], c["platform"]),
+                    )
+                ),
+            )
+            for c in consoles
+        ]
+        fields[vol.Optional("keep", default=[c["entity_id"] for c in consoles])] = (
+            SelectSelector(SelectSelectorConfig(options=keep, multiple=True))
+        )
+    fields[vol.Optional("entity_id")] = EntitySelector(
+        EntitySelectorConfig(domain="media_player")
+    )
+    fields[vol.Optional("person_id")] = SelectSelector(
+        SelectSelectorConfig(
+            options=[
+                SelectOptionDict(value=p["person_id"], label=str(p["name"]))
+                for p in persons
+            ]
+        )
+    )
+    fields[vol.Optional("platform", default="ps5")] = SelectSelector(
+        SelectSelectorConfig(
+            options=[
+                SelectOptionDict(value=key, label=_PLATFORM_LABELS[key])
+                for key in CONSOLE_PLATFORMS
+            ]
+        )
+    )
+    return vol.Schema(fields)
+
+
+def consoles_from_input(
+    consoles: list[dict[str, str]], user_input: dict[str, Any]
+) -> tuple[list[dict[str, str]], str | None]:
+    """The consoles after the form, and an error key or None."""
+    keep = set(user_input.get("keep", [c["entity_id"] for c in consoles]))
+    out = [c for c in consoles if c["entity_id"] in keep]
+    entity_id = str(user_input.get("entity_id") or "")
+    person_id = str(user_input.get("person_id") or "")
+    if not entity_id and not person_id:
+        return out, None
+    if not entity_id or not person_id:
+        return out, "console_incomplete"
+    if any(c["entity_id"] == entity_id for c in out):
+        return out, "console_exists"
+    new = {
+        "entity_id": entity_id,
+        "person_id": person_id,
+        "platform": str(user_input.get("platform") or "ps5"),
+        "source": "psn",
+    }
+    return clean_consoles([*out, new]), None
+
+
 class LibraryOptionsFlow(OptionsFlow):
-    """Change the currency and the IGDB keys."""
+    """Change the currency, the IGDB keys and the consoles."""
+
+    def __init__(self) -> None:
+        self._options: dict[str, Any] = {}
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
@@ -168,11 +250,32 @@ class LibraryOptionsFlow(OptionsFlow):
                         self.hass.config_entries.async_update_entry(
                             entry, data={**data, **keys}
                         )
-                    return self.async_create_entry(
-                        data=merge_flow_input(entry, {CONF_CURRENCY: currency})
-                    )
+                    self._options = {CONF_CURRENCY: currency}
+                    return await self.async_step_consoles()
                 errors["base"] = error
             current = str(user_input.get(CONF_CURRENCY) or current)
         return self.async_show_form(
             step_id="init", data_schema=_schema(current, client_id), errors=errors
+        )
+
+    async def async_step_consoles(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Keep, remove or add the consoles of the activity listener."""
+        consoles = clean_consoles(self.config_entry.options.get(CONF_CONSOLES))
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            result, error = consoles_from_input(consoles, user_input)
+            if error is None:
+                return self.async_create_entry(
+                    data=merge_flow_input(
+                        self.config_entry,
+                        {**self._options, CONF_CONSOLES: result},
+                    )
+                )
+            errors["base"] = error
+        return self.async_show_form(
+            step_id="consoles",
+            data_schema=_consoles_schema(consoles, people.persons(self.hass)),
+            errors=errors,
         )

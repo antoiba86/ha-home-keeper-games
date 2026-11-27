@@ -25,6 +25,7 @@ from .const import (
 from .store import LibraryStore
 
 if TYPE_CHECKING:
+    from .activity_listener import ActivityListener
     from .home_keeper import HomeKeeperLink
     from .igdb import IgdbClient
     from .loan_sync import LoanSync
@@ -46,6 +47,7 @@ class LibraryCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         # Set by async_setup_entry.
         self.wishlist_sync: WishlistSync
         self.loan_sync: LoanSync
+        self.activity: ActivityListener
         self.igdb: IgdbClient
         self.home_keeper: HomeKeeperLink
         self.tab_registered = False

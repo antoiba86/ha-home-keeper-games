@@ -5,7 +5,7 @@ implements:
   - custom_components/home_keeper_games/store.py
   - custom_components/home_keeper_games/models.py
 related: [architecture, events-api, people-privilege, csv-import-export]
-source_hash: 6ef37f691705
+source_hash: c8c271197022
 ---
 
 # Store and models
@@ -104,6 +104,8 @@ listener. A listener that fails is logged and the others still run. The listener
   platform. A new or `backlog` row becomes `playing`, and `last_played_at` takes the later
   date. `delete_session` takes the minutes off, down to 0. `get_state` does not hold the
   sessions; `list_sessions` reads them, the newest first.
+  `start_session` and `end_session` open and close a session of a console listener
+  ([console-activity](console-activity.md)). An open session has `minutes: null`.
 - **Loans.** A copy has at most 1 open loan. A lent copy keeps its shelf.
 - **Overdue.** `fire_overdue` marks each loan that passed its due date with
   `overdue_fired`, so `loan_overdue` fires once for each due date.

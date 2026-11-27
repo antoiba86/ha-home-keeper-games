@@ -44,13 +44,31 @@
           "igdb_client_id": "Volitelné. Vytvořte aplikaci na dev.twitch.tv a získejte klíče IGDB.",
           "igdb_client_secret": "Volitelné. Nechte prázdné, aby zůstal uložený tajný klíč."
         }
+      },
+      "consoles": {
+        "title": "Konzole",
+        "description": "Knihovna zapisuje herní relace z přehrávače médií každé konzole integrace PlayStation Network.",
+        "data": {
+          "keep": "Konzole",
+          "entity_id": "Nová konzole",
+          "person_id": "Osoba",
+          "platform": "Platforma"
+        },
+        "data_description": {
+          "keep": "Zrušte výběr konzole, aby se její herní relace přestaly zapisovat.",
+          "entity_id": "Volitelné. Přehrávač médií konzole PlayStation.",
+          "person_id": "Osoba, která hraje na nové konzoli.",
+          "platform": "Platforma nové konzole."
+        }
       }
     },
     "error": {
       "invalid_currency": "Zadejte kód měny ze 3 písmen.",
       "invalid_igdb_auth": "Twitch nepřijímá ID klienta a tajný klíč klienta.",
       "cannot_connect": "Nelze se připojit k Twitch. Zkuste to později.",
-      "igdb_keys_incomplete": "Zadejte ID klienta a tajný klíč klienta."
+      "igdb_keys_incomplete": "Zadejte ID klienta a tajný klíč klienta.",
+      "console_incomplete": "Vyberte přehrávač médií a osobu nové konzole.",
+      "console_exists": "Tento přehrávač médií už je konzole."
     }
   },
   "entity": {

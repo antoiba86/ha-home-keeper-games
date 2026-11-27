@@ -42,7 +42,8 @@ Names follow `home_keeper_games_<noun>_<verb>`.
 | `home_keeper_games_progress_changed` | The play status of a person on a platform changes. |
 | `home_keeper_games_progress_updated` | The rating, play time, dates, count or review of a progress row change, and the play status stays. |
 | `home_keeper_games_game_completed` | The play status of a person on a platform becomes `completed`. |
-| `home_keeper_games_session_logged` | A play session is added. Its minutes go on the play time. |
+| `home_keeper_games_session_started` | A console starts a play session. `minutes` is `null`. |
+| `home_keeper_games_session_logged` | A play session is added or a console session ends. Its minutes go on the play time. |
 | `home_keeper_games_session_deleted` | A play session is deleted. Its minutes leave the play time. |
 | `home_keeper_games_loan_started` | A game is lent or borrowed. |
 | `home_keeper_games_loan_returned` | A loan is returned. |

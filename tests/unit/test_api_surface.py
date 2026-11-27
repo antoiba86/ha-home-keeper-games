@@ -273,6 +273,7 @@ def _built() -> dict[str, dict[str, Any]]:
         const.EVENT_GAME_COMPLETED: events.game_completed_event_data(
             _GAME, "p1", "ps5", {"completed_at": "2026-10-01", "rating": 5}, None
         ),
+        const.EVENT_SESSION_STARTED: events.session_event_data(_GAME, _SESSION, None),
         const.EVENT_SESSION_LOGGED: events.session_event_data(_GAME, _SESSION, None),
         const.EVENT_SESSION_DELETED: events.session_event_data(_GAME, _SESSION, None),
         const.EVENT_LOAN_STARTED: events.loan_event_data(_GAME, _LOAN, None),

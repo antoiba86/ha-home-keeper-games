@@ -54,7 +54,14 @@ def test_options_flow_steps(api):
         f"{base}/{form['flow_id']}", json={"currency": "EUR", "igdb_client_id": "x"}
     ).json()
     assert again["errors"] == {"base": "igdb_keys_incomplete"}, again
-    done = api.post(f"{base}/{form['flow_id']}", json={"currency": "EUR"})
+    consoles = api.post(f"{base}/{form['flow_id']}", json={"currency": "EUR"}).json()
+    assert consoles["step_id"] == "consoles", consoles
+    # A media player with no person: the form comes back.
+    half = api.post(
+        f"{base}/{form['flow_id']}", json={"entity_id": "media_player.ps5"}
+    ).json()
+    assert half["errors"] == {"base": "console_incomplete"}, half
+    done = api.post(f"{base}/{form['flow_id']}", json={})
     assert done.json()["type"] == "create_entry", done.text
 
 
@@ -189,3 +196,57 @@ def test_every_service_has_a_touch(api):
     source = Path(__file__).read_text(encoding="utf-8")
     missing = {name for name in declared if f'"{name}"' not in source}
     assert not missing, f"no call in test_surfaces.py for: {sorted(missing)}"
+
+
+def test_a_console_state_makes_a_play_session(api):
+    """A console in the options, and a media player state as PSN sets it."""
+    import time
+
+    entry_id = _entry_id(api)
+    base = "/api/config/config_entries/options/flow"
+    person = _service(api, "list_people")["people"][0]["person_id"]
+    player = "media_player.surface_ps5"
+    title = "Surface Console Game"
+
+    def _options(console: dict) -> None:
+        form = api.post(base, json={"handler": entry_id}).json()
+        step = api.post(f"{base}/{form['flow_id']}", json={"currency": "EUR"}).json()
+        assert step["step_id"] == "consoles", step
+        done = api.post(f"{base}/{form['flow_id']}", json=console).json()
+        assert done["type"] == "create_entry", done
+
+    def _sessions() -> list[dict]:
+        return [
+            s for s in _service(api, "list_sessions")["sessions"] if s["title"] == title
+        ]
+
+    def _wait(check) -> None:
+        for _ in range(50):
+            if check():
+                return
+            time.sleep(0.2)
+        raise AssertionError("the listener did not act")
+
+    api.post(f"/api/states/{player}", json={"state": "on"})
+    _options({"entity_id": player, "person_id": person, "platform": "ps5"})
+    try:
+        api.post(
+            f"/api/states/{player}",
+            json={
+                "state": "playing",
+                "attributes": {"media_title": title, "media_content_id": "PPSA99"},
+            },
+        )
+        _wait(lambda: len(_sessions()) == 1)
+        [session] = _sessions()
+        assert session["source"] == "psn" and session["minutes"] is None, session
+        assert session["external_id"] == "PPSA99" and session["platform"] == "ps5"
+        game_id = session["game_id"]
+        game = _service(api, "get_game", {"game_id": game_id})["game"]
+        assert game["needs_details"] is True, game
+        # Off after less than 1 minute: the session is dropped.
+        api.post(f"/api/states/{player}", json={"state": "off"})
+        _wait(lambda: _sessions() == [])
+    finally:
+        _options({"keep": []})
+    _service(api, "delete_game", {"game_id": game_id})

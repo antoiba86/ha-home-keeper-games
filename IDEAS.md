@@ -20,6 +20,10 @@ Nothing here is committed scope. When an item ships, remove it. The design docs 
 - **Play sessions in the export.** `export_data` and `import_data` do not hold the play
   sessions (`import_export.EXCLUDED_KEYS`). Add a `sessions` section to the export
   format, with a check of the game and the person of each session.
+- **PlayStation trophies.** An own PSN client (`psnawp`) with the NPSSO token in an
+  options step reads the trophies of each game and the list of played games.
+- **Nintendo play time.** A source for the Nintendo Switch Parental Controls or Presence
+  integration, with the same consoles list.
 - **Play sessions in the tab.** The game page can show the sessions of a person, with a
   delete button. Today only `list_sessions` reads them.
 

@@ -44,13 +44,31 @@
           "igdb_client_id": "Opcional. Crea una aplicació a dev.twitch.tv per obtenir les claus d'IGDB.",
           "igdb_client_secret": "Opcional. Deixa-ho buit per conservar el secret desat."
         }
+      },
+      "consoles": {
+        "title": "Consoles de joc",
+        "description": "La biblioteca registra sessions de joc des del reproductor multimèdia de cada consola de la integració PlayStation Network.",
+        "data": {
+          "keep": "Consoles de joc",
+          "entity_id": "Consola nova",
+          "person_id": "Persona",
+          "platform": "Plataforma"
+        },
+        "data_description": {
+          "keep": "Desmarca una consola per aturar-ne les sessions de joc.",
+          "entity_id": "Opcional. El reproductor multimèdia d'una consola PlayStation.",
+          "person_id": "La persona que juga a la consola nova.",
+          "platform": "La plataforma de la consola nova."
+        }
       }
     },
     "error": {
       "invalid_currency": "Introdueix un codi de moneda de 3 lletres.",
       "invalid_igdb_auth": "Twitch no accepta l'ID de client i el secret de client.",
       "cannot_connect": "No es pot connectar amb Twitch. Torna-ho a provar més tard.",
-      "igdb_keys_incomplete": "Introdueix l'ID de client i el secret de client."
+      "igdb_keys_incomplete": "Introdueix l'ID de client i el secret de client.",
+      "console_incomplete": "Selecciona el reproductor multimèdia i la persona de la consola nova.",
+      "console_exists": "Aquest reproductor multimèdia ja és una consola."
     }
   },
   "entity": {

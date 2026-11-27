@@ -291,7 +291,9 @@ _WISH = (Field("buy", "bool"), Field("bought", "bool"))
 _SESSION = (
     Field("session_id", "str"),
     Field("platform", "str"),
-    Field("source", "str", "manual for a session that a person logs."),
+    Field(
+        "source", "str", "manual for a session that a person logs, psn for a console."
+    ),
     Field("date", "str", "YYYY-MM-DD."),
     Field("minutes", "int | None", "None for a session that is still open."),
 )
@@ -373,9 +375,16 @@ EVENTS: tuple[EventSpec, ...] = (
         ),
     ),
     _event(
+        "EVENT_SESSION_STARTED",
+        "game",
+        "A console started a play session. minutes is None until it ends.",
+        _SESSION,
+    ),
+    _event(
         "EVENT_SESSION_LOGGED",
         "game",
-        "A play session was added. Its minutes went on the progress row.",
+        "A play session was added or a console session ended. Its minutes went on "
+        "the progress row.",
         _SESSION,
     ),
     _event(

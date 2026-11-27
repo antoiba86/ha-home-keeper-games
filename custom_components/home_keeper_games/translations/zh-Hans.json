@@ -44,13 +44,31 @@
           "igdb_client_id": "可选。在 dev.twitch.tv 创建应用以获取 IGDB 密钥。",
           "igdb_client_secret": "可选。留空以保留已存储的密钥。"
         }
+      },
+      "consoles": {
+        "title": "游戏机",
+        "description": "游戏库会从 PlayStation Network 集成中每台游戏机的媒体播放器记录游戏时段。",
+        "data": {
+          "keep": "游戏机",
+          "entity_id": "新游戏机",
+          "person_id": "人员",
+          "platform": "平台"
+        },
+        "data_description": {
+          "keep": "取消选择一台游戏机即可停止记录它的游戏时段。",
+          "entity_id": "可选。PlayStation 游戏机的媒体播放器。",
+          "person_id": "在新游戏机上玩游戏的人员。",
+          "platform": "新游戏机的平台。"
+        }
       }
     },
     "error": {
       "invalid_currency": "请输入 3 个字母的货币代码。",
       "invalid_igdb_auth": "Twitch 不接受该客户端 ID 和客户端密钥。",
       "cannot_connect": "无法连接到 Twitch。请稍后重试。",
-      "igdb_keys_incomplete": "请输入客户端 ID 和客户端密钥。"
+      "igdb_keys_incomplete": "请输入客户端 ID 和客户端密钥。",
+      "console_incomplete": "请选择新游戏机的媒体播放器和人员。",
+      "console_exists": "此媒体播放器已经是一台游戏机。"
     }
   },
   "entity": {

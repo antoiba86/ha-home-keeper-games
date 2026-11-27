@@ -75,6 +75,7 @@ only_mutate = [
     "custom_components/home_keeper_games/csv_io.py",
     "custom_components/home_keeper_games/import_export.py",
     "custom_components/home_keeper_games/wishlist.py",
+    "custom_components/home_keeper_games/activity.py",
     "custom_components/home_keeper_games/loan_tasks.py",
     "custom_components/home_keeper_games/card_resource.py",
 ]

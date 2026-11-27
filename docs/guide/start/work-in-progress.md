@@ -12,6 +12,7 @@ the tab.
 - [Play progress](#play-progress) for each person on each platform.
 - [IGDB game](#igdb-game): correct the IGDB details of a game.
 - A [Telegram blueprint](../automation/telegram.md) that adds a game from a chat.
+- [Play time from a PlayStation console](../automation/playstation.md).
 - Loans with a Home Keeper task, and a wishlist for each person.
 - A CSV import and export in the format of Home Keeper Games.
 - The [dashboard card](../views/dashboard-card.md), the sensors and the
