@@ -5,7 +5,7 @@ import { adminState, gameByTitle, expect, homeKeeperTasks, openTab, test } from 
  * Lend a game and see its task in the real Home Keeper. The loan is deleted after,
  * and the library deletes its task.
  */
-const TITLE = 'Station Eleven';
+const TITLE = 'The Last of Us Part I';
 const PARTY = 'Robin';
 
 async function deleteLoans(): Promise<void> {
@@ -59,6 +59,6 @@ test.describe('Loans', { tag: '@responsive' }, () => {
     await expect(tab.locator('.hkl-listrow')).toHaveCount(out.length);
     await tab.locator('[data-k="lt-in"]').click();
     await expect(page).toHaveURL(/\/loans;tab=in$/);
-    await expect(tab.locator('.hkl-listrow').filter({ hasText: 'Spinning Silver' })).toContainText('Seattle Public Library · Alex · Physical · Playing');
+    await expect(tab.locator('.hkl-listrow').filter({ hasText: 'Hi-Fi Rush' })).toContainText('Seattle Public Library · Alex · Physical · Playing');
   });
 });

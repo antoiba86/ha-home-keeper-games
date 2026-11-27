@@ -20,7 +20,7 @@ test.describe('Import', { tag: '@responsive' }, () => {
     await expect(dialog.locator('.hkl-chips')).toContainText('New games: 4');
     await expect(dialog.locator('[data-k="import-run"]')).toHaveText('Import 6 rows');
     await dialog.locator('.hkl-details summary').click();
-    await expect(dialog.locator('.hkl-details tr').filter({ hasText: 'Piranesi' })).toContainText('In the library');
+    await expect(dialog.locator('.hkl-details tr').filter({ hasText: 'Hades' })).toContainText('In the library');
     const after = await adminState();
     expect(after.games.length).toBe(before.games.length);
     await dialog.locator('[data-k="import-cancel"]').click();

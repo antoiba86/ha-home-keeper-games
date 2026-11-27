@@ -61,7 +61,7 @@ The game, copy, progress, loan and wishlist events share 1 spine:
 ```json
 {
   "game_id": "5f0c1b2a9d8e4f7a8b6c5d4e3f2a1b0c",
-  "title": "The Left Hand of Darkness",
+  "title": "Hades",
   "person_id": "alice",
   "origin": null
 }

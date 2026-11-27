@@ -1,11 +1,11 @@
 [
   {
-    "entry_id": "local_todo_alex_books",
+    "entry_id": "local_todo_alex_games",
     "version": 1,
     "minor_version": 1,
     "domain": "local_todo",
-    "title": "Alex books",
-    "data": {"todo_list_name": "Alex books", "storage_key": "alex_books"},
+    "title": "Alex games",
+    "data": {"todo_list_name": "Alex games", "storage_key": "alex_games"},
     "options": {},
     "pref_disable_new_entities": false,
     "pref_disable_polling": false,

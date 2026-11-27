@@ -39,13 +39,13 @@ describe('card', () => {
     expect(fake.calls('get_state')).toHaveLength(1);
     expect($('h2').textContent).toBe('Library: Alex');
     expect(text()).toContain('38 games');
-    expect(text()).toContain('Project Hail Mary');
+    expect(text()).toContain('Outer Wilds');
     expect(text()).toContain('210 min played');
     expect(text()).toContain('Switch · 95 min played');
     expect(text()).toContain('Backlog · 2');
     expect(text()).toContain('6 of 24 games in 2026');
     expect(text()).toContain('Goal: 24');
-    expect(text()).toContain('Sam: playing The Left Hand of Darkness');
+    expect(text()).toContain('Sam: playing The Legend of Zelda: Tears of the Kingdom');
     expect(text()).toContain('2 days ago');
   });
 
@@ -54,12 +54,12 @@ describe('card', () => {
     state.people[SAM].share_progress = false;
     await mount({}, { state });
     expect(text()).not.toContain('Sam: playing');
-    expect(text()).toContain('Jo: playing The Tombs of Atuan');
+    expect(text()).toContain('Jo: playing Super Mario Bros. Wonder');
   });
 
   it('sets the play time and the completed status for the caller, with no person_id', async () => {
     const state = fixture();
-    const id = gameId(state, 'Project Hail Mary');
+    const id = gameId(state, 'Outer Wilds');
     const fake = await mount();
     $(`[data-k="st-${id}:pc"]`).click();
     const input = $(`[data-k="time-${id}:pc"]`);
@@ -70,7 +70,7 @@ describe('card', () => {
     $(`[data-k="cp-${id}:pc"]`).click();
     await flush();
     expect(fake.calls('set_progress')[1]).toEqual({ type: 'home_keeper_games/set_progress', game_id: id, platform: 'pc', play_status: 'completed', completed_at: '2026-10-05', completion_count: 1 });
-    const left = gameId(state, 'The Left Hand of Darkness');
+    const left = gameId(state, 'The Legend of Zelda: Tears of the Kingdom');
     $(`[data-k="cp-${left}:switch"]`).click();
     await flush();
     expect(fake.calls('set_progress')[2]).toMatchObject({ game_id: left, platform: 'switch', completion_count: 1 });
@@ -81,21 +81,21 @@ describe('card', () => {
     const fake = await mount();
     const input = $('[data-k="q"]');
     input.focus();
-    input.value = 'lavinia';
+    input.value = 'fire emblem';
     input.dispatchEvent(new Event('input', { bubbles: true }));
     await new Promise((r) => setTimeout(r, 200));
     expect(text()).toContain('Living room › Unit A › Shelf 3');
     expect(el.shadowRoot.activeElement?.dataset.k).toBe('q');
-    $(`[data-k="w-${gameId(state, 'Lavinia')}"]`).click();
+    $(`[data-k="w-${gameId(state, 'Fire Emblem Engage')}"]`).click();
     await flush();
-    expect(fake.calls('set_progress')[0]).toMatchObject({ game_id: gameId(state, 'Lavinia'), platform: 'switch2', play_status: 'backlog' });
+    expect(fake.calls('set_progress')[0]).toMatchObject({ game_id: gameId(state, 'Fire Emblem Engage'), platform: 'switch2', play_status: 'backlog' });
   });
 
   it('shows another person for an admin, with person_id in the call', async () => {
     const state = fixture();
     const fake = await mount({ person: SAM });
     expect($('h2').textContent).toBe('Library: Sam');
-    const id = gameId(state, 'The Left Hand of Darkness');
+    const id = gameId(state, 'The Legend of Zelda: Tears of the Kingdom');
     $(`[data-k="cp-${id}:switch2"]`).click();
     await flush();
     expect(fake.calls('set_progress')[0]).toMatchObject({ game_id: id, platform: 'switch2', person_id: SAM, play_status: 'completed' });
@@ -119,7 +119,7 @@ describe('card', () => {
     const rnd = vi.spyOn(Math, 'random').mockReturnValue(0.99);
     await mount();
     $('[data-k="random"]').click();
-    expect(text()).toContain('Pick: The Tombs of Atuan');
+    expect(text()).toContain('Pick: Super Mario Bros. Wonder');
     expect($$('.pick')).toHaveLength(1);
     rnd.mockRestore();
   });
@@ -128,7 +128,7 @@ describe('card', () => {
     await mount({ search: false, playing: false, backlog: false, household: false, title: 'Games' });
     expect($('h2').textContent).toBe('Games');
     expect($('[data-k="q"]')).toBeNull();
-    expect(text()).not.toContain('Project Hail Mary');
+    expect(text()).not.toContain('Outer Wilds');
     expect(text()).toContain('6 of 24 games in 2026');
     expect(text()).not.toContain('Household');
   });

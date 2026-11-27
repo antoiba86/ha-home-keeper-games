@@ -5,8 +5,8 @@ import { adminState, gameByTitle, expect, openTab, test } from './helpers';
  * The Wishlist view: the rows, the Buy box that sends the game to the to-do list
  * of the person, and the add dialog. Each test puts the seed back.
  */
-const BUY_TITLE = 'The Obelisk Gate';
-const NEW_TITLE = 'Spinning Silver';
+const BUY_TITLE = 'Hollow Knight: Silksong';
+const NEW_TITLE = 'Hi-Fi Rush';
 
 test.describe('Wishlist', { tag: '@responsive' }, () => {
   test.afterEach(async () => {
@@ -21,7 +21,7 @@ test.describe('Wishlist', { tag: '@responsive' }, () => {
     const state = await adminState();
     const wished = state.games.filter((b: { wishlist: unknown }) => b.wishlist);
     await expect(tab.locator('.hkl-listrow')).toHaveCount(wished.length);
-    await expect(tab.locator('.hkl-todo').first()).toContainText('Alex books');
+    await expect(tab.locator('.hkl-todo').first()).toContainText('Alex games');
 
     const game = await gameByTitle(BUY_TITLE);
     const box = tab.locator(`[data-k="buy-${game.id}"]`);
