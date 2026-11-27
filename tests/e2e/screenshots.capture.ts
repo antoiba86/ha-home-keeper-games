@@ -204,6 +204,14 @@ test('capture the Library screenshots', async ({ page, browser }) => {
   await coversLoaded(page);
   await shot(page, 'wishlist-desktop');
 
+  // Play log of Alex, with the sessions of 1 game open.
+  const outer = await gameByTitle('Outer Wilds');
+  tab = await openTab(page, '/playlog');
+  await tab.locator(`[data-k="pl-${outer.id}|pc"]`).click();
+  await expect(tab.locator('.hkl-session')).toHaveCount(3);
+  await coversLoaded(page);
+  await shot(page, 'playlog-desktop');
+
   // Import, after the dry run of the sample CSV file.
   tab = await openTab(page, '/import');
   await tab.locator('[data-k="im-file"]').setInputFiles(resolve(__dirname, 'seed/games_sample.csv'));
@@ -253,6 +261,11 @@ test('capture the Library screenshots', async ({ page, browser }) => {
   tab = await openTab(page, '/loans');
   await expect(tab.locator('a.hkl-task').first()).toBeVisible({ timeout: 30_000 });
   await shot(page, 'loans-mobile');
+
+  tab = await openTab(page, '/playlog');
+  await tab.locator(`[data-k="pl-${outer.id}|pc"]`).click();
+  await expect(tab.locator('.hkl-session')).toHaveCount(3);
+  await shot(page, 'playlog-mobile');
 
   await scanSession(page, 'scan-miss-mobile', 'scan-miss-details-mobile', 'scan-setup-mobile');
   await shot(page, 'scan-mobile');

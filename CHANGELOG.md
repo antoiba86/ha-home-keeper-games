@@ -5,6 +5,14 @@ Each change that a user can see is in this file. The format is based on
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). `manifest.json` `version`
 is the single source of truth (see `RELEASE.md`).
 
+## [0.5.0b13] - 2026-11-27
+
+### Added
+
+- **[Play log](https://antoiba86.github.io/ha-home-keeper-games/docs/guide/work-in-progress#play-log).**
+  A Play log page in the Games tab shows the play time of each person for each game and
+  platform. Open a game to see its sessions, and log a session by hand.
+
 ## [0.5.0b12] - 2026-11-27
 
 ### Added

@@ -2367,6 +2367,73 @@
     "yearly_goal": null
    }
   },
+  "sessions": {
+   "3d47e15303684ceaa2bb21ce481dcb19": {
+    "id": "3d47e15303684ceaa2bb21ce481dcb19",
+    "person_id": "alex",
+    "game_id": "d4c37434a7ea4a8e860517cd82ccc32b",
+    "platform": "pc",
+    "source": "psn",
+    "external_id": "PPSA00001_00",
+    "started_at": "2026-10-03T18:00:00+00:00",
+    "ended_at": "2026-10-03T19:35:00+00:00",
+    "date": "2026-10-03",
+    "minutes": 95,
+    "created_at": "2026-10-03T19:35:00+00:00"
+   },
+   "3a1e041ce21248fb9d4b3ae51b7e8cdf": {
+    "id": "3a1e041ce21248fb9d4b3ae51b7e8cdf",
+    "person_id": "alex",
+    "game_id": "d4c37434a7ea4a8e860517cd82ccc32b",
+    "platform": "pc",
+    "source": "psn",
+    "external_id": "PPSA00001_00",
+    "started_at": "2026-10-01T21:10:00+00:00",
+    "ended_at": "2026-10-01T22:20:00+00:00",
+    "date": "2026-10-01",
+    "minutes": 70,
+    "created_at": "2026-10-01T22:20:00+00:00"
+   },
+   "31781b88f804437bb9b99b1c8f59b73c": {
+    "id": "31781b88f804437bb9b99b1c8f59b73c",
+    "person_id": "alex",
+    "game_id": "d4c37434a7ea4a8e860517cd82ccc32b",
+    "platform": "pc",
+    "source": "manual",
+    "external_id": null,
+    "started_at": null,
+    "ended_at": null,
+    "date": "2026-09-27",
+    "minutes": 45,
+    "created_at": "2026-09-27T22:00:00+00:00"
+   },
+   "6c969a2f1e584a82af4e892578c67bf9": {
+    "id": "6c969a2f1e584a82af4e892578c67bf9",
+    "person_id": "alex",
+    "game_id": "ae18ed68fc3445f484544a09c13ece47",
+    "platform": "pc",
+    "source": "psn",
+    "external_id": "PPSA00001_00",
+    "started_at": "2026-09-29T20:30:00+00:00",
+    "ended_at": "2026-09-29T22:30:00+00:00",
+    "date": "2026-09-29",
+    "minutes": 120,
+    "created_at": "2026-09-29T22:30:00+00:00"
+   },
+   "5e0e74caf44e42e79c6b8fb479deebb7": {
+    "id": "5e0e74caf44e42e79c6b8fb479deebb7",
+    "person_id": "alex",
+    "game_id": "58247cad1ced46248fefe4d2b0db71b5",
+    "platform": "switch",
+    "source": "manual",
+    "external_id": null,
+    "started_at": null,
+    "ended_at": null,
+    "date": "2026-10-04",
+    "minutes": 95,
+    "created_at": "2026-10-04T22:00:00+00:00"
+   }
+  },
   "todo_orphans": []
  }
 }
