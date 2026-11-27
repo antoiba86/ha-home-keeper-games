@@ -1231,3 +1231,86 @@ describe('change IGDB game', () => {
     expect(dlg().querySelector('[data-k="d-igdb-note"]').textContent).toContain('Your uploaded cover stays.');
   });
 });
+
+describe('play log', () => {
+  const outer = () => gameId(fixture(), 'Outer Wilds');
+  const sessions = () => ({
+    sessions: [
+      { id: 's1', person_id: ALEX, game_id: outer(), platform: 'pc', source: 'psn', external_id: 'X', started_at: '2026-10-03T18:00:00Z', ended_at: '2026-10-03T18:45:00Z', date: '2026-10-03', minutes: 45, created_at: '2026-10-03T18:00:00Z', title: 'Outer Wilds' },
+      { id: 's2', person_id: ALEX, game_id: outer(), platform: 'pc', source: 'manual', external_id: null, started_at: null, ended_at: null, date: '2026-10-01', minutes: 30, created_at: '2026-10-01T10:00:00Z', title: 'Outer Wilds' },
+      { id: 's3', person_id: ALEX, game_id: outer(), platform: 'pc', source: 'psn', external_id: 'X', started_at: '2026-10-04T18:00:00Z', ended_at: null, date: '2026-10-04', minutes: null, created_at: '2026-10-04T18:00:00Z', title: 'Outer Wilds' },
+    ],
+  });
+
+  it('lists the games of the person and opens the sessions of a row', async () => {
+    const fake = await mount('/playlog', { replies: { list_sessions: sessions } });
+    expect(fake.calls('list_sessions')[0]).toMatchObject({ person_id: ALEX, limit: 500 });
+    expect($('[data-k="nav-playlog"]').getAttribute('aria-current')).toBe('page');
+    expect($('[data-k="lp-alex"]').getAttribute('aria-pressed')).toBe('true');
+    expect(text()).toContain('Alex: play log');
+    expect(text()).toContain('Outer Wilds');
+    expect(text()).toContain('3 h 30 min');
+    expect(text()).toContain('3 sessions');
+    expect(text()).toContain('The Witness');
+    const key = `${outer()}|pc`;
+    expect($(`[data-k="pl-${key}"]`).getAttribute('aria-expanded')).toBe('false');
+    $(`[data-k="pl-${key}"]`).click();
+    await flush();
+    expect($(`[data-k="pl-${key}"]`).getAttribute('aria-expanded')).toBe('true');
+    expect($('[data-k="ss-s1"]').textContent).toContain('45 min');
+    expect($('[data-k="ss-s1"]').textContent).toContain('PSN');
+    expect($('[data-k="ss-s2"]').textContent).toContain('No times');
+    expect($('[data-k="ss-s2"]').textContent).toContain('Manual');
+    expect($('[data-k="ss-s3"]').textContent).toContain('Playing now');
+    expect($('[data-k="ss-s3"]').textContent).toContain('Playing since');
+    $('[data-k="ds-s1"]').click();
+    expect(el.shadowRoot.getElementById('dlg').textContent).toContain('Delete session');
+    $('[data-k="d-submit"]').click();
+    await flush();
+    expect(fake.calls('delete_session')[0]).toMatchObject({ session_id: 's1' });
+    // The refresh after the change reads the sessions again.
+    expect(fake.calls('list_sessions').length).toBeGreaterThan(1);
+  });
+
+  it('switches the person and logs a session', async () => {
+    const fake = await mount('/playlog', { replies: { list_sessions: { sessions: [] } } });
+    $('[data-k="lp-sam"]').click();
+    await flush();
+    expect(host.navigate).toHaveBeenLastCalledWith('/playlog;person=sam', { replace: true });
+    expect(fake.calls('list_sessions').at(-1)).toMatchObject({ person_id: SAM });
+    expect(text()).toContain('Sam: play log');
+    expect(text()).toContain('Sea of Stars');
+    $('[data-k="log-session"]').click();
+    const dlg = el.shadowRoot.getElementById('dlg');
+    expect(dlg.querySelector('[name="person_id"]').value).toBe(SAM);
+    dlg.querySelector('[data-k="d-submit"]').click();
+    await flush();
+    expect(dlg.querySelector('.hkl-error').textContent).toBe('Select the game and enter the minutes.');
+    dlg.querySelector('[name="game_id"]').value = outer();
+    dlg.querySelector('[name="platform"]').value = 'ps5';
+    dlg.querySelector('[name="minutes"]').value = '20';
+    dlg.querySelector('[name="date"]').value = '2026-10-02';
+    dlg.querySelector('[data-k="d-submit"]').click();
+    await flush();
+    expect(fake.calls('log_session')[0]).toEqual({
+      type: 'home_keeper_games/log_session',
+      game_id: outer(),
+      person_id: SAM,
+      platform: 'ps5',
+      minutes: 20,
+      date: '2026-10-02',
+    });
+    expect(host.showToast).toHaveBeenCalledWith('Session logged.');
+  });
+
+  it('shows the error of list_sessions and a person with no play time', async () => {
+    await mount('/playlog;person=nobody', { replies: { list_sessions: () => Promise.reject(new Error('boom')) } });
+    expect($('[data-k="lp-alex"]').getAttribute('aria-pressed')).toBe('true');
+    expect(text()).toContain('boom');
+    el.remove();
+    const state = fixture();
+    for (const g of state.games) delete g.progress.jo;
+    await mount('/playlog;person=jo', { state, replies: { list_sessions: { sessions: [] } } });
+    expect(text()).toContain('No play time yet.');
+  });
+});

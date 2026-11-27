@@ -331,7 +331,32 @@ button { font: inherit; color: inherit; }
 .hkl-checklist { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; }
 
 /* Phone layout */
+/* Play log */
+.hkl-people { display: flex; flex-wrap: wrap; gap: 8px; }
+.hkl-people .hkl-navchip { padding-left: 6px; }
+.hkl-log { display: flex; flex-direction: column; }
+.hkl-logrow { border-bottom: 1px solid var(--hkl-divider); }
+.hkl-logrow.open { background: var(--hkl-tonal); }
+.hkl-logrow-head { width: 100%; display: grid; grid-template-columns: 40px minmax(0, 1fr) 96px 104px 96px 112px 24px; gap: 12px; align-items: center; padding: 10px 4px; border: none; background: none; color: var(--hkl-text); font: inherit; text-align: left; cursor: pointer; }
+.hkl-logrow-head:focus-visible { outline: 2px solid var(--hkl-primary); outline-offset: -2px; }
+.hkl-log-time { font-weight: 500; }
+.hkl-chev { width: 8px; height: 8px; border-right: 2px solid var(--hkl-muted); border-bottom: 2px solid var(--hkl-muted); transform: rotate(45deg); justify-self: center; }
+.hkl-logrow.open .hkl-chev { transform: rotate(225deg); }
+.hkl-sessions { padding: 0 8px 10px 56px; display: flex; flex-direction: column; }
+.hkl-session { display: grid; grid-template-columns: 120px 130px 96px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 4px 0; border-bottom: 1px dashed var(--hkl-divider); font-size: 13px; }
+.hkl-session-date, .hkl-session-len { font-weight: 500; }
+.hkl-pill.src { background: var(--hkl-tonal); color: var(--hkl-tonal-ink); }
 @media (max-width: 700px) {
+  .hkl-logrow-head { grid-template-columns: 40px minmax(0, 1fr) auto; grid-template-areas: "c t v" "c p v" "c m v"; row-gap: 2px; }
+  .hkl-logrow-head > :nth-child(1) { grid-area: c; }
+  .hkl-logrow-head > :nth-child(2) { grid-area: t; }
+  .hkl-logrow-head > :nth-child(3) { grid-area: p; }
+  .hkl-logrow-head > :nth-child(4) { grid-area: m; }
+  .hkl-logrow-head > :nth-child(5), .hkl-logrow-head > :nth-child(6) { display: none; }
+  .hkl-logrow-head > :nth-child(7) { grid-area: v; }
+  .hkl-sessions { padding-left: 12px; }
+  .hkl-session { grid-template-columns: minmax(0, 1fr) auto auto; }
+  .hkl-session > :nth-child(2), .hkl-session > :nth-child(4) { display: none; }
   .hkl-root { padding: 8px 0 24px; gap: 12px; }
   .hkl-navrow { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
   .hkl-navrow > .hkl-spacer { display: none; }

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { formatAgo, formatDate, formatMoney, formatNumber, getLanguage, setLanguage, t, tn } from '../src/i18n.ts';
+import { formatAgo, formatDate, formatMoney, formatNumber, formatTime, getLanguage, setLanguage, t, tn } from '../src/i18n.ts';
 import { DEFAULT_LOCALE, LOCALES } from '../src/locales/index.ts';
 
 // Behaviour of the i18n module. The translation gates (parity, leaks, key usage)
@@ -129,5 +129,22 @@ describe('formatters', () => {
     expect(formatAgo(3)).toBe('3 days ago');
     setLanguage('de');
     expect(formatNumber(3890)).toBe('3.890');
+  });
+});
+
+describe('formatTime', () => {
+  afterEach(() => setLanguage('en'));
+
+  it('gives the hour and minute of a time stamp, or nothing', () => {
+    const stamp = '2026-10-03T18:05:00';
+    const local = new Date(stamp);
+    setLanguage('en');
+    expect(formatTime(stamp)).toBe(local.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' }));
+    setLanguage('de');
+    expect(formatTime(stamp)).toBe('18:05');
+    expect(formatTime('')).toBe('');
+    expect(formatTime(null)).toBe('');
+    expect(formatTime(undefined)).toBe('');
+    expect(formatTime('soon')).toBe('');
   });
 });

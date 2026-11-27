@@ -25,7 +25,7 @@ implements:
   - custom_components/home_keeper_games/frontend/src/styles.ts
   - custom_components/home_keeper_games/frontend/src/global.d.ts
 related: [home-keeper-dependency, scan-and-barcode, csv-import-export, people-privilege]
-source_hash: b6458d89f5cf
+source_hash: b2d54d84c713
 ---
 
 # Tab and card
@@ -88,8 +88,7 @@ The Home Keeper panel sets `hass`, `narrow`, `route` and `host` on `home-keeper-
 and the filters, and `utils.buildPath` is the inverse. The host gives the tab only the path and
 drops a `?query`. So the filters are `;key=value` parameters on the last segment, as in
 `/games;q=zelda;status=playing`. `parseRoute` also reads a `?query`, and a parameter wins over it.
-The tab moves only with `host.navigate` and shows notices with `host.showToast`. A loan links to the
-URL of `host.taskLink`, and a click uses `host.openTask` if the host has it.
+Host calls: `navigate`, `showToast`, `taskLink` for a loan task, `openTask` (if any) on a click.
 
 | Path | View | Module |
 |---|---|---|
@@ -97,6 +96,7 @@ URL of `host.taskLink`, and a click uses `host.openTask` if the host has it.
 | `/shelves`, `/shelves/<room_id>` | Rooms and shelves | `tab-shelves.ts` |
 | `/loans;tab=in\|returned` | Loans | `tab-lists.ts` |
 | `/wishlist`, `/settings` | Wishlist, people settings | `tab-lists.ts` |
+| `/playlog;person=<id>` | Play log: the rows of `utils.playLog`, sessions from `list_sessions` | `tab-lists.ts` |
 | `/scan`, `/import` | Scan flow, import | `tab-scan.ts`, `tab-import.ts` |
 
 The game filters are `q`, `status`, `room`, `shelf`, `reader`, `genre`, `owned`, `sort` and `view`.

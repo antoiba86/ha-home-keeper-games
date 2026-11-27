@@ -10,6 +10,7 @@ the tab.
 - A barcode scan into a shelf. A new barcode asks for the title.
 - Copies with a platform, a physical or digital format, and the barcode of the case.
 - [Play progress](#play-progress) for each person on each platform.
+- The [Play log](#play-log) of each person, with each play session.
 - [IGDB game](#igdb-game): correct the IGDB details of a game.
 - A [Telegram blueprint](../automation/telegram.md) that adds a game from a chat.
 - [Play time from a PlayStation console](../automation/playstation.md).
@@ -37,6 +38,23 @@ Completed".
 
 When the status changes to **Completed**, the date of completion is today and the number
 of completions goes up by 1.
+
+## Play log
+
+The **Play log** page of the **Games** tab shows the play time of 1 person. Select the
+person at the top. Each row is 1 game on 1 platform, with the play status, the play
+time, the number of sessions and the last played date. The game played last is first.
+
+Select a row to see its sessions. A console session shows its start and end time, and
+each session shows its source, **PSN** or **Manual**. **Delete** removes a wrong session
+and takes its minutes off the play time. **Log session** adds a session by hand.
+
+![The Play log of Alex with the sessions of Outer Wilds](../../images/playlog-desktop.png)
+
+![The Play log at phone width](../../images/playlog-mobile.png)
+
+A user who is not an admin sees the log of a person who shares the progress, and their
+own log.
 
 ## Home Keeper export
 

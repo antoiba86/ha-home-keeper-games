@@ -42,7 +42,8 @@ a session can be a short time late.
 - **Restart of Home Assistant.** The session ends at the stop, and a new session starts
   after the restart.
 
-Use `home_keeper_games.list_sessions` to see the sessions, and `delete_session` to
-remove a wrong one ([Services and events](services.md#play-sessions)). The events
+The [Play log](../start/work-in-progress.md#play-log) page of the Games tab shows the
+sessions of each person, and **Delete** removes a wrong one. Automations can use
+`list_sessions` and `delete_session` ([Services and events](services.md#play-sessions)). The events
 `home_keeper_games_session_started` and `home_keeper_games_session_logged` fire when a
 session starts and ends.

@@ -17,11 +17,11 @@ import { STYLES } from './styles';
 import { gamesPath, progressTarget, renderGame, renderGames } from './tab-games';
 import { renderDialog, takenByOther, type Dialog, type DialogState } from './tab-dialogs';
 import { renderImport } from './tab-import';
-import { renderLoans, renderSettings, renderWishlist } from './tab-lists';
+import { playLogPerson, renderLoans, renderPlayLog, renderSettings, renderWishlist } from './tab-lists';
 import { cameraBlocked, isBorrowedMode, renderScan, routeShelf } from './tab-scan';
 import { renderShelves } from './tab-shelves';
 import type { ImportState, ScanEntry, UiState, ViewCtx } from './tab-types';
-import type { Candidate, Game, HomeAssistant, ImportSummary, Lib, Platform, PlayStatus, RawState, ScanResult, TabHost } from './types';
+import type { Candidate, Game, HomeAssistant, ImportSummary, Lib, Platform, PlayStatus, RawState, ScanResult, Session, TabHost } from './types';
 import {
   buildIndex,
   buildPath,
@@ -95,6 +95,7 @@ function freshUi(): UiState {
     import: freshImport(null),
     todoEntities: [],
     exportPerson: '',
+    playlog: { person: null, sessions: null, error: '', open: {} },
   };
 }
 
@@ -202,6 +203,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
     if (this._route.view !== 'scan' && this._sheetOpen()) this._closeDialog();
     this._syncScanner();
     if (this._route.view === 'settings') void this._loadTodo();
+    if (this._route.view === 'playlog') void this._loadSessions();
     this._render();
   }
   get route(): { path: string } {
@@ -275,6 +277,7 @@ export class HomeKeeperGamesTab extends HTMLElement {
         try {
           this._setState(await this._api!.getState());
           this._error = '';
+          if (this._route.view === 'playlog') void this._loadSessions(true);
         } catch (err) {
           this._error = errorText(err);
         }
@@ -301,6 +304,34 @@ export class HomeKeeperGamesTab extends HTMLElement {
     } catch {
       this._todoLoaded = false;
     }
+  }
+
+  /**
+   * Read the sessions of the person of the play log with `list_sessions`. The
+   * state has no sessions, so the view reads them again after each change.
+   */
+  private async _loadSessions(force = false): Promise<void> {
+    const ctx = this._ctx();
+    if (!ctx || !this._api) return;
+    const pid = playLogPerson(ctx);
+    const state = this._ui.playlog;
+    if (!force && state.person === pid && (state.sessions !== null || state.error)) return;
+    if (state.person !== pid) state.open = {};
+    state.person = pid;
+    if (!pid) {
+      state.sessions = [];
+      return;
+    }
+    try {
+      const reply = await this._api.call<{ sessions: Session[] }>('list_sessions', { person_id: pid, limit: 500 });
+      if (this._ui.playlog.person !== pid) return;
+      state.sessions = reply.sessions ?? [];
+      state.error = '';
+    } catch (err) {
+      state.sessions = [];
+      state.error = errorText(err);
+    }
+    this._render();
   }
 
   /** Run a command, show a toast, then fetch the state. Returns true if the command worked. */
@@ -367,6 +398,8 @@ export class HomeKeeperGamesTab extends HTMLElement {
         return renderLoans(ctx);
       case 'wishlist':
         return renderWishlist(ctx);
+      case 'playlog':
+        return renderPlayLog(ctx);
       case 'scan':
         return renderScan(ctx);
       case 'settings':
@@ -743,6 +776,19 @@ export class HomeKeeperGamesTab extends HTMLElement {
       case 'return-loan':
         await this._run('return_loan', { loan_id: id }, t('loan.returned_toast'));
         return;
+      case 'playlog-person':
+        this._go(buildPath({ view: 'playlog', query: withQuery(this._route.query, 'person', id) }), true);
+        return;
+      case 'playlog-toggle':
+        this._ui.playlog.open[id] = !this._ui.playlog.open[id];
+        this._render();
+        return;
+      case 'delete-session':
+        this._openDialog({ kind: 'confirm', title: t('dialog.delete_session'), text: t('dialog.delete_session_text'), label: t('action.delete'), command: 'delete_session', fields: { session_id: id } });
+        return;
+      case 'log-session':
+        this._openDialog({ kind: 'log-session', personId: this._ctx() ? playLogPerson(this._ctx()!) : null });
+        return;
       case 'delete-loan':
         this._openDialog({ kind: 'confirm', title: t('dialog.delete_loan'), text: t('dialog.delete_loan_text'), label: t('action.delete'), command: 'delete_loan', fields: { loan_id: id } });
         return;
@@ -1060,6 +1106,17 @@ export class HomeKeeperGamesTab extends HTMLElement {
           for (const copyId of data.getAll('copy')) await api.call('move_copy', { copy_id: String(copyId), shelf_id: shelf });
           break;
         }
+        case 'log-session':
+          if (!str('game_id') || !str('minutes')) throw new Error(t('playlog.need_minutes'));
+          await api.call('log_session', {
+            game_id: str('game_id'),
+            person_id: str('person_id') || undefined,
+            platform: str('platform') || undefined,
+            minutes: Number(str('minutes')),
+            date: str('date') || undefined,
+          });
+          this._toast(t('playlog.logged_toast'));
+          break;
         case 'lend':
           if (!str('copy_id') || !str('party')) throw new Error(t('dialog.need_party'));
           await api.call('lend_game', {
