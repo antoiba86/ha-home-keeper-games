@@ -52,7 +52,7 @@ def test_services_registered(api):
 
 def test_entities_exist(api):
     ids = {s["entity_id"] for s in api.get("/api/states").json()}
-    assert "sensor.home_keeper_games_books" in ids
+    assert "sensor.home_keeper_games_games" in ids
     assert "sensor.home_keeper_games_loans_overdue" in ids
     assert any(i.startswith("todo.home_keeper_games_") for i in ids), sorted(ids)
 
