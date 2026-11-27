@@ -5,6 +5,14 @@ Each change that a user can see is in this file. The format is based on
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). `manifest.json` `version`
 is the single source of truth (see `RELEASE.md`).
 
+## [0.5.0b9] - 2026-11-26
+
+### Changed
+
+- **Game words in the tab.** The tab, the card and the Home Keeper companion list say
+  games in place of books in each language, and a bookcase is now a cabinet. The names
+  and descriptions of the actions still say books.
+
 ## [0.5.0b8] - 2026-11-26
 
 ### Added

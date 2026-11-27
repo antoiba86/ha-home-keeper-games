@@ -1,6 +1,6 @@
 {
   "tab.title": "Juegos",
-  "companion.description": "Libros, estantes, préstamos y estado de lectura.",
+  "companion.description": "Juegos, estantes, préstamos y progreso de juego.",
   "loan_task.name_out": "Recuperar {title} de {party}",
   "loan_task.name_in": "Devolver {title} a {party}",
   "loan_task.completion_prompt": "Completar la tarea devuelve el préstamo."

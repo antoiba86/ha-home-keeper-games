@@ -55,7 +55,7 @@ test.describe('Games tab', { tag: '@responsive' }, () => {
     const state = await adminState();
     const leGuin = state.games.filter((b: { owned: boolean; genres: string[] }) => b.owned && b.genres.includes('Science fiction'));
     await expect(tab.locator('.hkl-tile')).toHaveCount(leGuin.length);
-    await expect(tab.locator('.hkl-summary')).toContainText(`${leGuin.length} books`);
+    await expect(tab.locator('.hkl-summary')).toContainText(`${leGuin.length} games`);
     await tab.locator('[data-k="clear"]').click();
     await expect(page).toHaveURL(/\/home-keeper\/games\/games$/);
   });
@@ -67,7 +67,7 @@ test.describe('Games tab', { tag: '@responsive' }, () => {
     const dialog = tab.locator('.hkl-dialog');
     await dialog.locator('[name="note"]').fill('Back by the trip');
     await dialog.locator('[data-k="d-submit"]').click();
-    await expect(dialog.locator('.hkl-error')).toHaveText('Enter the book and the name of the person.');
+    await expect(dialog.locator('.hkl-error')).toHaveText('Enter the game and the name of the person.');
     await expect(dialog.locator('[name="note"]')).toHaveValue('Back by the trip');
     await expect(dialog.locator('[data-k="d-submit"]')).toBeEnabled();
     await dialog.locator('[data-k="d-cancel"]').click();

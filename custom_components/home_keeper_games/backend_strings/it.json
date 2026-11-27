@@ -1,6 +1,6 @@
 {
   "tab.title": "Giochi",
-  "companion.description": "Libri, scaffali, prestiti e stato di lettura.",
+  "companion.description": "Giochi, scaffali, prestiti e progressi di gioco.",
   "loan_task.name_out": "Riavere {title} da {party}",
   "loan_task.name_in": "Restituire {title} a {party}",
   "loan_task.completion_prompt": "Completare l'attività restituisce il prestito."

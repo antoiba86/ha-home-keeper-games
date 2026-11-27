@@ -1,6 +1,6 @@
 {
   "tab.title": "Spellen",
-  "companion.description": "Boeken, planken, uitleningen en leesstatus.",
+  "companion.description": "Spellen, planken, uitleningen en speelvoortgang.",
   "loan_task.name_out": "{title} terugkrijgen van {party}",
   "loan_task.name_in": "{title} terugbrengen naar {party}",
   "loan_task.completion_prompt": "Het voltooien van de taak sluit de uitlening af."

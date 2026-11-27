@@ -8,13 +8,13 @@ in **Settings → People**. The library acts for the person of the user who sign
 
 | Operation | Admin | Other user |
 |---|---|---|
-| Manage rooms, shelves, books, copies, covers, loans and the wishlist | Yes | No |
+| Manage rooms, shelves, games, copies, covers, loans and the wishlist | Yes | No |
 | Scan, import and export | Yes | No |
 | Set the play progress, rating, play time and review of their own person | Yes | Yes |
 | Set the play progress of another person | Yes | No |
 | Turn **Share progress** on or off, and set the yearly goal, for their own person | Yes | Yes |
 | Select the wishlist to-do list of a person | Yes | No |
-| Read the books, the shelves and the covers | Yes | Yes |
+| Read the games, the shelves and the covers | Yes | Yes |
 
 The Library tab is in the Home Keeper panel, which only admins can open. Other users use
 the [dashboard card](../views/dashboard-card.md), the entities and the services. A user
@@ -25,7 +25,7 @@ with no linked person can read the library, and cannot set a play progress.
 Admins read the whole library. Other users do not read:
 
 - the price, the value and the source of a copy;
-- the name of the person who borrowed or lent a book;
+- the name of the person who borrowed or lent a game;
 - the review of another person;
 - the play progress of a person who turned **Share progress** off.
 
@@ -38,7 +38,7 @@ An admin sets these in the **Settings** page of the Library tab, for each person
 - **Share progress**: other users see the play progress of the person, with no review. It
   is on by default.
 - **Yearly goal**: the number of games to complete this year. The card and a sensor show it.
-- **Wishlist to-do list**: the to-do list that gets the wishlist books with **Buy** set
+- **Wishlist to-do list**: the to-do list that gets the wishlist games with **Buy** set
   ([Work in progress](work-in-progress.md)).
 
 ![The people settings, the currency and the export](../../images/settings-desktop.png)

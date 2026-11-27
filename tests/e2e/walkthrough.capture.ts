@@ -112,7 +112,7 @@ test('record the Library walkthrough', async ({ browser }) => {
     const shelf = state.shelves.find((s: { unit_id: string; name: string }) => s.unit_id === tall.id && s.name === 'Shelf 3');
     // The scan setup opens by its URL, with the shelf picked.
     await openTab(page, `/scan;shelf=${shelf.id}`);
-    await expect(tab.locator('.hkl-scan-head')).toContainText('Scan books');
+    await expect(tab.locator('.hkl-scan-head')).toContainText('Scan games');
     await beat(page);
     await tab.locator('[data-k="m-manual"]').check();
     await expect(tab.locator('[data-k="m-manual"]')).toBeChecked();

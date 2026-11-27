@@ -40,7 +40,7 @@ controls: use the Library tab for those.
 ```yaml
 type: custom:home-keeper-games-card
 person: alice   # optional, the id of a Home Assistant person
-title: Our books  # optional
+title: Our games  # optional
 search: true
 playing: true
 backlog: true

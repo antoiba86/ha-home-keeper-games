@@ -1,6 +1,6 @@
 {
   "tab.title": "Hry",
-  "companion.description": "Knihy, police, výpůjčky a stav čtení.",
+  "companion.description": "Hry, police, výpůjčky a postup hraní.",
   "loan_task.name_out": "Získat zpět {title} od {party}",
   "loan_task.name_in": "Vrátit {title} osobě {party}",
   "loan_task.completion_prompt": "Dokončení úkolu vrátí výpůjčku."
